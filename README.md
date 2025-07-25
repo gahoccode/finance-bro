@@ -123,7 +123,124 @@ finance-bro/
 ├── requirements.txt    # Python dependencies
 ├── pyproject.toml     # Project configuration
 ├── README.md          # Project documentation
+├── Dockerfile         # Docker configuration
+├── docker-compose.yml # Docker Compose configuration
+├── .env.example       # Environment variables template
+├── .dockerignore      # Docker ignore rules
 └── .gitignore         # Git ignore rules
+```
+
+## Docker Deployment
+
+### Quick Start with Docker
+
+#### Using Docker Compose (Recommended)
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/yourusername/finance-bro.git
+cd finance-bro
+```
+
+2. **Set up environment variables:**
+```bash
+cp .env.example .env
+# Edit .env and add your OpenAI API key
+```
+
+3. **Build and run with Docker Compose:**
+```bash
+docker-compose up --build
+```
+
+4. **Access the application:**
+Open your browser and navigate to `http://localhost:8501`
+
+#### Using Docker CLI
+
+1. **Build the Docker image:**
+```bash
+docker build -t finance-bro .
+```
+
+2. **Run the container:**
+```bash
+docker run -p 8501:8501 \
+  -e OPENAI_API_KEY=your_openai_api_key \
+  -v $(pwd)/exports:/app/exports \
+  -v $(pwd)/cache:/app/cache \
+  finance-bro
+```
+
+### Environment Variables
+
+Create a `.env` file based on `.env.example`:
+
+```bash
+# Copy the template
+cp .env.example .env
+
+# Edit .env and add your OpenAI API key
+# Required - Get from https://platform.openai.com/api-keys
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Optional - Usually not needed for local development
+STREAMLIT_SERVER_PORT=8501
+STREAMLIT_SERVER_ADDRESS=0.0.0.0
+LOG_LEVEL=INFO
+```
+
+**Important:** You must set your `OPENAI_API_KEY` in the `.env` file before running Docker. The application won't work without it.
+
+### Docker Commands Reference
+
+```bash
+# Build the image
+docker build -t finance-bro .
+
+# Run in development mode
+docker-compose up
+
+# Run in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop containers
+docker-compose down
+
+# Remove containers and volumes
+docker-compose down -v
+```
+
+### Volume Mounting
+
+The Docker setup includes volume mounting for:
+- `./exports:/app/exports` - Persistent storage for generated charts and exports
+- `./cache:/app/cache` - Persistent cache for faster data loading
+
+### Production Considerations
+
+For production deployment:
+
+1. **Use a reverse proxy** (nginx, traefik) for SSL termination
+2. **Set resource limits** in docker-compose.yml
+3. **Use environment-specific configurations**
+4. **Monitor container health** with the built-in health check
+
+Example production docker-compose.yml additions:
+```yaml
+# Add to services.finance-bro in docker-compose.yml
+deploy:
+  resources:
+    limits:
+      memory: 1G
+      cpus: "1.0"
+  restart_policy:
+    condition: on-failure
+    delay: 5s
+    max_attempts: 3
 ```
 
 ## Dependencies

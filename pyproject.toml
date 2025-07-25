@@ -10,7 +10,7 @@ classifiers = [
 ]
 dependencies = [
     "pandasai==2.4.2",
-    "pandas>=1.5.3,<2.0.0",
+    "pandas==1.5.3",
     "vnstock==3.2.5",
     "openai>=1.61.0",
     "streamlit==1.37.1",
