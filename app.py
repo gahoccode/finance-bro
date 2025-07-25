@@ -494,8 +494,8 @@ st.markdown("---")
 st.markdown(
     """
     <div style='text-align: center; color: #666; padding: 1rem;'>
-        <p>💡 Tip: Use specific questions for better analysis results</p>
-        <p>Built with ❤️ using Streamlit, PandasAI, and Vnstock</p>
+        <p>💡 Tip: Ask specific questions for more insightful analysis results, and customize charts by including any desired settings in your prompt</p>
+        <p>Built with using Streamlit, PandasAI, and Vnstock</p>
     </div>
     """,
     unsafe_allow_html=True
