@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [2025-01-25] Resolved "🤖 Ask Question" button not working issue
 - [2025-01-25] Fixed TypeError: object of type 'PandasConnector' has no len() by reverting to Agent approach
 - [2025-01-25] Fixed multi-index Ratio dataframe processing for better AI analysis
+- [2025-01-25] Fixed inconsistent generated code detection across different response methods
+- [2025-01-25] Improved code visibility by implementing comprehensive code extraction logic
 
 ### Changed
 - [2025-01-25] Moved sample questions from main content area (col3) to sidebar with dropdown menu
@@ -26,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [2025-01-25] Added multi-index column flattening for Ratio dataframe processing
 - [2025-01-25] Added generated code display functionality for all AI responses
 - [2025-01-25] Added expandable "🔍 View Generated Code" containers under AI responses
+- [2025-01-25] Added chart display containers with "📈 View Chart" expandable sections
+- [2025-01-25] Added comprehensive code extraction helper function for better code detection
 
 ### Technical Details
 - **Sample Questions UI**: Converted from expandable buttons in main area to dropdown selection in sidebar
@@ -41,6 +45,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Displays code in expandable containers with syntax highlighting
   - Available for all AI response types: chat input, sidebar questions, quick buttons
   - Provides complete transparency into data analysis process
+- **Chart Display Integration**: Added visual chart containers alongside generated code
+  - Automatic chart detection from PandasAI exports/charts/ directory
+  - Support for multiple chart formats: Plotly, Matplotlib, and image files
+  - Expandable "📈 View Chart" containers positioned under code sections
+- **Code Detection Enhancement**: Implemented robust code extraction system
+  - Created `get_generated_code()` helper function for consistent code access
+  - Tries multiple sources: response object, agent attributes, memory, internal state
+  - Unified code detection across all response methods (chat, sidebar, quick buttons)
+  - Improved reliability from inconsistent "Code generation details not available" messages
 
 ### User Experience Improvements
 - ✅ Sample questions now accessible from sidebar at all times

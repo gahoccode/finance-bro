@@ -11,6 +11,36 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
+# Helper function to extract generated code from PandasAI response/agent
+def get_generated_code(response, agent):
+    """Extract generated code from PandasAI response or agent object"""
+    try:
+        # Try response object first
+        if hasattr(response, 'last_code_executed') and response.last_code_executed:
+            return response.last_code_executed
+        
+        # Try agent object
+        if hasattr(agent, 'last_code_executed') and agent.last_code_executed:
+            return agent.last_code_executed
+            
+        # Try agent's memory or context
+        if hasattr(agent, 'memory') and hasattr(agent.memory, 'get_last_code'):
+            code = agent.memory.get_last_code()
+            if code:
+                return code
+                
+        # Try to find code in agent's internal state
+        for attr_name in ['_last_code_generated', '_code_executed', 'last_code']:
+            if hasattr(agent, attr_name):
+                code = getattr(agent, attr_name)
+                if code and isinstance(code, str) and len(code.strip()) > 5:
+                    return code
+        
+        return "# Code generation details not available"
+        
+    except Exception as e:
+        return f"# Error accessing code: {str(e)}"
+
 # Page configuration
 st.set_page_config(
     page_title="Finance Bro - AI Stock Analysis",
@@ -203,16 +233,8 @@ if 'dataframes' in st.session_state:
             with st.spinner("🤖 Analyzing..."):
                 response = agent.chat(pending_q)
                 
-                # Try to get the generated code from the agent's last code
-                generated_code = ""
-                try:
-                    # Access the last generated code from the agent
-                    if hasattr(agent, 'last_code_generated') and agent.last_code_generated:
-                        generated_code = agent.last_code_generated
-                    elif hasattr(agent, '_last_code_executed') and agent._last_code_executed:
-                        generated_code = agent._last_code_executed
-                except:
-                    generated_code = "# Code generation details not available"
+                # Get the generated code using helper function
+                generated_code = get_generated_code(response, agent)
                 
                 # Try to detect if a chart was generated
                 chart_data = None
@@ -261,16 +283,8 @@ if 'dataframes' in st.session_state:
                 with st.spinner("🤖 Analyzing..."):
                     response = agent.chat(question)
                     
-                    # Try to get the generated code from the response object
-                    generated_code = ""
-                    try:
-                        # Access the last executed code from the response object
-                        if hasattr(response, 'last_code_executed') and response.last_code_executed:
-                            generated_code = response.last_code_executed
-                        else:
-                            generated_code = "# Code generation details not available"
-                    except:
-                        generated_code = "# Code generation details not available"
+                    # Get the generated code using helper function
+                    generated_code = get_generated_code(response, agent)
                     
                     # Add assistant response to chat history with generated code
                     message_data = {"role": "assistant", "content": str(response)}
@@ -291,16 +305,8 @@ if 'dataframes' in st.session_state:
                 with st.spinner("🤖 Analyzing..."):
                     response = agent.chat(question)
                     
-                    # Try to get the generated code from the response object
-                    generated_code = ""
-                    try:
-                        # Access the last executed code from the response object
-                        if hasattr(response, 'last_code_executed') and response.last_code_executed:
-                            generated_code = response.last_code_executed
-                        else:
-                            generated_code = "# Code generation details not available"
-                    except:
-                        generated_code = "# Code generation details not available"
+                    # Get the generated code using helper function
+                    generated_code = get_generated_code(response, agent)
                     
                     # Add assistant response to chat history with generated code
                     message_data = {"role": "assistant", "content": str(response)}
@@ -321,16 +327,8 @@ if 'dataframes' in st.session_state:
                 with st.spinner("🤖 Analyzing..."):
                     response = agent.chat(question)
                     
-                    # Try to get the generated code from the response object
-                    generated_code = ""
-                    try:
-                        # Access the last executed code from the response object
-                        if hasattr(response, 'last_code_executed') and response.last_code_executed:
-                            generated_code = response.last_code_executed
-                        else:
-                            generated_code = "# Code generation details not available"
-                    except:
-                        generated_code = "# Code generation details not available"
+                    # Get the generated code using helper function
+                    generated_code = get_generated_code(response, agent)
                     
                     # Add assistant response to chat history with generated code
                     message_data = {"role": "assistant", "content": str(response)}
@@ -389,16 +387,8 @@ if 'dataframes' in st.session_state:
                     # Display response
                     st.markdown(response)
                     
-                    # Try to get the generated code from the response object
-                    generated_code = ""
-                    try:
-                        # Access the last executed code from the response object
-                        if hasattr(response, 'last_code_executed') and response.last_code_executed:
-                            generated_code = response.last_code_executed
-                        else:
-                            generated_code = "# Code generation details not available"
-                    except:
-                        generated_code = "# Code generation details not available"
+                    # Get the generated code using helper function
+                    generated_code = get_generated_code(response, agent)
                     
                     # Try to detect if a chart was generated
                     chart_data = None
@@ -430,9 +420,10 @@ if 'dataframes' in st.session_state:
                     st.session_state.messages.append(message_data)
                     
                     # Show generated code immediately
-                    if generated_code and generated_code != "# Code generation details not available":
+                    if generated_code:
                         with st.expander("🔍 View Generated Code", expanded=False):
                             st.code(generated_code, language="python")
+
                     
                     # Show chart immediately if available
                     if chart_data:
