@@ -142,7 +142,21 @@ if analyze_button and stock_symbol:
             CashFlow = stock.finance.cash_flow(period=period)
             BalanceSheet = stock.finance.balance_sheet(period=period, lang="en", dropna=True)
             IncomeStatement = stock.finance.income_statement(period=period, lang="en", dropna=True)
-            #Ratio = stock.finance.ratio(period=period, lang="en", dropna=True)
+            
+            # Load and process Ratio data (multi-index columns)
+            Ratio_raw = stock.finance.ratio(period=period, lang="en", dropna=True)
+            
+            # Process multi-index columns by flattening them
+            if isinstance(Ratio_raw.columns, pd.MultiIndex):
+                # Flatten multi-index columns by joining level names with ' - '
+                Ratio = Ratio_raw.copy()
+                Ratio.columns = [' - '.join(col).strip() if col[0] != 'Meta' else col[1] 
+                               for col in Ratio_raw.columns.values]
+                # Clean up column names
+                Ratio.columns = [col.replace('Meta - ', '') for col in Ratio.columns]
+            else:
+                Ratio = Ratio_raw
+            
             dividend_schedule = company.dividends()
             
             # Store dataframes in session state
@@ -150,7 +164,7 @@ if analyze_button and stock_symbol:
                 'CashFlow': CashFlow,
                 'BalanceSheet': BalanceSheet,
                 'IncomeStatement': IncomeStatement,
-                #'Ratios': Ratio,
+                'Ratios': Ratio,
                 'Dividends': dividend_schedule
             }
             
