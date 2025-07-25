@@ -161,14 +161,44 @@ if 'dataframes' in st.session_state:
     with col1:
         if st.button("📈 ROIC Analysis"):
             question = "What is the return on invested capital (ROIC) trend and how does it compare to industry standards?"
+            # Add to chat and generate response
+            st.session_state.messages.append({"role": "user", "content": question})
+            try:
+                with st.spinner("🤖 Analyzing..."):
+                    response = agent.chat(question)
+                    st.session_state.messages.append({"role": "assistant", "content": str(response)})
+            except Exception as e:
+                error_msg = f"❌ Analysis error: {str(e)}"
+                st.session_state.messages.append({"role": "assistant", "content": error_msg})
+            st.rerun()
     
     with col2:
         if st.button("💰 Dividend Yield"):
             question = "Analyze the dividend yield and payout ratio trends over the past years"
+            # Add to chat and generate response
+            st.session_state.messages.append({"role": "user", "content": question})
+            try:
+                with st.spinner("🤖 Analyzing..."):
+                    response = agent.chat(question)
+                    st.session_state.messages.append({"role": "assistant", "content": str(response)})
+            except Exception as e:
+                error_msg = f"❌ Analysis error: {str(e)}"
+                st.session_state.messages.append({"role": "assistant", "content": error_msg})
+            st.rerun()
     
     with col3:
         if st.button("⚖️ Debt Analysis"):
             question = "What is the company's debt-to-equity ratio and debt coverage metrics?"
+            # Add to chat and generate response
+            st.session_state.messages.append({"role": "user", "content": question})
+            try:
+                with st.spinner("🤖 Analyzing..."):
+                    response = agent.chat(question)
+                    st.session_state.messages.append({"role": "assistant", "content": str(response)})
+            except Exception as e:
+                error_msg = f"❌ Analysis error: {str(e)}"
+                st.session_state.messages.append({"role": "assistant", "content": error_msg})
+            st.rerun()
     
     # Chat Interface
     st.subheader("💬 Chat with AI Analyst")
