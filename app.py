@@ -116,7 +116,7 @@ if analyze_button and stock_symbol:
             CashFlow = stock.finance.cash_flow(period=period)
             BalanceSheet = stock.finance.balance_sheet(period=period, lang="en", dropna=True)
             IncomeStatement = stock.finance.income_statement(period=period, lang="en", dropna=True)
-            Ratio = stock.finance.ratio(period=period, lang="en", dropna=True)
+            #Ratio = stock.finance.ratio(period=period, lang="en", dropna=True)
             dividend_schedule = company.dividends()
             
             # Store dataframes in session state
@@ -124,7 +124,7 @@ if analyze_button and stock_symbol:
                 'CashFlow': CashFlow,
                 'BalanceSheet': BalanceSheet,
                 'IncomeStatement': IncomeStatement,
-                'Ratios': Ratio,
+                #'Ratios': Ratio,
                 'Dividends': dividend_schedule
             }
             
