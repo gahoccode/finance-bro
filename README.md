@@ -132,6 +132,33 @@ finance-bro/
 
 ## Docker Deployment
 
+### Using Pre-built Image from GitHub Container Registry
+
+**Pull and run the latest image:**
+```bash
+docker run -p 8501:8501 \
+  -e OPENAI_API_KEY=your_openai_api_key \
+  -v $(pwd)/exports:/app/exports \
+  -v $(pwd)/cache:/app/cache \
+  ghcr.io/tamle/finance-bro:latest
+```
+
+**Or use with docker-compose:**
+```yaml
+services:
+  finance-bro:
+    image: ghcr.io/tamle/finance-bro:latest
+    ports:
+      - "8501:8501"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./exports:/app/exports
+      - ./cache:/app/cache
+    env_file:
+      - .env
+```
+
 ### Quick Start with Docker
 
 #### Using Docker Compose (Recommended)
@@ -241,6 +268,49 @@ deploy:
     condition: on-failure
     delay: 5s
     max_attempts: 3
+```
+
+### Automated Publishing with GitHub Actions
+
+This project includes automated Docker image publishing to GitHub Container Registry (GHCR) via GitHub Actions.
+
+#### How It Works
+
+- **On push to main/master**: Builds and publishes `latest` tag
+- **On version tags** (e.g., `v1.0.0`): Builds and publishes versioned tags
+- **On pull requests**: Builds image for testing (doesn't publish)
+- **Multi-platform**: Builds for both `linux/amd64` and `linux/arm64`
+
+#### Available Image Tags
+
+- `ghcr.io/tamle/finance-bro:latest` - Latest stable version
+- `ghcr.io/tamle/finance-bro:main` - Latest from main branch
+- `ghcr.io/tamle/finance-bro:v1.0.0` - Specific version tags
+
+#### Manual Publishing
+
+To manually publish a new version:
+
+```bash
+# Create and push a version tag
+git tag v1.0.0
+git push origin v1.0.0
+
+# GitHub Actions will automatically build and publish
+```
+
+#### Local Development vs Production
+
+**For local development:**
+```bash
+# Build locally
+docker-compose up --build
+```
+
+**For production deployment:**
+```bash
+# Use pre-built image
+docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/tamle/finance-bro:latest
 ```
 
 ## Dependencies
