@@ -103,6 +103,32 @@ with st.sidebar:
     )
     
     analyze_button = st.button("🔍 Analyze Stock", type="primary", use_container_width=True)
+    
+    # Sample Questions - dropdown menu in sidebar
+    st.markdown("---")
+    st.subheader("💡 Sample Questions")
+    
+    sample_questions = [
+        "What is the return on invested capital (ROIC) trend?",
+        "Analyze the dividend yield and payout ratio trends",
+        "What is the company's debt-to-equity ratio?",
+        "Compare revenue growth across years",
+        "What are the key financial strengths and weaknesses?",
+        "How has cash flow evolved over time?",
+        "What is the company's profitability trend?",
+        "Analyze the balance sheet health indicators"
+    ]
+    
+    selected_question = st.selectbox(
+        "Select a question to analyze:",
+        options=["Choose a question..."] + sample_questions,
+        index=0,
+        key="sample_question_selector"
+    )
+    
+    if selected_question != "Choose a question..." and st.button("🤖 Ask Question", use_container_width=True):
+        # Store the selected question for processing
+        st.session_state.pending_question = selected_question
 
 # Main content area
 if analyze_button and stock_symbol:
@@ -142,17 +168,32 @@ if 'dataframes' in st.session_state:
     # Initialize LLM with OpenAI for pandasai v2.4.2
     llm = OpenAI(api_token=st.session_state.api_key)
     
-    # Use SmartDataframe approach for v2.4.2 to avoid tuple errors
-    from pandasai import SmartDataframe
+    # Use Agent approach with list of dataframes
+    agent = Agent(
+        list(st.session_state.dataframes.values()),
+        config={"llm": llm, "verbose": True}
+    )
     
-    # Create SmartDataframes first
-    smart_dfs = []
-    for name, df in st.session_state.dataframes.items():
-        smart_df = SmartDataframe(df, config={"llm": llm})
-        smart_dfs.append(smart_df)
-    
-    # Use the first SmartDataframe as the main agent
-    agent = smart_dfs[0] if smart_dfs else None
+    # Process any pending sample question from sidebar
+    if 'pending_question' in st.session_state and agent:
+        pending_q = st.session_state.pending_question
+        del st.session_state.pending_question
+        
+        # Add to chat and generate response
+        if 'messages' not in st.session_state:
+            st.session_state.messages = []
+            
+        st.session_state.messages.append({"role": "user", "content": pending_q})
+        
+        try:
+            with st.spinner("🤖 Analyzing..."):
+                response = agent.chat(pending_q)
+                st.session_state.messages.append({"role": "assistant", "content": str(response)})
+        except Exception as e:
+            error_msg = f"❌ Analysis error: {str(e)}"
+            st.session_state.messages.append({"role": "assistant", "content": error_msg})
+        
+        st.rerun()
     
     # Predefined questions
     st.subheader("Quick Questions")
@@ -255,34 +296,8 @@ if 'dataframes' in st.session_state:
                     st.dataframe(df)
     
     with col3:
-        # Sample Questions - always visible
-        with st.expander("💡 Sample Questions"):
-            sample_questions = [
-                "What is the return on invested capital (ROIC) trend?",
-                "Analyze the dividend yield and payout ratio trends",
-                "What is the company's debt-to-equity ratio?",
-                "Compare revenue growth across years",
-                "What are the key financial strengths and weaknesses?",
-                "How has cash flow evolved over time?",
-                "What is the company's profitability trend?",
-                "Analyze the balance sheet health indicators"
-            ]
-            
-            for i, q in enumerate(sample_questions):
-                if st.button(q, key=f"sample_q_{i}", use_container_width=True):
-                    # Add user message to chat history
-                    st.session_state.messages.append({"role": "user", "content": q})
-                    
-                    # Generate AI response immediately
-                    try:
-                        with st.spinner("🤖 Analyzing..."):
-                            response = agent.chat(q)
-                            st.session_state.messages.append({"role": "assistant", "content": str(response)})
-                    except Exception as e:
-                        error_msg = f"❌ Analysis error: {str(e)}"
-                        st.session_state.messages.append({"role": "assistant", "content": error_msg})
-                    
-                    st.rerun()
+        # This column is now empty - sample questions moved to sidebar
+        pass
 
 # Footer
 st.markdown("---")
