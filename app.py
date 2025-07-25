@@ -202,7 +202,23 @@ if 'dataframes' in st.session_state:
         try:
             with st.spinner("🤖 Analyzing..."):
                 response = agent.chat(pending_q)
-                st.session_state.messages.append({"role": "assistant", "content": str(response)})
+                
+                # Try to get the generated code from the agent's last code
+                generated_code = ""
+                try:
+                    # Access the last generated code from the agent
+                    if hasattr(agent, 'last_code_generated') and agent.last_code_generated:
+                        generated_code = agent.last_code_generated
+                    elif hasattr(agent, '_last_code_executed') and agent._last_code_executed:
+                        generated_code = agent._last_code_executed
+                except:
+                    generated_code = "# Code generation details not available"
+                
+                # Add assistant response to chat history with generated code
+                message_data = {"role": "assistant", "content": str(response)}
+                if generated_code:
+                    message_data["generated_code"] = generated_code
+                st.session_state.messages.append(message_data)
         except Exception as e:
             error_msg = f"❌ Analysis error: {str(e)}"
             st.session_state.messages.append({"role": "assistant", "content": error_msg})
@@ -221,7 +237,23 @@ if 'dataframes' in st.session_state:
             try:
                 with st.spinner("🤖 Analyzing..."):
                     response = agent.chat(question)
-                    st.session_state.messages.append({"role": "assistant", "content": str(response)})
+                    
+                    # Try to get the generated code from the response object
+                    generated_code = ""
+                    try:
+                        # Access the last executed code from the response object
+                        if hasattr(response, 'last_code_executed') and response.last_code_executed:
+                            generated_code = response.last_code_executed
+                        else:
+                            generated_code = "# Code generation details not available"
+                    except:
+                        generated_code = "# Code generation details not available"
+                    
+                    # Add assistant response to chat history with generated code
+                    message_data = {"role": "assistant", "content": str(response)}
+                    if generated_code:
+                        message_data["generated_code"] = generated_code
+                    st.session_state.messages.append(message_data)
             except Exception as e:
                 error_msg = f"❌ Analysis error: {str(e)}"
                 st.session_state.messages.append({"role": "assistant", "content": error_msg})
@@ -235,7 +267,23 @@ if 'dataframes' in st.session_state:
             try:
                 with st.spinner("🤖 Analyzing..."):
                     response = agent.chat(question)
-                    st.session_state.messages.append({"role": "assistant", "content": str(response)})
+                    
+                    # Try to get the generated code from the response object
+                    generated_code = ""
+                    try:
+                        # Access the last executed code from the response object
+                        if hasattr(response, 'last_code_executed') and response.last_code_executed:
+                            generated_code = response.last_code_executed
+                        else:
+                            generated_code = "# Code generation details not available"
+                    except:
+                        generated_code = "# Code generation details not available"
+                    
+                    # Add assistant response to chat history with generated code
+                    message_data = {"role": "assistant", "content": str(response)}
+                    if generated_code:
+                        message_data["generated_code"] = generated_code
+                    st.session_state.messages.append(message_data)
             except Exception as e:
                 error_msg = f"❌ Analysis error: {str(e)}"
                 st.session_state.messages.append({"role": "assistant", "content": error_msg})
@@ -249,7 +297,23 @@ if 'dataframes' in st.session_state:
             try:
                 with st.spinner("🤖 Analyzing..."):
                     response = agent.chat(question)
-                    st.session_state.messages.append({"role": "assistant", "content": str(response)})
+                    
+                    # Try to get the generated code from the response object
+                    generated_code = ""
+                    try:
+                        # Access the last executed code from the response object
+                        if hasattr(response, 'last_code_executed') and response.last_code_executed:
+                            generated_code = response.last_code_executed
+                        else:
+                            generated_code = "# Code generation details not available"
+                    except:
+                        generated_code = "# Code generation details not available"
+                    
+                    # Add assistant response to chat history with generated code
+                    message_data = {"role": "assistant", "content": str(response)}
+                    if generated_code:
+                        message_data["generated_code"] = generated_code
+                    st.session_state.messages.append(message_data)
             except Exception as e:
                 error_msg = f"❌ Analysis error: {str(e)}"
                 st.session_state.messages.append({"role": "assistant", "content": error_msg})
@@ -265,9 +329,14 @@ if 'dataframes' in st.session_state:
     # Display chat messages
     chat_container = st.container()
     with chat_container:
-        for message in st.session_state.messages:
+        for i, message in enumerate(st.session_state.messages):
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
+                
+                # Show generated code for assistant messages
+                if message["role"] == "assistant" and "generated_code" in message:
+                    with st.expander("🔍 View Generated Code", expanded=False):
+                        st.code(message["generated_code"], language="python")
     
     # Chat input
     if prompt := st.chat_input("Ask me anything about this stock..."):
@@ -287,8 +356,27 @@ if 'dataframes' in st.session_state:
                     # Display response
                     st.markdown(response)
                     
-                    # Add assistant response to chat history
-                    st.session_state.messages.append({"role": "assistant", "content": str(response)})
+                    # Try to get the generated code from the response object
+                    generated_code = ""
+                    try:
+                        # Access the last executed code from the response object
+                        if hasattr(response, 'last_code_executed') and response.last_code_executed:
+                            generated_code = response.last_code_executed
+                        else:
+                            generated_code = "# Code generation details not available"
+                    except:
+                        generated_code = "# Code generation details not available"
+                    
+                    # Add assistant response to chat history with generated code
+                    message_data = {"role": "assistant", "content": str(response)}
+                    if generated_code:
+                        message_data["generated_code"] = generated_code
+                    st.session_state.messages.append(message_data)
+                    
+                    # Show generated code immediately
+                    if generated_code and generated_code != "# Code generation details not available":
+                        with st.expander("🔍 View Generated Code", expanded=False):
+                            st.code(generated_code, language="python")
                     
             except Exception as e:
                 error_msg = f"❌ Analysis error: {str(e)}"
