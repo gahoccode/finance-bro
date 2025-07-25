@@ -1,0 +1,26 @@
+[project]
+name = "finance-bro"
+version = "0.1.0"
+description = "AI-powered financial analysis tool for Vietnamese stock market"
+requires-python = "==3.10.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pandasai==2.4.2",
+    "pandas>=1.5.3,<2.0.0",
+    "vnstock==3.2.5",
+    "openai>=1.61.0",
+    "streamlit==1.37.1",
+    "python-dotenv==1.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.2",
+    "black==24.4.2",
+    "flake8==7.1.1",
+    "mypy==1.11.1",
+]

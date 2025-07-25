@@ -1,0 +1,156 @@
+# Finance Bro - AI Stock Analysis
+
+🚀 **AI-powered Vietnamese stock market analysis tool** built with Streamlit, PandasAI, and Vnstock.
+
+## Features
+
+- 📊 **Vietnamese Stock Data** - Load financial data using Vnstock (VCI/TCBS sources)
+- 🤖 **AI Chat Interface** - Natural language queries about financial metrics
+- 💬 **Interactive Analysis** - Real-time conversation with AI analyst
+- 📈 **Financial Metrics** - ROIC, debt ratios, dividend yields, cash flow analysis
+- 🔐 **Secure API Key Management** - Environment variables or secure UI input
+
+## Quick Start
+
+### Prerequisites
+
+- Python >= 3.10.11
+- OpenAI API key
+
+### Installation
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/yourusername/finance-bro.git
+cd finance-bro
+```
+
+2. **Install dependencies using uv (recommended):**
+```bash
+uv sync
+```
+
+Or using pip:
+```bash
+pip install -r requirements.txt
+```
+
+3. **Set your OpenAI API key:**
+```bash
+export OPENAI_API_KEY="your-openai-api-key"
+```
+
+4. **Run the application:**
+```bash
+uv run streamlit run app.py
+```
+
+Or:
+```bash
+streamlit run app.py
+```
+
+5. **Open your browser** and navigate to `http://localhost:8501`
+
+## Usage
+
+1. **Configure Stock Settings:**
+   - Enter Vietnamese stock symbol (e.g., "REE", "VIC", "HPG")
+   - Select period (year/quarter)
+   - Choose data source (VCI/TCBS)
+
+2. **Load Data:**
+   - Click "🔍 Analyze Stock" to fetch financial data
+
+3. **Chat with AI:**
+   - Use the chat interface to ask questions about the stock
+   - Try sample questions for quick insights
+   - Ask follow-up questions for deeper analysis
+
+## Example Questions
+
+- "What is the return on invested capital (ROIC) trend?"
+- "Analyze the dividend yield and payout ratio trends"
+- "What is the company's debt-to-equity ratio?"
+- "Compare revenue growth across years"
+- "What are the key financial strengths and weaknesses?"
+
+## ⚠️ Critical: Package Compatibility
+
+**IMPORTANT:** This project uses specific versions of pandas and pandasai that are carefully matched for compatibility. **DO NOT** upgrade these packages independently without testing.
+
+### Why Version Compatibility Matters
+
+- **pandasai v2.4.2** requires **pandas v1.5.3** (not v2.x)
+- **pandasai v3.x** (beta) has breaking changes and schema issues
+- Mismatched versions cause:
+  - `TypeError: sequence item 0: expected str instance, tuple found`
+  - `'DataFrame' object has no attribute 'schema'`
+  - Agent initialization failures
+
+### Tested Compatible Versions
+
+✅ **WORKING COMBINATION:**
+- `pandasai==2.4.2` (stable)
+- `pandas>=1.5.3,<2.0.0` (compatible range)
+- Built-in OpenAI LLM (no separate extension needed)
+
+❌ **AVOID:**
+- `pandasai>=3.0.0` (beta, unstable)
+- `pandas>=2.0.0` (incompatible with pandasai 2.4.2)
+- `pandasai-openai` extension (not needed in v2.4.2)
+
+### If You Need to Upgrade
+
+1. **Test in a separate environment first**
+2. **Check pandasai release notes** for breaking changes
+3. **Update both packages together**, not individually
+4. **Run the app thoroughly** before deploying
+
+## Technology Stack
+
+- **Frontend:** Streamlit
+- **AI Engine:** PandasAI v2.4.2 (stable)
+- **Stock Data:** Vnstock v3.2.5
+- **LLM:** OpenAI GPT models
+- **Data Processing:** Pandas v1.5.3 (compatible with pandasai 2.4.2)
+
+## Project Structure
+
+```
+finance-bro/
+├── app.py              # Main Streamlit application
+├── requirements.txt    # Python dependencies
+├── pyproject.toml     # Project configuration
+├── README.md          # Project documentation
+└── .gitignore         # Git ignore rules
+```
+
+## Dependencies
+
+- `pandasai==2.4.2` - AI-powered data analysis
+- `pandas>=1.5.3,<2.0.0` - Data manipulation
+- `vnstock==3.2.5` - Vietnamese stock data
+- `openai>=1.61.0` - OpenAI API client
+- `streamlit==1.37.1` - Web application framework
+- `python-dotenv==1.0.1` - Environment variable management
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## Support
+
+If you encounter any issues or have questions, please open an issue on GitHub.
+
+---
+
+**Built with ❤️ using Streamlit, PandasAI, and Vnstock**
