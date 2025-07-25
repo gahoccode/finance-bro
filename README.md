@@ -140,14 +140,14 @@ docker run -p 8501:8501 \
   -e OPENAI_API_KEY=your_openai_api_key \
   -v $(pwd)/exports:/app/exports \
   -v $(pwd)/cache:/app/cache \
-  ghcr.io/tamle/finance-bro:latest
+  ghcr.io/gahoccode/finance-bro:latest
 ```
 
 **Or use with docker-compose:**
 ```yaml
 services:
   finance-bro:
-    image: ghcr.io/tamle/finance-bro:latest
+    image: ghcr.io/gahoccode/finance-bro:latest
     ports:
       - "8501:8501"
     environment:
@@ -283,9 +283,9 @@ This project includes automated Docker image publishing to GitHub Container Regi
 
 #### Available Image Tags
 
-- `ghcr.io/tamle/finance-bro:latest` - Latest stable version
-- `ghcr.io/tamle/finance-bro:main` - Latest from main branch
-- `ghcr.io/tamle/finance-bro:v1.0.0` - Specific version tags
+- `ghcr.io/gahoccode/finance-bro:latest` - Latest stable version
+- `ghcr.io/gahoccode/finance-bro:main` - Latest from main branch
+- `ghcr.io/gahoccode/finance-bro:v1.0.0` - Specific version tags
 
 #### Manual Publishing
 
@@ -310,7 +310,7 @@ docker-compose up --build
 **For production deployment:**
 ```bash
 # Use pre-built image
-docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/tamle/finance-bro:latest
+docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/gahoccode/finance-bro:latest
 ```
 
 ## Dependencies
