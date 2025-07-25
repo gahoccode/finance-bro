@@ -305,7 +305,7 @@ requires-dist = [
     { name = "flake8", marker = "extra == 'dev'", specifier = "==7.1.1" },
     { name = "mypy", marker = "extra == 'dev'", specifier = "==1.11.1" },
     { name = "openai", specifier = ">=1.61.0" },
-    { name = "pandas", specifier = ">=1.5.3,<2.0.0" },
+    { name = "pandas", specifier = "==1.5.3" },
     { name = "pandasai", specifier = "==2.4.2" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "==8.3.2" },
     { name = "python-dotenv", specifier = "==1.0.1" },

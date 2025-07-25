@@ -48,31 +48,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS
-st.markdown("""
-    <style>
-    .main-header {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #1f77b4;
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-    .stButton > button {
-        width: 100%;
-        background-color: #1f77b4;
-        color: white;
-        font-weight: bold;
-        border-radius: 5px;
-        border: none;
-        padding: 0.5rem 1rem;
-        transition: background-color 0.3s;
-    }
-    .stButton > button:hover {
-        background-color: #0d5a8f;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# Load custom CSS
+with open('static/style.css') as f:
+    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # Title
 st.markdown('<h1 class="main-header">📈 Finance Bro - AI Stock Analysis</h1>', unsafe_allow_html=True)
