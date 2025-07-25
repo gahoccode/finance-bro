@@ -137,6 +137,12 @@ with st.sidebar:
     if selected_question != "Choose a question..." and st.button("🤖 Ask Question", use_container_width=True):
         # Store the selected question for processing
         st.session_state.pending_question = selected_question
+    
+    # Clear Chat button in sidebar
+    st.markdown("---")
+    if st.button("🗑️ Clear Chat", use_container_width=True, key="sidebar_clear_chat"):
+        st.session_state.messages = []
+        st.rerun()
 
 # Main content area
 if analyze_button and stock_symbol:
@@ -472,21 +478,16 @@ if 'dataframes' in st.session_state:
                 st.session_state.messages.append({"role": "assistant", "content": error_msg})
     
     # Chat controls
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     with col1:
-        if st.button("🗑️ Clear Chat", use_container_width=True):
-            st.session_state.messages = []
-            st.rerun()
-    
-    with col2:
         if st.button("📊 Show Raw Data", use_container_width=True):
             with st.expander("📊 Financial Data"):
                 for name, df in st.session_state.dataframes.items():
                     st.subheader(name)
                     st.dataframe(df)
     
-    with col3:
-        # This column is now empty - sample questions moved to sidebar
+    with col2:
+        # This column can be used for future controls
         pass
 
 # Footer
