@@ -425,12 +425,13 @@ if 'dataframes' in st.session_state:
                 # Show chart only for the latest message to avoid accumulation
                 if "chart_data" in message and i == len(st.session_state.messages) - 1:
                     st.subheader("📊 Analysis Chart")
+                    # Increase chart dimensions by 200px (1000x700)
                     if message["chart_data"]["type"] == "plotly":
-                        st.plotly_chart(message["chart_data"]["figure"], use_container_width=True)
+                        st.plotly_chart(message["chart_data"]["figure"], use_container_width=False, width=1000, height=700)
                     elif message["chart_data"]["type"] == "matplotlib":
                         st.pyplot(message["chart_data"]["figure"])
                     elif message["chart_data"]["type"] == "image":
-                        st.image(message["chart_data"]["path"], use_column_width=True)
+                        st.image(message["chart_data"]["path"], width=1000)
     
     # Chat input
     if prompt := st.chat_input("Ask me anything about this stock..."):
