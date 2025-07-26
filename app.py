@@ -488,34 +488,51 @@ if 'dataframes' in st.session_state:
                     # Transpose financial statements from long to wide format
                     if name in ['CashFlow', 'BalanceSheet', 'IncomeStatement']:
                         try:
-                            # Check if 'yearReport' column exists for proper pivoting
+                            # Create wide format with years as columns
                             if 'yearReport' in df.columns:
-                                # Create wide format with years as columns
-                                # Drop ticker column as it's the same for all rows
-                                df_clean = df.drop('ticker', axis=1)
-                                
-                                # Set yearReport as index and transpose
+                                df_clean = df.drop('ticker', axis=1, errors='ignore')
                                 df_wide = df_clean.set_index('yearReport').T
-                                
-                                # Reset index to make metrics a column
                                 df_wide = df_wide.reset_index()
                                 df_wide = df_wide.rename(columns={'index': 'Metric'})
-                                
-                                # Display the wide format data
                                 st.dataframe(df_wide)
                             else:
-                                # Fallback to original format if no yearReport column
                                 st.dataframe(df)
                         except Exception as e:
                             st.warning(f"Could not transpose {name}: {str(e)}")
                             st.dataframe(df)
+                    
+                    elif name == 'Ratios':
+                        try:
+                            # Handle Ratios dataframe - check structure first
+                            if hasattr(df, 'columns') and len(df.columns) > 0:
+                                # Check if years are already in columns (numeric years)
+                                year_cols = [str(col) for col in df.columns if str(col).isdigit() and len(str(col)) == 4]
+                                
+                                if len(year_cols) > 1:
+                                    # Years are already columns, display as-is
+                                    st.dataframe(df)
+                                elif 'yearReport' in df.columns:
+                                    # Standard long format, transpose to wide
+                                    df_clean = df.drop('ticker', axis=1, errors='ignore')
+                                    df_wide = df_clean.set_index('yearReport').T
+                                    df_wide = df_wide.reset_index()
+                                    df_wide = df_wide.rename(columns={'index': 'Metric'})
+                                    st.dataframe(df_wide)
+                                else:
+                                    # Multi-index or other format, try simple transpose
+                                    df_transposed = df.T
+                                    df_transposed = df_transposed.reset_index()
+                                    df_transposed = df_transposed.rename(columns={'index': 'Metric'})
+                                    st.dataframe(df_transposed)
+                            else:
+                                st.dataframe(df)
+                        except Exception as e:
+                            st.warning(f"Could not transpose {name}: {str(e)}")
+                            st.dataframe(df)
+                    
                     else:
-                        # For non-financial statement data (Ratios, Dividends), display as-is
+                        # For Dividends and other data, display as-is
                         st.dataframe(df)
-    
-    with col2:
-        # This column can be used for future controls
-        pass
 
 # Footer
 st.markdown("---")
