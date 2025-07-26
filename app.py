@@ -43,7 +43,7 @@ def get_generated_code(response, agent):
 
 # Page configuration
 st.set_page_config(
-    page_title="Finance Bro - AI Stock Analysis",
+    page_title="Finance Bro",
     page_icon="📈",
     layout="wide"
 )
@@ -53,7 +53,8 @@ with open('static/style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # Title
-st.markdown('<h1 class="main-header">📈 Finance Bro - AI Stock Analysis</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">📈 Finance Bro</h1>', unsafe_allow_html=True)
+st.markdown('<p style="text-align: center; color: #666; font-size: 1.1rem; margin-top: -0.5rem; margin-bottom: 1rem;">Ask your finance bro about your company\'s financial statements</p>', unsafe_allow_html=True)
 
 # API Key handling
 if 'api_key' not in st.session_state:
@@ -118,10 +119,10 @@ with st.sidebar:
     
     sample_questions = [
         "What is the return on invested capital (ROIC) trend?",
-        "Analyze the dividend yield and payout ratio trends",
+        "Analyze the dividend yield trend",
         "What is the company's debt-to-equity ratio?",
-        "Compare revenue growth across years",
-        "What are the key financial strengths and weaknesses?",
+        "What's 2024 revenue growth?",
+        "What's the ROE in 2024?",
         "How has cash flow evolved over time?",
         "What is the company's profitability trend?",
         "Analyze the balance sheet health indicators"
@@ -143,6 +144,22 @@ with st.sidebar:
     if st.button("🗑️ Clear Chat", use_container_width=True, key="sidebar_clear_chat"):
         st.session_state.messages = []
         st.rerun()
+    
+    st.markdown(
+        """
+        <div style='text-align: center; padding: 0.25rem 0;'>
+            <a href="https://github.com/gahoccode/finance-bro" target="_blank" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;">
+                    <circle cx="12" cy="12" r="9" stroke="#0366d6" stroke-width="1" fill="none"/>
+                    <path d="M12 2C6.477 2 2 6.477 2 12C2 16.418 4.865 20.166 8.839 21.489C9.339 21.582 9.521 21.291 9.521 21.042C9.521 20.82 9.512 20.192 9.508 19.391C6.726 19.924 6.139 17.955 6.139 17.955C5.685 16.812 5.029 16.523 5.029 16.523C4.121 15.938 5.097 15.951 5.097 15.951C6.101 16.023 6.629 16.927 6.629 16.927C7.521 18.445 8.97 17.988 9.546 17.749C9.642 17.131 9.889 16.696 10.167 16.419C7.945 16.137 5.615 15.276 5.615 11.469C5.615 10.365 6.003 9.463 6.649 8.761C6.543 8.48 6.207 7.479 6.749 6.124C6.749 6.124 7.586 5.869 9.499 7.159C10.329 6.921 11.179 6.802 12.029 6.798C12.879 6.802 13.729 6.921 14.559 7.159C16.472 5.869 17.309 6.124 17.309 6.124C17.851 7.479 17.515 8.48 17.409 8.761C18.055 9.463 18.443 10.365 18.443 11.469C18.443 15.286 16.111 16.134 13.883 16.408C14.223 16.748 14.523 17.42 14.523 18.438C14.523 19.849 14.509 20.985 14.509 21.42C14.509 21.769 14.679 22.149 15.179 22.041C19.142 20.709 22 16.972 22 12C22 6.477 17.523 2 12 2Z" fill="#000000"/>
+                </svg>
+                <div style='font-size: 0.8rem; color: #000000; font-weight: 600; line-height: 1;'>Finance Bro</div>
+                <div style='font-size: 0.7rem; color: #000000; line-height: 1;'>by Tam Le</div>
+            </a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 # Check if period has changed and data needs to be reloaded
 period_changed = False
@@ -213,7 +230,7 @@ if (analyze_button and stock_symbol) or (period_changed and 'stock_symbol' in st
 
 # AI Analysis section
 if 'dataframes' in st.session_state:
-    st.header(f"🤖 AI Analysis for {st.session_state.stock_symbol}")
+    st.header(f"Analysis for {st.session_state.stock_symbol}")
     
     # Initialize LLM with OpenAI for pandasai v2.4.2
     llm = OpenAI(api_token=st.session_state.api_key)
@@ -282,7 +299,7 @@ if 'dataframes' in st.session_state:
     
     with col1:
         if st.button("📈 ROIC Analysis"):
-            question = "What is the return on invested capital (ROIC) trend and how does it compare to industry standards?"
+            question = "What is the return on invested capital (ROIC) in 2024?"
             # Add to chat and generate response
             st.session_state.messages.append({"role": "user", "content": question})
             try:
@@ -324,8 +341,8 @@ if 'dataframes' in st.session_state:
             st.rerun()
     
     with col2:
-        if st.button("💰 Dividend Yield"):
-            question = "Analyze the dividend yield and payout ratio trends over the past years"
+        if st.button("💰 Dividend Schedule"):
+            question = "Did the company issue cash dividends in 2024 and what was the exercise date, compare the percentage to last year?"
             # Add to chat and generate response
             st.session_state.messages.append({"role": "user", "content": question})
             try:
@@ -503,7 +520,7 @@ if 'dataframes' in st.session_state:
     # Chat controls
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("📊 Show Raw Data", use_container_width=True):
+        if st.button("📊 Show Table", use_container_width=True):
             with st.expander("📊 Financial Data"):
                 for name, df in st.session_state.dataframes.items():
                     st.subheader(name)
@@ -594,8 +611,8 @@ st.markdown("---")
 st.markdown(
     """
     <div style='text-align: center; color: #666; padding: 1rem;'>
-        <p>💡 Tip: Ask specific questions for more insightful analysis results, and customize charts by including any desired settings in your prompt</p>
-        <p>Built with using Streamlit, PandasAI, and Vnstock</p>
+        <p>💡 Tip: Specify the table you want to analyze for more accurate results and customize charts by including any desired technical settings in your prompt</p>
+        <p>Built with <a href="https://streamlit.io" target="_blank">Streamlit</a>, <a href="https://pandas-ai.com" target="_blank">PandasAI</a>, and <a href="https://github.com/thinh-vu/vnstock" target="_blank">Vnstock</a> by <a href="https://github.com/thinh-vu" target="_blank">Thinh Vu</a></p>
     </div>
     """,
     unsafe_allow_html=True
