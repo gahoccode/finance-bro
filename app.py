@@ -195,28 +195,41 @@ if (analyze_button and stock_symbol) or (period_changed and 'stock_symbol' in st
             
             dividend_schedule = company.dividends()
             
-            # Rename lengthReport to Quarter for quarterly data for better AI query compatibility
-            if period == 'quarter':
-                for df_name, df in [('CashFlow', CashFlow), ('BalanceSheet', BalanceSheet), 
-                                  ('IncomeStatement', IncomeStatement), ('Ratios', Ratio)]:
-                    if 'lengthReport' in df.columns and df['lengthReport'].isin([1, 2, 3, 4]).any():
-                        df = df.rename(columns={'lengthReport': 'Quarter'})
-                    # Update the dataframe in the dictionary
-                    if df_name == 'CashFlow':
-                        CashFlow = df
-                    elif df_name == 'BalanceSheet':
-                        BalanceSheet = df
-                    elif df_name == 'IncomeStatement':
-                        IncomeStatement = df
-                    elif df_name == 'Ratios':
-                        Ratio = df
-            
-            # Store dataframes in session state
-            st.session_state.dataframes = {
+            # Store original dataframes for display (keep original column names)
+            st.session_state.display_dataframes = {
                 'CashFlow': CashFlow,
                 'BalanceSheet': BalanceSheet,
                 'IncomeStatement': IncomeStatement,
                 'Ratios': Ratio,
+                'Dividends': dividend_schedule
+            }
+            
+            # Create copies with renamed columns for PandasAI (better query compatibility)
+            CashFlow_AI = CashFlow.copy()
+            BalanceSheet_AI = BalanceSheet.copy()
+            IncomeStatement_AI = IncomeStatement.copy()
+            Ratio_AI = Ratio.copy()
+            
+            if period == 'quarter':
+                # Rename columns in AI copies for better query compatibility
+                if 'lengthReport' in CashFlow_AI.columns and CashFlow_AI['lengthReport'].isin([1, 2, 3, 4]).any():
+                    CashFlow_AI = CashFlow_AI.rename(columns={'lengthReport': 'Quarter'})
+                
+                if 'lengthReport' in BalanceSheet_AI.columns and BalanceSheet_AI['lengthReport'].isin([1, 2, 3, 4]).any():
+                    BalanceSheet_AI = BalanceSheet_AI.rename(columns={'lengthReport': 'Quarter'})
+                
+                if 'lengthReport' in IncomeStatement_AI.columns and IncomeStatement_AI['lengthReport'].isin([1, 2, 3, 4]).any():
+                    IncomeStatement_AI = IncomeStatement_AI.rename(columns={'lengthReport': 'Quarter'})
+                
+                if 'lengthReport' in Ratio_AI.columns and Ratio_AI['lengthReport'].isin([1, 2, 3, 4]).any():
+                    Ratio_AI = Ratio_AI.rename(columns={'lengthReport': 'Quarter'})
+            
+            # Store AI-optimized dataframes for PandasAI
+            st.session_state.dataframes = {
+                'CashFlow': CashFlow_AI,
+                'BalanceSheet': BalanceSheet_AI,
+                'IncomeStatement': IncomeStatement_AI,
+                'Ratios': Ratio_AI,
                 'Dividends': dividend_schedule
             }
             
@@ -521,54 +534,16 @@ if 'dataframes' in st.session_state:
     col1, col2 = st.columns(2)
     with col1:
         if st.button("📊 Show Table", use_container_width=True):
-            with st.expander("📊 Financial Data"):
-                for name, df in st.session_state.dataframes.items():
-                    st.subheader(name)
-                    
-                    # Transpose financial statements from long to wide format
-                    if name in ['CashFlow', 'BalanceSheet', 'IncomeStatement']:
-                        try:
-                            # Create wide format with years/quarters as columns
-                            if 'yearReport' in df.columns:
-                                df_clean = df.drop('ticker', axis=1, errors='ignore')
-                                
-                                # Handle quarterly vs annual data based on period parameter and actual data content
-                                if ('lengthReport' in df.columns and period == 'quarter' and 
-                                    df['lengthReport'].isin([1, 2, 3, 4]).any()):
-                                    # Rename lengthReport to Quarter for more intuitive AI queries
-                                    df_clean = df_clean.rename(columns={'lengthReport': 'Quarter'})
-                                    # Create unique identifiers for quarters (e.g., "2024-Q1", "2024-Q2")
-                                    df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['Quarter'].astype(str)
-                                    df_wide = df_clean.set_index('period_id').T
-                                    # Drop redundant yearReport and Quarter rows since info is now in column headers
-                                    df_wide = df_wide.drop(['yearReport', 'Quarter'], axis=0, errors='ignore')
-                                else:
-                                    # Annual data - use year only
-                                    df_wide = df_clean.set_index('yearReport').T
-                                    # Drop lengthReport row for annual data since it's not meaningful
-                                    df_wide = df_wide.drop(['lengthReport'], axis=0, errors='ignore')
-                                
-                                df_wide = df_wide.reset_index()
-                                df_wide = df_wide.rename(columns={'index': 'Metric'})
-                                st.dataframe(df_wide)
-                            else:
-                                st.dataframe(df)
-                        except Exception as e:
-                            st.warning(f"Could not transpose {name}: {str(e)}")
-                            st.dataframe(df)
-                    
-                    elif name == 'Ratios':
-                        try:
-                            # Handle Ratios dataframe - check structure first
-                            if hasattr(df, 'columns') and len(df.columns) > 0:
-                                # Check if years are already in columns (numeric years)
-                                year_cols = [str(col) for col in df.columns if str(col).isdigit() and len(str(col)) == 4]
-                                
-                                if len(year_cols) > 1:
-                                    # Years are already columns, display as-is
-                                    st.dataframe(df)
-                                elif 'yearReport' in df.columns:
-                                    # Standard long format, transpose to wide
+            if 'display_dataframes' in st.session_state:
+                with st.expander("📊 Financial Data"):
+                    for name, df in st.session_state.display_dataframes.items():
+                        st.subheader(name)
+                        
+                        # Transpose financial statements from long to wide format
+                        if name in ['CashFlow', 'BalanceSheet', 'IncomeStatement']:
+                            try:
+                                # Create wide format with years/quarters as columns
+                                if 'yearReport' in df.columns:
                                     df_clean = df.drop('ticker', axis=1, errors='ignore')
                                     
                                     # Handle quarterly vs annual data based on period parameter and actual data content
@@ -591,20 +566,61 @@ if 'dataframes' in st.session_state:
                                     df_wide = df_wide.rename(columns={'index': 'Metric'})
                                     st.dataframe(df_wide)
                                 else:
-                                    # Multi-index or other format, try simple transpose
-                                    df_transposed = df.T
-                                    df_transposed = df_transposed.reset_index()
-                                    df_transposed = df_transposed.rename(columns={'index': 'Metric'})
-                                    st.dataframe(df_transposed)
-                            else:
+                                    st.dataframe(df)
+                            except Exception as e:
+                                st.warning(f"Could not transpose {name}: {str(e)}")
                                 st.dataframe(df)
-                        except Exception as e:
-                            st.warning(f"Could not transpose {name}: {str(e)}")
+                        
+                        elif name == 'Ratios':
+                            try:
+                                # Handle Ratios dataframe - check structure first
+                                if hasattr(df, 'columns') and len(df.columns) > 0:
+                                    # Check if years are already in columns (numeric years)
+                                    year_cols = [str(col) for col in df.columns if str(col).isdigit() and len(str(col)) == 4]
+                                    
+                                    if len(year_cols) > 1:
+                                        # Years are already columns, display as-is
+                                        st.dataframe(df)
+                                    elif 'yearReport' in df.columns:
+                                        # Standard long format, transpose to wide
+                                        df_clean = df.drop('ticker', axis=1, errors='ignore')
+                                        
+                                        # Handle quarterly vs annual data based on period parameter and actual data content
+                                        if ('lengthReport' in df.columns and period == 'quarter' and 
+                                            df['lengthReport'].isin([1, 2, 3, 4]).any()):
+                                            # Rename lengthReport to Quarter for more intuitive AI queries
+                                            df_clean = df_clean.rename(columns={'lengthReport': 'Quarter'})
+                                            # Create unique identifiers for quarters (e.g., "2024-Q1", "2024-Q2")
+                                            df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['Quarter'].astype(str)
+                                            df_wide = df_clean.set_index('period_id').T
+                                            # Drop redundant yearReport and Quarter rows since info is now in column headers
+                                            df_wide = df_wide.drop(['yearReport', 'Quarter'], axis=0, errors='ignore')
+                                        else:
+                                            # Annual data - use year only
+                                            df_wide = df_clean.set_index('yearReport').T
+                                            # Drop lengthReport row for annual data since it's not meaningful
+                                            df_wide = df_wide.drop(['lengthReport'], axis=0, errors='ignore')
+                                        
+                                        df_wide = df_wide.reset_index()
+                                        df_wide = df_wide.rename(columns={'index': 'Metric'})
+                                        st.dataframe(df_wide)
+                                    else:
+                                        # Multi-index or other format, try simple transpose
+                                        df_transposed = df.T
+                                        df_transposed = df_transposed.reset_index()
+                                        df_transposed = df_transposed.rename(columns={'index': 'Metric'})
+                                        st.dataframe(df_transposed)
+                                else:
+                                    st.dataframe(df)
+                            except Exception as e:
+                                st.warning(f"Could not transpose {name}: {str(e)}")
+                                st.dataframe(df)
+                        
+                        else:
+                            # For Dividends and other data, display as-is
                             st.dataframe(df)
-                    
-                    else:
-                        # For Dividends and other data, display as-is
-                        st.dataframe(df)
+            else:
+                st.warning("⚠️ No data loaded yet. Please click 'Analyze Stock' first to load financial data.")
 
 # Footer
 st.markdown("---")

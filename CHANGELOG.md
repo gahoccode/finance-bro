@@ -8,6 +8,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- [2025-07-26] **Dataframe Separation for AI Query Optimization**: Fixed PandasAI column detection issues by implementing dual dataframe architecture
+  - **Issue**: PandasAI couldn't properly detect `Quarter` column because dataframes still contained `lengthReport` column names
+  - **Root Cause**: Single dataframe set caused conflict between display formatting needs and AI query requirements
+  - **Solution**: Implemented separate dataframe storage systems:
+    - `st.session_state.display_dataframes`: Original dataframes with `lengthReport` for proper wide format display
+    - `st.session_state.dataframes`: AI-optimized copies with `Quarter` column names for enhanced query compatibility
+  - **AI Query Enhancement**: Renaming `lengthReport` → `Quarter` provides semantic context that enables:
+    - More intuitive natural language queries ("What's Q1 revenue?" vs "What's lengthReport 1 revenue?")
+    - Better AI understanding of temporal relationships between quarters
+    - Improved accuracy in quarterly trend analysis and comparisons
+    - Enhanced contextual awareness for financial period-based calculations
+  - **Display Integrity**: Wide format tables maintain original column structure for proper transposition logic
+  - **Affected Components**: CashFlow, BalanceSheet, IncomeStatement, and Ratios dataframes for quarterly data
+
+- [2025-07-26] **Show Table Button Error Handling**: Fixed AttributeError when clicking "Show Table" before loading data
+  - **Issue**: `AttributeError: st.session_state has no attribute 'display_dataframes'` when no data loaded
+  - **Solution**: Added proper existence checks and user-friendly warning messages
+  - **User Experience**: Clear guidance to load data first before attempting to view tables
+
+- [2025-07-26] **Display Logic Indentation**: Fixed multiple Python indentation errors in table display section
+  - **Issue**: Syntax errors preventing proper code execution in wide format display logic
+  - **Solution**: Corrected indentation throughout the display section for proper code structure
 - [2025-01-25] Fixed sample questions functionality by moving from main content area to sidebar
 - [2025-01-25] Resolved "🤖 Ask Question" button not working issue
 - [2025-01-25] Fixed TypeError: object of type 'PandasConnector' has no len() by reverting to Agent approach
