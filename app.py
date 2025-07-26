@@ -246,7 +246,8 @@ if 'dataframes' in st.session_state:
     st.header(f"Analysis for {st.session_state.stock_symbol}")
     
     # Initialize LLM with OpenAI for pandasai v2.4.2
-    llm = OpenAI(api_token=st.session_state.api_key, model="gpt-4o-mini")
+    model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+    llm = OpenAI(api_token=st.session_state.api_key, model=model)
     
     # Use Agent approach with list of dataframes
     agent = Agent(
