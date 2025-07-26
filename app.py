@@ -423,6 +423,9 @@ if 'dataframes' in st.session_state:
                     elif message["chart_data"]["type"] == "image":
                         st.image(message["chart_data"]["path"], width=1000)
     
+    # User instruction note
+    st.info("💡 **Tip:** When referring to quarters in your questions, use the keyword `lengthReport` instead of 'quarter'. For example: 'Show me the revenue trend by lengthReport'")
+    
     # Chat input
     if prompt := st.chat_input("Ask me anything about this stock..."):
         # Add user message to chat history
