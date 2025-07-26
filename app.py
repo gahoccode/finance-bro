@@ -497,6 +497,8 @@ if 'dataframes' in st.session_state:
                                     # Create unique identifiers for quarters (e.g., "2024-Q1", "2024-Q2")
                                     df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['lengthReport'].astype(str)
                                     df_wide = df_clean.set_index('period_id').T
+                                    # Drop redundant yearReport and lengthReport rows since info is now in column headers
+                                    df_wide = df_wide.drop(['yearReport', 'lengthReport'], axis=0, errors='ignore')
                                 else:
                                     # Annual data - use year only
                                     df_wide = df_clean.set_index('yearReport').T
@@ -529,6 +531,8 @@ if 'dataframes' in st.session_state:
                                         # Create unique identifiers for quarters (e.g., "2024-Q1", "2024-Q2")
                                         df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['lengthReport'].astype(str)
                                         df_wide = df_clean.set_index('period_id').T
+                                        # Drop redundant yearReport and lengthReport rows since info is now in column headers
+                                        df_wide = df_wide.drop(['yearReport', 'lengthReport'], axis=0, errors='ignore')
                                     else:
                                         # Annual data - use year only
                                         df_wide = df_clean.set_index('yearReport').T
