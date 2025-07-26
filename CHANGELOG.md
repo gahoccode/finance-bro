@@ -94,3 +94,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **User Experience**: Cleaner interface without chart accumulation
 - **Implementation**: Charts are displayed only for the latest message in chat history
 - **All Response Types**: Applied to chat input, sidebar questions, and quick buttons
+
+## [2025-07-26] Financial Data Transformation Enhancement
+
+### Added
+- **Data Format Transformation**: Implemented automatic transposition of financial statements from long to wide format
+- **Year Headers**: Financial metrics now display with years as column headers for easier trend analysis
+- **Multi-format Support**: Added handling for different data structures including multi-index columns in Ratios
+- **Smart Detection**: Automatic detection of data structure to apply appropriate transformation
+
+### Technical Implementation
+- **Financial Statements**: CashFlow, BalanceSheet, and IncomeStatement now transpose to wide format
+  - Years promoted from `yearReport` column to column headers
+  - Financial metrics displayed as row labels in "Metric" column
+  - Ticker column dropped as redundant for display purposes
+- **Ratios Handling**: Special processing for multi-index column structure
+  - Detects if years are already in columns vs. need transposition
+  - Handles flattened multi-index columns from Vietnamese financial data
+  - Graceful fallback to original format when transposition fails
+- **Dividends**: Maintained original format as time-series data is more appropriate
+
+### User Experience Improvements
+- **Trend Analysis**: Users can now easily compare financial metrics across years side-by-side
+- **Standard Format**: Wide format aligns with traditional financial statement presentation
+- **Error Handling**: Warning messages displayed if transposition fails for any dataset
+- **Consistent Display**: All financial data follows the same wide format pattern
+
+### Code Changes
+- **Location**: Modified `📊 Show Raw Data` button functionality in app.py lines 483-520
+- **Transformation Logic**: Added robust data structure detection and appropriate transposition methods
+- **Fallback Support**: Maintains original display format when transformation is not possible
+- **Data Integrity**: Preserves all original data while improving presentation format
