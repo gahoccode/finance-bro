@@ -178,6 +178,22 @@ if (analyze_button and stock_symbol) or (period_changed and 'stock_symbol' in st
             
             dividend_schedule = company.dividends()
             
+            # Rename lengthReport to Quarter for quarterly data for better AI query compatibility
+            if period == 'quarter':
+                for df_name, df in [('CashFlow', CashFlow), ('BalanceSheet', BalanceSheet), 
+                                  ('IncomeStatement', IncomeStatement), ('Ratios', Ratio)]:
+                    if 'lengthReport' in df.columns and df['lengthReport'].isin([1, 2, 3, 4]).any():
+                        df = df.rename(columns={'lengthReport': 'Quarter'})
+                    # Update the dataframe in the dictionary
+                    if df_name == 'CashFlow':
+                        CashFlow = df
+                    elif df_name == 'BalanceSheet':
+                        BalanceSheet = df
+                    elif df_name == 'IncomeStatement':
+                        IncomeStatement = df
+                    elif df_name == 'Ratios':
+                        Ratio = df
+            
             # Store dataframes in session state
             st.session_state.dataframes = {
                 'CashFlow': CashFlow,
@@ -423,9 +439,7 @@ if 'dataframes' in st.session_state:
                     elif message["chart_data"]["type"] == "image":
                         st.image(message["chart_data"]["path"], width=1000)
     
-    # User instruction note
-    st.info("💡 **Tip:** When referring to quarters in your questions, use the keyword `lengthReport` instead of 'quarter'. For example: 'Show me the revenue trend by lengthReport'")
-    
+        
     # Chat input
     if prompt := st.chat_input("Ask me anything about this stock..."):
         # Add user message to chat history
@@ -504,11 +518,13 @@ if 'dataframes' in st.session_state:
                                 # Handle quarterly vs annual data based on period parameter and actual data content
                                 if ('lengthReport' in df.columns and period == 'quarter' and 
                                     df['lengthReport'].isin([1, 2, 3, 4]).any()):
+                                    # Rename lengthReport to Quarter for more intuitive AI queries
+                                    df_clean = df_clean.rename(columns={'lengthReport': 'Quarter'})
                                     # Create unique identifiers for quarters (e.g., "2024-Q1", "2024-Q2")
-                                    df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['lengthReport'].astype(str)
+                                    df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['Quarter'].astype(str)
                                     df_wide = df_clean.set_index('period_id').T
-                                    # Drop redundant yearReport and lengthReport rows since info is now in column headers
-                                    df_wide = df_wide.drop(['yearReport', 'lengthReport'], axis=0, errors='ignore')
+                                    # Drop redundant yearReport and Quarter rows since info is now in column headers
+                                    df_wide = df_wide.drop(['yearReport', 'Quarter'], axis=0, errors='ignore')
                                 else:
                                     # Annual data - use year only
                                     df_wide = df_clean.set_index('yearReport').T
@@ -541,11 +557,13 @@ if 'dataframes' in st.session_state:
                                     # Handle quarterly vs annual data based on period parameter and actual data content
                                     if ('lengthReport' in df.columns and period == 'quarter' and 
                                         df['lengthReport'].isin([1, 2, 3, 4]).any()):
+                                        # Rename lengthReport to Quarter for more intuitive AI queries
+                                        df_clean = df_clean.rename(columns={'lengthReport': 'Quarter'})
                                         # Create unique identifiers for quarters (e.g., "2024-Q1", "2024-Q2")
-                                        df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['lengthReport'].astype(str)
+                                        df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['Quarter'].astype(str)
                                         df_wide = df_clean.set_index('period_id').T
-                                        # Drop redundant yearReport and lengthReport rows since info is now in column headers
-                                        df_wide = df_wide.drop(['yearReport', 'lengthReport'], axis=0, errors='ignore')
+                                        # Drop redundant yearReport and Quarter rows since info is now in column headers
+                                        df_wide = df_wide.drop(['yearReport', 'Quarter'], axis=0, errors='ignore')
                                     else:
                                         # Annual data - use year only
                                         df_wide = df_clean.set_index('yearReport').T
