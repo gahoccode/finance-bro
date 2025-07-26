@@ -144,8 +144,13 @@ with st.sidebar:
         st.session_state.messages = []
         st.rerun()
 
+# Check if period has changed and data needs to be reloaded
+period_changed = False
+if 'last_period' in st.session_state and st.session_state.last_period != period:
+    period_changed = True
+
 # Main content area
-if analyze_button and stock_symbol:
+if (analyze_button and stock_symbol) or (period_changed and 'stock_symbol' in st.session_state):
     try:
         with st.spinner(f"📊 Loading data for {stock_symbol}..."):
             # Initialize Vnstock
@@ -183,6 +188,7 @@ if analyze_button and stock_symbol:
             }
             
             st.session_state.stock_symbol = stock_symbol
+            st.session_state.last_period = period  # Store current period to detect changes
             st.success(f"✅ Successfully loaded data for {stock_symbol}")
     
     except Exception as e:
@@ -492,8 +498,9 @@ if 'dataframes' in st.session_state:
                             if 'yearReport' in df.columns:
                                 df_clean = df.drop('ticker', axis=1, errors='ignore')
                                 
-                                # Handle quarterly data by combining year and quarter
-                                if 'lengthReport' in df.columns:
+                                # Handle quarterly vs annual data based on period parameter and actual data content
+                                if ('lengthReport' in df.columns and period == 'quarter' and 
+                                    df['lengthReport'].isin([1, 2, 3, 4]).any()):
                                     # Create unique identifiers for quarters (e.g., "2024-Q1", "2024-Q2")
                                     df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['lengthReport'].astype(str)
                                     df_wide = df_clean.set_index('period_id').T
@@ -502,6 +509,8 @@ if 'dataframes' in st.session_state:
                                 else:
                                     # Annual data - use year only
                                     df_wide = df_clean.set_index('yearReport').T
+                                    # Drop lengthReport row for annual data since it's not meaningful
+                                    df_wide = df_wide.drop(['lengthReport'], axis=0, errors='ignore')
                                 
                                 df_wide = df_wide.reset_index()
                                 df_wide = df_wide.rename(columns={'index': 'Metric'})
@@ -526,8 +535,9 @@ if 'dataframes' in st.session_state:
                                     # Standard long format, transpose to wide
                                     df_clean = df.drop('ticker', axis=1, errors='ignore')
                                     
-                                    # Handle quarterly data by combining year and quarter
-                                    if 'lengthReport' in df.columns:
+                                    # Handle quarterly vs annual data based on period parameter and actual data content
+                                    if ('lengthReport' in df.columns and period == 'quarter' and 
+                                        df['lengthReport'].isin([1, 2, 3, 4]).any()):
                                         # Create unique identifiers for quarters (e.g., "2024-Q1", "2024-Q2")
                                         df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['lengthReport'].astype(str)
                                         df_wide = df_clean.set_index('period_id').T
@@ -536,6 +546,8 @@ if 'dataframes' in st.session_state:
                                     else:
                                         # Annual data - use year only
                                         df_wide = df_clean.set_index('yearReport').T
+                                        # Drop lengthReport row for annual data since it's not meaningful
+                                        df_wide = df_wide.drop(['lengthReport'], axis=0, errors='ignore')
                                     
                                     df_wide = df_wide.reset_index()
                                     df_wide = df_wide.rename(columns={'index': 'Metric'})

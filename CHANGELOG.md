@@ -104,6 +104,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Solution: Combined `yearReport` and `lengthReport` to create unique quarterly identifiers (2024-Q1, 2024-Q2, etc.)
   - Affected: CashFlow, BalanceSheet, IncomeStatement, and Ratios dataframes
 
+- [2025-07-26] **Period Parameter Handling**: Fixed dataframes not respecting user's period selection
+  - Issue: Ratios dataframe showed quarterly headers even when period="year" was selected
+  - Root Cause: Logic only checked for `lengthReport` column existence, not the actual period parameter
+  - Solution: Added period parameter validation in transposition logic
+  - Applied to: All financial dataframes (CashFlow, BalanceSheet, IncomeStatement, Ratios)
+
+- [2025-07-26] **Automatic Data Reloading**: Implemented automatic data refresh when period changes
+  - Issue: Changing period dropdown didn't reload data, causing stale data display
+  - Root Cause: Data only loaded on "Analyze Stock" button click, not on period changes
+  - Solution: Added period change detection with automatic data reloading
+  - Benefit: Users no longer need to click "Analyze Stock" after changing period
+
+- [2025-07-26] **Redundant Row Cleanup**: Removed meaningless rows from annual data display
+  - Issue: `lengthReport` row showing value "5" when period="year" was confusing
+  - Root Cause: API returns `lengthReport` column even for annual data
+  - Solution: Drop `lengthReport` row for annual data since it's not meaningful
+  - Applied to: Both financial statements and Ratios dataframes
+
 ### Added
 - **Data Format Transformation**: Implemented automatic transposition of financial statements from long to wide format
 - **Year Headers**: Financial metrics now display with years as column headers for easier trend analysis
