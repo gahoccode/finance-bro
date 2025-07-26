@@ -97,9 +97,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2025-07-26] Financial Data Transformation Enhancement
 
+### Fixed
+- [2025-07-26] **Quarterly Data Transposition**: Fixed duplicate column names error when displaying quarterly financial data
+  - Issue: When period="quarter" was selected, transposition failed with "Duplicate column names found" error
+  - Root Cause: Only using `yearReport` as index created duplicates (2024, 2024, 2024, 2024 for Q1-Q4)
+  - Solution: Combined `yearReport` and `lengthReport` to create unique quarterly identifiers (2024-Q1, 2024-Q2, etc.)
+  - Affected: CashFlow, BalanceSheet, IncomeStatement, and Ratios dataframes
+
 ### Added
 - **Data Format Transformation**: Implemented automatic transposition of financial statements from long to wide format
 - **Year Headers**: Financial metrics now display with years as column headers for easier trend analysis
+- **Quarterly Support**: Added proper handling for quarterly data with quarter identifiers in column headers
 - **Multi-format Support**: Added handling for different data structures including multi-index columns in Ratios
 - **Smart Detection**: Automatic detection of data structure to apply appropriate transformation
 

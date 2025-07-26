@@ -488,10 +488,19 @@ if 'dataframes' in st.session_state:
                     # Transpose financial statements from long to wide format
                     if name in ['CashFlow', 'BalanceSheet', 'IncomeStatement']:
                         try:
-                            # Create wide format with years as columns
+                            # Create wide format with years/quarters as columns
                             if 'yearReport' in df.columns:
                                 df_clean = df.drop('ticker', axis=1, errors='ignore')
-                                df_wide = df_clean.set_index('yearReport').T
+                                
+                                # Handle quarterly data by combining year and quarter
+                                if 'lengthReport' in df.columns:
+                                    # Create unique identifiers for quarters (e.g., "2024-Q1", "2024-Q2")
+                                    df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['lengthReport'].astype(str)
+                                    df_wide = df_clean.set_index('period_id').T
+                                else:
+                                    # Annual data - use year only
+                                    df_wide = df_clean.set_index('yearReport').T
+                                
                                 df_wide = df_wide.reset_index()
                                 df_wide = df_wide.rename(columns={'index': 'Metric'})
                                 st.dataframe(df_wide)
@@ -514,7 +523,16 @@ if 'dataframes' in st.session_state:
                                 elif 'yearReport' in df.columns:
                                     # Standard long format, transpose to wide
                                     df_clean = df.drop('ticker', axis=1, errors='ignore')
-                                    df_wide = df_clean.set_index('yearReport').T
+                                    
+                                    # Handle quarterly data by combining year and quarter
+                                    if 'lengthReport' in df.columns:
+                                        # Create unique identifiers for quarters (e.g., "2024-Q1", "2024-Q2")
+                                        df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['lengthReport'].astype(str)
+                                        df_wide = df_clean.set_index('period_id').T
+                                    else:
+                                        # Annual data - use year only
+                                        df_wide = df_clean.set_index('yearReport').T
+                                    
                                     df_wide = df_wide.reset_index()
                                     df_wide = df_wide.rename(columns={'index': 'Metric'})
                                     st.dataframe(df_wide)
