@@ -115,6 +115,28 @@ streamlit run app.py
 - **LLM:** OpenAI GPT models
 - **Data Processing:** Pandas v1.5.3 (compatible with pandasai 2.4.2)
 
+## Future Refactor: PandasAI 3.x Migration
+
+### Target Dependencies (PandasAI 3.x)
+For future migration to PandasAI 3.x, the following dependencies will be required:
+
+```toml
+dependencies = [
+    "numpy>=1.26.4",
+    "pandasai>=3.0.0b2",
+    "pandasai-openai>=0.1.6",
+    "streamlit>=1.47.1",
+    "vnstock>=3.2.6",
+]
+```
+
+### Migration Considerations
+- **Breaking Changes**: PandasAI 3.x has significant API changes from 2.x
+- **Schema Changes**: New dataframe schema handling required
+- **Extension System**: Separate pandasai-openai package needed
+- **Testing Required**: Full regression testing needed before migration
+- **Compatibility**: Verify vnstock integration with new pandas versions
+
 ## Project Structure
 
 ```
