@@ -15,6 +15,7 @@ dependencies = [
     "openai>=1.61.0",
     "streamlit==1.37.1",
     "python-dotenv==1.0.1",
+    "mplfinance>=0.12.10b0",
 ]
 
 [project.optional-dependencies]
