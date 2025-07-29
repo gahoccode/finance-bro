@@ -21,12 +21,3 @@ stock = Vnstock().stock(symbol=stock_symbol, source='VCI')
 company_info = stock.company
 ownership_percentage = company_info.shareholders()
 print(ownership_percentage)
-
-
-
-events = stock.company.events()
-print(events)
-
-news = stock.company.news()
-print(news)
-
