@@ -1,0 +1,14 @@
+Use context7 to get the latest docs on: 
+- Streamlit multipages web app
+- st.navigation and position = top
+- St.Page
+
+Action:
+- Refactor @app.py
+- Integrate ./pages to @app.py
+- Retain existing feature. 
+
+Rules: 
+- Do not add more pages to the navigation menu unless you're told to do so. 
+- Do not remove any existing feature from @app.py
+- Discuss if you need to remove any existing feature from @app.py by calling mcp_feedback_enhanced mcp server

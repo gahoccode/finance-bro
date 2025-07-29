@@ -1,0 +1,46 @@
+Use context7 to get the latest docs on: 
+- Streamlit multipages web app
+- Streamlit session state
+- st.navigation and position = top
+- St.Page
+
+Action:
+- Refactor @app.py
+- Integrate ./pages to @app.py
+- Retain existing feature. 
+- Focus on storing stock_symbol to session state
+
+Requirements:
+- Reuse stock_symbol variable from @app.py by storing it in session state so that users can input ticker symbol onces and it will apply for all other pages
+
+Goal:
+- Sucessfully resuse stock_symbol for all pages without breaking existing feature of the main app which is the entry point file
+
+Rules: 
+- Do not add more pages to the navigation menu unless you're told to do so. 
+- Do not remove any existing feature from the main entry point file. 
+
+Technical example:
+- pages = {
+    "Home": [
+        st.Page(main_page, title="📈 Finance Bro", icon="🏠"),
+    ],
+    "Analysis": [
+        st.Page("pages/stock_price_streamlit.py", title="Stock Price Analysis", icon="📊"),
+        st.Page("pages/company_profile_streamlit.py", title="Company Profile", icon="🏢"),
+    ]
+}   
+
+# Set up navigation at the top
+pg = st.navigation(pages, position="top")
+pg.run()
+
+
+# Get stock symbol from session state (set in main app)
+# If not available, show message to use main app first
+if 'stock_symbol' in st.session_state and st.session_state.stock_symbol:
+    ticker = st.session_state.stock_symbol
+    st.info(f"📊 Analyzing stock: **{ticker}** (from main app)")
+else:
+    st.warning("⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first.")
+    st.stop()
