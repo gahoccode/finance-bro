@@ -1,4 +1,5 @@
 import os
+import glob
 import streamlit as st
 import pandas as pd
 from vnstock import Vnstock
@@ -7,7 +8,6 @@ import warnings
 # pandasai v2.4.2 imports
 from pandasai import Agent
 from pandasai.llm import OpenAI
-import warnings
 
 warnings.filterwarnings("ignore")
 
@@ -277,9 +277,6 @@ if 'dataframes' in st.session_state:
                 chart_data = None
                 try:
                     # Check if PandasAI generated a chart/plot
-                    import os
-                    import glob
-                    
                     # Look for recently created chart files in exports/charts/
                     chart_dir = "exports/charts/"
                     if os.path.exists(chart_dir):
@@ -312,7 +309,7 @@ if 'dataframes' in st.session_state:
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        if st.button("📈 ROIC Analysis"):
+        if st.button("ROIC Analysis"):
             question = "What is the return on invested capital (ROIC) in 2024?"
             # Add to chat and generate response
             st.session_state.messages.append({"role": "user", "content": question})
@@ -398,7 +395,7 @@ if 'dataframes' in st.session_state:
             st.rerun()
     
     with col3:
-        if st.button("⚖️ Debt Analysis"):
+        if st.button("Debt Analysis"):
             question = "What is the company's debt-to-equity ratio and debt coverage metrics?"
             # Add to chat and generate response
             st.session_state.messages.append({"role": "user", "content": question})
@@ -496,9 +493,6 @@ if 'dataframes' in st.session_state:
                     chart_data = None
                     try:
                         # Check if PandasAI generated a chart/plot
-                        import os
-                        import glob
-                        
                         # Look for recently created chart files in exports/charts/
                         chart_dir = "exports/charts/"
                         if os.path.exists(chart_dir):
@@ -534,7 +528,7 @@ if 'dataframes' in st.session_state:
     # Chat controls
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("📊 Show Table", use_container_width=True):
+        if st.button("Show Table", use_container_width=True):
             if 'display_dataframes' in st.session_state:
                 with st.expander("📊 Financial Data"):
                     for name, df in st.session_state.display_dataframes.items():
