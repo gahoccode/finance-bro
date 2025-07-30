@@ -48,6 +48,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Technical**: Uses Altair's gradient functionality with linear gradient stops
 
 ### Fixed
+- [2025-07-30] **CSS Loading Order and Consistency**: Fixed StreamlitAPIException by ensuring set_page_config is called before CSS loading
+  - **Issue**: CSS loading was happening before set_page_config, causing Streamlit errors
+  - **Resolution**: Moved CSS loading after set_page_config in all pages (Portfolio_Optimization.py, Company_Overview.py, Stock_Price_Analysis.py)
+  - **Result**: Consistent CSS styling across all pages without errors
+
+### Styling Updates
+- [2025-07-30] **Enhanced Color Scheme and Typography**: Comprehensive styling improvements across the application
+  - **Page Titles**: Changed h1 color to #2B2523 (dark brown) for better visual hierarchy
+  - **Headers**: Updated h2 and h3 colors to #828282 (medium gray) for consistency
+  - **Metric Values**: Changed st.metrics value color to #56524D (dark olive)
+  - **CSS Targeting**: Added specific Streamlit selectors ([data-testid]) for reliable styling
+  - **Cross-Page Consistency**: Ensured all styling applies uniformly across main app and pages
+
+### Fixed
 - [2025-07-26] **Dataframe Separation for AI Query Optimization**: Fixed PandasAI column detection issues by implementing dual dataframe architecture
   - **Issue**: PandasAI couldn't properly detect `Quarter` column because dataframes still contained `lengthReport` column names
   - **Root Cause**: Single dataframe set caused conflict between display formatting needs and AI query requirements

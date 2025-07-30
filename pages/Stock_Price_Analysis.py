@@ -9,8 +9,13 @@ from bokeh.models import ColumnDataSource, HoverTool
 from bokeh.transform import factor_cmap
 from bokeh.palettes import Spectral6
 import altair as alt
+import os
 
-st.set_page_config(page_title="Stock Price Analysis", page_icon="📈")
+st.set_page_config(page_title="Stock Price Analysis", page_icon="📈", layout="wide")
+
+# Load custom CSS
+with open('static/style.css') as f:
+    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 st.title("📈 Stock Price Analysis")
 

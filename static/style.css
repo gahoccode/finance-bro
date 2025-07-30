@@ -1,24 +1,80 @@
 /* Finance Bro - AI Stock Analysis Styles */
 
+/* Main background and body styling */
+body {
+    background-color: #F8F8F8;
+    color: #333333;
+}
+
+.main {
+    background-color: #F8F8F8;
+}
+
 /* Main header styling */
 .main-header {
     font-size: 2.5rem;
     font-weight: bold;
-    color: #000000;
+    color: #2B2523;
     text-align: center;
     margin-bottom: 2rem;
+}
+
+/* Headers styling */
+h2 {
+    color: #828282;
+}
+
+h3 {
+    color: #828282;
 }
 
 /* Button styling */
 .stButton > button {
     width: 100%;
-    background-color: #000000;
+    background-color: #0B0B0B;
     color: white;
     font-weight: bold;
     border-radius: 5px;
     border: none;
     padding: 0.5rem 1rem;
     transition: background-color 0.3s;
+}
+
+
+/* Input fields and select boxes styling */
+.stTextInput > div > input,
+.stNumberInput > div > input,
+.stTextArea > div > textarea,
+.stSelectbox > div > div,
+.stMultiselect > div > div,
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+    border: 1px solid #434343;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+}
+
+.stTextInput > div > input:focus,
+.stNumberInput > div > input:focus,
+.stTextArea > div > textarea:focus,
+.stSelectbox > div > div:focus,
+.stMultiselect > div > div:focus,
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #56524D;
+    box-shadow: 0 0 0 1px #56524D;
+    outline: none;
+}
+
+/* Symbol input field specific styling */
+[data-testid="stTextInput"] input,
+[data-testid="stTextInput-Input"] {
+    border: 1px solid #434343;
+    border-radius: 4px;
 }
 
 .stButton > button:hover {
@@ -40,7 +96,7 @@
 
 /* Sidebar styling */
 .css-1d391kg {
-    background-color: #f8f9fa;
+    background-color: #E4E4E4;
 }
 
 /* Footer styling */
@@ -53,13 +109,23 @@
 
 /* Dataframe styling */
 .stDataFrame {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #434343;
     border-radius: 5px;
 }
 
 /* Expander styling */
 .st-expander {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #434343;
     border-radius: 5px;
     margin-bottom: 1rem;
+}
+
+/* Streamlit metrics styling */
+[data-testid="stMetricValue"] {
+    color: #56524D !important;
+}
+
+/* Alternative metric selectors */
+.stMetric > div > div > div:first-child {
+    color: #56524D !important;
 }

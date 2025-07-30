@@ -44,7 +44,7 @@ def get_generated_code(response, agent):
 # Page configuration
 st.set_page_config(
     page_title="Finance Bro",
-    page_icon="📈",
+    #page_icon="",
     layout="wide"
 )
 
