@@ -1,10 +1,31 @@
 import streamlit as st
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
+import altair as alt
 from vnstock import Company, Vnstock
 import warnings
 warnings.filterwarnings('ignore')
+
+# Cache data to reduce API calls
+@st.cache_data(ttl=3600)  # Cache for 1 hour
+def get_ownership_data(symbol):
+    """Get ownership data with caching"""
+    try:
+        stock = Vnstock().stock(symbol=symbol, source='VCI')
+        company_info = stock.company
+        return company_info.shareholders()
+    except Exception as e:
+        st.error(f"Error fetching ownership data: {str(e)}")
+        return pd.DataFrame()
+
+@st.cache_data(ttl=3600)  # Cache for 1 hour
+def get_management_data(symbol):
+    """Get management data with caching"""
+    try:
+        company = Company(symbol=symbol)
+        return company.officers(lang='en')
+    except Exception as e:
+        st.error(f"Error fetching management data: {str(e)}")
+        return pd.DataFrame()
 
 # Set page configuration
 st.set_page_config(
@@ -22,10 +43,8 @@ stock_symbol = st.text_input("Enter Stock Symbol (e.g., REE, VIC, VNM):", value=
 
 if stock_symbol:
     try:
-        # Get ownership data first (to display at top)
-        stock = Vnstock().stock(symbol=stock_symbol, source='VCI')
-        company_info = stock.company
-        ownership_percentage = company_info.shareholders()
+        # Get cached ownership data
+        ownership_percentage = get_ownership_data(stock_symbol)
         
         if not ownership_percentage.empty:
             # Display ownership chart and metrics at the top
@@ -35,38 +54,50 @@ if stock_symbol:
             col_chart, col_summary = st.columns([3, 1])
             
             with col_chart:
-                # Create horizontal bar chart
-                fig, ax = plt.subplots(figsize=(12, 8))
+                # Sort by quantity for better visualization
+                ownership_sorted = ownership_percentage.sort_values('quantity', ascending=True)
                 
-                # Sort by ownership percentage for better visualization
-                ownership_sorted = ownership_percentage.sort_values('share_own_percent', ascending=True)
-                
-                # Create horizontal bar chart
-                sns.barplot(
-                    data=ownership_sorted,
-                    y='share_holder',
-                    x='share_own_percent',
-                    palette='viridis',
-                    ax=ax
+                # Create base chart with quantity as x-axis
+                base = alt.Chart(ownership_sorted).encode(
+                    y=alt.Y('share_holder:N', title='Shareholder', sort='-x'),
+                    x=alt.X('quantity:Q', title='Number of Shares')
                 )
                 
-                # Customize the plot
-                ax.set_xlabel('Ownership Percentage (%)', fontsize=12)
-                ax.set_ylabel('Shareholder', fontsize=12)
-                ax.set_title(f'Ownership Distribution - {stock_symbol}', fontsize=14, fontweight='bold')
+                # Create bar chart
+                bars = base.mark_bar(color='black').encode(
+                    tooltip=[
+                        alt.Tooltip('share_holder:N', title='Shareholder'),
+                        alt.Tooltip('quantity:Q', title='Shares', format=',.0f'),
+                        alt.Tooltip('share_own_percent:Q', title='Ownership %', format='.1f')
+                    ]
+                )
                 
-                # Add percentage labels on bars
-                for i, (idx, row) in enumerate(ownership_sorted.iterrows()):
-                    ax.text(
-                        row['share_own_percent'] + 0.5,
-                        i,
-                        f'{row["share_own_percent"]:.1f}%',
-                        va='center',
-                        fontsize=10
-                    )
+                # Create text labels for share_own_percent
+                text = base.mark_text(
+                    align='left',
+                    baseline='middle',
+                    dx=3,  # Nudge text to right of bars
+                    fontSize=10
+                ).encode(
+                    x=alt.X('quantity:Q'),
+                    text=alt.Text('share_own_percent:Q', format='.1f%')
+                )
                 
-                plt.tight_layout()
-                st.pyplot(fig)
+                # Combine chart and text labels
+                final_chart = (bars + text).properties(
+                    title=f'Ownership by Share Quantity - {stock_symbol}',
+                    width=600,
+                    height=400
+                ).configure_axis(
+                    labelFontSize=10,
+                    titleFontSize=12
+                ).configure_title(
+                    fontSize=14,
+                    fontWeight='bold'
+                )
+                
+                # Display the chart
+                st.altair_chart(final_chart, use_container_width=True)
             
             with col_summary:
                 st.subheader("📊 Summary")
@@ -87,9 +118,8 @@ if stock_symbol:
         with tab1:
             st.header("Company Management")
             try:
-                # Get company officers
-                company = Company(symbol=stock_symbol)
-                management_team = company.officers(lang='en')
+                # Get cached management data
+                management_team = get_management_data(stock_symbol)
                 
                 if not management_team.empty:
                     st.dataframe(management_team, use_container_width=True)

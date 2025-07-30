@@ -89,8 +89,8 @@ if ticker:
             # Display the Altair chart
             st.altair_chart(line_chart, use_container_width=True)
             
-            # Create candlestick chart with Bokeh
-            st.subheader("Candlestick Chart")
+            # Create candlestick chart with volume using Bokeh
+            st.subheader("Candlestick Chart with Volume")
             
             # Prepare data for Bokeh
             stock_price_bokeh = stock_price_mpf.copy()
@@ -100,18 +100,28 @@ if ticker:
             stock_price_bokeh['color'] = ['green' if close >= open_price else 'red' 
                                           for close, open_price in zip(stock_price_bokeh['Close'], stock_price_bokeh['Open'])]
             
-            # Create Bokeh figure
-            p = figure(
+            # Create two subplots: price and volume with proper alignment
+            from bokeh.layouts import column
+            from bokeh.models import LinearAxis, Range1d
+            
+            # Calculate min/max values for consistent scaling
+            min_date = stock_price_bokeh.index.min()
+            max_date = stock_price_bokeh.index.max()
+            max_volume = stock_price_bokeh['Volume'].max()
+            
+            # Price chart - use responsive sizing
+            price = figure(
                 x_axis_type='datetime',
                 title=f'{ticker} - Candlestick Chart',
-                width=800,
                 height=400,
                 tools="pan,wheel_zoom,box_zoom,reset,save",
-                toolbar_location="above"
+                toolbar_location="above",
+                x_range=(min_date, max_date),
+                sizing_mode="stretch_width"
             )
             
             # Add segments for high-low range
-            p.segment(
+            price.segment(
                 x0='date', y0='High', 
                 x1='date', y1='Low',
                 source=stock_price_bokeh,
@@ -120,7 +130,7 @@ if ticker:
             )
             
             # Add rectangles for open-close range
-            p.vbar(
+            price.vbar(
                 x='date',
                 width=12*60*60*1000,  # 12 hours in milliseconds
                 top='Open',
@@ -131,13 +141,41 @@ if ticker:
                 line_width=1
             )
             
-            # Customize the plot
-            p.yaxis.axis_label = 'Price (VND)'
-            p.xaxis.axis_label = 'Date'
-            p.grid.grid_line_alpha = 0.3
+            # Customize price plot
+            price.yaxis.axis_label = 'Price (VND)'
+            price.grid.grid_line_alpha = 0.3
+            price.xaxis.visible = False  # Hide x-axis labels on price chart
             
-            # Add hover tool
-            hover = HoverTool(
+            # Volume chart - use same responsive sizing
+            volume = figure(
+                x_axis_type='datetime',
+                height=200,
+                tools="pan,wheel_zoom,box_zoom,reset,save",
+                toolbar_location=None,
+                x_range=price.x_range,  # Link x-axis with price chart
+                sizing_mode="stretch_width"
+            )
+            
+            # Add volume bars
+            volume.vbar(
+                x='date',
+                width=12*60*60*1000,
+                top='Volume',
+                bottom=0,
+                source=stock_price_bokeh,
+                fill_color='color',
+                line_color='black',
+                line_width=0.5,
+                alpha=0.7
+            )
+            
+            # Customize volume plot
+            volume.yaxis.axis_label = 'Volume'
+            volume.grid.grid_line_alpha = 0.3
+            volume.xaxis.axis_label = 'Date'
+            
+            # Add hover tools for both charts
+            hover_price = HoverTool(
                 tooltips=[
                     ('Date', '@date{%F}'),
                     ('Open', '@Open{0,0}'),
@@ -149,10 +187,23 @@ if ticker:
                 formatters={'@date': 'datetime'},
                 mode='vline'
             )
-            p.add_tools(hover)
+            price.add_tools(hover_price)
             
-            # Display the Bokeh chart
-            st.bokeh_chart(p, use_container_width=True)
+            hover_volume = HoverTool(
+                tooltips=[
+                    ('Date', '@date{%F}'),
+                    ('Volume', '@Volume{0,0}')
+                ],
+                formatters={'@date': 'datetime'},
+                mode='vline'
+            )
+            volume.add_tools(hover_volume)
+            
+            # Combine charts vertically with proper alignment
+            combined_chart = column(price, volume, sizing_mode="stretch_width")
+            
+            # Display the combined Bokeh chart
+            st.bokeh_chart(combined_chart, use_container_width=True)
                 
     except Exception as e:
         st.error(f"Error loading data for {ticker}: {str(e)}")
