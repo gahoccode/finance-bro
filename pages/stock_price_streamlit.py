@@ -16,23 +16,28 @@ with st.sidebar:
     start_date = st.date_input("Start Date:", value=pd.to_datetime('2024-01-01'))
     end_date = st.date_input("End Date:", value=pd.to_datetime('2024-12-31'))
 
+@st.cache_data(ttl=3600, show_spinner="Loading stock data...")
+def fetch_stock_data(ticker, start_date, end_date):
+    """Fetch stock data with caching to prevent repeated API calls."""
+    stock = Vnstock().stock(symbol=ticker, source='VCI')
+    stock_price = stock.quote.history(
+        symbol=ticker,
+        start=start_date.strftime('%Y-%m-%d'),
+        end=end_date.strftime('%Y-%m-%d'),
+        interval='1D'
+    )
+    
+    # Set time column as datetime index
+    stock_price['time'] = pd.to_datetime(stock_price['time'])
+    stock_price = stock_price.set_index('time')
+    
+    return stock_price
+
 if ticker:
     try:
         with st.spinner(f"Loading data for {ticker}..."):
-            # Initialize Vnstock
-            stock = Vnstock().stock(symbol=ticker, source='VCI')
-            
-            # Fetch stock data
-            stock_price = stock.quote.history(
-                symbol=ticker,
-                start=start_date.strftime('%Y-%m-%d'),
-                end=end_date.strftime('%Y-%m-%d'),
-                interval='1D'
-            )
-            
-            # Set time column as datetime index
-            stock_price['time'] = pd.to_datetime(stock_price['time'])
-            stock_price = stock_price.set_index('time')
+            # Fetch cached stock data
+            stock_price = fetch_stock_data(ticker, start_date, end_date)
             
             # Rename columns to match mplfinance expected format
             stock_price_mpf = stock_price.rename(columns={
@@ -69,7 +74,7 @@ if ticker:
             )
             
             # Customize the plot
-            ax.set_title(f'{ticker} - Close Price Over Time', fontsize=16, pad=20)
+            ax.set_title(f'{ticker}', fontsize=16, pad=20)
             ax.set_xlabel('Time', fontsize=12)
             ax.set_ylabel('Close Price (VND)', fontsize=12)
             ax.grid(False)  # Remove grid as requested
@@ -84,10 +89,13 @@ if ticker:
             st.subheader("Candlestick Chart")
             
             # Create mplfinance plot
+            # Remove grid (custom style)
+            s = mpf.make_mpf_style(base_mpf_style='charles', gridstyle="")
+
             fig_mpf, axes = mpf.plot(
                 stock_price_mpf,
                 type='candle',
-                style='yahoo',
+                style=s, # pass the custom style to remove grid
                 title=f'{ticker} - Candlestick Chart',
                 ylabel='Price (VND)',
                 volume=True,
