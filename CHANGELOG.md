@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [2025-07-30] **Chart Type Selector with Area Chart Gradient**: Added sidebar option to switch between line chart and area chart with gradient styling
+  - **Feature**: New dropdown selector in sidebar allows users to choose between "Line Chart" and "Area Chart"
+  - **Area Chart Enhancement**: Implemented gradient area chart using specified colors:
+    - Gradient Start: `#3C3C3C` (dark gray)
+    - Gradient End: `#807F80` (medium gray)
+  - **Interactive**: Both chart types maintain full interactivity with hover tooltips and zoom capabilities
+  - **User Experience**: Seamless switching between chart types without data reload
+  - **Technical**: Uses Altair's gradient functionality with linear gradient stops
+
 ### Fixed
 - [2025-07-26] **Dataframe Separation for AI Query Optimization**: Fixed PandasAI column detection issues by implementing dual dataframe architecture
   - **Issue**: PandasAI couldn't properly detect `Quarter` column because dataframes still contained `lengthReport` column names

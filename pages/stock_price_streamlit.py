@@ -20,6 +20,14 @@ with st.sidebar:
     ticker = st.text_input("Stock Ticker Symbol:", value="REE", placeholder="e.g., VIC, VNM, VCB")
     start_date = st.date_input("Start Date:", value=pd.to_datetime('2024-01-01'))
     end_date = st.date_input("End Date:", value=pd.to_datetime('2024-12-31'))
+    
+    # Chart type selector
+    chart_type = st.selectbox(
+        "Chart Type:", 
+        options=["Line Chart", "Area Chart"],
+        index=0,
+        help="Choose between line chart and area chart with gradient"
+    )
 
 @st.cache_data(ttl=3600, show_spinner="Loading stock data...")
 def fetch_stock_data(ticker, start_date, end_date):
@@ -85,33 +93,60 @@ if ticker:
             with col3:
                 st.metric("Annualized Volatility", f"{volatility:.2f}%")
             
-            # Create interactive line chart with Altair
+            # Create interactive chart with Altair
             st.subheader("Stock Performance")
             
             # Prepare data for Altair
-            line_data = stock_price.reset_index()
-            line_data = line_data.rename(columns={'time': 'date', 'close': 'price'})
+            chart_data = stock_price.reset_index()
+            chart_data = chart_data.rename(columns={'time': 'date', 'close': 'price'})
             
-            # Create Altair chart
-            line_chart = alt.Chart(line_data).mark_line(
-                color='black',
-                strokeWidth=2
-            ).encode(
-                x=alt.X('date:T', title='Date'),
-                y=alt.Y('price:Q', title='Close Price (in thousands)', 
-                       axis=alt.Axis(format=',.0f')),
-                tooltip=[
-                    alt.Tooltip('date:T', title='Date'),
-                    alt.Tooltip('price:Q', title='Close Price', format=',.0f')
-                ]
-            ).properties(
-                width='container',
-                height=400,
-                title=f'{ticker}'
-            ).interactive()
+            # Create chart based on selected type
+            if chart_type == "Line Chart":
+                # Line chart
+                stock_chart = alt.Chart(chart_data).mark_line(
+                    color='black',
+                    strokeWidth=2
+                ).encode(
+                    x=alt.X('date:T', title='Date'),
+                    y=alt.Y('price:Q', title='Close Price (in thousands)', 
+                           axis=alt.Axis(format=',.0f')),
+                    tooltip=[
+                        alt.Tooltip('date:T', title='Date'),
+                        alt.Tooltip('price:Q', title='Close Price', format=',.0f')
+                    ]
+                ).properties(
+                    width='container',
+                    height=400,
+                    title=f'{ticker}'
+                ).interactive()
+            else:
+                # Area chart with gradient
+                stock_chart = alt.Chart(chart_data).mark_area(
+                    line={'color': '#3C3C3C', 'strokeWidth': 2},
+                    color=alt.Gradient(
+                        gradient='linear',
+                        stops=[
+                            alt.GradientStop(color='#3C3C3C', offset=0),
+                            alt.GradientStop(color='#807F80', offset=1)
+                        ],
+                        x1=1, x2=1, y1=1, y2=0
+                    )
+                ).encode(
+                    x=alt.X('date:T', title='Date'),
+                    y=alt.Y('price:Q', title='Close Price (in thousands)', 
+                           axis=alt.Axis(format=',.0f')),
+                    tooltip=[
+                        alt.Tooltip('date:T', title='Date'),
+                        alt.Tooltip('price:Q', title='Close Price', format=',.0f')
+                    ]
+                ).properties(
+                    width='container',
+                    height=400,
+                    title=f'{ticker}'
+                ).interactive()
             
             # Display the Altair chart
-            st.altair_chart(line_chart, use_container_width=True)
+            st.altair_chart(stock_chart, use_container_width=True)
             
             # Create candlestick chart with volume using Bokeh
             st.subheader("Candlestick Chart with Volume")
