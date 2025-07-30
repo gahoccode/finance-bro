@@ -123,6 +123,66 @@ if stock_symbol:
                 
                 if not management_team.empty:
                     st.dataframe(management_team, use_container_width=True)
+                    
+                    # Create management team ownership chart
+                    st.subheader("📊 Management Team Ownership")
+                    
+                    # Filter for officers with quantity data
+                    mgmt_with_shares = management_team[
+                        management_team['quantity'].notna() & 
+                        management_team['officer_own_percent'].notna() &
+                        (management_team['quantity'] > 0)
+                    ].copy()
+                    
+                    if not mgmt_with_shares.empty:
+                        # Sort by quantity for better visualization
+                        mgmt_sorted = mgmt_with_shares.sort_values('quantity', ascending=True)
+                        
+                        # Create base chart
+                        mgmt_base = alt.Chart(mgmt_sorted).encode(
+                            y=alt.Y('officer_name:N', title='Officer Name', sort='-x'),
+                            x=alt.X('quantity:Q', title='Number of Shares')
+                        )
+                        
+                        # Create bars
+                        mgmt_bars = mgmt_base.mark_bar(color='black').encode(
+                            tooltip=[
+                                alt.Tooltip('officer_name:N', title='Officer'),
+                                alt.Tooltip('position_short_name:N', title='Position'),
+                                alt.Tooltip('quantity:Q', title='Shares', format=',.0f'),
+                                alt.Tooltip('officer_own_percent:Q', title='Ownership %', format='.2f')
+                            ]
+                        )
+                        
+                        # Create text labels
+                        mgmt_text = mgmt_base.mark_text(
+                            align='left',
+                            baseline='middle',
+                            dx=3,
+                            fontSize=9,
+                            color='black'
+                        ).encode(
+                            x=alt.X('quantity:Q'),
+                            text=alt.Text('officer_own_percent:Q', format='.2f%')
+                        )
+                        
+                        # Combine chart
+                        mgmt_chart = (mgmt_bars + mgmt_text).properties(
+                            title=f'Management Team Share Ownership - {stock_symbol}',
+                            width=600,
+                            height=300
+                        ).configure_axis(
+                            labelFontSize=9,
+                            titleFontSize=11
+                        ).configure_title(
+                            fontSize=13,
+                            fontWeight='bold'
+                        )
+                        
+                        st.altair_chart(mgmt_chart, use_container_width=True)
+                    else:
+                        st.info("No management share ownership data available.")
+                        
                 else:
                     st.info("No management information available for this symbol.")
                     
