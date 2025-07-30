@@ -8,6 +8,7 @@ from pypfopt.expected_returns import mean_historical_return
 from pypfopt.risk_models import sample_cov
 from pypfopt import plotting
 import numpy as np
+from datetime import datetime, timedelta
 
 # Streamlit page configuration
 st.set_page_config(
@@ -86,33 +87,35 @@ if start_date >= end_date:
 progress_bar = st.progress(0)
 status_text = st.empty()
 
-# Fetch historical data
-status_text.text("Fetching historical data...")
-all_historical_data = {}
-
-for i, symbol in enumerate(symbols):
-    try:
-        progress_bar.progress((i + 1) / len(symbols))
-        status_text.text(f"Processing {symbol}...")
-        
-        quote = Quote(symbol=symbol)
-        historical_data = quote.history(
-            start=start_date_str,
-            end=end_date_str,
-            interval=interval,
-            to_df=True
-        )
-        
-        if not historical_data.empty:
-            # Ensure we have the required columns
-            if 'time' not in historical_data.columns:
-                historical_data['time'] = historical_data.index
+@st.cache_data(ttl=3600)  # Cache for 1 hour
+def fetch_stock_data(symbols, start_date_str, end_date_str, interval):
+    """Cache stock data to avoid repeated API calls."""
+    all_data = {}
+    
+    for symbol in symbols:
+        try:
+            quote = Quote(symbol=symbol)
+            historical_data = quote.history(
+                start=start_date_str,
+                end=end_date_str,
+                interval=interval,
+                to_df=True
+            )
             
-            all_historical_data[symbol] = historical_data
-        else:
-            st.warning(f"⚠️ No data available for {symbol}")
-    except Exception as e:
-        st.error(f"❌ Error fetching data for {symbol}: {e}")
+            if not historical_data.empty:
+                # Ensure we have the required columns
+                if 'time' not in historical_data.columns:
+                    historical_data['time'] = historical_data.index
+                
+                all_data[symbol] = historical_data
+        except Exception as e:
+            st.error(f"❌ Error fetching data for {symbol}: {e}")
+    
+    return all_data
+
+# Fetch historical data with caching
+status_text.text("Fetching historical data...")
+all_historical_data = fetch_stock_data(symbols, start_date_str, end_date_str, interval)
 
 progress_bar.empty()
 status_text.empty()
@@ -174,21 +177,23 @@ with st.expander("View Price Data"):
 
 # Calculate returns and optimize portfolio
 status_text.text("Calculating portfolio optimization...")
-returns = expected_returns.returns_from_prices(prices_df, log_returns=False)
-mu = mean_historical_return(prices_df, log_returns=False)
-S = sample_cov(prices_df)
+returns = prices_df.pct_change().dropna()
+mu = expected_returns.mean_historical_return(prices_df)
+S = risk_models.sample_cov(prices_df)
 
-# Portfolio optimization
-ef_max_sharpe = EfficientFrontier(mu, S)
-ef_max_sharpe.max_sharpe(risk_free_rate=risk_free_rate)
-weights_max_sharpe = ef_max_sharpe.clean_weights()
-ret_tangent, std_tangent, sharpe = ef_max_sharpe.portfolio_performance(risk_free_rate=risk_free_rate)
+# Max Sharpe Ratio Portfolio
+ef_tangent = EfficientFrontier(mu, S)
+weights_tangent = ef_tangent.max_sharpe()
+weights_max_sharpe = ef_tangent.clean_weights()
+ret_tangent, std_tangent, sharpe = ef_tangent.portfolio_performance(risk_free_rate=risk_free_rate)
 
+# Min Volatility Portfolio
 ef_min_vol = EfficientFrontier(mu, S)
 ef_min_vol.min_volatility()
 weights_min_vol = ef_min_vol.clean_weights()
 ret_min_vol, std_min_vol, sharpe_min_vol = ef_min_vol.portfolio_performance(risk_free_rate=risk_free_rate)
 
+# Max Utility Portfolio
 ef_max_utility = EfficientFrontier(mu, S)
 ef_max_utility.max_quadratic_utility(risk_aversion=risk_aversion, market_neutral=False)
 weights_max_utility = ef_max_utility.clean_weights()

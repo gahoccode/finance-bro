@@ -8,6 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- [2025-07-30] **Stock Portfolio Optimization Page**: New comprehensive portfolio optimization feature using PyPortfolioOpt library
+  - **Library Integration**: Integrated PyPortfolioOpt for Modern Portfolio Theory calculations
+  - **Portfolio Models**: Implemented Max Sharpe, Min Volatility, and Max Utility portfolio optimization
+  - **Efficient Frontier**: Visual representation of efficient frontier with random portfolio simulation
+  - **Risk Analysis**: Comprehensive risk metrics including Sharpe ratios, volatility, and expected returns
+  - **Weight Visualization**: Bar charts for portfolio allocation across different optimization strategies
+  - **Caching System**: Added intelligent caching to prevent repeated API calls
+    - **Data Caching**: Stock price data cached for 1 hour using `@st.cache_data` to prevent repeated API calls
+    - **Performance**: Significant speed improvements on page reloads while maintaining real-time optimization calculations
+    - **Memory Efficiency**: Automatic cache invalidation when parameters change
+
+### Changed
+- [2025-07-30] **Stock Portfolio Optimization UI Updates**: Streamlined visual design and removed grid lines
+  - **Grid Lines**: Removed grid lines from efficient frontier scatter plot for cleaner appearance
+  - **Icons**: Removed emoji icons from section headers (Data Summary, Portfolio Optimization Results) for cleaner look
+  - **Page Icon**: Removed page icon from Streamlit configuration
+  - **Visual Consistency**: Maintained clean, professional appearance throughout the portfolio optimization interface
+
+### Added
 - [2025-07-30] **Chart Type Selector with Area Chart Gradient**: Added sidebar option to switch between line chart and area chart with gradient styling
   - **Feature**: New dropdown selector in sidebar allows users to choose between "Line Chart" and "Area Chart"
   - **Area Chart Enhancement**: Implemented gradient area chart using specified colors:
