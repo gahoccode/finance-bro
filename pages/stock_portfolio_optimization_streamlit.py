@@ -9,6 +9,11 @@ from pypfopt.risk_models import sample_cov
 from pypfopt import plotting
 import numpy as np
 from datetime import datetime, timedelta
+from bokeh.plotting import figure
+from bokeh.transform import cumsum
+from bokeh.palettes import Spectral
+from bokeh.models import ColumnDataSource
+from math import pi
 
 # Streamlit page configuration
 st.set_page_config(
@@ -64,7 +69,7 @@ risk_aversion = st.sidebar.number_input(
 )
 
 # Visualization settings
-colormap_options = ['gist_heat', 'copper', 'Greys', 'gist_yarg', 'gist_gray', 'cividis', 'magma', 'inferno', 'plasma', 'viridis']
+colormap_options = ['copper','gist_heat', 'Greys', 'gist_yarg', 'gist_gray', 'cividis', 'magma', 'inferno', 'plasma', 'viridis']
 colormap = st.sidebar.selectbox(
     "Scatter Plot Colormap",
     options=colormap_options,
@@ -304,19 +309,78 @@ with col3:
 
 # Weight visualization
 st.subheader("Portfolio Weights Visualization")
-fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 
-plotting.plot_weights(weights_max_sharpe, ax=axes[0])
-axes[0].set_title("Max Sharpe Portfolio")
+# Define colors for pie charts
+pie_colors = ["#56524D", "#76706C", "#AAA39F"]
 
-plotting.plot_weights(weights_min_vol, ax=axes[1])
-axes[1].set_title("Min Volatility Portfolio")
+def create_pie_chart(weights_dict, title, colors):
+    """Create a Bokeh pie chart for portfolio weights."""
+    # Filter out zero weights and prepare data
+    data = pd.DataFrame(list(weights_dict.items()), columns=['Symbol', 'Weight'])
+    data = data[data['Weight'] > 0.01]  # Filter out very small weights
+    data = data.sort_values('Weight', ascending=False)
+    
+    if len(data) == 0:
+        return None
+    
+    # Calculate angles for pie chart
+    data['angle'] = data['Weight'] / data['Weight'].sum() * 2 * pi
+    data['color'] = colors[:len(data)] if len(data) <= len(colors) else colors + ["#D3D3D3"] * (len(data) - len(colors))
+    
+    # Create pie chart with increased height for better visibility
+    p = figure(
+        height=400, 
+        width=350, 
+        title=title,
+        toolbar_location=None,
+        tools="hover",
+        tooltips="@Symbol: @Weight{0.00%}",
+        x_range=(-0.5, 0.5), 
+        y_range=(-0.5, 0.5),
+        sizing_mode="scale_both"
+    )
+    
+    p.wedge(
+        x=0, y=0, radius=0.35,
+        start_angle=cumsum('angle', include_zero=True), 
+        end_angle=cumsum('angle'),
+        line_color="white", 
+        fill_color='color',
+        legend_field='Symbol',
+        source=data
+    )
+    
+    p.axis.axis_label = None
+    p.axis.visible = False
+    p.grid.grid_line_color = None
+    p.title.text_font_size = "12pt"
+    p.legend.label_text_font_size = "10pt"
+    
+    return p
 
-plotting.plot_weights(weights_max_utility, ax=axes[2])
-axes[2].set_title("Max Utility Portfolio")
+# Create three pie charts in columns
+col1, col2, col3 = st.columns(3)
 
-plt.tight_layout()
-st.pyplot(fig)
+with col1:
+    pie1 = create_pie_chart(weights_max_sharpe, "Max Sharpe Portfolio", pie_colors)
+    if pie1:
+        st.bokeh_chart(pie1, use_container_width=True)
+    else:
+        st.write("No significant weights in Max Sharpe Portfolio")
+
+with col2:
+    pie2 = create_pie_chart(weights_min_vol, "Min Volatility Portfolio", pie_colors)
+    if pie2:
+        st.bokeh_chart(pie2, use_container_width=True)
+    else:
+        st.write("No significant weights in Min Volatility Portfolio")
+
+with col3:
+    pie3 = create_pie_chart(weights_max_utility, "Max Utility Portfolio", pie_colors)
+    if pie3:
+        st.bokeh_chart(pie3, use_container_width=True)
+    else:
+        st.write("No significant weights in Max Utility Portfolio")
 
 # Detailed performance table
 st.subheader("Detailed Performance Analysis")

@@ -24,6 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - **Flexible Viewing**: Users can quickly check both historical start and recent end of price datasets
 
 ### Changed
+- [2025-07-30] **Portfolio Weights Visualization Enhancement**: Replaced matplotlib bar charts with interactive Bokeh pie charts
+  - **Visualization**: Upgraded from matplotlib bar charts to interactive Bokeh pie charts for portfolio weights
+  - **Colors**: Applied custom color scheme (#56524D, #76706C, #AAA39F) for consistent branding
+  - **Interactivity**: Added hover tooltips showing symbol and weight percentages
+  - **Layout**: Responsive three-column layout for Max Sharpe, Min Volatility, and Max Utility portfolios
+  - **Data Filtering**: Implemented filtering to show only significant weights (>1%) for clarity
+  - **Sizing**: Optimized chart dimensions (400x350px) for better container fit and visibility
 - [2025-07-30] **Stock Portfolio Optimization UI Updates**: Streamlined visual design and removed grid lines
   - **Grid Lines**: Removed grid lines from efficient frontier scatter plot for cleaner appearance
   - **Icons**: Removed emoji icons from section headers (Data Summary, Portfolio Optimization Results) for cleaner look
