@@ -117,6 +117,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Implementation**: Charts are displayed only for the latest message in chat history
 - **All Response Types**: Applied to chat input, sidebar questions, and quick buttons
 
+## [2025-07-30] Company Profile Streamlit Enhancement
+
+### Changed
+- [2025-07-30] **Ownership Structure Chart Migration**: Converted from Seaborn to Altair for enhanced interactivity
+  - **Migration**: Replaced seaborn barplot with altair horizontal bar chart
+  - **Visual Improvements**: Added interactive tooltips and responsive design
+  - **Color Scheme**: Updated to black bars for consistent professional styling
+  - **Data Labels**: Added percentage labels positioned at bar ends
+
+### Added
+- [2025-07-30] **Management Team Ownership Visualization**: New altair bar chart for management share ownership
+  - **Data Source**: Uses management team dataframe with officer_name, quantity, and officer_own_percent
+  - **Interactive Features**: Hover tooltips with officer_name, position_short_name, shares, and ownership %
+  - **Visual Design**: Black bars matching ownership structure chart styling
+  - **Layout**: Positioned below management team dataframe in "👥 Management Team" tab
+
+- [2025-07-30] **Data Caching System**: Implemented Streamlit caching to reduce API calls
+  - **Caching Functions**: Added @st.cache_data decorators for ownership and management data
+  - **Cache Duration**: 1-hour TTL for cached data per stock symbol
+  - **Performance**: Significant reduction in API calls and faster data loading
+  - **Error Handling**: Graceful handling of API failures within cached functions
+
+- [2025-07-30] **Enhanced Data Visualization**: Improved chart interactivity and user experience
+  - **Hover Data**: Added position_short_name to management team tooltips
+  - **Axis Configuration**: Quantity-based x-axis for both ownership and management charts
+  - **Responsive Design**: Charts automatically adjust to container width
+  - **Sorting**: Data sorted by quantity for better visual comparison
+
+### Technical Implementation
+- **Altair Integration**: Native altair charts with Streamlit integration
+- **Layered Charts**: Combined bar charts with text labels using altair layering
+- **Data Filtering**: Robust handling of null values and missing data
+- **Error Handling**: Comprehensive error handling for missing data scenarios
+
+### User Experience Improvements
+- **Interactive Tooltips**: Detailed information available on hover
+- **Faster Loading**: Cached data loads instantly for repeated queries
+- **Consistent Styling**: Unified black color scheme across all charts
+- **Responsive Layout**: Charts adapt to different screen sizes
+
 ## [2025-07-26] Financial Data Transformation Enhancement
 
 ### Fixed
