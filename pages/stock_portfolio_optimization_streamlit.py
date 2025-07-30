@@ -63,6 +63,15 @@ risk_aversion = st.sidebar.number_input(
     step=0.1
 )
 
+# Visualization settings
+colormap_options = ['gist_heat', 'copper', 'Greys', 'gist_yarg', 'gist_gray', 'cividis', 'magma', 'inferno', 'plasma', 'viridis']
+colormap = st.sidebar.selectbox(
+    "Scatter Plot Colormap",
+    options=colormap_options,
+    index=0,  # Default to gist_heat
+    help="Choose the color scheme for the efficient frontier scatter plot"
+)
+
 # Interval selection
 interval = '1D'
 
@@ -172,7 +181,18 @@ with col2:
 
 # Show price data
 with st.expander("View Price Data"):
-    st.dataframe(prices_df.head())
+    view_option = st.radio(
+        "Display option:",
+        ["First 5 rows", "Last 5 rows"],
+        horizontal=True,
+        key="price_data_view"
+    )
+    
+    if view_option == "First 5 rows":
+        st.dataframe(prices_df.head())
+    else:
+        st.dataframe(prices_df.tail())
+    
     st.write(f"Shape: {prices_df.shape}")
 
 # Calculate returns and optimize portfolio
@@ -249,7 +269,7 @@ rets = w.dot(ef_plot.expected_returns)
 stds = np.sqrt(np.diag(w @ ef_plot.cov_matrix @ w.T))
 sharpes = rets / stds
 
-scatter = ax.scatter(stds, rets, marker=".", c=sharpes, cmap="viridis_r", alpha=0.6)
+scatter = ax.scatter(stds, rets, marker=".", c=sharpes, cmap=colormap, alpha=0.6)
 plt.colorbar(scatter, label='Sharpe Ratio')
 
 ax.set_title("Efficient Frontier with Random Portfolios")

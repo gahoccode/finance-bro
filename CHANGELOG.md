@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - **Data Caching**: Stock price data cached for 1 hour using `@st.cache_data` to prevent repeated API calls
     - **Performance**: Significant speed improvements on page reloads while maintaining real-time optimization calculations
     - **Memory Efficiency**: Automatic cache invalidation when parameters change
+  - **Data Viewing Enhancement**: Added interactive data viewing options
+    - **Display Options**: Toggle between first 5 rows (.head()) and last 5 rows (.tail()) of price data
+    - **User Control**: Radio button interface within price data expander for easy switching
+    - **Flexible Viewing**: Users can quickly check both historical start and recent end of price datasets
 
 ### Changed
 - [2025-07-30] **Stock Portfolio Optimization UI Updates**: Streamlined visual design and removed grid lines
