@@ -7,6 +7,7 @@ from bokeh.plotting import figure
 from bokeh.models import ColumnDataSource, HoverTool
 from bokeh.transform import factor_cmap
 from bokeh.palettes import Spectral6
+import altair as alt
 
 st.set_page_config(page_title="Stock Price Analysis", page_icon="📈")
 
@@ -60,33 +61,33 @@ if ticker:
             with col3:
                 st.metric("Price Change", f"{stock_price['close'].iloc[-1] - stock_price['close'].iloc[0]:,.0f} VND")
             
-            # Create line chart with seaborn
+            # Create interactive line chart with Altair
             st.subheader("Close Price Over Time")
             
-            # Create figure with seaborn
-            fig, ax = plt.subplots(figsize=(12, 6))
+            # Prepare data for Altair
+            line_data = stock_price.reset_index()
+            line_data = line_data.rename(columns={'time': 'date', 'close': 'price'})
             
-            # Plot close price without grid
-            sns.lineplot(
-                data=stock_price,
-                x=stock_price.index,
-                y='close',
-                ax=ax,
-                color='#000000',
-                linewidth=2
-            )
+            # Create Altair chart
+            line_chart = alt.Chart(line_data).mark_line(
+                color='black',
+                strokeWidth=2
+            ).encode(
+                x=alt.X('date:T', title='Date'),
+                y=alt.Y('price:Q', title='Close Price (VND)', 
+                       axis=alt.Axis(format=',.0f')),
+                tooltip=[
+                    alt.Tooltip('date:T', title='Date'),
+                    alt.Tooltip('price:Q', title='Close Price', format=',.0f')
+                ]
+            ).properties(
+                width='container',
+                height=400,
+                title=f'{ticker} - Close Price Over Time'
+            ).interactive()
             
-            # Customize the plot
-            ax.set_title(f'{ticker}', fontsize=16, pad=20)
-            ax.set_xlabel('Time', fontsize=12)
-            ax.set_ylabel('Close Price (VND)', fontsize=12)
-            ax.grid(False)  # Remove grid as requested
-            
-            # Format x-axis to show dates nicely
-            fig.autofmt_xdate()
-            
-            # Display the plot
-            st.pyplot(fig)
+            # Display the Altair chart
+            st.altair_chart(line_chart, use_container_width=True)
             
             # Create candlestick chart with Bokeh
             st.subheader("Candlestick Chart")

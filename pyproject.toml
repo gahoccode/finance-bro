@@ -17,6 +17,7 @@ dependencies = [
     "python-dotenv==1.0.1",
     "mplfinance>=0.12.10b0",
     "bokeh==2.4.3",
+    "altair>=5.5.0",
 ]
 
 [project.optional-dependencies]
