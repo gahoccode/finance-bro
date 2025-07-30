@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from vnstock import Vnstock
@@ -52,17 +53,40 @@ if ticker:
                 'volume': 'Volume'
             })
             
-            # Show basic statistics at the top
+            # Calculate returns with data validation
+            # Clean price data for returns calculation
+            clean_prices = stock_price['close'].dropna()
+            clean_prices = clean_prices[clean_prices > 0]  # Remove zero/negative prices
+            
+            if len(clean_prices) > 1:
+                # Calculate log returns
+                returns = np.log(clean_prices / clean_prices.shift(1)).dropna()
+                
+                # Calculate mean return (annualized)
+                mean_daily_return = returns.mean()
+                annualized_return = mean_daily_return * 252  # 252 trading days per year
+                
+                # Format as percentage
+                mean_return_pct = annualized_return * 100
+                
+                # Calculate volatility (annualized)
+                volatility = returns.std() * np.sqrt(252) * 100
+                
+            else:
+                mean_return_pct = 'Error'
+                volatility = 'Error'
+            
+            # Show returns statistics at the top
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.metric("Latest Close", f"{stock_price['close'].iloc[-1]:,.0f} VND")
+                st.metric("Latest Close", f"{stock_price['close'].iloc[-1]*1000:,.0f}")
             with col2:
-                st.metric("Average Close", f"{stock_price['close'].mean():,.0f} VND")
+                st.metric("Mean Return (Annualized)", f"{mean_return_pct:.2f}%")
             with col3:
-                st.metric("Price Change", f"{stock_price['close'].iloc[-1] - stock_price['close'].iloc[0]:,.0f} VND")
+                st.metric("Annualized Volatility", f"{volatility:.2f}%")
             
             # Create interactive line chart with Altair
-            st.subheader("Close Price Over Time")
+            st.subheader("Stock Performance")
             
             # Prepare data for Altair
             line_data = stock_price.reset_index()
@@ -74,7 +98,7 @@ if ticker:
                 strokeWidth=2
             ).encode(
                 x=alt.X('date:T', title='Date'),
-                y=alt.Y('price:Q', title='Close Price (VND)', 
+                y=alt.Y('price:Q', title='Close Price (in thousands)', 
                        axis=alt.Axis(format=',.0f')),
                 tooltip=[
                     alt.Tooltip('date:T', title='Date'),
@@ -83,7 +107,7 @@ if ticker:
             ).properties(
                 width='container',
                 height=400,
-                title=f'{ticker} - Close Price Over Time'
+                title=f'{ticker}'
             ).interactive()
             
             # Display the Altair chart
@@ -142,7 +166,7 @@ if ticker:
             )
             
             # Customize price plot
-            price.yaxis.axis_label = 'Price (VND)'
+            price.yaxis.axis_label = 'Price (in thousands)'
             price.grid.grid_line_alpha = 0.3
             price.xaxis.visible = False  # Hide x-axis labels on price chart
             
