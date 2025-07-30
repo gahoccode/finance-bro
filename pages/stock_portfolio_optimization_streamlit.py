@@ -12,7 +12,7 @@ import numpy as np
 # Streamlit page configuration
 st.set_page_config(
     page_title="Stock Portfolio Optimization",
-    page_icon="📈",
+    #page_icon="📈",
     layout="wide"
 )
 
@@ -160,7 +160,7 @@ if prices_df.empty:
     st.stop()
 
 # Display data summary
-st.header("📊 Data Summary")
+st.header("Data Summary")
 col1, col2 = st.columns(2)
 with col1:
     st.metric("Symbols", len(symbols))
@@ -197,7 +197,7 @@ ret_utility, std_utility, sharpe_utility = ef_max_utility.portfolio_performance(
 status_text.empty()
 
 # Display results
-st.header("📈 Portfolio Optimization Results")
+st.header("Portfolio Optimization Results")
 
 # Performance metrics
 st.subheader("Performance Metrics")
@@ -251,7 +251,7 @@ ax.set_title("Efficient Frontier with Random Portfolios")
 ax.set_xlabel("Annual Volatility")
 ax.set_ylabel("Annual Return")
 ax.legend()
-ax.grid(True, alpha=0.3)
+#ax.grid(True, alpha=0.3)
 
 st.pyplot(fig)
 
