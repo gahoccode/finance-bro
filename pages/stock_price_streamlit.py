@@ -69,7 +69,7 @@ if ticker:
                 x=stock_price.index,
                 y='close',
                 ax=ax,
-                color='#1f77b4',
+                color='#000000',
                 linewidth=2
             )
             
@@ -90,7 +90,7 @@ if ticker:
             
             # Create mplfinance plot
             # Remove grid (custom style)
-            s = mpf.make_mpf_style(base_mpf_style='charles', gridstyle="")
+            s = mpf.make_mpf_style(base_mpf_style='classic', gridstyle="")
 
             fig_mpf, axes = mpf.plot(
                 stock_price_mpf,
