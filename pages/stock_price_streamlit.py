@@ -2,8 +2,11 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import mplfinance as mpf
 from vnstock import Vnstock
+from bokeh.plotting import figure
+from bokeh.models import ColumnDataSource, HoverTool
+from bokeh.transform import factor_cmap
+from bokeh.palettes import Spectral6
 
 st.set_page_config(page_title="Stock Price Analysis", page_icon="📈")
 
@@ -85,26 +88,70 @@ if ticker:
             # Display the plot
             st.pyplot(fig)
             
-            # Create candlestick chart with mplfinance
+            # Create candlestick chart with Bokeh
             st.subheader("Candlestick Chart")
             
-            # Create mplfinance plot
-            # Remove grid (custom style)
-            s = mpf.make_mpf_style(base_mpf_style='classic', gridstyle="")
-
-            fig_mpf, axes = mpf.plot(
-                stock_price_mpf,
-                type='candle',
-                style=s, # pass the custom style to remove grid
+            # Prepare data for Bokeh
+            stock_price_bokeh = stock_price_mpf.copy()
+            stock_price_bokeh['date'] = stock_price_bokeh.index
+            
+            # Calculate candlestick properties
+            stock_price_bokeh['color'] = ['green' if close >= open_price else 'red' 
+                                          for close, open_price in zip(stock_price_bokeh['Close'], stock_price_bokeh['Open'])]
+            
+            # Create Bokeh figure
+            p = figure(
+                x_axis_type='datetime',
                 title=f'{ticker} - Candlestick Chart',
-                ylabel='Price (VND)',
-                volume=True,
-                figsize=(12, 8),
-                returnfig=True
+                width=800,
+                height=400,
+                tools="pan,wheel_zoom,box_zoom,reset,save",
+                toolbar_location="above"
             )
             
-            # Display the candlestick chart
-            st.pyplot(fig_mpf)
+            # Add segments for high-low range
+            p.segment(
+                x0='date', y0='High', 
+                x1='date', y1='Low',
+                source=stock_price_bokeh,
+                color='black',
+                line_width=1
+            )
+            
+            # Add rectangles for open-close range
+            p.vbar(
+                x='date',
+                width=12*60*60*1000,  # 12 hours in milliseconds
+                top='Open',
+                bottom='Close',
+                source=stock_price_bokeh,
+                fill_color='color',
+                line_color='black',
+                line_width=1
+            )
+            
+            # Customize the plot
+            p.yaxis.axis_label = 'Price (VND)'
+            p.xaxis.axis_label = 'Date'
+            p.grid.grid_line_alpha = 0.3
+            
+            # Add hover tool
+            hover = HoverTool(
+                tooltips=[
+                    ('Date', '@date{%F}'),
+                    ('Open', '@Open{0,0}'),
+                    ('High', '@High{0,0}'),
+                    ('Low', '@Low{0,0}'),
+                    ('Close', '@Close{0,0}'),
+                    ('Volume', '@Volume{0,0}')
+                ],
+                formatters={'@date': 'datetime'},
+                mode='vline'
+            )
+            p.add_tools(hover)
+            
+            # Display the Bokeh chart
+            st.bokeh_chart(p, use_container_width=True)
                 
     except Exception as e:
         st.error(f"Error loading data for {ticker}: {str(e)}")
