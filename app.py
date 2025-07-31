@@ -489,30 +489,28 @@ if 'dataframes' in st.session_state:
                     # Get the generated code using helper function
                     generated_code = get_generated_code(response, agent)
                     
-                    # Try to detect if a chart was generated
-                    chart_data = None
+                    # Clear any existing chart containers
+                    chart_container = st.empty()
+                    
+                    # Try to detect if a chart was generated and display it
                     try:
                         # Check if PandasAI generated a chart/plot
-                        # Look for recently created chart files in exports/charts/
                         chart_dir = "exports/charts/"
                         if os.path.exists(chart_dir):
                             chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
                             if chart_files:
                                 # Get the most recent chart file
                                 latest_chart = max(chart_files, key=os.path.getctime)
-                                chart_data = {
-                                    "type": "image",
-                                    "path": latest_chart
-                                }
-                    except:
+                                with chart_container:
+                                    st.image(latest_chart, use_column_width=True)
+                    except Exception as e:
+                        # Chart display failed, continue without error
                         pass
                     
-                    # Add assistant response to chat history with generated code and chart
+                    # Add assistant response to chat history
                     message_data = {"role": "assistant", "content": str(response)}
                     if generated_code:
                         message_data["generated_code"] = generated_code
-                    if chart_data:
-                        message_data["chart_data"] = chart_data
                     st.session_state.messages.append(message_data)
                     
                     # Display generated code in expandable container

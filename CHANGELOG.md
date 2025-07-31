@@ -157,11 +157,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### [2025-01-25] PandasAI Visualization Enhancements
 
-#### Final Implementation
-- **Chart Display**: Moved charts from expandable containers to direct display in main content area
-- **Code Display**: Kept generated code in expandable "🔍 View Generated Code" containers for clean interface
-- **Layout**: Charts now appear directly below AI responses with proper subheaders
-- **Consistency**: Applied same pattern across all response methods (chat, sidebar, quick buttons)
+#### Changed
+- [2025-07-31] **Chart Display Refactor**: Complete overhaul of chart display system in app.py
+  - **Disk-Free Display**: Charts now display directly in Streamlit without saving to disk
+  - **Memory Optimization**: Removed chart storage in session state/memory
+  - **Display Logic**: Now shows only the latest generated chart instead of storing multiple charts
+  - **Clear Previous**: Automatically clears previous charts when new ones are generated
+  - **User Experience**: Charts display immediately below AI responses without cluttering the interface
+  - **Implementation**: Uses Streamlit's `st.pyplot()` for direct matplotlib integration
+  - **Pop-up Prevention**: Fixed chart pop-up window issue by configuring matplotlib to use non-interactive backend ('Agg')
+  - **PandasAI Configuration**: Added `save_charts=False`, `save_logs=False`, and `enable_cache=False` to prevent all disk operations
 
 #### Technical Updates
 - **Chat Interface**: Charts display directly in main content with "📊 Analysis Chart" subheader
