@@ -50,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Sizing**: Optimized chart dimensions (400x350px) for better container fit and visibility
 - [2025-07-30] **Stock Portfolio Optimization UI Updates**: Streamlined visual design and removed grid lines
   - **Grid Lines**: Removed grid lines from efficient frontier scatter plot for cleaner appearance
-  - **Icons**: Removed emoji icons from section headers (Data Summary, Portfolio Optimization Results) for cleaner look
+  - **Icons**: Removed icons from section headers (Data Summary, Portfolio Optimization Results) for cleaner look
   - **Page Icon**: Removed page icon from Streamlit configuration
   - **Visual Consistency**: Maintained clean, professional appearance throughout the portfolio optimization interface
 

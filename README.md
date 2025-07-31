@@ -52,20 +52,42 @@ streamlit run app.py
 
 5. **Open your browser** and navigate to `http://localhost:8501`
 
-## Usage
+## User Flow
 
-1. **Configure Stock Settings:**
+### Recommended Setup for Best Experience
+
+**🌞 Light Mode Required**: This app is designed for optimal readability in light mode. Please enable light mode in Streamlit settings before use.
+
+**How to enable light mode:**
+1. Click the hamburger menu (☰) in the top-right corner
+2. Select "Settings"
+3. Under "Theme", choose "Light"
+4. The app will immediately switch to light mode for better visibility
+
+### Step-by-Step Usage
+
+1. **Initial Setup:**
+   - Enable light mode for optimal readability (see above)
+   - Enter your OpenAI API key when prompted
+
+2. **Configure Stock Settings:**
    - Enter Vietnamese stock symbol (e.g., "REE", "VIC", "HPG")
    - Select period (year/quarter)
    - Choose data source (VCI/TCBS)
 
-2. **Load Data:**
-   - Click "🔍 Analyze Stock" to fetch financial data
+3. **Load Data:**
+   - Click "Analyze Stock" to fetch financial data
+   - Wait for data to load (progress indicator will show)
 
-3. **Chat with AI:**
+4. **Chat with AI:**
    - Use the chat interface to ask questions about the stock
    - Try sample questions for quick insights
    - Ask follow-up questions for deeper analysis
+
+5. **Explore Results:**
+   - View financial data tables
+   - Analyze AI-generated charts and insights
+   - Use sample questions from the sidebar for inspiration
 
 ## Example Questions
 
@@ -346,11 +368,28 @@ docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/gahoccode/finance-bro
 
 ## Contributing
 
+We welcome contributions! Here are ways you can help improve Finance Bro:
+
+### Theme Contributions
+**🎨 Custom Themes Wanted**: We're looking for contributors to help create custom themes for the app. If you have design skills and want to contribute:
+- Create custom CSS themes (light/dark variants)
+- Design responsive layouts
+- Improve accessibility features
+- Submit theme proposals via pull requests
+
+### General Contributions
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
 4. Add tests if applicable
 5. Submit a pull request
+
+### Contribution Guidelines
+- Follow PEP8 style guidelines
+- Add appropriate documentation
+- Test your changes thoroughly
+- Include screenshots for UI changes
+- Update README if adding new features
 
 ## License
 

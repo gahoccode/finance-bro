@@ -53,7 +53,7 @@ with open('static/style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # Title
-st.markdown('<h1 class="main-header">📈 Finance Bro</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">Finance Bro</h1>', unsafe_allow_html=True)
 st.markdown('<p style="text-align: center; color: #666; font-size: 1.1rem; margin-top: -0.5rem; margin-bottom: 1rem;">Ask your finance bro about your company\'s financial statements</p>', unsafe_allow_html=True)
 
 # API Key handling
@@ -61,7 +61,7 @@ if 'api_key' not in st.session_state:
     st.session_state.api_key = os.environ.get("OPENAI_API_KEY", "")
 
 if not st.session_state.api_key:
-    st.warning("🔑 OpenAI API Key Required")
+    st.warning("OpenAI API Key Required")
     
     with st.expander("Enter API Key", expanded=True):
         api_key_input = st.text_input(
@@ -84,7 +84,7 @@ if not st.session_state.api_key:
 
 # Sidebar for stock configuration
 with st.sidebar:
-    st.header("📊 Stock Configuration")
+    st.header("Stock Configuration")
     
     # User input fields
     stock_symbol = st.text_input(
@@ -111,11 +111,11 @@ with st.sidebar:
         index=0
     )
     
-    analyze_button = st.button("🔍 Analyze Stock", type="primary", use_container_width=True)
+    analyze_button = st.button("Analyze Stock", type="primary", use_container_width=True)
     
     # Sample Questions - dropdown menu in sidebar
     st.markdown("---")
-    st.subheader("💡 Sample Questions")
+    st.subheader("Sample Questions")
     
     sample_questions = [
         "What is the return on invested capital (ROIC) trend?",
@@ -135,13 +135,13 @@ with st.sidebar:
         key="sample_question_selector"
     )
     
-    if selected_question != "Choose a question..." and st.button("🤖 Ask Question", use_container_width=True):
+    if selected_question != "Choose a question..." and st.button("Ask Question", use_container_width=True):
         # Store the selected question for processing
         st.session_state.pending_question = selected_question
     
     # Clear Chat button in sidebar
     st.markdown("---")
-    if st.button("🗑️ Clear Chat", use_container_width=True, key="sidebar_clear_chat"):
+    if st.button("Clear Chat", use_container_width=True, key="sidebar_clear_chat"):
         st.session_state.messages = []
         st.rerun()
     
@@ -169,7 +169,7 @@ if 'last_period' in st.session_state and st.session_state.last_period != period:
 # Main content area
 if (analyze_button and stock_symbol) or (period_changed and 'stock_symbol' in st.session_state):
     try:
-        with st.spinner(f"📊 Loading data for {stock_symbol}..."):
+        with st.spinner(f"Loading data for {stock_symbol}..."):
             # Initialize Vnstock
             stock = Vnstock().stock(symbol=stock_symbol, source=source)
             company = Vnstock().stock(symbol=stock_symbol, source=company_source).company
@@ -352,7 +352,7 @@ if 'dataframes' in st.session_state:
             st.rerun()
     
     with col2:
-        if st.button("💰 Dividend Schedule"):
+        if st.button("Dividend Schedule"):
             question = "Did the company issue cash dividends in 2024 and what was the exercise date, compare the percentage to last year?"
             # Add to chat and generate response
             st.session_state.messages.append({"role": "user", "content": question})
@@ -438,7 +438,7 @@ if 'dataframes' in st.session_state:
             st.rerun()
     
     # Chat Interface
-    st.subheader("💬 Chat with AI Analyst")
+    st.subheader("Chat with AI Analyst")
     
     # Initialize chat history
     if 'messages' not in st.session_state:
@@ -458,7 +458,7 @@ if 'dataframes' in st.session_state:
                 
                 # Show chart only for the latest message to avoid accumulation
                 if "chart_data" in message and i == len(st.session_state.messages) - 1:
-                    st.subheader("📊 Analysis Chart")
+                    st.subheader("Analysis Chart")
                     # Increase chart dimensions by 200px (1000x700)
                     if message["chart_data"]["type"] == "plotly":
                         st.plotly_chart(message["chart_data"]["figure"], use_container_width=False, width=1000, height=700)
@@ -517,7 +517,7 @@ if 'dataframes' in st.session_state:
                     
                     # Display generated code in expandable container
                     if generated_code:
-                        with st.expander("🔍 View Generated Code", expanded=False):
+                        with st.expander("View Generated Code", expanded=False):
                             st.code(generated_code, language="python")
                     
             except Exception as e:
@@ -530,7 +530,7 @@ if 'dataframes' in st.session_state:
     with col1:
         if st.button("Show Table", use_container_width=True):
             if 'display_dataframes' in st.session_state:
-                with st.expander("📊 Financial Data"):
+                with st.expander("Financial Data"):
                     for name, df in st.session_state.display_dataframes.items():
                         st.subheader(name)
                         
@@ -622,7 +622,7 @@ st.markdown("---")
 st.markdown(
     """
     <div style='text-align: center; color: #666; padding: 1rem;'>
-        <p>💡 Tip: Specify the table you want to analyze for more accurate results and customize charts by including any desired technical settings in your prompt</p>
+        <p>Tip: Specify the table you want to analyze for more accurate results and customize charts by including any desired technical settings in your prompt</p>
         <p>Built with <a href="https://streamlit.io" target="_blank">Streamlit</a>, <a href="https://pandas-ai.com" target="_blank">PandasAI</a>, and <a href="https://github.com/thinh-vu/vnstock" target="_blank">Vnstock</a> by <a href="https://github.com/thinh-vu" target="_blank">Thinh Vu</a></p>
     </div>
     """,

@@ -30,7 +30,6 @@ def get_management_data(symbol):
 # Set page configuration
 st.set_page_config(
     page_title="Company Profile Analysis",
-    page_icon="📊",
     layout="wide"
 )
 
@@ -41,7 +40,7 @@ with open('static/style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # Title and description
-st.title("📈 Company Profile Analysis")
+st.title("Company Profile Analysis")
 st.markdown("Analyze company ownership structure and management information")
 
 # User input for ticker symbol
@@ -54,7 +53,7 @@ if stock_symbol:
         
         if not ownership_percentage.empty:
             # Display ownership chart and metrics at the top
-            st.header(f"🏢 {stock_symbol} - Ownership Structure")
+            st.header(f"{stock_symbol} - Ownership Structure")
             
             # Create two columns for chart and summary
             col_chart, col_summary = st.columns([3, 1])
@@ -106,7 +105,7 @@ if stock_symbol:
                 st.altair_chart(final_chart, use_container_width=True)
             
             with col_summary:
-                st.subheader("📊 Summary")
+                st.subheader("Summary")
                 st.metric("Total Shareholders", len(ownership_percentage))
                 st.metric("Largest Shareholder", f"{ownership_percentage['share_own_percent'].max():.1f}%")
                 st.metric("Top 3 Combined", f"{ownership_percentage['share_own_percent'].nlargest(3).sum():.1f}%")
@@ -119,7 +118,7 @@ if stock_symbol:
             st.info("No ownership data available for this symbol.")
         
         # Create tabs for additional information
-        tab1, tab2 = st.tabs(["👥 Management Team", "📋 Full Details"])
+        tab1, tab2 = st.tabs(["Management Team", "Full Details"])
         
         with tab1:
             st.header("Company Management")
@@ -131,7 +130,7 @@ if stock_symbol:
                     st.dataframe(management_team, use_container_width=True)
                     
                     # Create management team ownership chart
-                    st.subheader("📊 Management Team Ownership")
+                    st.subheader("Management Team Ownership")
                     
                     # Filter for officers with quantity data
                     mgmt_with_shares = management_team[

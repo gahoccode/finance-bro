@@ -91,7 +91,7 @@ start_date_str = start_date.strftime('%Y-%m-%d')
 end_date_str = end_date.strftime('%Y-%m-%d')
 
 # Main title
-st.title("📈 Stock Portfolio Optimization")
+st.title("Stock Portfolio Optimization")
 st.write("Optimize your portfolio using Modern Portfolio Theory")
 
 # Validate inputs
@@ -129,7 +129,7 @@ def fetch_stock_data(symbols, start_date_str, end_date_str, interval):
                 
                 all_data[symbol] = historical_data
         except Exception as e:
-            st.error(f"❌ Error fetching data for {symbol}: {e}")
+            st.error(f"Error fetching data for {symbol}: {e}")
     
     return all_data
 

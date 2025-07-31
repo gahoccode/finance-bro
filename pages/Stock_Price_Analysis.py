@@ -11,13 +11,13 @@ from bokeh.palettes import Spectral6
 import altair as alt
 import os
 
-st.set_page_config(page_title="Stock Price Analysis", page_icon="📈", layout="wide")
+st.set_page_config(page_title="Stock Price Analysis", layout="wide")
 
 # Load custom CSS
 with open('static/style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
-st.title("📈 Stock Price Analysis")
+st.title("Stock Price Analysis")
 
 # Sidebar for user inputs
 with st.sidebar:

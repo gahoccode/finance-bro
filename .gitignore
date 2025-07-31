@@ -54,9 +54,6 @@ Thumbs.db
 .env.local
 .env.production
 
-# Streamlit
-.streamlit/
-
 # PandasAI cache
 cache/
 exports/
