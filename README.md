@@ -1,6 +1,6 @@
 # Finance Bro - AI Stock Analysis
 
-🚀 **AI-powered Vietnamese stock market analysis tool** built with Streamlit, PandasAI, and Vnstock.
+🚀 **Natural language interface for Vietnamese stock market analysis** Interact with your financial statements in natural language. Get answers to your questions about any financial statement of listed stocks in Vietnam with a friendly finance bro. He's an introvert so please make your questions short and to the point. 
 
 ## Features
 
