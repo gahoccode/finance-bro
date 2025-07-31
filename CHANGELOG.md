@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [2025-07-31] **Docker Build Error Resolution**: Fixed osqp package build failure in Docker container
+  - **Issue**: osqp package (dependency of pyportfolioopt) failed to build due to missing git and build dependencies
+  - **Root Cause**: Docker container lacked essential build tools required for scientific Python packages
+  - **Solution**: Added comprehensive system dependencies to Dockerfile:
+    - `build-essential` - Essential build tools and utilities
+    - `git` - Required for osqp to clone dependencies during build
+    - `cmake` - Required for CMake-based build process
+    - `pkg-config` - Package configuration tool
+    - `libblas-dev`, `liblapack-dev` - BLAS/LAPACK mathematical libraries
+    - `gfortran` - Fortran compiler for scientific computing
+    - `libopenblas-dev` - Optimized BLAS implementation
+    - `curl` - For health checks and HTTP requests
+  - **Additional Fix**: Added explicit osqp version (0.6.2.post8) in requirements.txt for better wheel compatibility
+  - **Result**: Docker build now completes successfully, all Python packages install properly
+  - **Impact**: Finance-bro application now runs successfully in Docker containers
+
 ### Added
 - [2025-07-30] **Stock Portfolio Optimization Page**: New comprehensive portfolio optimization feature using PyPortfolioOpt library
   - **Library Integration**: Integrated PyPortfolioOpt for Modern Portfolio Theory calculations

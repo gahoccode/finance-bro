@@ -1,6 +1,14 @@
-pandasai==2.4.2
+numpy==1.26.4
+pandasai==2.3.0
 pandas==1.5.3
 vnstock==3.2.5
 openai>=1.61.0
 streamlit==1.37.1
 python-dotenv==1.0.1
+mplfinance>=0.12.10b0
+bokeh==2.4.3
+altair>=5.5.0
+# Try installing osqp first with specific version
+osqp==0.6.2.post8
+# Then install pyportfolioopt
+pyportfolioopt>=1.5.6
