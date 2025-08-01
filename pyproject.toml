@@ -11,6 +11,8 @@ classifiers = [
 dependencies = [
     "numpy>=1.26.4,<2.0.0",
     "pandasai>=3.0.0b2",
+    "pandasai-openai>=0.1.0",
+    "pandasai-litellm>=0.0.1",
     "pandas>=2.0.3",
     "vnstock==3.2.5",
     "openai>=1.61.0",
