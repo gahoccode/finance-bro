@@ -56,6 +56,24 @@ with open('static/style.css') as f:
 st.markdown('<h1 class="main-header">Finance Bro</h1>', unsafe_allow_html=True)
 st.markdown('<p style="text-align: center; color: #666; font-size: 1.1rem; margin-top: -0.5rem; margin-bottom: 1rem;">Ask your finance bro about your company\'s financial statements</p>', unsafe_allow_html=True)
 
+# Authentication handling
+# Check if user is logged in using Streamlit's built-in authentication
+if not st.user.is_logged_in:
+    st.title("🔒 Authentication Required")
+    st.markdown("Please authenticate with Google to access Finance Bro")
+    
+    # Create a clean login interface
+    st.button("Login with Google", on_click=st.login)
+    
+    # Show helpful information
+    st.markdown("---")
+    st.info("After logging in, you'll be redirected back to the app automatically.")
+    
+    st.stop()
+
+# User is now authenticated - show welcome message in sidebar
+st.sidebar.success("Successfully logged in")
+
 # API Key handling
 if 'api_key' not in st.session_state:
     st.session_state.api_key = os.environ.get("OPENAI_API_KEY", "")
@@ -85,6 +103,12 @@ if not st.session_state.api_key:
 # Sidebar for stock configuration
 with st.sidebar:
     st.header("Stock Configuration")
+    
+    # User logout option
+    if st.sidebar.button("Logout", use_container_width=True):
+        st.logout()
+    
+    st.sidebar.markdown("---")
     
     # User input fields
     stock_symbol = st.text_input(

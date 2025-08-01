@@ -16,6 +16,39 @@
 
 - Python >= 3.10.11
 - OpenAI API key
+- Google Cloud Console account (for OAuth setup)
+
+### Google OAuth Setup (Required)
+
+Before running the app, you need to set up Google OAuth authentication:
+
+1. **Create Google OAuth Credentials:**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing one
+   - Enable Google+ API
+   - Go to Credentials → Create Credentials → OAuth 2.0 Client IDs
+   - Configure OAuth consent screen
+   - Add authorized redirect URI: `http://localhost:8501/oauth2callback` or 'https://your-app-domain.com/oauth2callback' if you are deploying to production with a custom domain
+   - Download credentials JSON file
+
+2. **Configure authentication:**
+   ```bash
+   # Copy the example secrets file
+   cp .streamlit/secrets.example.toml .streamlit/secrets.toml
+   
+   # Edit .streamlit/secrets.toml and add your Google OAuth credentials
+   # Replace the placeholder values with your actual credentials
+   ```
+
+3. **Update secrets.toml with your credentials:**
+   ```toml
+   [auth]
+   redirect_uri = "http://localhost:8501/oauth2callback"
+   cookie_secret = "your-random-secret-string-here"
+   client_id = "your-google-client-id.apps.googleusercontent.com"
+   client_secret = "your-google-client-secret"
+   server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"
+   ```
 
 ### Installation
 

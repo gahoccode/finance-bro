@@ -289,3 +289,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Transformation Logic**: Added robust data structure detection and appropriate transposition methods
 - **Fallback Support**: Maintains original display format when transformation is not possible
 - **Data Integrity**: Preserves all original data while improving presentation format
+
+## [2025-07-31] Google OAuth Authentication Integration
+
+### Added
+- [2025-07-31] **Google OAuth Authentication**: Implemented secure Google OAuth authentication using Streamlit 1.47.0+ built-in authentication features
+  - **Authentication Gating**: App now requires Google login before accessing any features, similar to API key check
+  - **Streamlit Integration**: Uses `st.login()`, `st.user`, and `st.logout()` for seamless OAuth flow
+  - **Configuration**: Properly configured `.streamlit/secrets.toml` with Google OAuth credentials
+  - **User Experience**: Clean login interface with Google sign-in button
+  - **Logout Functionality**: Added logout button in sidebar for easy session management
+
+### Technical Implementation
+- **Authentication Flow**: Uses `st.user.is_logged_in` to properly check authentication state and prevent redirect loops
+- **Configuration**: Updated `.streamlit/secrets.toml` with correct OAuth parameters:
+  - `redirect_uri = "http://localhost:8501/oauth2callback"`
+  - `client_id`, `client_secret`, and `server_metadata_url` for Google OAuth
+- **Session Management**: Streamlit handles session cookies automatically with 30-day expiration
+- **Security**: OAuth credentials stored securely in secrets.toml file
+
+### User Experience Improvements
+- **Seamless Login**: Users authenticate once and stay logged in across sessions
+- **Clean Interface**: Minimal login page with Google sign-in button
+- **Easy Logout**: One-click logout option in sidebar
+- **No Redirect Loops**: Fixed previous authentication state issues
+- **Professional Appearance**: Clean, modern authentication flow
+
+### Files Modified
+- `app.py`: Added authentication gating at application start
+- `.streamlit/secrets.toml`: Configured Google OAuth credentials
+- **Dependencies**: Requires `streamlit>=1.47.0` and `Authlib>=1.3.2`

@@ -58,3 +58,6 @@ Thumbs.db
 cache/
 exports/
 temp_chart.png
+
+# Streamlit secrets
+.streamlit/secrets.toml
