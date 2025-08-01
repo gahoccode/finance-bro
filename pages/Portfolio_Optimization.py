@@ -18,7 +18,7 @@ from math import pi
 # Streamlit page configuration
 st.set_page_config(
     page_title="Stock Portfolio Optimization",
-    #page_icon="📈",
+    page_icon="",
     layout="wide"
 )
 
@@ -58,13 +58,7 @@ with col2:
     )
 
 # Risk parameters
-risk_free_rate = st.sidebar.number_input(
-    "Risk-free Rate (%)", 
-    value=2.0, 
-    min_value=0.0, 
-    max_value=10.0, 
-    step=0.1
-) / 100
+
 
 risk_aversion = st.sidebar.number_input(
     "Risk Aversion Parameter",
@@ -216,19 +210,19 @@ S = risk_models.sample_cov(prices_df)
 ef_tangent = EfficientFrontier(mu, S)
 weights_tangent = ef_tangent.max_sharpe()
 weights_max_sharpe = ef_tangent.clean_weights()
-ret_tangent, std_tangent, sharpe = ef_tangent.portfolio_performance(risk_free_rate=risk_free_rate)
+ret_tangent, std_tangent, sharpe = ef_tangent.portfolio_performance()
 
 # Min Volatility Portfolio
 ef_min_vol = EfficientFrontier(mu, S)
 ef_min_vol.min_volatility()
 weights_min_vol = ef_min_vol.clean_weights()
-ret_min_vol, std_min_vol, sharpe_min_vol = ef_min_vol.portfolio_performance(risk_free_rate=risk_free_rate)
+ret_min_vol, std_min_vol, sharpe_min_vol = ef_min_vol.portfolio_performance()
 
 # Max Utility Portfolio
 ef_max_utility = EfficientFrontier(mu, S)
 ef_max_utility.max_quadratic_utility(risk_aversion=risk_aversion, market_neutral=False)
 weights_max_utility = ef_max_utility.clean_weights()
-ret_utility, std_utility, sharpe_utility = ef_max_utility.portfolio_performance(risk_free_rate=risk_free_rate)
+ret_utility, std_utility, sharpe_utility = ef_max_utility.portfolio_performance()
 
 status_text.empty()
 
