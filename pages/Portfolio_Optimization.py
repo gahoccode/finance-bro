@@ -53,7 +53,7 @@ with col1:
 with col2:
     end_date = st.date_input(
         "End Date", 
-        value=pd.to_datetime("2025-03-19"),
+        value=pd.to_datetime("today") - pd.Timedelta(days=1), # Default to yesterday
         max_value=pd.to_datetime("today")
     )
 
@@ -243,21 +243,21 @@ with col1:
     st.metric(
         "Max Sharpe Portfolio",
         f"{sharpe:.4f}",
-        f"Return: {(ret_tangent*100):.2f}%\nVol: {(std_tangent*100):.2f}%"
+        f"Return: {(ret_tangent*100):.2f}"
     )
 
 with col2:
     st.metric(
         "Min Volatility Portfolio", 
         f"{sharpe_min_vol:.4f}",
-        f"Return: {(ret_min_vol*100):.2f}%\nVol: {(std_min_vol*100):.2f}%"
+        f"Return: {(ret_min_vol*100):.2f}"
     )
 
 with col3:
     st.metric(
         "Max Utility Portfolio",
         f"{sharpe_utility:.4f}",
-        f"Return: {(ret_utility*100):.2f}%\nVol: {(std_utility*100):.2f}%"
+        f"Return: {(ret_utility*100):.2f}"
     )
 
 # Efficient Frontier Plot
