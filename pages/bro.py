@@ -298,7 +298,18 @@ if analyze_button or (period_changed and 'stock_symbol' in st.session_state):
 
 # AI Analysis section
 if 'dataframes' in st.session_state:
-    st.header(f"Analysis for {st.session_state.stock_symbol}")
+    # Get company full name from cached symbols DataFrame
+    company_name = st.session_state.stock_symbol
+    if 'symbols_df' in st.session_state and st.session_state.symbols_df is not None:
+        try:
+            symbols_df = st.session_state.symbols_df
+            matching_company = symbols_df[symbols_df['symbol'] == st.session_state.stock_symbol]
+            if not matching_company.empty and 'organ_name' in symbols_df.columns:
+                company_name = matching_company['organ_name'].iloc[0]
+        except Exception:
+            company_name = st.session_state.stock_symbol
+    
+    st.header(company_name)
     
     # Initialize LLM with OpenAI for pandasai v2.4.2
     model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")

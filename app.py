@@ -66,13 +66,20 @@ def main_page():
     # Stock symbol selection with searchable dropdown
     st.subheader("🔍 Stock Symbol Selection")
     
-    # Get stock symbols from session state (loaded by bro.py) or use defaults
-    if 'stock_symbols_list' in st.session_state:
-        stock_symbols_list = st.session_state.stock_symbols_list
-    else:
-        # Default list if symbols haven't been loaded yet
-        stock_symbols_list = ["REE", "VIC", "VNM", "VCB", "BID", "HPG", "FPT", "FMC", "DHC"]
-        st.info("💡 Visit the Stock Analysis page to load the complete list of stock symbols.")
+    # Load stock symbols using Listing().all_symbols() since this is the entry point
+    if 'stock_symbols_list' not in st.session_state:
+        try:
+            with st.spinner("Loading stock symbols..."):
+                symbols_df = Listing().all_symbols()
+                st.session_state.stock_symbols_list = sorted(symbols_df['symbol'].tolist())
+                st.session_state.symbols_df = symbols_df  # Cache the full DataFrame for organ_name access
+                st.success("✅ Stock symbols loaded!")
+        except Exception as e:
+            st.warning(f"Could not load stock symbols: {str(e)}")
+            st.session_state.stock_symbols_list = ["REE", "VIC", "VNM", "VCB", "BID", "HPG", "FPT", "FMC", "DHC"]
+            st.session_state.symbols_df = None
+    
+    stock_symbols_list = st.session_state.stock_symbols_list
     
     # Use multiselect but configure for single selection
     selected_symbols = st.multiselect(
