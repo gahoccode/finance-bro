@@ -5,6 +5,34 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-08-02
+
+### Fixed
+- [2025-08-02] **Environment Variable Loading**: Fixed API key not being loaded from .env file
+  - **Issue**: App was showing API key input page despite having API key saved in .env file
+  - **Root Cause**: Missing `load_dotenv()` call to load environment variables from .env file
+  - **Solution**: Added `python-dotenv` import and `load_dotenv()` call at app startup
+  - **Files Modified**: app.py - added dotenv import and load_dotenv() call before other imports
+  - **Result**: API key now properly loaded from .env file, skipping manual input step
+
+- [2025-08-02] **Chat Input File Upload Compatibility**: Fixed "expected string or bytes-like object" error in chat interface
+  - **Issue**: Chat input with `accept_file=True` parameter returned object instead of string, causing TypeError
+  - **Root Cause**: Streamlit 1.47+ `st.chat_input` with file support returns dict-like object with `.text` and `.files` attributes
+  - **Solution**: Added proper handling for new chat input format with fallback for string input
+  - **Technical Details**:
+    - Added detection for object vs string input types
+    - Extract text content from `.text` attribute when available
+    - Added validation to only process chat when text content exists
+    - Maintains backwards compatibility with string-only input
+  - **Files Modified**: pages/bro.py - updated chat input handling logic
+  - **Result**: Chat interface now works properly with file upload support enabled
+
+### Technical Implementation
+- **Environment Loading**: Proper dotenv integration ensures environment variables are available throughout application
+- **Chat Input Handling**: Robust input processing that handles both new object-based and legacy string-based input formats
+- **Error Prevention**: Added input validation to prevent processing empty or invalid chat submissions
+- **Backwards Compatibility**: Code works with both newer Streamlit versions (with file support) and older versions
+
 ## [0.2.0] - 2025-08-02
 
 ### Added

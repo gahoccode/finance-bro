@@ -511,63 +511,78 @@ if 'dataframes' in st.session_state:
     
         
     # Chat input with file upload support
-    if prompt := st.chat_input(
+    if user_input := st.chat_input(
         "Ask me anything about this stock...",
         accept_file=True,
         file_type=["csv", "xlsx", "json", "txt", "pdf", "jpg", "jpeg", "png"]
     ):
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": prompt})
+        # Extract text and files from the input object
+        if hasattr(user_input, 'text'):
+            # New format with file support
+            prompt = user_input.text if user_input.text else ""
+            files = user_input.files if hasattr(user_input, 'files') else []
+        else:
+            # Fallback for string input (when no files)
+            prompt = str(user_input) if user_input else ""
+            files = []
         
-        # Display user message
-        with st.chat_message("user"):
-            st.markdown(prompt)
+        # Only proceed if there's text content
+        if prompt.strip():
+            # Add user message to chat history
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            
+            # Display user message
+            with st.chat_message("user"):
+                st.markdown(prompt)
         
-        # Generate response
-        with st.chat_message("assistant"):
-            try:
-                with st.spinner("🤖 Analyzing..."):
-                    response = agent.chat(prompt)
-                    
-                    # Display response
-                    st.markdown(response)
-                    
-                    # Get the generated code using helper function
-                    generated_code = get_generated_code(response, agent)
-                    
-                    # Clear any existing chart containers
-                    chart_container = st.empty()
-                    
-                    # Try to detect if a chart was generated and display it
+            # Generate response only if there's text content
+            if prompt.strip():
+                # Generate response
+                with st.chat_message("assistant"):
                     try:
-                        # Check if PandasAI generated a chart/plot
-                        chart_dir = "exports/charts/"
-                        if os.path.exists(chart_dir):
-                            chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
-                            if chart_files:
-                                # Get the most recent chart file
-                                latest_chart = max(chart_files, key=os.path.getctime)
-                                with chart_container:
-                                    st.image(latest_chart, use_column_width=True)
+                        with st.spinner("🤖 Analyzing..."):
+                            response = agent.chat(prompt)
+                    
+                        # Display response - ensure it's a string
+                        response_text = str(response) if response is not None else "No response generated"
+                        st.markdown(response_text)
+                        
+                        # Get the generated code using helper function
+                        generated_code = get_generated_code(response, agent)
+                        
+                        # Clear any existing chart containers
+                        chart_container = st.empty()
+                        
+                        # Try to detect if a chart was generated and display it
+                        try:
+                            # Check if PandasAI generated a chart/plot
+                            chart_dir = "exports/charts/"
+                            if os.path.exists(chart_dir):
+                                chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
+                                if chart_files:
+                                    # Get the most recent chart file
+                                    latest_chart = max(chart_files, key=os.path.getctime)
+                                    with chart_container:
+                                        st.image(latest_chart, use_column_width=True)
+                        except Exception as e:
+                            # Chart display failed, continue without error
+                            pass
+                        
+                        # Add assistant response to chat history
+                        message_data = {"role": "assistant", "content": response_text}
+                        if generated_code:
+                            message_data["generated_code"] = generated_code
+                        st.session_state.messages.append(message_data)
+                        
+                        # Display generated code in expandable container
+                        if generated_code:
+                            with st.expander("View Generated Code", expanded=False):
+                                st.code(generated_code, language="python")
+                        
                     except Exception as e:
-                        # Chart display failed, continue without error
-                        pass
-                    
-                    # Add assistant response to chat history
-                    message_data = {"role": "assistant", "content": str(response)}
-                    if generated_code:
-                        message_data["generated_code"] = generated_code
-                    st.session_state.messages.append(message_data)
-                    
-                    # Display generated code in expandable container
-                    if generated_code:
-                        with st.expander("View Generated Code", expanded=False):
-                            st.code(generated_code, language="python")
-                    
-            except Exception as e:
-                error_msg = f"❌ Analysis error: {str(e)}"
-                st.error(error_msg)
-                st.session_state.messages.append({"role": "assistant", "content": error_msg})
+                        error_msg = f"❌ Analysis error: {str(e)}"
+                        st.error(error_msg)
+                        st.session_state.messages.append({"role": "assistant", "content": error_msg})
     
     # Chat controls
     col1, col2 = st.columns(2)

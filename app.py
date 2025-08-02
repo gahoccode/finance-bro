@@ -1,6 +1,10 @@
 import streamlit as st
 import os
+from dotenv import load_dotenv
 from vnstock import Listing
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Set page configuration - this must be called first
 st.set_page_config(

@@ -1,5 +1,5 @@
 ---
-trigger: manual
+trigger: always_on
 ---
 
 Versioning Rules Summary
@@ -10,4 +10,3 @@ Patch Increment: Only on actual changes (features/fixes/improvements)
 Date-Based: Each unique date with changes gets next patch number
 No Empty Increments: Skip dates without actual changes
 Chronological: Organize by actual implementation dates
-
