@@ -66,14 +66,13 @@ def main_page():
     # Stock symbol selection with searchable dropdown
     st.subheader("🔍 Stock Symbol Selection")
     
-    # Get stock symbols from vnstock with fallback
-    try:
-        symbols_df = Listing().all_symbols()
-        stock_symbols_list = symbols_df['symbol'].tolist()
-        stock_symbols_list = sorted(stock_symbols_list)
-    except Exception as e:
-        st.warning(f"Could not load stock symbols from vnstock: {str(e)}")
+    # Get stock symbols from session state (loaded by bro.py) or use defaults
+    if 'stock_symbols_list' in st.session_state:
+        stock_symbols_list = st.session_state.stock_symbols_list
+    else:
+        # Default list if symbols haven't been loaded yet
         stock_symbols_list = ["REE", "VIC", "VNM", "VCB", "BID", "HPG", "FPT", "FMC", "DHC"]
+        st.info("💡 Visit the Stock Analysis page to load the complete list of stock symbols.")
     
     # Use multiselect but configure for single selection
     selected_symbols = st.multiselect(

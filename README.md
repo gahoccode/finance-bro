@@ -87,9 +87,43 @@ streamlit run app.py
 
 ## User Flow
 
+### Optimal User Experience Flow
+
+**Finance Bro** is designed with a specific user flow for the best experience. Follow these steps to get the most out of the application:
+
+### Step 1: Authentication & Homepage
+1. **🔐 Google Login**: Start by logging in with your Google account on the authentication page
+2. **🏠 Homepage Navigation**: After login, you'll be directed to the Finance Bro homepage
+3. **📊 Stock Symbol Selection**: On the homepage, use the searchable dropdown to select a Vietnamese stock symbol
+   - **Critical Step**: This stock symbol selection is essential - it will be shared across all analysis pages
+   - **Search Feature**: Type to search through all available Vietnamese stock symbols
+   - **Persistence**: Your selected symbol will be available throughout your session
+
+### Step 2: Stock Analysis Page (Essential First Stop)
+4. **📈 Navigate to Stock Analysis**: From the homepage, click the "📊 Stock Analysis" quick navigation button
+   - **Why This Matters**: The Stock Analysis page loads and caches essential data for optimal performance
+   - **Data Loading**: This page loads all stock symbols and company information for the entire app
+   - **Performance**: Visiting this page first ensures faster loading on all other pages
+
+5. **⚙️ Configure Analysis Settings**: In the Stock Analysis page:
+   - Select period (year/quarter)
+   - Choose data source (VCI/TCBS)
+   - Click "Analyze Stock" to load financial data
+
+6. **💬 AI Interaction**: Once data is loaded:
+   - Use the chat interface to ask financial questions
+   - Try sample questions from the sidebar
+   - Explore AI-generated insights and charts
+
+### Step 3: Explore Other Analysis Tools
+7. **🚀 Navigate to Other Pages**: Now you can efficiently use other analysis tools:
+   - **📈 Price Analysis**: Interactive price charts and technical analysis
+   - **🏢 Company Overview**: Company profile with full company names and ownership structure
+   - **💼 Portfolio Optimization**: Modern Portfolio Theory-based optimization
+
 ### Recommended Setup for Best Experience
 
-**🌞 Light Mode Required**: This app is designed for optimal readability in light mode. Please enable light mode in Streamlit settings before use.
+**🌞 Light Mode Recommended**: This app is optimized for readability in light mode.
 
 **How to enable light mode:**
 1. Click the hamburger menu (☰) in the top-right corner
@@ -97,30 +131,22 @@ streamlit run app.py
 3. Under "Theme", choose "Light"
 4. The app will immediately switch to light mode for better visibility
 
-### Step-by-Step Usage
+### Why This Flow Matters
 
-1. **Initial Setup:**
-   - Enable light mode for optimal readability (see above)
-   - Enter your OpenAI API key when prompted
+**🎯 Performance Optimization**: 
+- Stock Analysis page loads and caches symbols data once for the entire session
+- All other pages benefit from this cached data for faster loading
+- Company names display properly across all pages
 
-2. **Configure Stock Settings:**
-   - Enter Vietnamese stock symbol (e.g., "REE", "VIC", "HPG")
-   - Select period (year/quarter)
-   - Choose data source (VCI/TCBS)
+**📊 Data Consistency**: 
+- Your selected stock symbol persists across all pages
+- Financial data is loaded once and shared across analysis tools
+- Seamless navigation between different analysis perspectives
 
-3. **Load Data:**
-   - Click "Analyze Stock" to fetch financial data
-   - Wait for data to load (progress indicator will show)
-
-4. **Chat with AI:**
-   - Use the chat interface to ask questions about the stock
-   - Try sample questions for quick insights
-   - Ask follow-up questions for deeper analysis
-
-5. **Explore Results:**
-   - View financial data tables
-   - Analyze AI-generated charts and insights
-   - Use sample questions from the sidebar for inspiration
+**🚀 Best User Experience**:
+- No need to re-enter stock symbols on each page
+- Faster page loads after initial data caching
+- Professional company name display instead of just stock symbols
 
 ## Example Questions
 

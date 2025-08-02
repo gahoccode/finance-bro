@@ -1,6 +1,5 @@
 import streamlit as st
 from vnstock import Quote
-from vnstock import Listing
 import pandas as pd
 import matplotlib.pyplot as plt
 from pypfopt import EfficientFrontier, risk_models, expected_returns, DiscreteAllocation
@@ -41,13 +40,12 @@ else:
 # Sidebar for user inputs
 st.sidebar.header("Portfolio Configuration")
 
-# Get stock symbols from vnstock
-try:
-    symbols_df = Listing().all_symbols()
-    stock_symbols_list = symbols_df['symbol'].tolist()
-    stock_symbols_list = sorted(stock_symbols_list)
-except Exception as e:
-    st.error(f"Error loading stock symbols: {str(e)}")
+# Get stock symbols from session state (cached from bro.py)
+if 'stock_symbols_list' in st.session_state:
+    stock_symbols_list = st.session_state.stock_symbols_list
+else:
+    # If not cached, user should visit bro.py first
+    st.warning("⚠️ Stock symbols not loaded. Please visit the Stock Analysis page first to load symbols.")
     stock_symbols_list = ["REE", "FMC", "DHC", "VNM", "VCB", "BID", "HPG", "FPT"]
 
 # Set default symbols to include the main symbol from session state

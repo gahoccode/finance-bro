@@ -48,6 +48,21 @@ else:
     st.warning("⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first.")
     st.stop()
 
+# Get company full name from cached symbols DataFrame
+company_name = stock_symbol  # Default fallback
+if 'symbols_df' in st.session_state and st.session_state.symbols_df is not None:
+    try:
+        symbols_df = st.session_state.symbols_df
+        matching_company = symbols_df[symbols_df['symbol'] == stock_symbol]
+        if not matching_company.empty and 'organ_name' in symbols_df.columns:
+            company_name = matching_company['organ_name'].iloc[0]
+    except Exception:
+        # Keep using stock_symbol as fallback if anything fails
+        pass
+else:
+    # If symbols not cached, user should visit bro.py first for optimal experience
+    st.info("💡 For best experience with company names, visit the Stock Analysis page first to load stock symbols.")
+
 # Title and description
 st.title("Company Profile Analysis")
 st.markdown("Analyze company ownership structure and management information")
@@ -59,7 +74,7 @@ if stock_symbol:
         
         if not ownership_percentage.empty:
             # Display ownership chart and metrics at the top
-            st.header(f"{stock_symbol} - Ownership Structure")
+            st.header(f"{company_name} ({stock_symbol}) - Ownership Structure")
             
             # Create two columns for chart and summary
             col_chart, col_summary = st.columns([3, 1])
@@ -96,7 +111,7 @@ if stock_symbol:
                 
                 # Combine chart and text labels
                 final_chart = (bars + text).properties(
-                    title=f'Ownership by Share Quantity - {stock_symbol}',
+                    title=f'Ownership by Share Quantity - {company_name}',
                     width=600,
                     height=400
                 ).configure_axis(
@@ -179,7 +194,7 @@ if stock_symbol:
                         
                         # Combine chart
                         mgmt_chart = (mgmt_bars + mgmt_text).properties(
-                            title=f'Management Team Share Ownership - {stock_symbol}',
+                            title=f'Management Team Share Ownership - {company_name}',
                             width=600,
                             height=300
                         ).configure_axis(

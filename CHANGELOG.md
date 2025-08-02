@@ -5,6 +5,41 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2025-08-02
+
+### Changed
+- [2025-08-02] **Stock Symbols Loading Optimization**: Centralized symbols loading to Stock Analysis page for optimal user flow
+  - **Migration**: Moved `Listing().all_symbols()` loading from multiple pages to `pages/bro.py` (Stock Analysis page)
+  - **Centralized Caching**: Stock symbols now loaded once in the primary workflow entry point and cached for all pages
+  - **Performance**: Eliminated redundant API calls across pages - symbols loaded only once per session
+  - **User Flow**: Stock Analysis page is now the recommended first stop after homepage for optimal caching
+  - **Company Names**: Full company names (via `organ_name`) now available across all pages from single cache
+  - **Files Modified**: 
+    - `pages/bro.py`: Added symbols loading and caching logic
+    - `pages/Portfolio_Optimization.py`: Removed symbols loading fallback, now uses cached data
+    - `pages/Company_Overview.py`: Enhanced to use cached company names from DataFrame
+    - `app.py`: Simplified to use cached symbols or show default list with helpful guidance
+
+### Added  
+- [2025-08-02] **Enhanced Company Name Display**: Company Overview page now shows full company names instead of just symbols
+  - **Full Names**: Headers now display "Company Name (SYMBOL)" format instead of just "SYMBOL"
+  - **Chart Titles**: Updated ownership and management charts to use full company names
+  - **Data Source**: Uses cached `symbols_df['organ_name']` field for proper company names
+  - **Example**: "Vietnam Dairy Products Joint Stock Company (VNM) - Ownership Structure"
+
+### Technical Implementation
+- **Single Loading Point**: Symbols loaded efficiently in main user workflow (bro.py) instead of multiple pages
+- **Session State Caching**: Both `stock_symbols_list` and full `symbols_df` DataFrame cached in session state
+- **Graceful Fallbacks**: Pages still work if accessed directly, with helpful messages directing users to optimal flow
+- **User Guidance**: Clear messages throughout app directing users to Stock Analysis page for best experience
+- **Code Cleanup**: Removed redundant import statements and unused fallback loading logic
+
+### User Experience Improvements
+- **Optimal Flow**: Users guided to visit Stock Analysis page first for complete symbols loading and caching
+- **Better Performance**: Faster page loads after initial symbols caching in Stock Analysis page
+- **Professional Display**: Company names displayed properly throughout application
+- **Clear Guidance**: Helpful messages guide users to optimal workflow for best experience
+
 ## [0.2.1] - 2025-08-02
 
 ### Fixed

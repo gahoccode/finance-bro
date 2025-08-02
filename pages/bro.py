@@ -2,7 +2,7 @@ import os
 import glob
 import streamlit as st
 import pandas as pd
-from vnstock import Vnstock
+from vnstock import Vnstock, Listing
 import warnings
 
 # pandasai v2.4.2 imports
@@ -82,6 +82,19 @@ if not st.user.is_logged_in:
 
 # User is now authenticated - show welcome message in sidebar
 st.sidebar.success("Successfully logged in")
+
+# Load stock symbols and cache in session state if not already loaded
+if 'stock_symbols_list' not in st.session_state:
+    try:
+        with st.spinner("Loading stock symbols..."):
+            symbols_df = Listing().all_symbols()
+            st.session_state.stock_symbols_list = sorted(symbols_df['symbol'].tolist())
+            st.session_state.symbols_df = symbols_df  # Cache the full DataFrame for organ_name access
+            st.success("✅ Stock symbols loaded and cached!")
+    except Exception as e:
+        st.warning(f"Could not load stock symbols from vnstock: {str(e)}")
+        st.session_state.stock_symbols_list = ["REE", "VIC", "VNM", "VCB", "BID", "HPG", "FPT", "FMC", "DHC"]
+        st.session_state.symbols_df = None
 
 # API Key handling
 if 'api_key' not in st.session_state:
