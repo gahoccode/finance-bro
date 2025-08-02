@@ -39,12 +39,18 @@ import os
 with open('static/style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
+# Get stock symbol from session state (set in main app)
+# If not available, show message to use main app first
+if 'stock_symbol' in st.session_state and st.session_state.stock_symbol:
+    stock_symbol = st.session_state.stock_symbol
+    st.info(f"📊 Analyzing stock: **{stock_symbol}** (from main app)")
+else:
+    st.warning("⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first.")
+    st.stop()
+
 # Title and description
 st.title("Company Profile Analysis")
 st.markdown("Analyze company ownership structure and management information")
-
-# User input for ticker symbol
-stock_symbol = st.text_input("Enter Stock Symbol (e.g., REE, VIC, VNM):", value="REE").upper()
 
 if stock_symbol:
     try:

@@ -196,7 +196,7 @@ dependencies = [
 
 ```
 finance-bro/
-├── app.py              # Main Streamlit application
+├── app.py              # Main Streamlit application entry point
 ├── requirements.txt    # Python dependencies
 ├── pyproject.toml     # Project configuration
 ├── README.md          # Project documentation

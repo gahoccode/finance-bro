@@ -17,12 +17,21 @@ st.set_page_config(page_title="Stock Price Analysis", layout="wide")
 with open('static/style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
+# Get stock symbol from session state (set in main app)
+# If not available, show message to use main app first
+if 'stock_symbol' in st.session_state and st.session_state.stock_symbol:
+    ticker = st.session_state.stock_symbol
+    st.info(f"📊 Analyzing stock: **{ticker}** (from main app)")
+else:
+    st.warning("⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first.")
+    st.stop()
+
 st.title("Stock Price Analysis")
 
 # Sidebar for user inputs
 with st.sidebar:
     st.header("Settings")
-    ticker = st.text_input("Stock Ticker Symbol:", value="REE", placeholder="e.g., VIC, VNM, VCB")
+    st.metric("Current Symbol", ticker)
     start_date = st.date_input("Start Date:", value=pd.to_datetime('2024-01-01'))
     end_date = st.date_input("End Date:", value=pd.to_datetime('2024-12-31'))
     

@@ -5,6 +5,56 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-08-02
+
+### Added
+- [2025-08-02] **Multipage Application Architecture**: Implemented comprehensive multipage application using Streamlit's st.navigation and st.Page
+  - **Navigation System**: Added st.navigation with position="top" for seamless page switching
+  - **Session State Management**: Implemented stock_symbol sharing across all pages via st.session_state
+  - **Main Entry Point**: Created new app.py as central hub for stock symbol selection and navigation
+  - **Page Integration**: Refactored all existing pages to use shared session state pattern
+  - **User Experience**: Users select stock symbol once and it's available across all analysis pages
+
+### Changed
+- [2025-08-02] **Application Structure Refactor**: Complete reorganization from single-page to multipage application
+  - **Entry Point**: New app.py serves as main navigation hub with stock symbol selection
+  - **Pages Integration**: All analysis tools moved to dedicated pages that share session state
+  - **Navigation Menu**: Organized pages into "Home" and "Analysis" sections with descriptive icons
+  - **Session State Pattern**: All pages now check for stock_symbol in session state with fallback warnings
+  - **File Structure**: Original app.py renamed to pages/bro.py (main Finance Bro analysis page)
+
+### Technical Implementation
+- **st.Page Configuration**: Each page defined with custom titles, icons, and file paths
+- **Session State Pattern**: Consistent implementation across all pages:
+  ```python
+  if 'stock_symbol' in st.session_state and st.session_state.stock_symbol:
+      stock_symbol = st.session_state.stock_symbol
+      st.info(f"📊 Analyzing stock: **{stock_symbol}** (from main app)")
+  else:
+      st.warning("⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first.")
+      st.stop()
+  ```
+- **Navigation Structure**: 
+  - Home: Main Finance Bro hub page for stock selection
+  - Analysis: Stock Analysis (bro.py), Price Analysis, Company Overview, Portfolio Optimization
+- **Page Organization**: Clean separation of concerns with each page handling specific analysis types
+
+### User Experience Improvements
+- **Single Symbol Selection**: Users input stock symbol once and it persists across all pages
+- **Seamless Navigation**: Top navigation bar allows easy switching between analysis tools
+- **Context Preservation**: Selected stock symbol maintained throughout user session
+- **Clear Guidance**: Warning messages guide users to select symbol on main page if none chosen
+- **Quick Navigation**: Direct buttons on main page to jump to specific analysis tools
+
+### Files Modified
+- **app.py**: New main entry point with st.navigation and stock symbol selection hub
+- **pages/bro.py**: Original app.py functionality moved here, updated to use session state
+- **pages/Company_Overview.py**: Updated to use session state stock_symbol
+- **pages/Portfolio_Optimization.py**: Updated to use session state with smart default inclusion
+- **pages/Stock_Price_Analysis.py**: Updated to use session state stock_symbol
+- **Dockerfile**: Updated to run app.py as entry point
+- **README.md**: Updated documentation to reflect new app.py entry point
+
 ## [0.1.3] - 2025-08-02
 
 ### Changed

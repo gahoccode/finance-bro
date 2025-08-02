@@ -29,6 +29,15 @@ import os
 with open('static/style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
+# Get stock symbol from session state (set in main app)
+# If not available, show message to use main app first
+if 'stock_symbol' in st.session_state and st.session_state.stock_symbol:
+    main_stock_symbol = st.session_state.stock_symbol
+    st.info(f"📊 Portfolio optimization including: **{main_stock_symbol}** (from main app)")
+else:
+    st.warning("⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first.")
+    st.stop()
+
 # Sidebar for user inputs
 st.sidebar.header("Portfolio Configuration")
 
@@ -41,13 +50,18 @@ except Exception as e:
     st.error(f"Error loading stock symbols: {str(e)}")
     stock_symbols_list = ["REE", "FMC", "DHC", "VNM", "VCB", "BID", "HPG", "FPT"]
 
+# Set default symbols to include the main symbol from session state
+default_symbols = [main_stock_symbol, "FMC", "DHC"] if main_stock_symbol not in ["FMC", "DHC"] else [main_stock_symbol, "REE", "VNM"]
+# Remove duplicates and ensure main symbol is first
+default_symbols = list(dict.fromkeys(default_symbols))
+
 # Ticker symbols input
 symbols = st.sidebar.multiselect(
     "Select ticker symbols:",
     options=stock_symbols_list,
-    default=["REE", "FMC", "DHC"],
+    default=default_symbols,
     placeholder="Choose stock symbols...",
-    help="Select multiple stock symbols for portfolio optimization"
+    help="Select multiple stock symbols for portfolio optimization (main symbol included by default)"
 )
 
 # Date range inputs
