@@ -492,8 +492,12 @@ if 'dataframes' in st.session_state:
                         st.image(message["chart_data"]["path"], width=1000)
     
         
-    # Chat input
-    if prompt := st.chat_input("Ask me anything about this stock..."):
+    # Chat input with file upload support
+    if prompt := st.chat_input(
+        "Ask me anything about this stock...",
+        accept_file=True,
+        file_type=["csv", "xlsx", "json", "txt", "pdf", "jpg", "jpeg", "png"]
+    ):
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt})
         
