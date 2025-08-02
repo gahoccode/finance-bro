@@ -1,5 +1,6 @@
 import streamlit as st
 from vnstock import Quote
+from vnstock import Listing
 import pandas as pd
 import matplotlib.pyplot as plt
 from pypfopt import EfficientFrontier, risk_models, expected_returns, DiscreteAllocation
@@ -31,15 +32,23 @@ with open('static/style.css') as f:
 # Sidebar for user inputs
 st.sidebar.header("Portfolio Configuration")
 
-# Ticker symbols input
-symbols_input = st.sidebar.text_input(
-    "Enter ticker symbols (comma-separated):",
-    value="REE, FMC, DHC",
-    placeholder="e.g., VNM, VCB, BID"
-)
+# Get stock symbols from vnstock
+try:
+    symbols_df = Listing().all_symbols()
+    stock_symbols_list = symbols_df['symbol'].tolist()
+    stock_symbols_list = sorted(stock_symbols_list)
+except Exception as e:
+    st.error(f"Error loading stock symbols: {str(e)}")
+    stock_symbols_list = ["REE", "FMC", "DHC", "VNM", "VCB", "BID", "HPG", "FPT"]
 
-# Parse symbols
-symbols = [s.strip() for s in symbols_input.split(',') if s.strip()]
+# Ticker symbols input
+symbols = st.sidebar.multiselect(
+    "Select ticker symbols:",
+    options=stock_symbols_list,
+    default=["REE", "FMC", "DHC"],
+    placeholder="Choose stock symbols...",
+    help="Select multiple stock symbols for portfolio optimization"
+)
 
 # Date range inputs
 col1, col2 = st.sidebar.columns(2)

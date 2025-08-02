@@ -5,10 +5,99 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.3] - 2025-08-02
+
+### Changed
+- [2025-08-02] **Stock Symbol Input Enhancement**: Replaced text input with searchable multiselect dropdown using vnstock symbols
+  - **Main App (app.py)**: Replaced text_input with multiselect using vnstock Listing().all_symbols()
+  - **Portfolio Optimization**: Updated Portfolio_Optimization.py to use multiselect with vnstock symbols
+  - **Symbol Source**: Uses `Listing().all_symbols()` to populate dropdown with all available stock symbols
+  - **User Experience**: Users can now select multiple symbols from searchable dropdown instead of typing comma-separated values
+  - **Error Handling**: Added fallback to default symbol list when vnstock symbols cannot be loaded
+  - **Multi-symbol Support**: Framework in place for future multi-symbol analysis (currently uses first selected symbol)
+
+### Added
+- [2025-08-02] **Theme Display Feature**: Added current theme indicator in sidebar
+  - **Theme Detection**: Uses st.get_option("theme.base") to detect light/dark mode
+  - **Visual Indicators**: Emoji indicators (☀️ for light, 🌙 for dark) for quick recognition
+  - **User Feedback**: Shows "Theme unavailable" when detection fails
+  - **Location**: Added to sidebar as collapsible "🎨 Theme" expander section
+
+## [0.1.2] - 2025-07-31
+
+### Added
+- [2025-07-31] **Google OAuth Authentication**: Implemented secure Google OAuth authentication using Streamlit 1.47.0+ built-in authentication features
 
 ### Fixed
 - [2025-07-31] **Docker Build Error Resolution**: Fixed osqp package build failure in Docker container
+  - **Issue**: osqp package (dependency of pyportfolioopt) failed to build due to missing git and build dependencies
+  - **Root Cause**: Docker container lacked essential build tools required for scientific Python packages
+  - **Solution**: Added comprehensive system dependencies to Dockerfile
+  - **Additional Fix**: Added explicit osqp version (0.6.2.post8) in requirements.txt for better wheel compatibility
+  - **Result**: Docker build now completes successfully, all Python packages install properly
+
+## [0.1.1] - 2025-07-30
+
+### Added
+- [2025-07-30] **Stock Portfolio Optimization Page**: New comprehensive portfolio optimization feature using PyPortfolioOpt library
+- [2025-07-30] **Company Profile Streamlit Enhancement**: Added interactive company profile page with ownership visualization
+- [2025-07-30] **Enhanced Color Scheme and Typography**: Comprehensive styling improvements across the application
+- [2025-07-30] **Management Team Ownership Visualization**: New altair bar chart for management share ownership
+- [2025-07-30] **Data Caching System**: Implemented Streamlit caching to reduce API calls
+- [2025-07-30] **Enhanced Data Visualization**: Improved chart interactivity and user experience
+
+### Changed
+- [2025-07-30] **Stock Portfolio Optimization UI Updates**: Streamlined visual design and removed grid lines
+- [2025-07-30] **Chart Type Selector with Area Chart Gradient**: Added sidebar option to switch between line chart and area chart with gradient styling
+- [2025-07-30] **Portfolio Weights Visualization Enhancement**: Replaced matplotlib bar charts with interactive Bokeh pie charts
+
+## [0.1.0] - 2025-07-26
+
+### Added
+- [2025-07-26] **Financial Data Transformation Enhancement**: Implemented automatic transposition of financial statements from long to wide format
+- [2025-07-26] **Chart Clearing Enhancement**: Implemented automatic chart clearing before new questions
+- [2025-07-26] **Final Chart Display Fix**: Fixed chart display for all sample questions and chat messages
+- [2025-07-26] **Dataframe Separation for AI Query Optimization**: Fixed PandasAI column detection issues by implementing dual dataframe architecture
+- [2025-07-26] **Quarterly Data Transposition**: Fixed duplicate column names error when displaying quarterly financial data
+- [2025-07-26] **Period Parameter Handling**: Fixed dataframes not respecting user's period selection
+- [2025-07-26] **Automatic Data Reloading**: Implemented automatic data refresh when period changes
+- [2025-07-26] **Redundant Row Cleanup**: Removed meaningless rows from annual data display
+- [2025-07-25] **Chart Display Enhancement**: Enhanced AI responses with automatic chart generation
+- [2025-07-25] **AI Response Formatting**: Improved natural language responses with structured data presentation
+- [2025-07-25] **CSS Loading Order and Consistency**: Fixed StreamlitAPIException by ensuring set_page_config is called before CSS loading
+- [2025-01-25] **Chart Management**: Implemented automatic chart clearing and single chart display
+
+### Added
+- [2025-07-31] **Google OAuth Authentication**: Implemented secure Google OAuth authentication using Streamlit 1.47.0+ built-in authentication features
+- [2025-07-30] **Stock Portfolio Optimization Page**: New comprehensive portfolio optimization feature using PyPortfolioOpt library
+- [2025-07-30] **Company Profile Streamlit Enhancement**: Added interactive company profile page with ownership visualization
+- [2025-07-30] **Enhanced Color Scheme and Typography**: Comprehensive styling improvements across the application
+- [2025-07-30] **Stock Portfolio Optimization UI Updates**: Streamlined visual design and removed grid lines
+- [2025-07-30] **Chart Type Selector with Area Chart Gradient**: Added sidebar option to switch between line chart and area chart with gradient styling
+- [2025-07-30] **Portfolio Weights Visualization Enhancement**: Replaced matplotlib bar charts with interactive Bokeh pie charts
+- [2025-07-30] **Management Team Ownership Visualization**: New altair bar chart for management share ownership
+- [2025-07-30] **Data Caching System**: Implemented Streamlit caching to reduce API calls
+- [2025-07-30] **Enhanced Data Visualization**: Improved chart interactivity and user experience
+- [2025-07-26] **Financial Data Transformation Enhancement**: Implemented automatic transposition of financial statements from long to wide format
+- [2025-07-26] **Chart Clearing Enhancement**: Implemented automatic chart clearing before new questions
+- [2025-07-26] **Final Chart Display Fix**: Fixed chart display for all sample questions and chat messages
+- [2025-07-26] **Dataframe Separation for AI Query Optimization**: Fixed PandasAI column detection issues by implementing dual dataframe architecture
+- [2025-07-26] **Quarterly Data Transposition**: Fixed duplicate column names error when displaying quarterly financial data
+- [2025-07-26] **Period Parameter Handling**: Fixed dataframes not respecting user's period selection
+- [2025-07-26] **Automatic Data Reloading**: Implemented automatic data refresh when period changes
+- [2025-07-26] **Redundant Row Cleanup**: Removed meaningless rows from annual data display
+- [2025-07-25] **Chart Display Enhancement**: Enhanced AI responses with automatic chart generation
+- [2025-07-25] **AI Response Formatting**: Improved natural language responses with structured data presentation
+- [2025-07-25] **CSS Loading Order and Consistency**: Fixed StreamlitAPIException by ensuring set_page_config is called before CSS loading
+- [2025-01-25] **Chart Management**: Implemented automatic chart clearing and single chart display
+
+### Fixed
+- [2025-07-31] **Docker Build Error Resolution**: Fixed osqp package build failure in Docker container
+  - **Issue**: osqp package (dependency of pyportfolioopt) failed to build due to missing git and build dependencies
+  - **Root Cause**: Docker container lacked essential build tools required for scientific Python packages
+  - **Solution**: Added comprehensive system dependencies to Dockerfile
+  - **Additional Fix**: Added explicit osqp version (0.6.2.post8) in requirements.txt for better wheel compatibility
+  - **Result**: Docker build now completes successfully, all Python packages install properly
   - **Issue**: osqp package (dependency of pyportfolioopt) failed to build due to missing git and build dependencies
   - **Root Cause**: Docker container lacked essential build tools required for scientific Python packages
   - **Solution**: Added comprehensive system dependencies to Dockerfile:

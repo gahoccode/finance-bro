@@ -164,7 +164,20 @@ with st.sidebar:
         st.session_state.pending_question = selected_question
     
     # Clear Chat button in sidebar
-    st.markdown("---")
+    st.sidebar.markdown("---")
+    
+    # Display current theme
+    with st.sidebar.expander("🎨 Theme", expanded=False):
+        try:
+            # Check if dark mode is enabled
+            is_dark = st.get_option("theme.base") == "dark"
+            if is_dark:
+                st.write("**Dark Mode** 🌙")
+            else:
+                st.write("**Light Mode** ☀️")
+        except Exception:
+            st.write("**Theme unavailable**")
+    
     if st.button("Clear Chat", use_container_width=True, key="sidebar_clear_chat"):
         st.session_state.messages = []
         st.rerun()
