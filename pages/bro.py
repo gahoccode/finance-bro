@@ -339,30 +339,10 @@ if 'dataframes' in st.session_state:
                 # Get the generated code using helper function
                 generated_code = get_generated_code(response, agent)
                 
-                # Try to detect if a chart was generated
-                chart_data = None
-                try:
-                    # Check if PandasAI generated a chart/plot
-                    # Look for recently created chart files in exports/charts/
-                    chart_dir = "exports/charts/"
-                    if os.path.exists(chart_dir):
-                        chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
-                        if chart_files:
-                            # Get the most recent chart file
-                            latest_chart = max(chart_files, key=os.path.getctime)
-                            chart_data = {
-                                "type": "image",
-                                "path": latest_chart
-                            }
-                except:
-                    pass
-                
-                # Add assistant response to chat history with generated code and chart
+                # Add assistant response to chat history with generated code
                 message_data = {"role": "assistant", "content": str(response)}
                 if generated_code:
                     message_data["generated_code"] = generated_code
-                if chart_data:
-                    message_data["chart_data"] = chart_data
                 st.session_state.messages.append(message_data)
         except Exception as e:
             error_msg = f"❌ Analysis error: {str(e)}"
@@ -386,31 +366,10 @@ if 'dataframes' in st.session_state:
                     # Get the generated code using helper function
                     generated_code = get_generated_code(response, agent)
                     
-                    # Try to detect if a chart was generated
-                    chart_data = None
-                    try:
-                        import os
-                        import glob
-                        
-                        # Look for recently created chart files in exports/charts/
-                        chart_dir = "exports/charts/"
-                        if os.path.exists(chart_dir):
-                            chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
-                            if chart_files:
-                                latest_chart = max(chart_files, key=os.path.getctime)
-                                chart_data = {
-                                    "type": "image",
-                                    "path": latest_chart
-                                }
-                    except:
-                        pass
-                    
-                    # Add assistant response to chat history with generated code and chart
+                    # Add assistant response to chat history with generated code
                     message_data = {"role": "assistant", "content": str(response)}
                     if generated_code:
                         message_data["generated_code"] = generated_code
-                    if chart_data:
-                        message_data["chart_data"] = chart_data
                     st.session_state.messages.append(message_data)
             except Exception as e:
                 error_msg = f"❌ Analysis error: {str(e)}"
@@ -429,31 +388,10 @@ if 'dataframes' in st.session_state:
                     # Get the generated code using helper function
                     generated_code = get_generated_code(response, agent)
                     
-                    # Try to detect if a chart was generated
-                    chart_data = None
-                    try:
-                        import os
-                        import glob
-                        
-                        # Look for recently created chart files in exports/charts/
-                        chart_dir = "exports/charts/"
-                        if os.path.exists(chart_dir):
-                            chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
-                            if chart_files:
-                                latest_chart = max(chart_files, key=os.path.getctime)
-                                chart_data = {
-                                    "type": "image",
-                                    "path": latest_chart
-                                }
-                    except:
-                        pass
-                    
-                    # Add assistant response to chat history with generated code and chart
+                    # Add assistant response to chat history with generated code
                     message_data = {"role": "assistant", "content": str(response)}
                     if generated_code:
                         message_data["generated_code"] = generated_code
-                    if chart_data:
-                        message_data["chart_data"] = chart_data
                     st.session_state.messages.append(message_data)
             except Exception as e:
                 error_msg = f"❌ Analysis error: {str(e)}"
@@ -472,31 +410,10 @@ if 'dataframes' in st.session_state:
                     # Get the generated code using helper function
                     generated_code = get_generated_code(response, agent)
                     
-                    # Try to detect if a chart was generated
-                    chart_data = None
-                    try:
-                        import os
-                        import glob
-                        
-                        # Look for recently created chart files in exports/charts/
-                        chart_dir = "exports/charts/"
-                        if os.path.exists(chart_dir):
-                            chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
-                            if chart_files:
-                                latest_chart = max(chart_files, key=os.path.getctime)
-                                chart_data = {
-                                    "type": "image",
-                                    "path": latest_chart
-                                }
-                    except:
-                        pass
-                    
-                    # Add assistant response to chat history with generated code and chart
+                    # Add assistant response to chat history with generated code
                     message_data = {"role": "assistant", "content": str(response)}
                     if generated_code:
                         message_data["generated_code"] = generated_code
-                    if chart_data:
-                        message_data["chart_data"] = chart_data
                     st.session_state.messages.append(message_data)
             except Exception as e:
                 error_msg = f"❌ Analysis error: {str(e)}"
@@ -522,16 +439,6 @@ if 'dataframes' in st.session_state:
                     with st.expander("🔍 View Generated Code", expanded=False):
                         st.code(message["generated_code"], language="python")
                 
-                # Show chart only for the latest message to avoid accumulation
-                if "chart_data" in message and i == len(st.session_state.messages) - 1:
-                    st.subheader("Analysis Chart")
-                    # Increase chart dimensions by 200px (1000x700)
-                    if message["chart_data"]["type"] == "plotly":
-                        st.plotly_chart(message["chart_data"]["figure"], use_container_width=False, width=1000, height=700)
-                    elif message["chart_data"]["type"] == "matplotlib":
-                        st.pyplot(message["chart_data"]["figure"])
-                    elif message["chart_data"]["type"] == "image":
-                        st.image(message["chart_data"]["path"], width=1000)
     
         
     # Chat input with file upload support
@@ -574,20 +481,22 @@ if 'dataframes' in st.session_state:
                         # Get the generated code using helper function
                         generated_code = get_generated_code(response, agent)
                         
-                        # Clear any existing chart containers
-                        chart_container = st.empty()
-                        
-                        # Try to detect if a chart was generated and display it
+                        # Try to capture and display chart directly from matplotlib
                         try:
-                            # Check if PandasAI generated a chart/plot
-                            chart_dir = "exports/charts/"
-                            if os.path.exists(chart_dir):
-                                chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
-                                if chart_files:
-                                    # Get the most recent chart file
-                                    latest_chart = max(chart_files, key=os.path.getctime)
-                                    with chart_container:
-                                        st.image(latest_chart, use_column_width=True)
+                            import matplotlib.pyplot as plt
+                            import io
+                            
+                            # Check if matplotlib has any active figures
+                            if plt.get_fignums():
+                                # Get the current figure
+                                fig = plt.gcf()
+                                if fig.get_axes():  # Check if figure has content
+                                    # Convert to bytes and display
+                                    img_buffer = io.BytesIO()
+                                    fig.savefig(img_buffer, format='png', bbox_inches='tight', dpi=150)
+                                    img_buffer.seek(0)
+                                    st.image(img_buffer, use_column_width=True)
+                                    plt.close(fig)  # Clean up
                         except Exception as e:
                             # Chart display failed, continue without error
                             pass
