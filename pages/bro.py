@@ -324,22 +324,55 @@ if 'dataframes' in st.session_state:
     model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
     llm = OpenAI(api_token=st.session_state.api_key, model=model)
     
-    # Use Agent approach with list of dataframes
-    agent = Agent(
-        list(st.session_state.dataframes.values()),
-        config={"llm": llm, "verbose": True}
-    )
+    # Initialize session state for uploaded files if not exists
+    if 'uploaded_dataframes' not in st.session_state:
+        st.session_state.uploaded_dataframes = []
+    
+    def get_or_create_agent():
+        """
+        Creates or retrieves cached PandasAI agent with all available dataframes.
+        Only recreates when dataframes have changed.
+        """
+        # Create unique key based on current dataframes
+        stock_df_count = len(st.session_state.dataframes) if 'dataframes' in st.session_state else 0
+        uploaded_df_count = len(st.session_state.uploaded_dataframes)
+        current_key = f"agent_{stock_df_count}_{uploaded_df_count}"
+        
+        # Check if agent exists and is up to date
+        if ('agent' in st.session_state and 
+            'agent_key' in st.session_state and 
+            st.session_state.agent_key == current_key):
+            return st.session_state.agent
+        
+        # Create new agent with all dataframes
+        all_dataframes = []
+        if 'dataframes' in st.session_state:
+            all_dataframes.extend(list(st.session_state.dataframes.values()))
+        all_dataframes.extend(st.session_state.uploaded_dataframes)
+        
+        if not all_dataframes:
+            return None
+            
+        agent = Agent(all_dataframes, config={"llm": llm, "verbose": True})
+        
+        # Cache the agent
+        st.session_state.agent = agent
+        st.session_state.agent_key = current_key
+        
+        return agent
     
     # Process any pending sample question from sidebar
-    if 'pending_question' in st.session_state and agent:
-        pending_q = st.session_state.pending_question
-        del st.session_state.pending_question
-        
-        # Add to chat and generate response
-        if 'messages' not in st.session_state:
-            st.session_state.messages = []
+    if 'pending_question' in st.session_state:
+        agent = get_or_create_agent()
+        if agent:
+            pending_q = st.session_state.pending_question
+            del st.session_state.pending_question
             
-        st.session_state.messages.append({"role": "user", "content": pending_q})
+            # Add to chat and generate response
+            if 'messages' not in st.session_state:
+                st.session_state.messages = []
+                
+            st.session_state.messages.append({"role": "user", "content": pending_q})
         
         try:
             with st.spinner("🤖 Analyzing..."):
@@ -547,7 +580,7 @@ if 'dataframes' in st.session_state:
     if user_input := st.chat_input(
         "Ask me anything about this stock...",
         accept_file=True,
-        file_type=["csv", "xlsx", "json", "txt", "pdf", "jpg", "jpeg", "png"]
+        file_type=["csv", "xlsx"]
     ):
         # Extract text and files from the input object
         if hasattr(user_input, 'text'):
@@ -559,16 +592,44 @@ if 'dataframes' in st.session_state:
             prompt = str(user_input) if user_input else ""
             files = []
         
-        # Only proceed if there's text content
-        if prompt.strip():
-            # Add user message to chat history
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            
-            # Display user message
-            with st.chat_message("user"):
-                st.markdown(prompt)
+        # Process uploaded files and add to session state
+        if files:
+            for file in files:
+                try:
+                    if file.name.endswith('.csv'):
+                        df = pd.read_csv(file)
+                        st.session_state.uploaded_dataframes.append(df)
+                        st.info(f"📂 Loaded CSV file: {file.name} ({len(df)} rows)")
+                    elif file.name.endswith(('.xlsx', '.xls')):
+                        df = pd.read_excel(file)
+                        st.session_state.uploaded_dataframes.append(df)
+                        st.info(f"📂 Loaded Excel file: {file.name} ({len(df)} rows)")
+                except Exception as e:
+                    st.error(f"❌ Error loading file {file.name}: {str(e)}")
         
-            # Generate response only if there's text content
+        # Only proceed if there's text content or files were uploaded
+        if prompt.strip() or files:
+            # Get or create agent with all current dataframes
+            agent = get_or_create_agent()
+            
+            if not agent:
+                st.error("❌ No data available for analysis. Please load stock data first.")
+                st.stop()
+            
+            # Add user message to chat history
+            message_content = prompt
+            if files:
+                file_names = [f.name for f in files]
+                message_content += f"\n📎 Uploaded files: {', '.join(file_names)}"
+            
+            if message_content.strip():
+                st.session_state.messages.append({"role": "user", "content": message_content})
+                
+                # Display user message
+                with st.chat_message("user"):
+                    st.markdown(message_content)
+            
+            # Generate response if there's text content
             if prompt.strip():
                 # Generate response
                 with st.chat_message("assistant"):
