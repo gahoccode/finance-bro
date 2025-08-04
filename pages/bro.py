@@ -3,6 +3,7 @@ import glob
 import streamlit as st
 import pandas as pd
 from vnstock import Vnstock, Listing
+from vnstock.core.utils.transform import flatten_hierarchical_index
 import warnings
 
 # pandasai v2.4.2 imports
@@ -238,15 +239,23 @@ if analyze_button or (period_changed and 'stock_symbol' in st.session_state):
             Ratio_raw = stock.finance.ratio(period=period, lang="en", dropna=True)
             
             # Process multi-index columns by flattening them
-            if isinstance(Ratio_raw.columns, pd.MultiIndex):
-                # Flatten multi-index columns by joining level names with ' - '
-                Ratio = Ratio_raw.copy()
-                Ratio.columns = [' - '.join(col).strip() if col[0] != 'Meta' else col[1] 
-                               for col in Ratio_raw.columns.values]
-                # Clean up column names
-                Ratio.columns = [col.replace('Meta - ', '') for col in Ratio.columns]
-            else:
-                Ratio = Ratio_raw
+            # if isinstance(Ratio_raw.columns, pd.MultiIndex):
+            #     # Flatten multi-index columns by joining level names with ' - '
+            #     Ratio = Ratio_raw.copy()
+            #     Ratio.columns = [' - '.join(col).strip() if col[0] != 'Meta' else col[1] 
+            #                    for col in Ratio_raw.columns.values]
+            #     # Clean up column names
+            #     Ratio.columns = [col.replace('Meta - ', '') for col in Ratio.columns]
+            # else:
+            #     Ratio = Ratio_raw
+            
+            # Use vnstock's built-in flatten_hierarchical_index function
+            Ratio = flatten_hierarchical_index(
+                Ratio_raw,
+                separator="_",
+                handle_duplicates=True,
+                drop_levels=0
+            )
             
             dividend_schedule = company.dividends()
             

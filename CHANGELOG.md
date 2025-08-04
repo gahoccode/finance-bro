@@ -5,6 +5,23 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2025-08-04
+
+### Changed
+- [2025-08-04] **Multi-Index Column Processing Enhancement**: Replaced custom multi-index flattening with vnstock's built-in function
+  - **Migration**: Replaced manual multi-index column processing with `flatten_hierarchical_index()` from vnstock.core.utils.transform
+  - **Improved Reliability**: Uses vnstock's official utility function for consistent column name handling
+  - **Configuration**: Applied settings: separator="_", handle_duplicates=True, drop_levels=0
+  - **Code Quality**: Removed custom logic that manually joined column names with ' - ' separator
+  - **Files Modified**: pages/bro.py - updated ratio data processing section
+  - **Import Management**: Added vnstock.core.utils.transform import at top of file instead of inline
+
+### Technical Implementation
+- **Built-in Function**: Leverages vnstock's official `flatten_hierarchical_index()` utility
+- **Consistent Naming**: Uses underscore separator instead of dash separator for better compatibility
+- **Error Handling**: Built-in duplicate handling and level dropping capabilities
+- **Performance**: More efficient processing using library's optimized implementation
+
 ## [0.2.2] - 2025-08-02
 
 ### Changed
