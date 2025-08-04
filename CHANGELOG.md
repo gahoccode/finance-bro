@@ -5,6 +5,52 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2025-08-04
+
+### Added
+- [2025-08-04] **File Upload Integration**: Enhanced chat interface with CSV/Excel file upload support
+  - **Upload Support**: Added `accept_file=True` parameter to `st.chat_input` with CSV and Excel file type filtering
+  - **File Processing**: Automatic detection and loading of uploaded CSV (.csv) and Excel (.xlsx, .xls) files
+  - **DataFrame Integration**: Uploaded files automatically added to PandasAI agent for analysis alongside stock data
+  - **User Feedback**: Clear notifications showing successful file uploads with row counts
+  - **Error Handling**: Comprehensive error handling for file loading failures with user-friendly messages
+  - **Chat History**: File uploads properly tracked in chat history with file attachment indicators
+
+### Changed
+- [2025-08-04] **Agent Architecture Refactor**: Implemented lazy agent creation pattern to handle file uploads
+  - **Lazy Loading**: Created `get_or_create_agent()` function to handle timing between chat input and agent creation
+  - **Dynamic Updates**: Agent automatically recreates when new files are uploaded or dataframes change
+  - **Session Caching**: Intelligent caching system prevents unnecessary agent recreation
+  - **Scope Resolution**: Fixed agent availability issues across quick buttons and chat interface
+
+- [2025-08-04] **Code Quality Enhancement**: Major code cleanup and refactoring for maintainability
+  - **Helper Functions**: Extracted three key helper functions to eliminate ~150 lines of duplicate code:
+    - `detect_latest_chart()`: Centralized chart detection logic
+    - `process_agent_response()`: Unified agent response processing with error handling
+    - `transpose_financial_dataframe()`: Consolidated data transposition logic across all dataframes
+  - **Code Reduction**: Eliminated massive code duplication in quick buttons and chat handlers
+  - **Error Handling**: Improved error handling consistency across all response processing paths
+  - **Maintainability**: Cleaner, more maintainable codebase with single source of truth for common operations
+
+### Fixed
+- [2025-08-04] **Streamlit Deprecation Warning**: Fixed use_column_width parameter deprecation
+  - **Issue**: "The use_column_width parameter has been deprecated and will be removed in a future release"
+  - **Solution**: Replaced `use_column_width=True` with `use_container_width=True` in chart display code
+  - **Location**: Updated chart display in chat input handler (pages/bro.py:607)
+  - **Impact**: Eliminates deprecation warnings and ensures future Streamlit compatibility
+
+### Technical Implementation
+- **File Upload Flow**: Streamlit 1.47+ chat input with file support returns object with `.text` and `.files` attributes
+- **Agent Management**: Smart agent recreation based on dataframe changes with unique cache key system
+- **Memory Efficiency**: Session state management prevents memory leaks from agent recreation
+- **Error Resilience**: Graceful handling of file loading errors, agent creation failures, and processing exceptions
+
+### User Experience Improvements
+- **Seamless Integration**: Users can upload data files directly in chat interface without disrupting workflow
+- **Multi-Format Support**: Support for both CSV and Excel formats with automatic format detection
+- **Visual Feedback**: Clear success/error messages for file operations with meaningful context
+- **Enhanced Analysis**: Uploaded data automatically available for AI analysis alongside stock financial data
+
 ## [0.2.3] - 2025-08-04
 
 ### Changed
