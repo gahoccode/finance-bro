@@ -238,13 +238,33 @@ finance-bro/
 ### Using Pre-built Image from GitHub Container Registry
 
 **Pull and run the latest image:**
+
+**macOS/Linux:**
 ```bash
 docker run -p 8501:8501 \
   -e OPENAI_API_KEY=your_openai_api_key \
   -v $(pwd)/exports:/app/exports \
   -v $(pwd)/cache:/app/cache \
+  -v $(pwd)/.streamlit:/app/.streamlit \
   ghcr.io/gahoccode/finance-bro:latest
 ```
+
+**Windows Command Prompt:**
+```cmd
+docker run -p 8501:8501 -e OPENAI_API_KEY=your_openai_api_key -v %cd%/exports:/app/exports -v %cd%/cache:/app/cache -v %cd%/.streamlit:/app/.streamlit ghcr.io/gahoccode/finance-bro:latest
+```
+
+**Windows PowerShell:**
+```powershell
+docker run -p 8501:8501 `
+  -e OPENAI_API_KEY=your_openai_api_key `
+  -v ${PWD}/exports:/app/exports `
+  -v ${PWD}/cache:/app/cache `
+  -v ${PWD}/.streamlit:/app/.streamlit `
+  ghcr.io/gahoccode/finance-bro:latest
+```
+
+**Note:** The `$(pwd)`, `%cd%`, and `${PWD}` commands automatically get your current working directory. For example, if you're in `/home/user/finance-bro`, these resolve to that path.
 
 **Or use with docker-compose:**
 ```yaml
