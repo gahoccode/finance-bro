@@ -5,6 +5,26 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2025-08-05
+
+### Added
+- [2025-08-05] **Subsidiaries Visualization**: Added new subsidiaries tab with ownership percentage visualization
+  - **New Tab**: Added "Subsidiaries" tab to Company Overview page alongside Management Team and Full Details
+  - **Data Integration**: Uses `company.subsidiaries()` with columns: `organ_name`, `ownership_percent`, `type`
+  - **Altair Visualization**: Horizontal bar chart showing subsidiaries ownership distribution with steelblue bars
+  - **Summary Metrics**: Total subsidiaries count, subsidiaries with ownership data, and average ownership percentage
+  - **Percentage Display**: Converted decimal ownership values (0.75) to percentage format (75.0%) for better readability
+  - **Data Caching**: Added `get_subsidiaries_data()` function with 1-hour TTL caching to reduce API calls
+  - **Error Handling**: Comprehensive error handling for missing subsidiaries data with user-friendly messages
+
+### Changed
+- [2025-08-05] **Ownership Data Display Enhancement**: Converted all ownership percentages from decimal to percentage format
+  - **Main Ownership Chart**: Share ownership percentages now display as readable percentages (75.0% vs 0.75)
+  - **Management Team Chart**: Officer ownership percentages converted to percentage format for consistency
+  - **Summary Metrics**: Largest shareholder and top 3 combined metrics now show proper percentage values
+  - **Chart Labels**: Updated text formatting to display percentage values without redundant % symbols
+  - **User Experience**: All ownership data now consistently displayed in intuitive percentage format
+
 ## [0.2.4] - 2025-08-04
 
 ### Added

@@ -15,3 +15,17 @@ stock = Vnstock().stock(symbol=stock_symbol, source='VCI')
 company_info = stock.company
 ownership_percentage = company_info.shareholders()
 print(ownership_percentage)
+
+
+from vnstock.explorer.vci import Company
+company = Company('REE')
+affiliate = company.affiliate()
+
+trading_stats = company.trading_stats()
+
+
+
+
+from vnstock import Company
+company = Company(symbol='REE', source='TCBS')
+insider_trading_info= company.insider_deals()
