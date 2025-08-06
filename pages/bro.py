@@ -173,9 +173,6 @@ st.markdown('<p style="text-align: center; color: #666; font-size: 1.1rem; margi
 
 # Authentication is handled in main app, so we assume user is already logged in
 
-# User is now authenticated - show welcome message in sidebar
-st.sidebar.success("Successfully logged in")
-
 # Load stock symbols and cache in session state if not already loaded
 if 'stock_symbols_list' not in st.session_state:
     try:

@@ -101,9 +101,7 @@ def create_histogram(df, col, title):
     
     return chart
 
-# Show current stock symbol from session state if available (for context)
-if 'stock_symbol' in st.session_state and st.session_state.stock_symbol:
-    st.info(f"📊 Current selected symbol: **{st.session_state.stock_symbol}** (from main app) - Use screener to find similar stocks!")
+# Current stock symbol is available in sidebar for context - no need for notification
 
 # Quick filter presets
 st.subheader("⚡ Quick Filter Presets")
@@ -290,10 +288,7 @@ if use_dividend_yield:
 if use_ev_ebitda:
     active_filters.append("EV/EBITDA")
 
-if active_filters:
-    st.sidebar.success(f"✅ Active filters: {', '.join(active_filters)}")
-else:
-    st.sidebar.info("ℹ️ No filters enabled - will show all stocks")
+# Active filters are visually indicated by enabled checkboxes - no need for additional notification
 
 
 # Load data button or auto-run from preset
@@ -336,9 +331,11 @@ if run_screener:
     if not screener_data.empty:
         # Apply client-side financial filtering if any filters are enabled
         if financial_filters:
-            st.info(f"📊 Applying {len(financial_filters)} financial filters to {len(screener_data)} stocks...")
             filtered_data = screener_data.copy()
             original_count = len(filtered_data)
+            
+            # Track filtering progress for visualization
+            filtering_steps = [{"Step": "Initial", "Count": original_count, "Filter": "Base data"}]
             
             for column, (min_val, max_val) in financial_filters.items():
                 if column in filtered_data.columns:
@@ -350,16 +347,70 @@ if run_screener:
                         (filtered_data[column] <= max_val)
                     ]
                     after_count = len(filtered_data)
-                    st.write(f"  • {column}: {before_count} → {after_count} stocks (range: {min_val}-{max_val})")
+                    
+                    # Add step to tracking
+                    filter_name = column.replace('_', ' ').title()
+                    filtering_steps.append({
+                        "Step": f"After {filter_name}",
+                        "Count": after_count,
+                        "Filter": f"{filter_name} ({min_val}-{max_val})"
+                    })
                 else:
                     st.warning(f"⚠️ Column '{column}' not found in data. Skipping this filter.")
             
+            # Create filtering visualization if we have multiple steps
+            if len(filtering_steps) > 1:
+                st.subheader("🔍 Filtering Breakdown")
+                
+                # Create DataFrame for visualization
+                filter_df = pd.DataFrame(filtering_steps)
+                
+                # Create funnel chart showing stock count reduction
+                funnel_chart = alt.Chart(filter_df).mark_bar(
+                    color='steelblue',
+                    opacity=0.8
+                ).encode(
+                    x=alt.X('Count:Q', title='Number of Stocks'),
+                    y=alt.Y('Step:N', title='Filtering Step', sort='-x'),
+                    tooltip=[
+                        alt.Tooltip('Step:N', title='Step'),
+                        alt.Tooltip('Count:Q', title='Stock Count', format=',.0f'),
+                        alt.Tooltip('Filter:N', title='Filter Applied')
+                    ]
+                ).properties(
+                    width=600,
+                    height=min(400, len(filtering_steps) * 60),
+                    title=f'Stock Filtering Process: {original_count} → {len(filtered_data)} stocks'
+                )
+                
+                # Add text labels showing count
+                text_chart = alt.Chart(filter_df).mark_text(
+                    align='left',
+                    baseline='middle',
+                    dx=5,
+                    fontSize=11,
+                    fontWeight='bold'
+                ).encode(
+                    x=alt.X('Count:Q'),
+                    y=alt.Y('Step:N', sort='-x'),
+                    text=alt.Text('Count:Q', format=',.0f')
+                )
+                
+                # Combine charts
+                combined_chart = (funnel_chart + text_chart).resolve_scale(
+                    color='independent'
+                )
+                
+                st.altair_chart(combined_chart, use_container_width=True)
+                
+                # Show reduction percentage
+                reduction_pct = ((original_count - len(filtered_data)) / original_count) * 100
+                st.caption(f"📊 Filtering reduced dataset by {reduction_pct:.1f}% ({original_count - len(filtered_data):,} stocks removed)")
+            
             screener_data = filtered_data
-            st.success(f"✅ Filtered from {original_count} to {len(screener_data)} stocks!")
         
         if not screener_data.empty:
             st.session_state['screener_data'] = screener_data
-            st.success(f"Found {len(screener_data)} stocks matching your criteria!")
         else:
             st.warning("No stocks found after applying financial filters. Try relaxing the filter ranges.")
     else:
