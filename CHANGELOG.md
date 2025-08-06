@@ -5,6 +5,75 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.8] - 2025-08-06
+
+### Added
+- [2025-08-06] **Advanced Stock Screening Filters**: Added 6 new sophisticated filters for comprehensive stock analysis
+  - **Beta Filter** (0.0-3.0): Market volatility coefficient with smart defaults (0.5-2.0) for risk assessment
+  - **Alpha Filter** (-50 to +50): Performance vs market benchmark with intelligent range selection (-10 to +10)
+  - **Financial Health Filter** (0-10): Overall financial health score for company stability analysis
+  - **Business Model Filter** (0-10): Business model quality score for strategic assessment
+  - **Business Operation Filter** (0-10): Operational efficiency score for performance evaluation
+  - **Stock Rating Filter** (0-10): Overall stock rating for investment grade classification
+  - **Client-Side Processing**: All new filters use efficient client-side filtering with same performance as existing filters
+  - **Preset Integration**: New filters fully integrated with existing preset system and session state management
+
+### Changed
+- [2025-08-06] **Enhanced Quick Filter Presets**: Replaced "High Dividend Stocks" with sophisticated "Low Risk Quality" preset
+  - **🛡️ Low Risk Quality**: Targets conservative investors seeking quality stocks
+    - Financial Health > 7.0 (strong fundamentals)
+    - Beta < 1.2 (lower volatility than market)  
+    - Stock Rating > 6.0 (investment grade)
+  - **Smart Defaults**: Preset automatically configures optimal ranges for risk-averse investors
+  - **Immediate Execution**: Auto-runs screener with preset parameters for instant results
+
+- [2025-08-06] **Revolutionary Summary Metrics**: Replaced traditional averages with impactful range-based metrics
+  - **Beta Range**: Shows portfolio risk spectrum (e.g., "0.5 - 2.1") for immediate risk assessment
+  - **Health Range**: Displays quality spectrum (e.g., "4.2 - 9.8") showing company health diversity
+  - **Rating Range**: Shows investment grade spread (e.g., "3.1 - 8.9") for quality distribution
+  - **Smart Fallbacks**: Automatically falls back to original metrics when new data isn't available
+  - **Instant Insights**: Users immediately understand portfolio diversity and risk/quality characteristics
+
+- [2025-08-06] **Comprehensive Visualization Enhancement**: Added 2 new analysis tabs with professional insights
+  - **Risk Analysis Tab**: Beta vs Alpha scatter plot with market performance insights
+    - Sweet spot identification: Low Beta (<1.0) + High Alpha (>0) = Low risk with market outperformance
+    - Beta guidelines: Defensive (<0.8), Market-like (0.8-1.2), High volatility (>1.2)
+    - Alpha interpretation: Positive (outperforming), Negative (underperforming)
+  - **Quality Scores Tab**: Financial Health vs Business Model analysis
+    - Quality leader identification: High Financial Health (>7) + High Business Model (>7) = Strong fundamentals
+    - Score guidelines: Excellent (8-10), Good (6-8), Average (4-6), Below average (<4)
+  - **Enhanced Distribution Charts**: Added 3 new histograms (Beta, Alpha, Financial Health, Stock Rating)
+    - 2x3 grid layout showing comprehensive metric distributions
+    - Professional styling with consistent color schemes
+
+### Technical Implementation
+- **Filter Architecture**: All 6 new filters follow existing client-side pattern for consistency
+  - Checkbox activation → Slider range selection → Dictionary storage → Loop processing
+  - Same filtering visualization with new metrics in funnel breakdown chart
+  - Identical performance characteristics to existing filters
+- **Active Filters Integration**: Updated active filters summary to include all new filter types
+- **Data Table Enhancement**: Added new columns with appropriate formatting
+  - Beta/Alpha: 3 decimal places for precision in risk metrics
+  - Quality scores: 1 decimal place for readability in business metrics
+  - Maintains 2 decimal places for existing financial metrics
+- **Visualization Framework**: Extended existing Altair charts to handle new risk and quality dimensions
+- **Session State Management**: Seamless integration with existing preset system and filter persistence
+
+### User Experience Improvements
+- **Advanced Risk Analysis**: Users can now screen for specific risk profiles using beta and alpha metrics
+- **Quality Assessment**: Comprehensive evaluation of business fundamentals through health and operation scores
+- **Sophisticated Presets**: One-click access to professionally configured filter combinations
+- **Visual Storytelling**: Range-based metrics immediately communicate portfolio characteristics
+- **Professional Insights**: Expert guidance provided for interpreting risk, quality, and rating metrics
+- **Intuitive Interface**: New filters seamlessly integrate with familiar screening workflow
+
+### Performance & Compatibility
+- **Filter Order Independence**: Final results identical regardless of filter application sequence
+- **Efficient Processing**: Client-side filtering maintains fast performance with larger datasets
+- **Backward Compatibility**: All existing functionality preserved while adding advanced capabilities
+- **Data Availability**: Graceful handling when new metrics unavailable, falling back to traditional metrics
+- **Memory Efficiency**: Reuses existing filtering infrastructure without additional memory overhead
+
 ## [0.2.7] - 2025-08-06
 
 ### Fixed
