@@ -5,6 +5,26 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.10] - 2025-08-06
+
+### Changed
+- [2025-08-06] **Chart Color Scheme Unification**: Updated visualization colors across Screener and Company Overview pages for consistent branding
+  - **Screener Page**: Updated Distribution Charts tab histograms to use `#AAA39F` color (previously steelblue)
+  - **Screener Page**: Updated Filtering Breakdown chart to use `#AAA39F` color (previously steelblue)
+  - **Company Overview**: Updated "Ownership by Share Quantity" chart to use `#56524D` color (previously black)
+  - **Company Overview**: Updated "Management Team Share Ownership" chart to use `#56524D` color (previously black)
+  - **Grid Removal**: Removed grid lines from Distribution Charts histograms by setting `axis=alt.Axis(grid=False)` on both x and y axes
+  - **Visual Consistency**: All ownership and distribution charts now follow unified color scheme across the application
+  - **Files Modified**: `pages/Screener.py`, `pages/Company_Overview.py`
+  - **Result**: More cohesive visual branding and cleaner chart appearance without grid distractions
+
+### Fixed
+- [2025-08-06] **Sidebar UI Cleanup**: Removed redundant "Current Symbol" display from main app sidebar
+  - **Issue**: Sidebar showed current stock symbol status, which was redundant since symbol selection is prominently displayed on main page
+  - **Solution**: Removed "Current Symbol" check and display section from app.py sidebar
+  - **Files Modified**: `app.py` lines 194-197 - removed stock symbol status display from sidebar controls
+  - **Result**: Cleaner sidebar interface without redundant information display
+
 ## [0.2.9] - 2025-08-06
 
 ### Changed
