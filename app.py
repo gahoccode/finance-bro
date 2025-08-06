@@ -188,22 +188,11 @@ pages = {
 
 # Sidebar for user controls
 with st.sidebar:
-    st.header("🔧 Controls")
-    
-    # Show current stock symbol if available
-    if 'stock_symbol' in st.session_state:
-        st.success(f"📊 Current Symbol: **{st.session_state.stock_symbol}**")
-    else:
-        st.warning("⚠️ No symbol selected")
-    
-    st.markdown("---")
-    
+    st.header("🔧 Controls")        
     # User logout option
     if st.button("🚪 Logout", use_container_width=True):
         st.logout()
-    
     # GitHub link
-    st.markdown("---")
     st.markdown("[Finance Bro on GitHub](https://github.com/gahoccode/finance-bro) by Tam Le")
 
 # Set up navigation at the top

@@ -180,7 +180,6 @@ exchanges = st.sidebar.multiselect(
 # Financial filters
 st.sidebar.subheader("📊 Financial Filters")
 st.sidebar.markdown("*Toggle filters on/off and adjust ranges as needed*")
-st.sidebar.info("💡 Financial filters are applied after data retrieval (client-side filtering)")
 
 # Market Cap filter
 use_market_cap = st.sidebar.checkbox(

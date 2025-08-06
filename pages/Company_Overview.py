@@ -72,7 +72,6 @@ import os
 # If not available, show message to use main app first
 if 'stock_symbol' in st.session_state and st.session_state.stock_symbol:
     stock_symbol = st.session_state.stock_symbol
-    st.info(f"📊 Analyzing stock: **{stock_symbol}** (from main app)")
 else:
     st.warning("⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first.")
     st.stop()

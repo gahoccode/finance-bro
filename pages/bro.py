@@ -160,7 +160,6 @@ st.set_page_config(
 # If not available, show message to use main app first
 if 'stock_symbol' in st.session_state and st.session_state.stock_symbol:
     stock_symbol = st.session_state.stock_symbol
-    st.info(f"📊 Analyzing stock: **{stock_symbol}** (from main app)")
 else:
     st.warning("⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first.")
     st.stop()
@@ -357,7 +356,7 @@ if analyze_button or (period_changed and 'stock_symbol' in st.session_state):
             
             st.session_state.stock_symbol = stock_symbol
             st.session_state.last_period = period  # Store current period to detect changes
-            st.success(f"✅ Successfully loaded data for {stock_symbol}")
+            
     
     except Exception as e:
         st.error(f"❌ Error loading data: {str(e)}")
