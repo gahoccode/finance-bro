@@ -377,32 +377,7 @@ if 'screener_data' in st.session_state and not st.session_state['screener_data']
         total_market_cap = df['market_cap'].sum() if 'market_cap' in df.columns else 0
         st.metric("Total Market Cap", f"{total_market_cap/1000:.0f}B VND")
     
-    # Data table
-    st.subheader("📋 Screened Stocks")
-    
-    # Select columns to display
-    display_columns = ['ticker', 'exchange', 'industry', 'market_cap', 'roe', 'roa', 'dividend_yield', 'ev_ebitda', 'pe', 'pb']
-    available_columns = [col for col in display_columns if col in df.columns]
-    
-    # Format the dataframe for display
-    display_df = df[available_columns].copy()
-    
-    # Format numeric columns
-    numeric_cols = ['market_cap', 'roe', 'roa', 'dividend_yield', 'ev_ebitda', 'pe', 'pb']
-    for col in numeric_cols:
-        if col in display_df.columns:
-            if col == 'market_cap':
-                display_df[col] = display_df[col].apply(lambda x: f"{x:,.0f}" if pd.notna(x) else "N/A")
-            else:
-                display_df[col] = display_df[col].apply(lambda x: f"{x:.2f}" if pd.notna(x) else "N/A")
-    
-    st.dataframe(
-        display_df,
-        use_container_width=True,
-        hide_index=True
-    )
-    
-    # Visualizations
+    # Visualizations (moved above data table)
     st.subheader("📊 Visualizations")
     
     # Create tabs for different visualizations
@@ -466,16 +441,177 @@ if 'screener_data' in st.session_state and not st.session_state['screener_data']
                     hist_chart = create_histogram(viz_df, 'dividend_yield', 'Dividend Yield Distribution')
                     st.altair_chart(hist_chart, use_container_width=True)
     
-    # Export functionality
-    st.subheader("📥 Export Data")
-    if st.button("Download as CSV"):
-        csv = df.to_csv(index=False)
-        st.download_button(
-            label="Download CSV file",
-            data=csv,
-            file_name=f"screener_results_{source.lower()}.csv",
-            mime="text/csv"
-        )
+    # Data table (moved below visualizations)
+    st.subheader("📋 Screened Stocks")
+    
+    # Select columns to display
+    display_columns = ['ticker', 'exchange', 'industry', 'market_cap', 'roe', 'roa', 'dividend_yield', 'ev_ebitda', 'pe', 'pb']
+    available_columns = [col for col in display_columns if col in df.columns]
+    
+    # Format the dataframe for display
+    display_df = df[available_columns].copy()
+    
+    # Format numeric columns
+    numeric_cols = ['market_cap', 'roe', 'roa', 'dividend_yield', 'ev_ebitda', 'pe', 'pb']
+    for col in numeric_cols:
+        if col in display_df.columns:
+            if col == 'market_cap':
+                display_df[col] = display_df[col].apply(lambda x: f"{x:,.0f}" if pd.notna(x) else "N/A")
+            else:
+                display_df[col] = display_df[col].apply(lambda x: f"{x:.2f}" if pd.notna(x) else "N/A")
+    
+    st.dataframe(
+        display_df,
+        use_container_width=True,
+        hide_index=True
+    )
+    
+    # Export functionality - Download PNG visualization
+    st.subheader("📥 Export Visualization")
+    
+    def create_matplotlib_charts_for_download(data):
+        """Create matplotlib charts for PNG download"""
+        import matplotlib.pyplot as plt
+        import matplotlib.patches as mpatches
+        import numpy as np
+        from datetime import datetime
+        import io
+        
+        # Set up the figure with subplots
+        fig_height = 12
+        num_charts = 0
+        
+        # Count available charts
+        if 'roe' in data.columns and 'market_cap' in data.columns:
+            num_charts += 1
+        if 'market_cap' in data.columns and 'dividend_yield' in data.columns:
+            num_charts += 1
+        if 'ev_ebitda' in data.columns and 'roe' in data.columns:
+            num_charts += 1
+            
+        if num_charts == 0:
+            return None, None
+            
+        fig, axes = plt.subplots(num_charts, 1, figsize=(12, fig_height))
+        if num_charts == 1:
+            axes = [axes]
+        
+        chart_idx = 0
+        
+        # ROE vs Market Cap
+        if 'roe' in data.columns and 'market_cap' in data.columns:
+            viz_df = data.dropna(subset=['roe', 'market_cap'])
+            if not viz_df.empty:
+                ax = axes[chart_idx]
+                
+                # Create scatter plot with industry colors
+                industries = viz_df['industry'].unique() if 'industry' in viz_df.columns else ['Unknown']
+                colors = plt.cm.Set3(np.linspace(0, 1, len(industries)))
+                
+                for i, industry in enumerate(industries):
+                    if 'industry' in viz_df.columns:
+                        industry_data = viz_df[viz_df['industry'] == industry]
+                    else:
+                        industry_data = viz_df
+                    
+                    ax.scatter(industry_data['market_cap'], industry_data['roe'], 
+                             alpha=0.7, s=100, c=[colors[i]], label=industry)
+                
+                ax.set_xlabel('Market Cap', fontsize=12)
+                ax.set_ylabel('ROE (%)', fontsize=12)
+                ax.set_title('Market Cap vs ROE', fontsize=14, fontweight='bold')
+                ax.grid(True, alpha=0.3)
+                if len(industries) <= 10:  # Only show legend if not too many industries
+                    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+                
+                chart_idx += 1
+        
+        # Market Cap vs Dividend Yield
+        if 'market_cap' in data.columns and 'dividend_yield' in data.columns:
+            viz_df = data.dropna(subset=['market_cap', 'dividend_yield'])
+            if not viz_df.empty:
+                ax = axes[chart_idx]
+                
+                industries = viz_df['industry'].unique() if 'industry' in viz_df.columns else ['Unknown']
+                colors = plt.cm.Set3(np.linspace(0, 1, len(industries)))
+                
+                for i, industry in enumerate(industries):
+                    if 'industry' in viz_df.columns:
+                        industry_data = viz_df[viz_df['industry'] == industry]
+                    else:
+                        industry_data = viz_df
+                    
+                    ax.scatter(industry_data['market_cap'], industry_data['dividend_yield'], 
+                             alpha=0.7, s=100, c=[colors[i]], label=industry)
+                
+                ax.set_xlabel('Market Cap', fontsize=12)
+                ax.set_ylabel('Dividend Yield (%)', fontsize=12)
+                ax.set_title('Market Cap vs Dividend Yield', fontsize=14, fontweight='bold')
+                ax.grid(True, alpha=0.3)
+                if len(industries) <= 10:
+                    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+                
+                chart_idx += 1
+        
+        # ROE vs EV/EBITDA (Value vs Quality)
+        if 'ev_ebitda' in data.columns and 'roe' in data.columns:
+            viz_df = data.dropna(subset=['ev_ebitda', 'roe'])
+            if not viz_df.empty:
+                ax = axes[chart_idx]
+                
+                industries = viz_df['industry'].unique() if 'industry' in viz_df.columns else ['Unknown']
+                colors = plt.cm.Set3(np.linspace(0, 1, len(industries)))
+                
+                for i, industry in enumerate(industries):
+                    if 'industry' in viz_df.columns:
+                        industry_data = viz_df[viz_df['industry'] == industry]
+                    else:
+                        industry_data = viz_df
+                    
+                    ax.scatter(industry_data['roe'], industry_data['ev_ebitda'], 
+                             alpha=0.7, s=100, c=[colors[i]], label=industry)
+                
+                ax.set_xlabel('ROE (%)', fontsize=12)
+                ax.set_ylabel('EV/EBITDA', fontsize=12)
+                ax.set_title('ROE vs EV/EBITDA (Quality vs Valuation)', fontsize=14, fontweight='bold')
+                ax.set_ylim(0, 30)  # Hard-coded range for EV/EBITDA
+                ax.grid(True, alpha=0.3)
+                if len(industries) <= 10:
+                    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+                
+                chart_idx += 1
+        
+        plt.tight_layout()
+        
+        # Save to bytes
+        img_buffer = io.BytesIO()
+        plt.savefig(img_buffer, format='png', dpi=300, bbox_inches='tight', facecolor='white')
+        img_buffer.seek(0)
+        plt.close()
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"screener_visualization_{timestamp}.png"
+        
+        return img_buffer.getvalue(), filename
+    
+    # Create and offer PNG download
+    try:
+        png_data, filename = create_matplotlib_charts_for_download(df)
+        
+        if png_data:
+            st.download_button(
+                label="📊 Download Visualization as PNG",
+                data=png_data,
+                file_name=filename,
+                mime="image/png",
+                help="Downloads all visualizations as a PNG file"
+            )
+        else:
+            st.warning("No visualizations available to download")
+            
+    except Exception as e:
+        st.error(f"Error creating PNG download: {str(e)}")
+        st.info("💡 **Alternative:** Take a screenshot of the visualizations above.")
 
 else:
     # Initial state - show instructions

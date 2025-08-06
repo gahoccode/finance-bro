@@ -5,6 +5,37 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.7] - 2025-08-06
+
+### Changed
+- [2025-08-06] **Stock Screener UI Enhancements**: Improved user experience with better layout and export functionality
+  - **Visualization Priority**: Moved all visualizations above the screened stocks data table for immediate visual insights
+  - **Layout Optimization**: Users now see charts and metrics first, followed by detailed stock data
+  - **Export Enhancement**: Replaced CSV download with PNG visualization export functionality
+  - **Direct Download**: Implemented single-click PNG download without popup confirmation dialogs
+  - **Professional Charts**: Added matplotlib-based PNG generation with high-quality 300 DPI output
+  - **Combined Visualization**: Creates single PNG file containing all available charts (ROE vs Market Cap, Market Cap vs Dividend Yield, Value vs Quality)
+  - **Industry Color Coding**: Maintains industry-based color schemes with legends in exported PNG files
+  - **Timestamped Files**: Automatic filename generation with timestamps to prevent download conflicts
+
+### Technical Implementation
+- **PNG Generation**: Custom matplotlib chart creation function for downloadable visualizations
+  - High-quality 300 DPI output for professional presentation
+  - Industry-based color coding with Set3 colormap
+  - Hard-coded EV/EBITDA y-axis scaling (0-30) for consistent visualization
+  - Automatic legend management (shows legends only for ≤10 industries)
+  - Responsive subplot layout with proper spacing and grid styling
+- **Direct Download**: Uses `st.download_button` with `image/png` MIME type for immediate file download
+- **Error Handling**: Comprehensive error handling with fallback to screenshot recommendations
+- **Layout Restructure**: Moved visualization tabs above data table in screener results display
+
+### User Experience Improvements
+- **Visual First**: Charts and insights appear immediately when screening results are available
+- **Export Convenience**: Single-click download of professional-quality visualization files
+- **No Popups**: Eliminated multi-step download process for better user flow
+- **Professional Output**: High-resolution charts suitable for presentations and reports
+- **Consistent Branding**: Maintained application color scheme and styling in exported files
+
 ## [0.2.6] - 2025-08-06
 
 ### Added
