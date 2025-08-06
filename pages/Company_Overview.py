@@ -130,19 +130,8 @@ if stock_symbol:
                     ]
                 )
                 
-                # Create text labels for share_own_percent
-                text = base.mark_text(
-                    align='left',
-                    baseline='middle',
-                    dx=3,  # Nudge text to right of bars
-                    fontSize=10
-                ).encode(
-                    x=alt.X('quantity:Q'),
-                    text=alt.Text('share_own_percent:Q', format='.1f')
-                )
-                
-                # Combine chart and text labels
-                final_chart = (bars + text).properties(
+                # Create chart without text labels
+                final_chart = bars.properties(
                     title=f'Ownership by Share Quantity - {company_name}',
                     width=600,
                     height=400
@@ -284,20 +273,8 @@ if stock_symbol:
                             ]
                         )
                         
-                        # Create text labels
-                        subs_text = subs_base.mark_text(
-                            align='left',
-                            baseline='middle',
-                            dx=3,
-                            fontSize=10,
-                            color='black'
-                        ).encode(
-                            x=alt.X('ownership_percent:Q'),
-                            text=alt.Text('ownership_percent:Q', format='.1f')
-                        )
-                        
-                        # Combine chart
-                        subs_chart = (subs_bars + subs_text).properties(
+                        # Create chart without text labels
+                        subs_chart = subs_bars.properties(
                             title=f'Subsidiaries Ownership Percentage - {company_name}',
                             width=600,
                             height=max(300, len(subs_sorted) * 25)

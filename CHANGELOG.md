@@ -57,6 +57,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Faster Selection**: No need for complex multiselect configuration or selection extraction logic
 - **Error Elimination**: Removed Company Officers API errors that were blocking Management Team data
 - **Consistent Behavior**: Clear button now maintains consistent selection state rather than empty state
+- **Cleaner Chart Visuals**: Removed data labels from ownership charts for less cluttered visualization
+
+### Changed
+- [2025-08-06] **Company Overview Chart Simplification**: Removed percentage data labels from ownership bar charts
+  - **Main Ownership Chart**: Removed text labels showing percentage values next to bars in "Ownership by Share Quantity" chart
+  - **Subsidiaries Chart**: Removed text labels showing percentage values next to bars in "Subsidiaries Ownership Percentage" chart
+  - **Tooltip Preservation**: Percentage information still accessible via interactive tooltips on hover
+  - **Visual Improvement**: Charts now display cleaner with less visual clutter while maintaining data accessibility
+  - **Files Modified**: `pages/Company_Overview.py` lines 133-134, 276-277 - removed text label creation and combination
+  - **Result**: More professional and readable ownership visualization charts
 
 ## [0.2.8] - 2025-08-06
 
