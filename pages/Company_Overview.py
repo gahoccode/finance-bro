@@ -37,6 +37,16 @@ def get_subsidiaries_data(symbol):
         st.error(f"Error fetching subsidiaries data: {str(e)}")
         return pd.DataFrame()
 
+@st.cache_data(ttl=3600)  # Cache for 1 hour
+def get_insider_deals_data(symbol):
+    """Get insider deals data with caching"""
+    try:
+        stock = Vnstock().stock(symbol=symbol, source='TCBS')
+        return stock.company.insider_deals()
+    except Exception as e:
+        st.error(f"Error fetching insider deals data: {str(e)}")
+        return pd.DataFrame()
+
 # Set page configuration
 st.set_page_config(
     page_title="Company Profile Analysis",
@@ -150,7 +160,7 @@ if stock_symbol:
             st.info("No ownership data available for this symbol.")
         
         # Create tabs for additional information
-        tab1, tab2, tab3 = st.tabs(["Management Team", "Subsidiaries", "Full Details"])
+        tab1, tab2, tab3, tab4 = st.tabs(["Management Team", "Subsidiaries", "Insider Deals", "Full Details"])
         
         with tab1:
             st.header("Company Management")
@@ -316,6 +326,70 @@ if stock_symbol:
                 st.error(f"Error loading subsidiaries data: {str(e)}")
         
         with tab3:
+            st.header("Insider Deals")
+            try:
+                # Get cached insider deals data
+                insider_deals = get_insider_deals_data(stock_symbol)
+                
+                if not insider_deals.empty:
+                    # Display insider deals table
+                    st.subheader("Recent Insider Transactions")
+                    st.dataframe(insider_deals, use_container_width=True)
+                    
+                    # Create timeline visualization
+                    st.subheader("Insider Deals Timeline")
+                    
+                    # Prepare data for visualization
+                    deals_viz = insider_deals.copy()
+                    deals_viz['deal_value'] = deals_viz['deal_quantity'] * deals_viz['deal_price']
+                    
+                    # Create scatter plot showing deals over time
+                    scatter_chart = alt.Chart(deals_viz).mark_circle(size=100).encode(
+                        x=alt.X('deal_announce_date:T', title='Deal Announce Date'),
+                        y=alt.Y('deal_quantity:Q', title='Deal Quantity'),
+                        color=alt.Color('deal_action:N', title='Action', scale=alt.Scale(range=['#d62728', '#2ca02c'])),
+                        size=alt.Size('deal_value:Q', title='Deal Value', scale=alt.Scale(range=[100, 400])),
+                        tooltip=[
+                            alt.Tooltip('deal_announce_date:T', title='Date'),
+                            alt.Tooltip('deal_action:N', title='Action'),
+                            alt.Tooltip('deal_method:N', title='Method'),
+                            alt.Tooltip('deal_quantity:Q', title='Quantity', format=',.0f'),
+                            alt.Tooltip('deal_price:Q', title='Price', format=',.0f'),
+                            alt.Tooltip('deal_value:Q', title='Deal Value', format=',.0f'),
+                            alt.Tooltip('deal_ratio:Q', title='Deal Ratio', format='.2f')
+                        ]
+                    ).properties(
+                        title=f'Insider Deals Timeline - {company_name}',
+                        width=700,
+                        height=400
+                    ).configure_axis(
+                        labelFontSize=10,
+                        titleFontSize=12
+                    ).configure_title(
+                        fontSize=14,
+                        fontWeight='bold'
+                    ).interactive()
+                    
+                    st.altair_chart(scatter_chart, use_container_width=True)
+                    
+                    # Summary metrics
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("Total Deals", len(insider_deals))
+                    with col2:
+                        buy_deals = len(insider_deals[insider_deals['deal_action'] == 'Mua'])
+                        st.metric("Buy Deals", buy_deals)
+                    with col3:
+                        sell_deals = len(insider_deals[insider_deals['deal_action'] == 'Bán'])
+                        st.metric("Sell Deals", sell_deals)
+                        
+                else:
+                    st.info("No insider deals information available for this symbol.")
+                    
+            except Exception as e:
+                st.error(f"Error loading insider deals data: {str(e)}")
+        
+        with tab4:
             st.header("Detailed Information")
             if not ownership_percentage.empty:
                 st.subheader("Complete Ownership Data")
