@@ -1,10 +1,9 @@
 [theme]
 base= "light"
-linkUnderline = false
+linkUnderline = true
 primaryColor = "#56524D"
 secondaryBackgroundColor = "#AAA39F"
 showWidgetBorder = true
-borderColor = "#2B2523"
 
 [theme.sidebar]
 backgroundColor = "#D4D4D4"

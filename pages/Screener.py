@@ -6,8 +6,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Title and header
-st.markdown('<h1 class="main-header">🔍 Stock Screener</h1>', unsafe_allow_html=True)
-st.markdown('<p style="text-align: center; color: #666; font-size: 1.1rem; margin-top: -0.5rem; margin-bottom: 1rem;">Filter and analyze Vietnamese stocks based on various financial metrics</p>', unsafe_allow_html=True)
+st.markdown('# 🔍 Stock Screener')
+st.markdown('Filter and analyze Vietnamese stocks based on various financial metrics')
 
 # Authentication handling
 if not st.user.is_logged_in:

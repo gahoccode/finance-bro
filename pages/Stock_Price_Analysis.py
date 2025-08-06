@@ -13,9 +13,7 @@ import os
 
 st.set_page_config(page_title="Stock Price Analysis", layout="wide")
 
-# Load custom CSS
-with open('static/style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+# CSS loading removed
 
 # Get stock symbol from session state (set in main app)
 # If not available, show message to use main app first
