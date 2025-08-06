@@ -36,6 +36,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Professional Output**: High-resolution charts suitable for presentations and reports
 - **Consistent Branding**: Maintained application color scheme and styling in exported files
 
+### Fixed
+- [2025-08-06] **Duplicate Login Button Issue**: Removed redundant authentication check in Stock Analysis page
+  - **Issue**: Users were seeing two login buttons - one from main app and one from Stock Analysis page
+  - **Root Cause**: Duplicate authentication handling in `pages/bro.py` lines 176-187 alongside main app authentication
+  - **Solution**: Removed duplicate authentication check from Stock Analysis page since authentication is handled at app entry point
+  - **Files Modified**: `pages/bro.py` - removed redundant authentication block and login button
+  - **Result**: Clean single login flow with authentication properly centralized in main app
+
+- [2025-08-06] **Duplicate Logout Button Issue**: Removed redundant logout button from Stock Analysis page
+  - **Issue**: Users were seeing two logout buttons - one from main app sidebar and one from Stock Analysis page sidebar
+  - **Root Cause**: Duplicate logout functionality in `pages/bro.py` lines 226-227 alongside main app logout button
+  - **Solution**: Removed duplicate logout button from Stock Analysis page since logout is handled in main app
+  - **Files Modified**: `pages/bro.py` - removed redundant logout button from sidebar
+  - **Result**: Clean single logout flow with session management properly centralized in main app
+
 ## [0.2.6] - 2025-08-06
 
 ### Added
