@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 from vnstock import Company, Vnstock
+from vnstock.explorer.vci import Company
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -45,6 +46,16 @@ def get_insider_deals_data(symbol):
         return stock.company.insider_deals()
     except Exception as e:
         st.error(f"Error fetching insider deals data: {str(e)}")
+        return pd.DataFrame()
+
+@st.cache_data(ttl=3600)  # Cache for 1 hour
+def get_foreign_trading_data(symbol):
+    """Get foreign trading data with caching"""
+    try:
+        company = Company(symbol=symbol)
+        return company.trading_stats()
+    except Exception as e:
+        st.error(f"Error fetching foreign trading data: {str(e)}")
         return pd.DataFrame()
 
 # Set page configuration
@@ -160,7 +171,7 @@ if stock_symbol:
             st.info("No ownership data available for this symbol.")
         
         # Create tabs for additional information
-        tab1, tab2, tab3, tab4 = st.tabs(["Management Team", "Subsidiaries", "Insider Deals", "Full Details"])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["Management Team", "Subsidiaries", "Insider Deals", "Foreign Transaction", "Full Details"])
         
         with tab1:
             st.header("Company Management")
@@ -390,6 +401,88 @@ if stock_symbol:
                 st.error(f"Error loading insider deals data: {str(e)}")
         
         with tab4:
+            st.header("Foreign Transaction Analysis")
+            try:
+                # Get cached foreign trading data
+                foreign_trading = get_foreign_trading_data(stock_symbol)
+                
+                if not foreign_trading.empty:
+                    # Display EV metric
+                    st.subheader("Enterprise Value")
+                    if 'ev' in foreign_trading.columns:
+                        ev_value = foreign_trading['ev'].iloc[0] if len(foreign_trading) > 0 else 0
+                        st.metric("Enterprise Value", f"{ev_value:,.0f}")
+                    
+                    # Create visualization for foreign holding rooms
+                    st.subheader("Foreign Holding Room Analysis")
+                    
+                    room_data = []
+                    for col in ['foreign_room', 'foreign_holding_room', 'current_holding_room', 'max_holding_room']:
+                        if col in foreign_trading.columns:
+                            room_data.append({
+                                'Room Type': col.replace('_', ' ').title(),
+                                'Value': foreign_trading[col].iloc[0]
+                            })
+                    
+                    if room_data:
+                        room_df = pd.DataFrame(room_data)
+                        
+                        # Create horizontal bar chart for room comparison
+                        room_chart = alt.Chart(room_df).mark_bar(color='orange').encode(
+                            y=alt.Y('Room Type:N', title='Room Type', sort='-x'),
+                            x=alt.X('Value:Q', title='Room Value'),
+                            tooltip=[
+                                alt.Tooltip('Room Type:N', title='Room Type'),
+                                alt.Tooltip('Value:Q', title='Value', format=',.0f')
+                            ]
+                        ).properties(
+                            title=f'Foreign Holding Room Analysis - {company_name}',
+                            width=600,
+                            height=300
+                        ).configure_axis(
+                            labelFontSize=10,
+                            titleFontSize=12
+                        ).configure_title(
+                            fontSize=14,
+                            fontWeight='bold'
+                        )
+                        
+                        st.altair_chart(room_chart, use_container_width=True)
+                    
+                    # Summary metrics
+                    col1, col2, col3, col4, col5 = st.columns(5)
+                    with col1:
+                        if 'foreign_volume' in foreign_trading.columns:
+                            foreign_vol = foreign_trading['foreign_volume'].iloc[0]
+                            st.metric("Foreign Volume", f"{foreign_vol:,.0f}")
+                    with col2:
+                        if 'total_volume' in foreign_trading.columns:
+                            total_vol = foreign_trading['total_volume'].iloc[0]
+                            st.metric("Total Volume", f"{total_vol:,.0f}")
+                    with col3:
+                        if 'foreign_room' in foreign_trading.columns:
+                            foreign_room = foreign_trading['foreign_room'].iloc[0]
+                            st.metric("Foreign Room", f"{foreign_room:,.0f}")
+                    with col4:
+                        if 'current_holding_ratio' in foreign_trading.columns:
+                            holding_ratio = foreign_trading['current_holding_ratio'].iloc[0]
+                            st.metric("Current Holding Ratio", f"{holding_ratio:.2%}")
+                    with col5:
+                        if 'max_holding_ratio' in foreign_trading.columns:
+                            max_holding_ratio = foreign_trading['max_holding_ratio'].iloc[0]
+                            st.metric("Max Holding Ratio", f"{max_holding_ratio:.2%}")
+                    
+                    # Display complete foreign trading data
+                    st.subheader("Complete Foreign Trading Data")
+                    st.dataframe(foreign_trading, use_container_width=True)
+                    
+                else:
+                    st.info("No foreign trading information available for this symbol.")
+                    
+            except Exception as e:
+                st.error(f"Error loading foreign trading data: {str(e)}")
+        
+        with tab5:
             st.header("Detailed Information")
             if not ownership_percentage.empty:
                 st.subheader("Complete Ownership Data")

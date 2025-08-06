@@ -5,6 +5,42 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.6] - 2025-08-06
+
+### Added
+- [2025-08-06] **Foreign Transaction Analysis Tab**: Added comprehensive foreign trading data visualization to Company Overview page
+  - **New Tab**: Added "Foreign Transaction" tab alongside Management Team, Subsidiaries, and Insider Deals tabs
+  - **Data Integration**: Uses `vnstock.explorer.vci.Company` with `trading_stats()` method for comprehensive foreign trading data
+  - **Enterprise Value Metric**: Displays Enterprise Value (EV) as primary metric from foreign trading data
+  - **Foreign Holding Room Visualization**: Horizontal bar chart showing foreign room, foreign holding room, current holding room, and max holding room
+  - **Summary Metrics**: Five-column layout displaying Foreign Volume, Total Volume, Foreign Room, Current Holding Ratio, and Max Holding Ratio
+  - **Data Caching**: Added `get_foreign_trading_data()` function with 1-hour TTL caching to optimize API performance
+  - **Error Handling**: Comprehensive error handling for missing foreign trading data with user-friendly messages
+
+### Changed
+- [2025-08-06] **UI Layout Improvements**: Enhanced Company Overview page layout for better user experience
+  - **Visualization First**: Moved all visualizations above dataframes in Management Team, Subsidiaries, and Insider Deals tabs
+  - **Consistent Layout**: All tabs now follow the pattern of visualization → metrics → dataframe display
+  - **User Experience**: Visual insights now appear first, followed by detailed raw data tables
+  - **Import Optimization**: Added `from vnstock.explorer.vci import Company` import for foreign trading functionality
+
+### Technical Implementation
+- **Foreign Trading Data Structure**: Complete access to 24-column foreign trading dataset including:
+  - Basic trading metrics: symbol, exchange, price data, volume data
+  - Foreign investor metrics: foreign_volume, foreign_room, foreign_holding_room, current_holding_ratio, max_holding_ratio
+  - Enterprise valuation: ev (Enterprise Value)
+  - Technical indicators: high_price_1y, low_price_1y, pct_low_change_1y, pct_high_change_1y
+- **Visualization Architecture**: Altair-based horizontal bar charts with interactive tooltips and responsive design
+- **Metrics Display**: Professional five-column layout with formatted numerical displays (thousands separators, percentages)
+- **Session State Management**: Proper integration with existing stock symbol session state pattern
+
+### User Experience Improvements
+- **Visual Priority**: Charts and visualizations now appear first in all tabs for immediate insights
+- **Foreign Investment Insights**: Users can quickly assess foreign investor activity and holding capacity
+- **Enterprise Valuation**: Direct access to enterprise value metric for company valuation analysis
+- **Comprehensive Foreign Data**: Full foreign trading dataset available in tabular format for detailed analysis
+- **Consistent Navigation**: Foreign Transaction tab seamlessly integrated into existing Company Overview workflow
+
 ## [0.2.5] - 2025-08-05
 
 ### Added

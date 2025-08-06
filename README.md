@@ -8,7 +8,7 @@
 - 🤖 **AI Chat Interface** - Natural language queries about financial metrics
 - 💬 **Interactive Analysis** - Real-time conversation with AI analyst
 - 📈 **Financial Metrics** - ROIC, debt ratios, dividend yields, cash flow analysis
-- 🏢 **Company Analysis** - Ownership structure, management team, and subsidiaries visualization
+- 🏢 **Company Analysis** - Ownership structure, management team, subsidiaries, and foreign transaction analysis
 - 🔐 **Secure API Key Management** - Environment variables or secure UI input
 
 ## Quick Start
@@ -119,7 +119,7 @@ streamlit run app.py
 ### Step 3: Explore Other Analysis Tools
 7. **🚀 Navigate to Other Pages**: Now you can efficiently use other analysis tools:
    - **📈 Price Analysis**: Interactive price charts and technical analysis
-   - **🏢 Company Overview**: Company profile with ownership structure, management team, and subsidiaries analysis
+   - **🏢 Company Overview**: Company profile with ownership structure, management team, subsidiaries, and foreign transaction analysis
    - **💼 Portfolio Optimization**: Modern Portfolio Theory-based optimization
 
 ### Recommended Setup for Best Experience
