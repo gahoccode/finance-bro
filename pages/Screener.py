@@ -110,21 +110,27 @@ st.subheader("⚡ Quick Filter Presets")
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    if st.button("🏦 High Quality Banks", help="ROE > 15%, Market Cap > 50B"):
+    if st.button("🏦 High Quality Banks", help="Banks with ROE > 15%, Market Cap > 50B"):
+        # Set preset values in sidebar
         st.session_state.preset_industries = ["Banks"]
         st.session_state.preset_roe = True
         st.session_state.preset_market_cap = True
+        st.session_state.auto_run_screener = True
         st.rerun()
 
 with col2:
-    if st.button("💰 High Dividend Stocks", help="Dividend Yield > 5%"):
+    if st.button("💰 High Dividend Stocks", help="All industries with Dividend Yield > 5%"):
+        # Set preset values in sidebar
         st.session_state.preset_dividend = True
+        st.session_state.auto_run_screener = True
         st.rerun()
 
 with col3:
-    if st.button("📈 Growth Stocks", help="ROE > 20%, ROA > 10%"):
+    if st.button("📈 Growth Stocks", help="All industries with ROE > 20%, ROA > 10%"):
+        # Set preset values in sidebar
         st.session_state.preset_roe = True
         st.session_state.preset_roa = True
+        st.session_state.auto_run_screener = True
         st.rerun()
 
 with col4:
@@ -132,6 +138,8 @@ with col4:
         for key in list(st.session_state.keys()):
             if key.startswith('preset_'):
                 del st.session_state[key]
+        if 'screener_data' in st.session_state:
+            del st.session_state['screener_data']
         st.rerun()
 
 # Sidebar controls
@@ -276,8 +284,13 @@ else:
     st.sidebar.info("ℹ️ No filters enabled - will show all stocks")
 
 
-# Load data button
-if st.sidebar.button("🔍 Run Screener", type="primary"):
+# Load data button or auto-run from preset
+run_screener = st.sidebar.button("🔍 Run Screener", type="primary") or st.session_state.get('auto_run_screener', False)
+
+if run_screener:
+    # Clear the auto-run flag
+    if 'auto_run_screener' in st.session_state:
+        del st.session_state.auto_run_screener
     # Build parameters - only include enabled filters
     params = {
         "exchangeName": ",".join(exchanges)
