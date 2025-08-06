@@ -5,6 +5,45 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.9] - 2025-08-06
+
+### Fixed
+- [2025-08-06] **Stock Symbol Selection Synchronization**: Fixed critical bug where main content and sidebar showed contradictory selection states
+  - **Issue**: After selecting a stock symbol, main content displayed success message but sidebar controls still showed "no symbol selected"
+  - **Root Cause**: Streamlit execution timing issue - sidebar rendered before main content could update session state
+  - **Primary Fix**: Fixed multiselect default parameter to always pass a list instead of string
+    ```python
+    # Before: Could pass string causing TypeError
+    default=st.session_state.stock_symbol if 'stock_symbol' in st.session_state else "REE"
+    
+    # After: Always passes list for multiselect compatibility
+    default=[st.session_state.stock_symbol] if 'stock_symbol' in st.session_state else ["REE"]
+    ```
+  - **Secondary Fix**: Added `st.rerun()` calls to force immediate page refresh after session state changes
+    ```python
+    # After symbol selection
+    st.session_state.stock_symbol = current_symbol
+    st.rerun()  # Force immediate rerun to update sidebar
+    
+    # After clearing selection  
+    del st.session_state.stock_symbol
+    st.rerun()  # Force rerun when clearing selection
+    ```
+  - **Files Modified**: `app.py` lines 88, 101, 105, 122 - updated multiselect default logic and added rerun triggers
+  - **Result**: Sidebar and main content now show consistent stock symbol selection state immediately
+
+### Technical Implementation
+- **Multiselect Parameter Fix**: Ensures type safety by always providing list to multiselect component
+- **Session State Synchronization**: `st.rerun()` forces immediate UI refresh to propagate session state changes
+- **Error Prevention**: Eliminates TypeError from passing string to multiselect expecting list
+- **Timing Resolution**: Addresses Streamlit's execution order where sidebar renders before main content updates
+
+### User Experience Improvements
+- **Consistent UI State**: Sidebar controls always reflect current stock symbol selection
+- **Immediate Feedback**: Changes appear instantly without page reload delays
+- **Error Elimination**: No more TypeError messages disrupting user workflow
+- **Reliable Navigation**: Users can confidently rely on sidebar status indicators
+
 ## [0.2.8] - 2025-08-06
 
 ### Added

@@ -85,7 +85,7 @@ def main_page():
     selected_symbols = st.multiselect(
         "Search and select a stock symbol:",
         options=stock_symbols_list,
-        default=st.session_state.get('stock_symbol', 'REE') if 'stock_symbol' in st.session_state else ["REE"],
+        default=[st.session_state.stock_symbol] if 'stock_symbol' in st.session_state else ["REE"],
         max_selections=1,  # Limit to single selection
         placeholder="Type to search for stock symbols...",
         help="Search and select one stock symbol to analyze"
@@ -98,9 +98,11 @@ def main_page():
             st.session_state.stock_symbol = current_symbol
             st.success(f"✅ Selected stock symbol: **{current_symbol}**")
             st.info("📊 You can now navigate to other pages to analyze this stock!")
+            st.rerun()  # Force immediate rerun to update sidebar
     else:
         if 'stock_symbol' in st.session_state:
             del st.session_state.stock_symbol
+            st.rerun()  # Force rerun when clearing selection
         st.warning("⚠️ Please select a stock symbol to continue.")
     
     # Display current selection status
