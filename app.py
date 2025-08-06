@@ -138,6 +138,14 @@ def main_page():
         with col4:
             if st.button("💼 Portfolio Optimization", use_container_width=True):
                 st.switch_page("pages/Portfolio_Optimization.py")
+        
+        # Second row of navigation buttons
+        st.markdown("")  # Add some spacing
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            if st.button("🔍 Stock Screener", use_container_width=True):
+                st.switch_page("pages/Screener.py")
     
     # Instructions and app information
     st.markdown("---")
@@ -157,6 +165,7 @@ def main_page():
         - **📈 Price Analysis** - Interactive price charts and technical analysis
         - **🏢 Company Overview** - Company profile, ownership structure, and management team
         - **💼 Portfolio Optimization** - Modern Portfolio Theory-based portfolio optimization
+        - **🔍 Stock Screener** - Filter and analyze stocks by financial metrics across industries
         
         **Tips:**
         - Your selected stock symbol persists across all pages
@@ -186,6 +195,7 @@ pages = {
         st.Page("pages/Stock_Price_Analysis.py", title="Price Analysis", icon="📈"),
         st.Page("pages/Company_Overview.py", title="Company Overview", icon="🏢"),
         st.Page("pages/Portfolio_Optimization.py", title="Portfolio Optimization", icon="💼"),
+        st.Page("pages/Screener.py", title="Stock Screener", icon="🔍"),
     ]
 }
 
