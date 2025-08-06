@@ -51,9 +51,11 @@ def get_screener_data(params, source='TCBS', limit=1700):
     """Get screener data with caching"""
     try:
         screener = Screener(source=source)
-        return screener.stock(params=params, limit=limit, lang='en')
+        result = screener.stock(params=params, limit=limit, lang='en')
+        return result
     except Exception as e:
         st.error(f"Error fetching screener data: {str(e)}")
+        st.error(f"API parameters used: {params}")
         return pd.DataFrame()
 
 def create_scatter_chart(df, x_col, y_col, title, y_scale=None):
@@ -135,12 +137,8 @@ with col4:
 # Sidebar controls
 st.sidebar.header("🎛️ Screening Filters")
 
-# Data source selection
-source = st.sidebar.selectbox(
-    "Data Source",
-    ["TCBS", "VCI"],
-    help="Choose data provider"
-)
+# Fixed data source
+source = "TCBS"  # Using TCBS as the only data source
 
 # Industry filter
 default_industries = st.session_state.get('preset_industries', [])
@@ -162,6 +160,7 @@ exchanges = st.sidebar.multiselect(
 # Financial filters
 st.sidebar.subheader("📊 Financial Filters")
 st.sidebar.markdown("*Toggle filters on/off and adjust ranges as needed*")
+st.sidebar.info("💡 Financial filters are applied after data retrieval (client-side filtering)")
 
 # Market Cap filter
 use_market_cap = st.sidebar.checkbox(
@@ -276,6 +275,7 @@ if active_filters:
 else:
     st.sidebar.info("ℹ️ No filters enabled - will show all stocks")
 
+
 # Load data button
 if st.sidebar.button("🔍 Run Screener", type="primary"):
     # Build parameters - only include enabled filters
@@ -287,30 +287,64 @@ if st.sidebar.button("🔍 Run Screener", type="primary"):
     if selected_industries:
         params["industryName"] = ",".join(selected_industries)
     
-    # Add financial filters only if enabled
+    # IMPORTANT: Based on vnstock documentation, the screener API only supports:
+    # - exchangeName (exchanges)
+    # - industryName (industries)
+    # Financial filters will be applied POST-PROCESSING after getting all data
+    
+    # We'll store the financial filters for client-side filtering
+    financial_filters = {}
     if use_market_cap and market_cap_range:
-        params["marketCap"] = market_cap_range
-    
+        financial_filters["market_cap"] = market_cap_range
     if use_roe and roe_range:
-        params["roe"] = roe_range
-    
+        financial_filters["roe"] = roe_range
     if use_roa and roa_range:
-        params["roa"] = roa_range
-    
+        financial_filters["roa"] = roa_range
     if use_dividend_yield and dividend_yield_range:
-        params["dividend_yield"] = dividend_yield_range
-    
+        financial_filters["dividend_yield"] = dividend_yield_range
     if use_ev_ebitda and ev_ebitda_range:
-        params["ev_ebitda"] = ev_ebitda_range
+        financial_filters["ev_ebitda"] = ev_ebitda_range
     
     with st.spinner("Screening stocks..."):
         screener_data = get_screener_data(params, source=source)
     
     if not screener_data.empty:
-        st.session_state['screener_data'] = screener_data
-        st.success(f"Found {len(screener_data)} stocks matching your criteria!")
+        # Apply client-side financial filtering if any filters are enabled
+        if financial_filters:
+            st.info(f"📊 Applying {len(financial_filters)} financial filters to {len(screener_data)} stocks...")
+            filtered_data = screener_data.copy()
+            original_count = len(filtered_data)
+            
+            for column, (min_val, max_val) in financial_filters.items():
+                if column in filtered_data.columns:
+                    # Remove rows where the column value is outside the range or is NaN
+                    before_count = len(filtered_data)
+                    filtered_data = filtered_data[
+                        (filtered_data[column].notna()) & 
+                        (filtered_data[column] >= min_val) & 
+                        (filtered_data[column] <= max_val)
+                    ]
+                    after_count = len(filtered_data)
+                    st.write(f"  • {column}: {before_count} → {after_count} stocks (range: {min_val}-{max_val})")
+                else:
+                    st.warning(f"⚠️ Column '{column}' not found in data. Skipping this filter.")
+            
+            screener_data = filtered_data
+            st.success(f"✅ Filtered from {original_count} to {len(screener_data)} stocks!")
+        
+        if not screener_data.empty:
+            st.session_state['screener_data'] = screener_data
+            st.success(f"Found {len(screener_data)} stocks matching your criteria!")
+        else:
+            st.warning("No stocks found after applying financial filters. Try relaxing the filter ranges.")
     else:
-        st.warning("No stocks found matching your criteria. Try adjusting the filters.")
+        st.warning("No stocks found from the API. Try adjusting the industry/exchange filters.")
+        st.info("""
+        **Troubleshooting Tips:**
+        1. Try using the 'Test Basic API' button first to verify the connection
+        2. Start with just Industry + Exchange filters (financial filters are applied after data retrieval)
+        3. Try different industry combinations if no results are found
+        """)
 
 # Display results if data is available
 if 'screener_data' in st.session_state and not st.session_state['screener_data'].empty:
@@ -398,7 +432,9 @@ if 'screener_data' in st.session_state and not st.session_state['screener_data']
                 - **> 18**: Expensive (needs exceptional growth prospects)
                 """)
             else:
-                st.info("No data available for EV/EBITDA visualization")
+                st.info("No stocks have both ROE and EV/EBITDA data available")
+        else:
+            st.info("Value vs Quality analysis requires both ROE and EV/EBITDA data. These metrics may not be available in the current dataset.")
     
     with tab4:
         col1, col2 = st.columns(2)
@@ -435,8 +471,8 @@ else:
     
     1. **Select Industries**: Choose one or more industry sectors from the sidebar
     2. **Set Exchanges**: Select which Vietnamese stock exchanges to include
-    3. **Configure Filters**: Adjust the financial metric filters:
-       - Market Cap: Company size filter
+    3. **Configure Filters**: Toggle and adjust the financial metric filters:
+       - Market Cap: Company size filter (applied after data retrieval)
        - ROE: Return on Equity (profitability)
        - ROA: Return on Assets (efficiency)
        - Dividend Yield: Dividend return percentage
@@ -444,7 +480,7 @@ else:
     4. **Run Screener**: Click the "Run Screener" button to find matching stocks
     5. **Analyze Results**: View the filtered stocks and interactive visualizations
     
-    The screener will show you stocks that match ALL your filter criteria.
+    The screener uses TCBS data and applies financial filters after data retrieval.
     """)
     
     # Show sample metrics
