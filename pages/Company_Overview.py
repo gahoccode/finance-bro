@@ -169,8 +169,6 @@ if stock_symbol:
                 management_team = get_management_data(stock_symbol)
                 
                 if not management_team.empty:
-                    st.dataframe(management_team, use_container_width=True)
-                    
                     # Create management team ownership chart
                     st.subheader("Management Team Ownership")
                     
@@ -230,6 +228,8 @@ if stock_symbol:
                         st.altair_chart(mgmt_chart, use_container_width=True)
                     else:
                         st.info("No management share ownership data available.")
+                    
+                    st.dataframe(management_team, use_container_width=True)
                         
                 else:
                     st.info("No management information available for this symbol.")
@@ -244,13 +244,6 @@ if stock_symbol:
                 subsidiaries = get_subsidiaries_data(stock_symbol)
                 
                 if not subsidiaries.empty:
-                    # Display subsidiaries table
-                    st.subheader("Subsidiaries Overview")
-                    # Convert ownership_percent to percentage for display
-                    display_subs = subsidiaries[['organ_name', 'ownership_percent', 'type']].copy()
-                    display_subs['ownership_percent'] = display_subs['ownership_percent'] * 100
-                    st.dataframe(display_subs, use_container_width=True)
-                    
                     # Create ownership percentage visualization
                     st.subheader("Subsidiaries Ownership Distribution")
                     
@@ -318,6 +311,13 @@ if stock_symbol:
                             st.metric("Average Ownership", f"{avg_ownership:.1f}%")
                     else:
                         st.info("No subsidiaries with ownership percentage data available.")
+                    
+                    # Display subsidiaries table
+                    st.subheader("Subsidiaries Overview")
+                    # Convert ownership_percent to percentage for display
+                    display_subs = subsidiaries[['organ_name', 'ownership_percent', 'type']].copy()
+                    display_subs['ownership_percent'] = display_subs['ownership_percent'] * 100
+                    st.dataframe(display_subs, use_container_width=True)
                         
                 else:
                     st.info("No subsidiaries information available for this symbol.")
@@ -332,10 +332,6 @@ if stock_symbol:
                 insider_deals = get_insider_deals_data(stock_symbol)
                 
                 if not insider_deals.empty:
-                    # Display insider deals table
-                    st.subheader("Recent Insider Transactions")
-                    st.dataframe(insider_deals, use_container_width=True)
-                    
                     # Create timeline visualization
                     st.subheader("Insider Deals Timeline")
                     
@@ -382,6 +378,10 @@ if stock_symbol:
                     with col3:
                         sell_deals = len(insider_deals[insider_deals['deal_action'] == 'Bán'])
                         st.metric("Sell Deals", sell_deals)
+                    
+                    # Display insider deals table
+                    st.subheader("Recent Insider Transactions")
+                    st.dataframe(insider_deals, use_container_width=True)
                         
                 else:
                     st.info("No insider deals information available for this symbol.")
