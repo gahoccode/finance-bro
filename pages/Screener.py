@@ -111,7 +111,11 @@ col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     if st.button("🏦 High Quality Banks", help="Banks with ROE > 15%, Market Cap > 50B"):
-        # Set preset values in sidebar
+        # Clear all previous preset values
+        for key in list(st.session_state.keys()):
+            if key.startswith('preset_'):
+                del st.session_state[key]
+        # Set new preset values
         st.session_state.preset_industries = ["Banks"]
         st.session_state.preset_roe = True
         st.session_state.preset_market_cap = True
@@ -120,14 +124,22 @@ with col1:
 
 with col2:
     if st.button("💰 High Dividend Stocks", help="All industries with Dividend Yield > 5%"):
-        # Set preset values in sidebar
+        # Clear all previous preset values
+        for key in list(st.session_state.keys()):
+            if key.startswith('preset_'):
+                del st.session_state[key]
+        # Set new preset values
         st.session_state.preset_dividend = True
         st.session_state.auto_run_screener = True
         st.rerun()
 
 with col3:
     if st.button("📈 Growth Stocks", help="All industries with ROE > 20%, ROA > 10%"):
-        # Set preset values in sidebar
+        # Clear all previous preset values
+        for key in list(st.session_state.keys()):
+            if key.startswith('preset_'):
+                del st.session_state[key]
+        # Set new preset values
         st.session_state.preset_roe = True
         st.session_state.preset_roa = True
         st.session_state.auto_run_screener = True

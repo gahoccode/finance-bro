@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.7] - 2025-08-06
 
+### Fixed
+- [2025-08-06] **Quick Filter Preset Isolation**: Fixed filter preset buttons accumulating parameters from previous selections
+  - **Issue**: Clicking "High Dividend Stocks" then "Growth Stocks" would apply both sets of filters instead of replacing them
+  - **Root Cause**: Preset buttons were only adding new session state variables without clearing previous preset values
+  - **Solution**: Each preset button now clears all previous preset parameters before setting new ones
+  - **Implementation**: Added preset cleanup loop (`for key in list(st.session_state.keys()): if key.startswith('preset_'): del st.session_state[key]`) to each preset button
+  - **Files Modified**: `pages/Screener.py` - updated all Quick Filter Preset buttons (High Quality Banks, High Dividend Stocks, Growth Stocks)
+  - **Result**: Each preset button now provides clean, isolated filtering without parameter accumulation from previous selections
+
 ### Changed
 - [2025-08-06] **Stock Screener UI Enhancements**: Improved user experience with better layout and export functionality
   - **Visualization Priority**: Moved all visualizations above the screened stocks data table for immediate visual insights
