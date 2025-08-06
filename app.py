@@ -81,29 +81,22 @@ def main_page():
     
     stock_symbols_list = st.session_state.stock_symbols_list
     
-    # Use multiselect but configure for single selection
-    selected_symbols = st.multiselect(
+    # Use selectbox for single selection
+    current_symbol = st.selectbox(
         "Search and select a stock symbol:",
         options=stock_symbols_list,
-        default=[st.session_state.stock_symbol] if 'stock_symbol' in st.session_state else ["REE"],
-        max_selections=1,  # Limit to single selection
+        index=stock_symbols_list.index(st.session_state.stock_symbol) if 'stock_symbol' in st.session_state and st.session_state.stock_symbol in stock_symbols_list else stock_symbols_list.index("REE") if "REE" in stock_symbols_list else 0,
         placeholder="Type to search for stock symbols...",
         help="Search and select one stock symbol to analyze"
     )
     
     # Store the selected symbol in session state
-    if selected_symbols:
-        current_symbol = selected_symbols[0]
+    if current_symbol:
         if 'stock_symbol' not in st.session_state or st.session_state.stock_symbol != current_symbol:
             st.session_state.stock_symbol = current_symbol
             st.success(f"✅ Selected stock symbol: **{current_symbol}**")
             st.info("📊 You can now navigate to other pages to analyze this stock!")
             st.rerun()  # Force immediate rerun to update sidebar
-    else:
-        if 'stock_symbol' in st.session_state:
-            del st.session_state.stock_symbol
-            st.rerun()  # Force rerun when clearing selection
-        st.warning("⚠️ Please select a stock symbol to continue.")
     
     # Display current selection status
     if 'stock_symbol' in st.session_state:
@@ -118,7 +111,8 @@ def main_page():
         with col3:
             if st.button("Clear Selection", type="secondary"):
                 if 'stock_symbol' in st.session_state:
-                    del st.session_state.stock_symbol
+                    # Reset to default symbol instead of deleting
+                    st.session_state.stock_symbol = "REE" if "REE" in stock_symbols_list else stock_symbols_list[0]
                 st.rerun()
         
         # Quick navigation to analysis pages

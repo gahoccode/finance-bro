@@ -23,7 +23,7 @@ def get_management_data(symbol):
     """Get management data with caching"""
     try:
         company = Company(symbol=symbol)
-        return company.officers(lang='en')
+        return company.officers()
     except Exception as e:
         st.error(f"Error fetching management data: {str(e)}")
         return pd.DataFrame()

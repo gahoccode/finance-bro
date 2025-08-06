@@ -6,7 +6,7 @@ stock_symbol = 'REE'
 company = Company(symbol=stock_symbol)
 
 # Get company officers information
-management_team = company.officers(lang='en')
+management_team = company.officers()
 print(management_team)
 
 from vnstock import Vnstock

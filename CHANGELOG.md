@@ -7,42 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.9] - 2025-08-06
 
+### Changed
+- [2025-08-06] **Stock Symbol Selection Interface Enhancement**: Replaced multiselect with selectbox for cleaner single selection UX
+  - **UI Component Change**: Replaced `st.multiselect` with `st.selectbox` for more intuitive single stock selection
+    ```python
+    # Before: Multiselect with max_selections=1
+    selected_symbols = st.multiselect(
+        "Search and select a stock symbol:",
+        options=stock_symbols_list,
+        default=[st.session_state.stock_symbol] if 'stock_symbol' in st.session_state else ["REE"],
+        max_selections=1
+    )
+    
+    # After: Clean selectbox implementation
+    current_symbol = st.selectbox(
+        "Search and select a stock symbol:",
+        options=stock_symbols_list,
+        index=stock_symbols_list.index(st.session_state.stock_symbol) if 'stock_symbol' in st.session_state else 0
+    )
+    ```
+  - **Index-Based Selection**: Uses proper index parameter to maintain current selection state
+  - **Clear Button Update**: Modified clear selection to reset to default symbol instead of deletion
+  - **Files Modified**: `app.py` lines 85-99, 115 - replaced multiselect with selectbox and updated clear logic
+  - **Result**: More intuitive stock selection interface with native single-selection behavior
+
 ### Fixed
-- [2025-08-06] **Stock Symbol Selection Synchronization**: Fixed critical bug where main content and sidebar showed contradictory selection states
-  - **Issue**: After selecting a stock symbol, main content displayed success message but sidebar controls still showed "no symbol selected"
-  - **Root Cause**: Streamlit execution timing issue - sidebar rendered before main content could update session state
-  - **Primary Fix**: Fixed multiselect default parameter to always pass a list instead of string
+- [2025-08-06] **Company Officers API Parameter Error**: Fixed `Company.officers()` unexpected keyword argument error
+  - **Issue**: `Company.officers()` method was being called with `lang='en'` parameter causing API errors
+  - **Root Cause**: vnstock `Company.officers()` method doesn't accept language parameter
+  - **Solution**: Removed `lang='en'` parameter from `company.officers()` call
     ```python
-    # Before: Could pass string causing TypeError
-    default=st.session_state.stock_symbol if 'stock_symbol' in st.session_state else "REE"
+    # Before: Caused "unexpected keyword argument 'lang'" error
+    return company.officers(lang='en')
     
-    # After: Always passes list for multiselect compatibility
-    default=[st.session_state.stock_symbol] if 'stock_symbol' in st.session_state else ["REE"]
+    # After: Clean method call without parameters
+    return company.officers()
     ```
-  - **Secondary Fix**: Added `st.rerun()` calls to force immediate page refresh after session state changes
-    ```python
-    # After symbol selection
-    st.session_state.stock_symbol = current_symbol
-    st.rerun()  # Force immediate rerun to update sidebar
-    
-    # After clearing selection  
-    del st.session_state.stock_symbol
-    st.rerun()  # Force rerun when clearing selection
-    ```
-  - **Files Modified**: `app.py` lines 88, 101, 105, 122 - updated multiselect default logic and added rerun triggers
-  - **Result**: Sidebar and main content now show consistent stock symbol selection state immediately
+  - **Files Modified**: `pages/Company_Overview.py` line 26 - updated get_management_data function
+  - **Result**: Management Team tab now loads successfully without API parameter errors
 
 ### Technical Implementation
-- **Multiselect Parameter Fix**: Ensures type safety by always providing list to multiselect component
-- **Session State Synchronization**: `st.rerun()` forces immediate UI refresh to propagate session state changes
-- **Error Prevention**: Eliminates TypeError from passing string to multiselect expecting list
-- **Timing Resolution**: Addresses Streamlit's execution order where sidebar renders before main content updates
+- **Selectbox Integration**: Proper index calculation for maintaining selection state across page refreshes
+- **Session State Handling**: Simplified session state management with direct value assignment from selectbox
+- **Clear Selection Logic**: Modified to reset to default symbol rather than clearing state entirely
+- **API Compatibility**: Ensured vnstock Company class method calls match actual API signatures
 
 ### User Experience Improvements
-- **Consistent UI State**: Sidebar controls always reflect current stock symbol selection
-- **Immediate Feedback**: Changes appear instantly without page reload delays
-- **Error Elimination**: No more TypeError messages disrupting user workflow
-- **Reliable Navigation**: Users can confidently rely on sidebar status indicators
+- **Native Selection UX**: Selectbox provides standard dropdown behavior users expect for single selection
+- **Faster Selection**: No need for complex multiselect configuration or selection extraction logic
+- **Error Elimination**: Removed Company Officers API errors that were blocking Management Team data
+- **Consistent Behavior**: Clear button now maintains consistent selection state rather than empty state
 
 ## [0.2.8] - 2025-08-06
 
