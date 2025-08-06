@@ -90,9 +90,9 @@ def create_scatter_chart(df, x_col, y_col, title, y_scale=None):
 def create_histogram(df, col, title):
     """Create histogram with Altair"""
     chart = alt.Chart(df).mark_bar(opacity=0.7).encode(
-        x=alt.X(f'{col}:Q', bin=alt.Bin(maxbins=20), title=col.replace('_', ' ').title()),
-        y=alt.Y('count()', title='Count'),
-        color=alt.value('steelblue')
+        x=alt.X(f'{col}:Q', bin=alt.Bin(maxbins=20), title=col.replace('_', ' ').title(), axis=alt.Axis(grid=False)),
+        y=alt.Y('count()', title='Count', axis=alt.Axis(grid=False)),
+        color=alt.value('#AAA39F')
     ).properties(
         width=400,
         height=300,
@@ -503,7 +503,7 @@ if run_screener:
                 
                 # Create funnel chart showing stock count reduction
                 funnel_chart = alt.Chart(filter_df).mark_bar(
-                    color='steelblue',
+                    color='#AAA39F',
                     opacity=0.8
                 ).encode(
                     x=alt.X('Count:Q', title='Number of Stocks'),

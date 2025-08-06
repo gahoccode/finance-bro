@@ -119,7 +119,7 @@ if stock_symbol:
                 )
                 
                 # Create bar chart
-                bars = base.mark_bar(color='black').encode(
+                bars = base.mark_bar(color='#56524D').encode(
                     tooltip=[
                         alt.Tooltip('share_holder:N', title='Shareholder'),
                         alt.Tooltip('quantity:Q', title='Shares', format=',.0f'),
@@ -188,7 +188,7 @@ if stock_symbol:
                         )
                         
                         # Create bars
-                        mgmt_bars = mgmt_base.mark_bar(color='black').encode(
+                        mgmt_bars = mgmt_base.mark_bar(color='#56524D').encode(
                             tooltip=[
                                 alt.Tooltip('officer_name:N', title='Officer'),
                                 alt.Tooltip('position_short_name:N', title='Position'),
