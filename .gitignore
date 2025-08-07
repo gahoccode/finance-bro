@@ -61,3 +61,8 @@ temp_chart.png
 
 # Streamlit secrets
 .streamlit/secrets.toml
+
+#Claude
+.claude/ 
+.serena/
+.mcp.json
