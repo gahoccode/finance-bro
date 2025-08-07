@@ -254,22 +254,22 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.metric(
         "Max Sharpe Portfolio",
-        f"{sharpe:.4f}",
-        f"Return: {(ret_tangent*100):.2f}"
+        f"{sharpe:.1f}",
+        f"Return: {(ret_tangent*100):.1f}%"
     )
 
 with col2:
     st.metric(
         "Min Volatility Portfolio", 
-        f"{sharpe_min_vol:.4f}",
-        f"Return: {(ret_min_vol*100):.2f}"
+        f"{sharpe_min_vol:.1f}",
+        f"Return: {(ret_min_vol*100):.1f}%"
     )
 
 with col3:
     st.metric(
         "Max Utility Portfolio",
-        f"{sharpe_utility:.4f}",
-        f"Return: {(ret_utility*100):.2f}"
+        f"{sharpe_utility:.1f}",
+        f"Return: {(ret_utility*100):.1f}%"
     )
 
 # Efficient Frontier Plot
