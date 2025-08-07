@@ -57,7 +57,8 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
   - **Company_Overview.py** - Company profile and ownership analysis
   - **Stock_Price_Analysis.py** - Price charts and technical analysis
   - **Portfolio_Optimization.py** - Modern Portfolio Theory optimization
-- **static/** - CSS styling
+  - **Screener.py** - Stock screening and filtering functionality
+- **static/** - CSS styling with custom theme configuration
 - **cache/** - Data caching for performance
 - **exports/charts/** - Generated chart storage
 
@@ -76,9 +77,11 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
 5. Chart generation and export
 
 ### Critical Dependencies
-**NEVER upgrade pandas or pandasai independently.** The app uses:
+**NEVER upgrade pandas or pandasai independently.** The app requires:
+- **Python** - Exact version `3.10.11` (specified in pyproject.toml)
 - `pandasai==2.3.0` (stable)
 - `pandas==1.5.3` (compatible with pandasai 2.x)
+- Uses `uv` for dependency management (recommended over pip)
 
 PandasAI 3.x has breaking changes and requires different pandas versions.
 
@@ -103,7 +106,16 @@ Requires Google OAuth configuration in `.streamlit/secrets.toml`:
 client_id = "your-google-client-id"
 client_secret = "your-google-client-secret"
 redirect_uri = "http://localhost:8501/oauth2callback"
+cookie_secret = "your-random-secret-string"
+server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"
 ```
+
+### Theme Configuration
+Custom theme is configured in `.streamlit/config.toml` with:
+- Earth-toned color palette (`#56524D`, `#2B2523`, `#76706C`)
+- Custom chart colors for financial data visualization
+- Sequential colors for data progression charts
+- Serif font for professional appearance
 
 ### Environment Variables
 - `OPENAI_API_KEY` - Required for AI functionality
