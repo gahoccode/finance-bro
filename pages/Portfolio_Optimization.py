@@ -310,19 +310,19 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.write("**Max Sharpe Portfolio**")
     weights_df = pd.DataFrame(list(weights_max_sharpe.items()), columns=['Symbol', 'Weight'])
-    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.2%}")
+    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.1%}")
     st.dataframe(weights_df, hide_index=True)
 
 with col2:
     st.write("**Min Volatility Portfolio**")
     weights_df = pd.DataFrame(list(weights_min_vol.items()), columns=['Symbol', 'Weight'])
-    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.2%}")
+    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.1%}")
     st.dataframe(weights_df, hide_index=True)
 
 with col3:
     st.write("**Max Utility Portfolio**")
     weights_df = pd.DataFrame(list(weights_max_utility.items()), columns=['Symbol', 'Weight'])
-    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.2%}")
+    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.1%}")
     st.dataframe(weights_df, hide_index=True)
 
 # Weight visualization
