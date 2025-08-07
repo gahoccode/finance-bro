@@ -13,15 +13,12 @@ import os
 
 st.set_page_config(page_title="Stock Price Analysis", layout="wide")
 
-# Load custom CSS
-with open('static/style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+# CSS loading removed
 
 # Get stock symbol from session state (set in main app)
 # If not available, show message to use main app first
 if 'stock_symbol' in st.session_state and st.session_state.stock_symbol:
     ticker = st.session_state.stock_symbol
-    st.info(f"📊 Analyzing stock: **{ticker}** (from main app)")
 else:
     st.warning("⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first.")
     st.stop()

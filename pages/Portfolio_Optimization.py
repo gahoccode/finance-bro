@@ -24,15 +24,12 @@ st.set_page_config(
 
 import os
 
-# Load custom CSS
-with open('static/style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+# CSS loading removed
 
 # Get stock symbol from session state (set in main app)
 # If not available, show message to use main app first
 if 'stock_symbol' in st.session_state and st.session_state.stock_symbol:
     main_stock_symbol = st.session_state.stock_symbol
-    st.info(f"📊 Portfolio optimization including: **{main_stock_symbol}** (from main app)")
 else:
     st.warning("⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first.")
     st.stop()
@@ -257,22 +254,22 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.metric(
         "Max Sharpe Portfolio",
-        f"{sharpe:.4f}",
-        f"Return: {(ret_tangent*100):.2f}"
+        f"{sharpe:.1f}",
+        f"Return: {(ret_tangent*100):.1f}%"
     )
 
 with col2:
     st.metric(
         "Min Volatility Portfolio", 
-        f"{sharpe_min_vol:.4f}",
-        f"Return: {(ret_min_vol*100):.2f}"
+        f"{sharpe_min_vol:.1f}",
+        f"Return: {(ret_min_vol*100):.1f}%"
     )
 
 with col3:
     st.metric(
         "Max Utility Portfolio",
-        f"{sharpe_utility:.4f}",
-        f"Return: {(ret_utility*100):.2f}"
+        f"{sharpe_utility:.1f}",
+        f"Return: {(ret_utility*100):.1f}%"
     )
 
 # Efficient Frontier Plot
@@ -313,19 +310,19 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.write("**Max Sharpe Portfolio**")
     weights_df = pd.DataFrame(list(weights_max_sharpe.items()), columns=['Symbol', 'Weight'])
-    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.2%}")
+    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.1%}")
     st.dataframe(weights_df, hide_index=True)
 
 with col2:
     st.write("**Min Volatility Portfolio**")
     weights_df = pd.DataFrame(list(weights_min_vol.items()), columns=['Symbol', 'Weight'])
-    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.2%}")
+    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.1%}")
     st.dataframe(weights_df, hide_index=True)
 
 with col3:
     st.write("**Max Utility Portfolio**")
     weights_df = pd.DataFrame(list(weights_max_utility.items()), columns=['Symbol', 'Weight'])
-    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.2%}")
+    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.1%}")
     st.dataframe(weights_df, hide_index=True)
 
 # Weight visualization

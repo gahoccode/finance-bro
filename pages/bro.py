@@ -3,6 +3,7 @@ import glob
 import streamlit as st
 import pandas as pd
 from vnstock import Vnstock, Listing
+from vnstock.core.utils.transform import flatten_hierarchical_index
 import warnings
 
 # pandasai v2.4.2 imports
@@ -41,6 +42,111 @@ def get_generated_code(response, agent):
     except Exception as e:
         return f"# Error accessing code: {str(e)}"
 
+def detect_latest_chart():
+    """Detect the most recently generated chart file"""
+    try:
+        chart_dir = "exports/charts/"
+        if os.path.exists(chart_dir):
+            chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
+            if chart_files:
+                latest_chart = max(chart_files, key=os.path.getctime)
+                return {
+                    "type": "image",
+                    "path": latest_chart
+                }
+    except Exception:
+        pass
+    return None
+
+def process_agent_response(agent, question):
+    """Process agent response and return formatted message data"""
+    try:
+        with st.spinner("🤖 Analyzing..."):
+            response = agent.chat(question)
+            
+            # Get the generated code
+            generated_code = get_generated_code(response, agent)
+            
+            # Detect chart
+            chart_data = detect_latest_chart()
+            
+            # Create message data
+            message_data = {"role": "assistant", "content": str(response)}
+            if generated_code:
+                message_data["generated_code"] = generated_code
+            if chart_data:
+                message_data["chart_data"] = chart_data
+            
+            return message_data
+            
+    except Exception as e:
+        return {"role": "assistant", "content": f"❌ Analysis error: {str(e)}"}
+
+def transpose_financial_dataframe(df, name, period):
+    """Transpose financial dataframes from long to wide format"""
+    try:
+        if name in ['CashFlow', 'BalanceSheet', 'IncomeStatement']:
+            if 'yearReport' in df.columns:
+                df_clean = df.drop('ticker', axis=1, errors='ignore')
+                
+                # Handle quarterly vs annual data
+                if ('lengthReport' in df.columns and period == 'quarter' and 
+                    df['lengthReport'].isin([1, 2, 3, 4]).any()):
+                    # Quarterly data
+                    df_clean = df_clean.rename(columns={'lengthReport': 'Quarter'})
+                    df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['Quarter'].astype(str)
+                    df_wide = df_clean.set_index('period_id').T
+                    df_wide = df_wide.drop(['yearReport', 'Quarter'], axis=0, errors='ignore')
+                else:
+                    # Annual data
+                    df_wide = df_clean.set_index('yearReport').T
+                    df_wide = df_wide.drop(['lengthReport'], axis=0, errors='ignore')
+                
+                df_wide = df_wide.reset_index()
+                df_wide = df_wide.rename(columns={'index': 'Metric'})
+                return df_wide
+        
+        elif name == 'Ratios':
+            if hasattr(df, 'columns') and len(df.columns) > 0:
+                # Check if years are already in columns
+                year_cols = [str(col) for col in df.columns if str(col).isdigit() and len(str(col)) == 4]
+                
+                if len(year_cols) > 1:
+                    # Years already in columns
+                    return df
+                elif 'yearReport' in df.columns:
+                    # Standard long format, transpose to wide
+                    df_clean = df.drop('ticker', axis=1, errors='ignore')
+                    
+                    if ('lengthReport' in df.columns and period == 'quarter' and 
+                        df['lengthReport'].isin([1, 2, 3, 4]).any()):
+                        # Quarterly data
+                        df_clean = df_clean.rename(columns={'lengthReport': 'Quarter'})
+                        df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['Quarter'].astype(str)
+                        df_wide = df_clean.set_index('period_id').T
+                        df_wide = df_wide.drop(['yearReport', 'Quarter'], axis=0, errors='ignore')
+                    else:
+                        # Annual data
+                        df_wide = df_clean.set_index('yearReport').T
+                        df_wide = df_wide.drop(['lengthReport'], axis=0, errors='ignore')
+                    
+                    df_wide = df_wide.reset_index()
+                    df_wide = df_wide.rename(columns={'index': 'Metric'})
+                    return df_wide
+                else:
+                    # Multi-index or other format
+                    df_transposed = df.T
+                    df_transposed = df_transposed.reset_index()
+                    df_transposed = df_transposed.rename(columns={'index': 'Metric'})
+                    return df_transposed
+        
+        # For other dataframes, return as-is
+        return df
+        
+    except Exception as e:
+        # If transposition fails, return original dataframe
+        return df
+
 # Page configuration
 st.set_page_config(
     page_title="Finance Bro",
@@ -48,40 +154,21 @@ st.set_page_config(
     layout="wide"
 )
 
-# Load custom CSS
-with open('static/style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+# CSS loading removed
 
 # Get stock symbol from session state (set in main app)
 # If not available, show message to use main app first
 if 'stock_symbol' in st.session_state and st.session_state.stock_symbol:
     stock_symbol = st.session_state.stock_symbol
-    st.info(f"📊 Analyzing stock: **{stock_symbol}** (from main app)")
 else:
     st.warning("⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first.")
     st.stop()
 
 # Title
-st.markdown('<h1 class="main-header">Finance Bro</h1>', unsafe_allow_html=True)
-st.markdown('<p style="text-align: center; color: #666; font-size: 1.1rem; margin-top: -0.5rem; margin-bottom: 1rem;">Ask your finance bro about your company\'s financial statements</p>', unsafe_allow_html=True)
+st.markdown('# Finance Bro')
+st.markdown('Ask your finance bro about your company\'s financial statements')
 
-# Authentication handling
-# Check if user is logged in using Streamlit's built-in authentication
-if not st.user.is_logged_in:
-    st.title("🔒 Authentication Required")
-    st.markdown("Please authenticate with Google to access Finance Bro")
-    
-    # Create a clean login interface
-    st.button("Login with Google", on_click=st.login)
-    
-    # Show helpful information
-    st.markdown("---")
-    st.info("After logging in, you'll be redirected back to the app automatically.")
-    
-    st.stop()
-
-# User is now authenticated - show welcome message in sidebar
-st.sidebar.success("Successfully logged in")
+# Authentication is handled in main app, so we assume user is already logged in
 
 # Load stock symbols and cache in session state if not already loaded
 if 'stock_symbols_list' not in st.session_state:
@@ -128,10 +215,6 @@ with st.sidebar:
     
     # Show current stock symbol from session state
     st.metric("Current Symbol", stock_symbol)
-    
-    # User logout option
-    if st.sidebar.button("Logout", use_container_width=True):
-        st.logout()
     
     st.sidebar.markdown("---")
     
@@ -200,21 +283,7 @@ with st.sidebar:
         st.session_state.messages = []
         st.rerun()
     
-    st.markdown(
-        """
-        <div style='text-align: center; padding: 0.25rem 0;'>
-            <a href="https://github.com/gahoccode/finance-bro" target="_blank" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;">
-                    <circle cx="12" cy="12" r="9" stroke="#0366d6" stroke-width="1" fill="none"/>
-                    <path d="M12 2C6.477 2 2 6.477 2 12C2 16.418 4.865 20.166 8.839 21.489C9.339 21.582 9.521 21.291 9.521 21.042C9.521 20.82 9.512 20.192 9.508 19.391C6.726 19.924 6.139 17.955 6.139 17.955C5.685 16.812 5.029 16.523 5.029 16.523C4.121 15.938 5.097 15.951 5.097 15.951C6.101 16.023 6.629 16.927 6.629 16.927C7.521 18.445 8.97 17.988 9.546 17.749C9.642 17.131 9.889 16.696 10.167 16.419C7.945 16.137 5.615 15.276 5.615 11.469C5.615 10.365 6.003 9.463 6.649 8.761C6.543 8.48 6.207 7.479 6.749 6.124C6.749 6.124 7.586 5.869 9.499 7.159C10.329 6.921 11.179 6.802 12.029 6.798C12.879 6.802 13.729 6.921 14.559 7.159C16.472 5.869 17.309 6.124 17.309 6.124C17.851 7.479 17.515 8.48 17.409 8.761C18.055 9.463 18.443 10.365 18.443 11.469C18.443 15.286 16.111 16.134 13.883 16.408C14.223 16.748 14.523 17.42 14.523 18.438C14.523 19.849 14.509 20.985 14.509 21.42C14.509 21.769 14.679 22.149 15.179 22.041C19.142 20.709 22 16.972 22 12C22 6.477 17.523 2 12 2Z" fill="#000000"/>
-                </svg>
-                <div style='font-size: 0.8rem; color: #000000; font-weight: 600; line-height: 1;'>Finance Bro</div>
-                <div style='font-size: 0.7rem; color: #000000; line-height: 1;'>by Tam Le</div>
-            </a>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown("[Finance Bro on GitHub](https://github.com/gahoccode/finance-bro) by Tam Le")
 
 # Check if period has changed and data needs to be reloaded
 period_changed = False
@@ -237,16 +306,13 @@ if analyze_button or (period_changed and 'stock_symbol' in st.session_state):
             # Load and process Ratio data (multi-index columns)
             Ratio_raw = stock.finance.ratio(period=period, lang="en", dropna=True)
             
-            # Process multi-index columns by flattening them
-            if isinstance(Ratio_raw.columns, pd.MultiIndex):
-                # Flatten multi-index columns by joining level names with ' - '
-                Ratio = Ratio_raw.copy()
-                Ratio.columns = [' - '.join(col).strip() if col[0] != 'Meta' else col[1] 
-                               for col in Ratio_raw.columns.values]
-                # Clean up column names
-                Ratio.columns = [col.replace('Meta - ', '') for col in Ratio.columns]
-            else:
-                Ratio = Ratio_raw
+            # Use vnstock's built-in flatten_hierarchical_index function
+            Ratio = flatten_hierarchical_index(
+                Ratio_raw,
+                separator="_",
+                handle_duplicates=True,
+                drop_levels=0
+            )
             
             dividend_schedule = company.dividends()
             
@@ -290,7 +356,7 @@ if analyze_button or (period_changed and 'stock_symbol' in st.session_state):
             
             st.session_state.stock_symbol = stock_symbol
             st.session_state.last_period = period  # Store current period to detect changes
-            st.success(f"✅ Successfully loaded data for {stock_symbol}")
+            
     
     except Exception as e:
         st.error(f"❌ Error loading data: {str(e)}")
@@ -315,58 +381,59 @@ if 'dataframes' in st.session_state:
     model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
     llm = OpenAI(api_token=st.session_state.api_key, model=model)
     
-    # Use Agent approach with list of dataframes
-    agent = Agent(
-        list(st.session_state.dataframes.values()),
-        config={"llm": llm, "verbose": True}
-    )
+    # Initialize session state for uploaded files if not exists
+    if 'uploaded_dataframes' not in st.session_state:
+        st.session_state.uploaded_dataframes = []
+    
+    def get_or_create_agent():
+        """
+        Creates or retrieves cached PandasAI agent with all available dataframes.
+        Only recreates when dataframes have changed.
+        """
+        # Create unique key based on current dataframes
+        stock_df_count = len(st.session_state.dataframes) if 'dataframes' in st.session_state else 0
+        uploaded_df_count = len(st.session_state.uploaded_dataframes)
+        current_key = f"agent_{stock_df_count}_{uploaded_df_count}"
+        
+        # Check if agent exists and is up to date
+        if ('agent' in st.session_state and 
+            'agent_key' in st.session_state and 
+            st.session_state.agent_key == current_key):
+            return st.session_state.agent
+        
+        # Create new agent with all dataframes
+        all_dataframes = []
+        if 'dataframes' in st.session_state:
+            all_dataframes.extend(list(st.session_state.dataframes.values()))
+        all_dataframes.extend(st.session_state.uploaded_dataframes)
+        
+        if not all_dataframes:
+            return None
+            
+        agent = Agent(all_dataframes, config={"llm": llm, "verbose": True})
+        
+        # Cache the agent
+        st.session_state.agent = agent
+        st.session_state.agent_key = current_key
+        
+        return agent
     
     # Process any pending sample question from sidebar
-    if 'pending_question' in st.session_state and agent:
-        pending_q = st.session_state.pending_question
-        del st.session_state.pending_question
-        
-        # Add to chat and generate response
-        if 'messages' not in st.session_state:
-            st.session_state.messages = []
+    if 'pending_question' in st.session_state:
+        agent = get_or_create_agent()
+        if agent:
+            pending_q = st.session_state.pending_question
+            del st.session_state.pending_question
             
-        st.session_state.messages.append({"role": "user", "content": pending_q})
+            # Add to chat and generate response
+            if 'messages' not in st.session_state:
+                st.session_state.messages = []
+                
+            st.session_state.messages.append({"role": "user", "content": pending_q})
         
-        try:
-            with st.spinner("🤖 Analyzing..."):
-                response = agent.chat(pending_q)
-                
-                # Get the generated code using helper function
-                generated_code = get_generated_code(response, agent)
-                
-                # Try to detect if a chart was generated
-                chart_data = None
-                try:
-                    # Check if PandasAI generated a chart/plot
-                    # Look for recently created chart files in exports/charts/
-                    chart_dir = "exports/charts/"
-                    if os.path.exists(chart_dir):
-                        chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
-                        if chart_files:
-                            # Get the most recent chart file
-                            latest_chart = max(chart_files, key=os.path.getctime)
-                            chart_data = {
-                                "type": "image",
-                                "path": latest_chart
-                            }
-                except:
-                    pass
-                
-                # Add assistant response to chat history with generated code and chart
-                message_data = {"role": "assistant", "content": str(response)}
-                if generated_code:
-                    message_data["generated_code"] = generated_code
-                if chart_data:
-                    message_data["chart_data"] = chart_data
-                st.session_state.messages.append(message_data)
-        except Exception as e:
-            error_msg = f"❌ Analysis error: {str(e)}"
-            st.session_state.messages.append({"role": "assistant", "content": error_msg})
+            # Process agent response
+            message_data = process_agent_response(agent, pending_q)
+            st.session_state.messages.append(message_data)
         
         st.rerun()
     
@@ -376,132 +443,33 @@ if 'dataframes' in st.session_state:
     
     with col1:
         if st.button("ROIC Analysis"):
-            question = "What is the return on invested capital (ROIC) in 2024?"
-            # Add to chat and generate response
-            st.session_state.messages.append({"role": "user", "content": question})
-            try:
-                with st.spinner("🤖 Analyzing..."):
-                    response = agent.chat(question)
-                    
-                    # Get the generated code using helper function
-                    generated_code = get_generated_code(response, agent)
-                    
-                    # Try to detect if a chart was generated
-                    chart_data = None
-                    try:
-                        import os
-                        import glob
-                        
-                        # Look for recently created chart files in exports/charts/
-                        chart_dir = "exports/charts/"
-                        if os.path.exists(chart_dir):
-                            chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
-                            if chart_files:
-                                latest_chart = max(chart_files, key=os.path.getctime)
-                                chart_data = {
-                                    "type": "image",
-                                    "path": latest_chart
-                                }
-                    except:
-                        pass
-                    
-                    # Add assistant response to chat history with generated code and chart
-                    message_data = {"role": "assistant", "content": str(response)}
-                    if generated_code:
-                        message_data["generated_code"] = generated_code
-                    if chart_data:
-                        message_data["chart_data"] = chart_data
-                    st.session_state.messages.append(message_data)
-            except Exception as e:
-                error_msg = f"❌ Analysis error: {str(e)}"
-                st.session_state.messages.append({"role": "assistant", "content": error_msg})
-            st.rerun()
+            agent = get_or_create_agent()
+            if agent:
+                question = "What is the return on invested capital (ROIC) in 2024?"
+                st.session_state.messages.append({"role": "user", "content": question})
+                message_data = process_agent_response(agent, question)
+                st.session_state.messages.append(message_data)
+                st.rerun()
     
     with col2:
         if st.button("Dividend Schedule"):
-            question = "Did the company issue cash dividends in 2024 and what was the exercise date, compare the percentage to last year?"
-            # Add to chat and generate response
-            st.session_state.messages.append({"role": "user", "content": question})
-            try:
-                with st.spinner("🤖 Analyzing..."):
-                    response = agent.chat(question)
-                    
-                    # Get the generated code using helper function
-                    generated_code = get_generated_code(response, agent)
-                    
-                    # Try to detect if a chart was generated
-                    chart_data = None
-                    try:
-                        import os
-                        import glob
-                        
-                        # Look for recently created chart files in exports/charts/
-                        chart_dir = "exports/charts/"
-                        if os.path.exists(chart_dir):
-                            chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
-                            if chart_files:
-                                latest_chart = max(chart_files, key=os.path.getctime)
-                                chart_data = {
-                                    "type": "image",
-                                    "path": latest_chart
-                                }
-                    except:
-                        pass
-                    
-                    # Add assistant response to chat history with generated code and chart
-                    message_data = {"role": "assistant", "content": str(response)}
-                    if generated_code:
-                        message_data["generated_code"] = generated_code
-                    if chart_data:
-                        message_data["chart_data"] = chart_data
-                    st.session_state.messages.append(message_data)
-            except Exception as e:
-                error_msg = f"❌ Analysis error: {str(e)}"
-                st.session_state.messages.append({"role": "assistant", "content": error_msg})
-            st.rerun()
+            agent = get_or_create_agent()
+            if agent:
+                question = "Did the company issue cash dividends in 2024 and what was the exercise date, compare the percentage to last year?"
+                st.session_state.messages.append({"role": "user", "content": question})
+                message_data = process_agent_response(agent, question)
+                st.session_state.messages.append(message_data)
+                st.rerun()
     
     with col3:
         if st.button("Debt Analysis"):
-            question = "What is the company's debt-to-equity ratio and debt coverage metrics?"
-            # Add to chat and generate response
-            st.session_state.messages.append({"role": "user", "content": question})
-            try:
-                with st.spinner("🤖 Analyzing..."):
-                    response = agent.chat(question)
-                    
-                    # Get the generated code using helper function
-                    generated_code = get_generated_code(response, agent)
-                    
-                    # Try to detect if a chart was generated
-                    chart_data = None
-                    try:
-                        import os
-                        import glob
-                        
-                        # Look for recently created chart files in exports/charts/
-                        chart_dir = "exports/charts/"
-                        if os.path.exists(chart_dir):
-                            chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
-                            if chart_files:
-                                latest_chart = max(chart_files, key=os.path.getctime)
-                                chart_data = {
-                                    "type": "image",
-                                    "path": latest_chart
-                                }
-                    except:
-                        pass
-                    
-                    # Add assistant response to chat history with generated code and chart
-                    message_data = {"role": "assistant", "content": str(response)}
-                    if generated_code:
-                        message_data["generated_code"] = generated_code
-                    if chart_data:
-                        message_data["chart_data"] = chart_data
-                    st.session_state.messages.append(message_data)
-            except Exception as e:
-                error_msg = f"❌ Analysis error: {str(e)}"
-                st.session_state.messages.append({"role": "assistant", "content": error_msg})
-            st.rerun()
+            agent = get_or_create_agent()
+            if agent:
+                question = "What is the company's debt-to-equity ratio and debt coverage metrics?"
+                st.session_state.messages.append({"role": "user", "content": question})
+                message_data = process_agent_response(agent, question)
+                st.session_state.messages.append(message_data)
+                st.rerun()
     
     # Chat Interface
     st.subheader("Chat with AI Analyst")
@@ -538,7 +506,7 @@ if 'dataframes' in st.session_state:
     if user_input := st.chat_input(
         "Ask me anything about this stock...",
         accept_file=True,
-        file_type=["csv", "xlsx", "json", "txt", "pdf", "jpg", "jpeg", "png"]
+        file_type=["csv", "xlsx"]
     ):
         # Extract text and files from the input object
         if hasattr(user_input, 'text'):
@@ -550,63 +518,64 @@ if 'dataframes' in st.session_state:
             prompt = str(user_input) if user_input else ""
             files = []
         
-        # Only proceed if there's text content
-        if prompt.strip():
-            # Add user message to chat history
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            
-            # Display user message
-            with st.chat_message("user"):
-                st.markdown(prompt)
+        # Process uploaded files and add to session state
+        if files:
+            for file in files:
+                try:
+                    if file.name.endswith('.csv'):
+                        df = pd.read_csv(file)
+                        st.session_state.uploaded_dataframes.append(df)
+                        st.info(f"📂 Loaded CSV file: {file.name} ({len(df)} rows)")
+                    elif file.name.endswith(('.xlsx', '.xls')):
+                        df = pd.read_excel(file)
+                        st.session_state.uploaded_dataframes.append(df)
+                        st.info(f"📂 Loaded Excel file: {file.name} ({len(df)} rows)")
+                except Exception as e:
+                    st.error(f"❌ Error loading file {file.name}: {str(e)}")
         
-            # Generate response only if there's text content
+        # Only proceed if there's text content or files were uploaded
+        if prompt.strip() or files:
+            # Get or create agent with all current dataframes
+            agent = get_or_create_agent()
+            
+            if not agent:
+                st.error("❌ No data available for analysis. Please load stock data first.")
+                st.stop()
+            
+            # Add user message to chat history
+            message_content = prompt
+            if files:
+                file_names = [f.name for f in files]
+                message_content += f"\n📎 Uploaded files: {', '.join(file_names)}"
+            
+            if message_content.strip():
+                st.session_state.messages.append({"role": "user", "content": message_content})
+                
+                # Display user message
+                with st.chat_message("user"):
+                    st.markdown(message_content)
+            
+            # Generate response if there's text content
             if prompt.strip():
-                # Generate response
                 with st.chat_message("assistant"):
-                    try:
-                        with st.spinner("🤖 Analyzing..."):
-                            response = agent.chat(prompt)
+                    message_data = process_agent_response(agent, prompt)
                     
-                        # Display response - ensure it's a string
-                        response_text = str(response) if response is not None else "No response generated"
-                        st.markdown(response_text)
-                        
-                        # Get the generated code using helper function
-                        generated_code = get_generated_code(response, agent)
-                        
-                        # Clear any existing chart containers
-                        chart_container = st.empty()
-                        
-                        # Try to detect if a chart was generated and display it
-                        try:
-                            # Check if PandasAI generated a chart/plot
-                            chart_dir = "exports/charts/"
-                            if os.path.exists(chart_dir):
-                                chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
-                                if chart_files:
-                                    # Get the most recent chart file
-                                    latest_chart = max(chart_files, key=os.path.getctime)
-                                    with chart_container:
-                                        st.image(latest_chart, use_column_width=True)
-                        except Exception as e:
-                            # Chart display failed, continue without error
-                            pass
-                        
-                        # Add assistant response to chat history
-                        message_data = {"role": "assistant", "content": response_text}
-                        if generated_code:
-                            message_data["generated_code"] = generated_code
-                        st.session_state.messages.append(message_data)
-                        
-                        # Display generated code in expandable container
-                        if generated_code:
-                            with st.expander("View Generated Code", expanded=False):
-                                st.code(generated_code, language="python")
-                        
-                    except Exception as e:
-                        error_msg = f"❌ Analysis error: {str(e)}"
-                        st.error(error_msg)
-                        st.session_state.messages.append({"role": "assistant", "content": error_msg})
+                    # Display response
+                    st.markdown(message_data["content"])
+                    
+                    # Display chart if available
+                    if "chart_data" in message_data:
+                        chart_data = message_data["chart_data"]
+                        if chart_data["type"] == "image":
+                            st.image(chart_data["path"], use_container_width=True)
+                    
+                    # Display generated code in expandable container
+                    if "generated_code" in message_data:
+                        with st.expander("View Generated Code", expanded=False):
+                            st.code(message_data["generated_code"], language="python")
+                    
+                    # Add to chat history
+                    st.session_state.messages.append(message_data)
     
     # Chat controls
     col1, col2 = st.columns(2)
@@ -617,97 +586,13 @@ if 'dataframes' in st.session_state:
                     for name, df in st.session_state.display_dataframes.items():
                         st.subheader(name)
                         
-                        # Transpose financial statements from long to wide format
-                        if name in ['CashFlow', 'BalanceSheet', 'IncomeStatement']:
-                            try:
-                                # Create wide format with years/quarters as columns
-                                if 'yearReport' in df.columns:
-                                    df_clean = df.drop('ticker', axis=1, errors='ignore')
-                                    
-                                    # Handle quarterly vs annual data based on period parameter and actual data content
-                                    if ('lengthReport' in df.columns and period == 'quarter' and 
-                                        df['lengthReport'].isin([1, 2, 3, 4]).any()):
-                                        # Rename lengthReport to Quarter for more intuitive AI queries
-                                        df_clean = df_clean.rename(columns={'lengthReport': 'Quarter'})
-                                        # Create unique identifiers for quarters (e.g., "2024-Q1", "2024-Q2")
-                                        df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['Quarter'].astype(str)
-                                        df_wide = df_clean.set_index('period_id').T
-                                        # Drop redundant yearReport and Quarter rows since info is now in column headers
-                                        df_wide = df_wide.drop(['yearReport', 'Quarter'], axis=0, errors='ignore')
-                                    else:
-                                        # Annual data - use year only
-                                        df_wide = df_clean.set_index('yearReport').T
-                                        # Drop lengthReport row for annual data since it's not meaningful
-                                        df_wide = df_wide.drop(['lengthReport'], axis=0, errors='ignore')
-                                    
-                                    df_wide = df_wide.reset_index()
-                                    df_wide = df_wide.rename(columns={'index': 'Metric'})
-                                    st.dataframe(df_wide)
-                                else:
-                                    st.dataframe(df)
-                            except Exception as e:
-                                st.warning(f"Could not transpose {name}: {str(e)}")
-                                st.dataframe(df)
-                        
-                        elif name == 'Ratios':
-                            try:
-                                # Handle Ratios dataframe - check structure first
-                                if hasattr(df, 'columns') and len(df.columns) > 0:
-                                    # Check if years are already in columns (numeric years)
-                                    year_cols = [str(col) for col in df.columns if str(col).isdigit() and len(str(col)) == 4]
-                                    
-                                    if len(year_cols) > 1:
-                                        # Years are already columns, display as-is
-                                        st.dataframe(df)
-                                    elif 'yearReport' in df.columns:
-                                        # Standard long format, transpose to wide
-                                        df_clean = df.drop('ticker', axis=1, errors='ignore')
-                                        
-                                        # Handle quarterly vs annual data based on period parameter and actual data content
-                                        if ('lengthReport' in df.columns and period == 'quarter' and 
-                                            df['lengthReport'].isin([1, 2, 3, 4]).any()):
-                                            # Rename lengthReport to Quarter for more intuitive AI queries
-                                            df_clean = df_clean.rename(columns={'lengthReport': 'Quarter'})
-                                            # Create unique identifiers for quarters (e.g., "2024-Q1", "2024-Q2")
-                                            df_clean['period_id'] = df_clean['yearReport'].astype(str) + '-Q' + df_clean['Quarter'].astype(str)
-                                            df_wide = df_clean.set_index('period_id').T
-                                            # Drop redundant yearReport and Quarter rows since info is now in column headers
-                                            df_wide = df_wide.drop(['yearReport', 'Quarter'], axis=0, errors='ignore')
-                                        else:
-                                            # Annual data - use year only
-                                            df_wide = df_clean.set_index('yearReport').T
-                                            # Drop lengthReport row for annual data since it's not meaningful
-                                            df_wide = df_wide.drop(['lengthReport'], axis=0, errors='ignore')
-                                        
-                                        df_wide = df_wide.reset_index()
-                                        df_wide = df_wide.rename(columns={'index': 'Metric'})
-                                        st.dataframe(df_wide)
-                                    else:
-                                        # Multi-index or other format, try simple transpose
-                                        df_transposed = df.T
-                                        df_transposed = df_transposed.reset_index()
-                                        df_transposed = df_transposed.rename(columns={'index': 'Metric'})
-                                        st.dataframe(df_transposed)
-                                else:
-                                    st.dataframe(df)
-                            except Exception as e:
-                                st.warning(f"Could not transpose {name}: {str(e)}")
-                                st.dataframe(df)
-                        
-                        else:
-                            # For Dividends and other data, display as-is
-                            st.dataframe(df)
+                        # Use helper function to transpose dataframes
+                        df_display = transpose_financial_dataframe(df, name, period)
+                        st.dataframe(df_display)
             else:
                 st.warning("⚠️ No data loaded yet. Please click 'Analyze Stock' first to load financial data.")
 
 # Footer
 st.markdown("---")
-st.markdown(
-    """
-    <div style='text-align: center; color: #666; padding: 1rem;'>
-        <p>Tip: Specify the table you want to analyze for more accurate results and customize charts by including any desired technical settings in your prompt</p>
-        <p>Built with <a href="https://streamlit.io" target="_blank">Streamlit</a>, <a href="https://pandas-ai.com" target="_blank">PandasAI</a>, and <a href="https://github.com/thinh-vu/vnstock" target="_blank">Vnstock</a> by <a href="https://github.com/thinh-vu" target="_blank">Thinh Vu</a></p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("**Tip:** Specify the table you want to analyze for more accurate results and customize charts by including any desired technical settings in your prompt")
+st.markdown("Built with [Streamlit](https://streamlit.io), [PandasAI](https://pandas-ai.com), and [Vnstock](https://github.com/thinh-vu/vnstock) by [Thinh Vu](https://github.com/thinh-vu)")

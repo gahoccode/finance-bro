@@ -8,6 +8,7 @@
 - 🤖 **AI Chat Interface** - Natural language queries about financial metrics
 - 💬 **Interactive Analysis** - Real-time conversation with AI analyst
 - 📈 **Financial Metrics** - ROIC, debt ratios, dividend yields, cash flow analysis
+- 🏢 **Company Analysis** - Ownership structure, management team, subsidiaries, and foreign transaction analysis
 - 🔐 **Secure API Key Management** - Environment variables or secure UI input
 
 ## Quick Start
@@ -118,18 +119,20 @@ streamlit run app.py
 ### Step 3: Explore Other Analysis Tools
 7. **🚀 Navigate to Other Pages**: Now you can efficiently use other analysis tools:
    - **📈 Price Analysis**: Interactive price charts and technical analysis
-   - **🏢 Company Overview**: Company profile with full company names and ownership structure
+   - **🏢 Company Overview**: Company profile with ownership structure, management team, subsidiaries, and foreign transaction analysis
    - **💼 Portfolio Optimization**: Modern Portfolio Theory-based optimization
 
 ### Recommended Setup for Best Experience
 
-**🌞 Light Mode Recommended**: This app is optimized for readability in light mode.
+**🎨 Custom Theme for Best Appearance**: This app is designed with a custom color scheme for optimal visual experience.
 
-**How to enable light mode:**
+**How to enable custom theme:**
 1. Click the hamburger menu (☰) in the top-right corner
 2. Select "Settings"
-3. Under "Theme", choose "Light"
-4. The app will immediately switch to light mode for better visibility
+3. Under "Theme", choose "Custom"
+4. The app will display with the optimized color scheme and chart styling
+
+**Alternative**: Light mode is also supported if you prefer standard Streamlit styling.
 
 ### Why This Flow Matters
 
@@ -162,7 +165,7 @@ streamlit run app.py
 
 ### Why Version Compatibility Matters
 
-- **pandasai v2.4.2** requires **pandas v1.5.3** (not v2.x)
+- **pandasai v2.3.0** requires **pandas v1.5.3** (not v2.x)
 - **pandasai v3.x** (beta) has breaking changes and schema issues
 - Mismatched versions cause:
   - `TypeError: sequence item 0: expected str instance, tuple found`
@@ -172,14 +175,14 @@ streamlit run app.py
 ### Tested Compatible Versions
 
 ✅ **WORKING COMBINATION:**
-- `pandasai==2.4.2` (stable)
+- `pandasai==2.3.0` (stable)
 - `pandas>=1.5.3,<2.0.0` (compatible range)
 - Built-in OpenAI LLM (no separate extension needed)
 
 ❌ **AVOID:**
 - `pandasai>=3.0.0` (beta, unstable)
-- `pandas>=2.0.0` (incompatible with pandasai 2.4.2)
-- `pandasai-openai` extension (not needed in v2.4.2)
+- `pandas>=2.0.0` (incompatible with pandasai 2.3.0)
+- `pandasai-openai` extension (not needed in v2.3.0)
 
 ### If You Need to Upgrade
 
@@ -191,10 +194,10 @@ streamlit run app.py
 ## Technology Stack
 
 - **Frontend:** Streamlit
-- **AI Engine:** PandasAI v2.4.2 (stable)
+- **AI Engine:** PandasAI v2.3.0 (stable)
 - **Stock Data:** Vnstock v3.2.5
 - **LLM:** OpenAI GPT models
-- **Data Processing:** Pandas v1.5.3 (compatible with pandasai 2.4.2)
+- **Data Processing:** Pandas v1.5.3 (compatible with pandasai 2.3.0)
 
 ## Future Refactor: PandasAI 3.x Migration
 
@@ -438,11 +441,11 @@ docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/gahoccode/finance-bro
 
 ## Dependencies
 
-- `pandasai==2.4.2` - AI-powered data analysis
+- `pandasai==2.3.0` - AI-powered data analysis
 - `pandas>=1.5.3,<2.0.0` - Data manipulation
 - `vnstock==3.2.5` - Vietnamese stock data
 - `openai>=1.61.0` - OpenAI API client
-- `streamlit==1.37.1` - Web application framework
+- `streamlit==1.47.0` - Web application framework
 - `python-dotenv==1.0.1` - Environment variable management
 
 ## Contributing
