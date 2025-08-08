@@ -240,12 +240,16 @@ ret_tangent, std_tangent, sharpe = ef_tangent.portfolio_performance()
 ef_min_vol = EfficientFrontier(mu, S)
 ef_min_vol.min_volatility()
 weights_min_vol = ef_min_vol.clean_weights()
+# Store weights dictionary in session state for riskfolio plot_table
+st.session_state.weights_min_vol = weights_min_vol
 ret_min_vol, std_min_vol, sharpe_min_vol = ef_min_vol.portfolio_performance()
 
 # Max Utility Portfolio
 ef_max_utility = EfficientFrontier(mu, S)
 ef_max_utility.max_quadratic_utility(risk_aversion=risk_aversion, market_neutral=False)
 weights_max_utility = ef_max_utility.clean_weights()
+# Store weights dictionary in session state for riskfolio plot_table
+st.session_state.weights_max_utility = weights_max_utility
 ret_utility, std_utility, sharpe_utility = ef_max_utility.portfolio_performance()
 
 status_text.empty()
@@ -639,10 +643,10 @@ with tab5:
             selected_weights = st.session_state.weights_max_sharpe
             portfolio_label = "Max Sharpe"
         elif portfolio_choice == "Min Volatility Portfolio":
-            selected_weights = weights_min_vol
+            selected_weights = st.session_state.weights_min_vol
             portfolio_label = "Min Volatility"
         else:  # Max Utility Portfolio
-            selected_weights = weights_max_utility
+            selected_weights = st.session_state.weights_max_utility
             portfolio_label = "Max Utility"
         
         # Convert weights dictionary to DataFrame as required by riskfolio plot_table

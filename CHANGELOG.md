@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [2025-08-08] **Riskfolio-lib Risk Analysis Table**: Added comprehensive risk analysis visualization to Portfolio Optimization page
   - **New Tab**: Added "📋 Risk Analysis" as 5th tab alongside existing portfolio analysis tabs
   - **Risk Metrics Table**: Integrated `rp.plot_table()` function from riskfolio-lib for comprehensive risk assessment
-  - **Data Integration**: Uses session state `portfolio_returns` and `weights_max_sharpe` for seamless data flow
+  - **Data Integration**: Uses session state `portfolio_returns` and all three portfolio weights for seamless data flow
   - **DataFrame Conversion**: Automatic conversion of weights dictionary to DataFrame format required by riskfolio-lib
   - **Matplotlib Integration**: Professional risk analysis table displayed via matplotlib with proper figure sizing (12x8)
   - **Session State Management**: Stores `weights_max_sharpe` dictionary in session state for cross-tab access
