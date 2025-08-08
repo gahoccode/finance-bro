@@ -1,16 +1,13 @@
-# This extracts the last row of prices_df and converts it to a Series
+import riskfolio as rp
 
-from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
-latest_prices = get_latest_prices(prices_df) #Alternatives: latest_prices = prices_df.iloc[-1]
-# Assuming you already have optimized weights (e.g., from max_sharpe or min_volatility)
-# And a total portfolio value
-portfolio_value = 100000  # 1 million VND
+# Method 1: Convert OrderedDict to DataFrame
+converted_weights_sharpe = pd.DataFrame.from_dict(weights_max_sharpe, orient='index', columns=['Max Sharpe'])
 
-# You can use either the Series or dict version of latest_prices
-da = DiscreteAllocation(weights, latest_prices, total_portfolio_value=portfolio_value)
-allocation, leftover = da.greedy_portfolio()
-
-Acceptance criteria:
-- Create a tab called "Dollars Allocation" and implement the above code in that tab.
-- successfully display the allocation and leftover. 
-- Create user input for portfolio_value and use that for the calculation. 
+rp.excel_report(returns,
+                w=converted_weights_sharpe,
+                rf=0, # could =0 or =risk_free-rate
+                alpha=0.05,
+                t_factor=252,
+                ini_days=1,
+                days_per_year=252,
+                name="./outputs/report")

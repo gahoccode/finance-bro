@@ -15,6 +15,7 @@ from bokeh.transform import cumsum
 from bokeh.palettes import Spectral
 from bokeh.models import ColumnDataSource
 from math import pi
+import riskfolio as rp
 
 # Streamlit page configuration
 st.set_page_config(
@@ -276,7 +277,7 @@ with col3:
     )
 
 # Create tabs for different analysis views
-tab1, tab2, tab3 = st.tabs(["📈 Efficient Frontier & Weights", "🌳 Hierarchical Risk Parity", "💰 Dollars Allocation"])
+tab1, tab2, tab3, tab4 = st.tabs(["📈 Efficient Frontier & Weights", "🌳 Hierarchical Risk Parity", "💰 Dollars Allocation", "📊 Report"])
 
 with tab1:
     # Efficient Frontier Plot
@@ -535,6 +536,87 @@ with tab3:
             st.error("Please ensure you have selected stocks and loaded price data first.")
     else:
         st.info("👆 Click 'Calculate Allocation' to see how many shares to buy for each stock based on your selected portfolio strategy and investment amount.")
+
+with tab4:
+    st.subheader("Portfolio Excel Report Generator")
+    st.write("Generate comprehensive Excel reports for your optimized portfolios using Riskfolio-lib.")
+    
+    # Portfolio selection
+    portfolio_choice = st.radio(
+        "Select Portfolio Strategy for Report:",
+        ["Max Sharpe Portfolio", "Min Volatility Portfolio", "Max Utility Portfolio"],
+        help="Choose which optimized portfolio to generate a detailed Excel report for"
+    )
+    
+    # Generate report button
+    if st.button("Generate Report", key="generate_excel_report"):
+        # Production-safe absolute path resolution
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        reports_dir = os.path.join(project_root, "exports", "reports")
+        os.makedirs(reports_dir, exist_ok=True)
+        
+        # Get the selected weights and create meaningful names
+        if portfolio_choice == "Max Sharpe Portfolio":
+            selected_weights = weights_max_sharpe
+            portfolio_name = "Max_Sharpe_Portfolio"
+            portfolio_label = "Max Sharpe"
+        elif portfolio_choice == "Min Volatility Portfolio":
+            selected_weights = weights_min_vol
+            portfolio_name = "Min_Volatility_Portfolio"
+            portfolio_label = "Min Volatility"
+        else:  # Max Utility Portfolio
+            selected_weights = weights_max_utility
+            portfolio_name = "Max_Utility_Portfolio"
+            portfolio_label = "Max Utility"
+        
+        # Convert weights dictionary to DataFrame
+        selected_weights_df = pd.DataFrame.from_dict(selected_weights, orient='index', columns=[portfolio_name])
+        
+        # Create filename with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{portfolio_name}_{timestamp}.xlsx"
+        filepath = os.path.join(reports_dir, filename)
+        
+        # Generate Excel report using riskfolio-lib
+        rp.excel_report(returns=returns, w=selected_weights_df, name=filepath)
+        
+        # Success message and download interface
+        st.success(f"✅ Excel report generated successfully!")
+        
+        # Display report information
+        col1, col2 = st.columns(2)
+        with col1:
+            st.info(f"**Portfolio**: {portfolio_label}")
+        with col2:
+            st.info(f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        
+        # File download
+        with open(filepath, "rb") as file:
+            st.download_button(
+                label="📥 Download Excel Report",
+                data=file.read(),
+                file_name=filename,
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                help=f"Download the {portfolio_label} portfolio Excel report"
+            )
+        
+        # Show file details
+        file_size = os.path.getsize(filepath) / 1024  # Size in KB
+        st.caption(f"File: {filename} ({file_size:.1f} KB)")
+    
+    else:
+        st.info("👆 Select a portfolio strategy and click 'Generate Report' to create a comprehensive Excel analysis.")
+        
+        # Show what will be included in the report
+        st.markdown("### 📋 Report Contents")
+        st.markdown("""
+        The Excel report will include:
+        - **Portfolio Weights**: Detailed allocation percentages
+        - **Performance Metrics**: Returns, volatility, and Sharpe ratio
+        - **Risk Analysis**: Comprehensive risk assessment
+        - **Asset Statistics**: Individual asset performance data
+        - **Correlation Matrix**: Asset correlation analysis
+        """)
 
 # Footer
 st.markdown("---")
