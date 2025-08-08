@@ -5,6 +5,42 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.13] - 2025-08-08
+
+### Added
+- [2025-08-08] **Comprehensive Riskfolio-lib Risk Analysis Suite**: Expanded Risk Analysis tab with three comprehensive risk visualization tools
+  - **Risk Analysis Table**: Uses `rp.plot_table()` for comprehensive risk metrics table (Expected Return, Volatility, Sharpe Ratio, VaR, CVaR, Max Drawdown, Calmar Ratio)
+  - **Portfolio Drawdown Analysis**: Added `rp.plot_drawdown()` visualization showing cumulative returns and drawdown periods with recovery analysis
+  - **Portfolio Returns Risk Measures**: Implemented `rp.plot_range()` for histogram and risk range analysis with return distributions, VaR, and CVaR visualizations
+  - **Unified Data Integration**: All three analyses use same session state returns and weights for consistent portfolio analysis
+  - **Multi-Portfolio Support**: Portfolio selection dropdown allows risk analysis for Max Sharpe, Min Volatility, and Max Utility portfolios
+  - **Professional Visualization**: Each analysis uses proper matplotlib figure sizing and styling for publication-quality outputs
+
+### Changed
+- [2025-08-08] **Risk Analysis Tab Enhancement**: Expanded from single risk table to comprehensive three-analysis suite
+  - **Sequential Layout**: Risk metrics table → Drawdown analysis → Returns risk measures for logical analysis flow
+  - **Consistent Parameters**: All analyses use alpha=0.05 for 95% confidence intervals and standardized riskfolio parameters
+  - **Educational Content**: Maintained informational expander explaining risk metrics for user understanding
+
+### Technical Implementation
+- **Riskfolio Integration**: Three riskfolio functions integrated with consistent parameter handling:
+  - `rp.plot_table()`: MAR=0, alpha=0.05 for risk metrics table
+  - `rp.plot_drawdown()`: alpha=0.05, kappa=0.3, solver='CLARABEL', height_ratios=[2,3] for drawdown visualization
+  - `rp.plot_range()`: alpha=0.05, a_sim=100, bins=50 for return distribution analysis
+- **Session State Reuse**: All analyses leverage existing `st.session_state.portfolio_returns` and portfolio weights
+- **DataFrame Consistency**: Same `weights_df` DataFrame format used across all three analyses for data consistency
+- **Figure Management**: Separate matplotlib figures for each analysis (fig, fig_drawdown, fig_range) to prevent conflicts
+
+### User Experience Improvements
+- **Complete Risk Assessment**: Users get comprehensive risk analysis suite covering metrics, drawdowns, and return distributions
+- **Visual Progression**: Logical flow from tabular metrics to visual drawdown analysis to statistical distributions
+- **Portfolio Flexibility**: Any optimized portfolio can be analyzed with all three risk visualization tools
+- **Professional Output**: Publication-quality risk analysis charts suitable for investment presentations
+- **Educational Value**: Combined risk metrics provide deep insights into portfolio risk characteristics
+
+### Files Modified
+- `pages/Portfolio_Optimization.py`: Expanded Risk Analysis tab with drawdown and range analysis implementations
+
 ## [0.2.12] - 2025-08-08
 
 ### Added

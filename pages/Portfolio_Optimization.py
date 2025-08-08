@@ -659,13 +659,58 @@ with tab5:
         ax = rp.plot_table(
             returns=returns,
             w=weights_df,
-            MAR=0,
-            alpha=0.05,
+            MAR=0, #Minimum acceptable return
+            alpha=0.05, #Significance level for confidence intervals 95%
             ax=ax
         )
         
         # Display the risk analysis table
         st.pyplot(fig)
+        
+        # Drawdown Analysis
+        st.subheader("Portfolio Drawdown Analysis")
+        
+        # Create matplotlib figure for riskfolio plot_drawdown
+        fig_drawdown, ax_drawdown = plt.subplots(figsize=(12, 8))
+        
+        # Generate drawdown analysis using riskfolio-lib
+        ax_drawdown = rp.plot_drawdown(
+            returns=returns,
+            w=weights_df,
+            alpha=0.05,
+            kappa=0.3,
+            solver='CLARABEL',
+            height=8,
+            width=10,
+            height_ratios=[2, 3],
+            ax=ax_drawdown
+        )
+        
+        # Display the drawdown analysis
+        st.pyplot(fig_drawdown)
+        
+        # Portfolio Returns Risk Measures
+        st.subheader("Portfolio Returns Risk Measures")
+        
+        # Create matplotlib figure for riskfolio plot_range
+        fig_range, ax_range = plt.subplots(figsize=(12, 6))
+        
+        # Generate portfolio returns risk measures using riskfolio-lib
+        ax_range = rp.plot_range(
+            returns=returns,
+            w=weights_df,
+            alpha=0.05,
+            a_sim=100,
+            beta=None,
+            b_sim=None,
+            bins=50,
+            height=6,
+            width=10,
+            ax=ax_range
+        )
+        
+        # Display the portfolio returns risk measures
+        st.pyplot(fig_range)
         
         # Add informational expander
         with st.expander("📚 Understanding the Risk Analysis Table"):
