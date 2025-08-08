@@ -5,6 +5,46 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.14] - 2025-08-08
+
+### Fixed
+- [2025-08-08] **QuantStats Pandas Compatibility Issue**: Fixed "Invalid frequency: ME" error by downgrading to compatible QuantStats version
+  - **Issue**: QuantStats latest versions use pandas 2.0+ frequency aliases (`ME`, `QE`, `YE`) incompatible with pandas 1.5.3
+  - **Root Cause**: App uses pandas 1.5.3 for PandasAI compatibility, but newer QuantStats expects pandas 2.0+ frequency conventions
+  - **Solution**: Downgraded to QuantStats 0.0.59, the last version compatible with pandas 1.5.3 legacy frequency aliases
+  - **Implementation**: 
+    - Added `quantstats==0.0.59` to requirements.txt for version pinning
+    - Removed broken pandas compatibility patches from Stock_Price_Analysis.py (lines 13-28)
+    - Added fallback logic for QuantStats file export path handling
+  - **Chart Rendering Fix**: Replaced `st.html()` with `streamlit.components.v1.html()` for proper tearsheet visualization
+    - **Issue**: Charts in QuantStats tearsheets were not visible, only performance metrics displayed
+    - **Solution**: Used iframe rendering with `components.html(html_content, height=2000, scrolling=True)` for better JavaScript/CSS support
+    - **Result**: Full tearsheet now displays with all charts, graphs, and performance analytics visible
+
+### Changed
+- [2025-08-08] **Dependency Management Enhancement**: Updated critical dependencies documentation
+  - **CLAUDE.md**: Added quantstats to critical dependencies list with version compatibility notes
+  - **Version Constraints**: Documented that QuantStats 0.0.60+ requires pandas 2.0+ and is incompatible with app's pandas 1.5.3
+  - **Compatibility Notes**: Added explanation of frequency alias changes between pandas versions
+  - **Warning Enhancement**: Updated dependency upgrade warning to include quantstats alongside pandas and pandasai
+
+### Technical Implementation
+- **Version Pinning**: `quantstats==0.0.59` ensures compatibility with pandas 1.5.3 legacy frequency aliases (`M`, `Q`, `A`)
+- **File Path Handling**: Added fallback logic to handle QuantStats 0.0.59's behavior of exporting to project root with default filename
+- **Chart Rendering**: Iframe-based HTML display provides proper JavaScript execution environment for embedded charts
+- **Code Cleanup**: Removed 15 lines of broken pandas compatibility patches and warning suppressions
+
+### User Experience Improvements
+- **Reliable Tearsheet Generation**: QuantStats tearsheets now generate without pandas frequency errors
+- **Complete Visualization**: All charts, performance metrics, and analytical plots display correctly in tearsheets
+- **Professional Output**: Full-featured tearsheets with comprehensive portfolio analytics comparable to institutional tools
+- **Download Functionality**: Generated HTML tearsheets available for download with proper formatting
+
+### Files Modified
+- `requirements.txt`: Added quantstats version pin
+- `pages/Stock_Price_Analysis.py`: Removed compatibility patches, added file path fallback, improved chart rendering
+- `CLAUDE.md`: Updated critical dependencies documentation with quantstats compatibility notes
+
 ## [0.2.13] - 2025-08-08
 
 ### Added

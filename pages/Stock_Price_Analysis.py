@@ -10,8 +10,13 @@ from bokeh.transform import factor_cmap
 from bokeh.palettes import Spectral6
 import altair as alt
 import os
+import quantstats as qs
+from datetime import datetime
 
 st.set_page_config(page_title="Stock Price Analysis", layout="wide")
+
+# Extend pandas functionality with QuantStats
+qs.extend_pandas()
 
 # CSS loading removed
 
@@ -55,6 +60,9 @@ def fetch_stock_data(ticker, start_date, end_date):
     stock_price['time'] = pd.to_datetime(stock_price['time'])
     stock_price = stock_price.set_index('time')
     
+    # Store in session state for cross-page access
+    st.session_state.stock_price_data = stock_price
+    
     return stock_price
 
 if ticker:
@@ -63,23 +71,24 @@ if ticker:
             # Fetch cached stock data
             stock_price = fetch_stock_data(ticker, start_date, end_date)
             
-            # Rename columns to match mplfinance expected format
-            stock_price_mpf = stock_price.rename(columns={
-                'open': 'Open',
-                'high': 'High',
-                'low': 'Low',
-                'close': 'Close',
-                'volume': 'Volume'
-            })
+
             
-            # Calculate returns with data validation
-            # Clean price data for returns calculation
-            clean_prices = stock_price['close'].dropna()
+            # Calculate returns using session state data and pct_change method
+            # Use the stock_price data stored in session state for consistency across pages
+            # Check if session state data exists, otherwise use the just-fetched data
+            if 'stock_price_data' in st.session_state:
+                session_stock_price = st.session_state.stock_price_data
+            else:
+                session_stock_price = stock_price
+            
+            clean_prices = session_stock_price['close'].dropna()
             clean_prices = clean_prices[clean_prices > 0]  # Remove zero/negative prices
             
             if len(clean_prices) > 1:
-                # Calculate log returns
-                returns = np.log(clean_prices / clean_prices.shift(1)).dropna()
+                # Calculate percentage returns using pct_change() for consistency with Portfolio Optimization
+                returns = clean_prices.pct_change().dropna()
+                # Store returns in session state for cross-page access
+                st.session_state.stock_returns = returns
                 
                 # Calculate mean return (annualized)
                 mean_daily_return = returns.mean()
@@ -103,6 +112,109 @@ if ticker:
                 st.metric("Mean Return (Annualized)", f"{mean_return_pct:.2f}%")
             with col3:
                 st.metric("Annualized Volatility", f"{volatility:.2f}%")
+            
+            # Create metrics tabs including Tearsheet
+            st.subheader("Performance Analytics")
+            tearsheet_tab, metrics_tab = st.tabs(["📊 Tearsheet", "📈 Quick Metrics"])
+            
+            with tearsheet_tab:
+                st.write("Generate comprehensive performance analytics using QuantStats")
+                
+                if st.button("Generate Tearsheet", key="generate_tearsheet"):
+                    # Check if returns data exists in session state
+                    if 'stock_returns' in st.session_state and len(st.session_state.stock_returns) > 0:
+                        
+                        # Set up exports directory
+                        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                        tearsheets_dir = os.path.join(project_root, "exports", "tearsheets")
+                        os.makedirs(tearsheets_dir, exist_ok=True)
+                        
+                        # Generate timestamp and filename
+                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                        filename = f"{ticker}_tearsheet_{timestamp}.html"
+                        filepath = os.path.join(tearsheets_dir, filename)
+                        
+                        with st.spinner("Generating QuantStats tearsheet..."):
+                            try:
+                                # Generate HTML tearsheet using QuantStats
+                                returns_data = st.session_state.stock_returns
+                                
+                                # Generate tearsheet HTML and save to disk
+                                qs.reports.html(returns_data, output=filepath)
+                                
+                                # Check if file was created at expected location, if not check project root
+                                if not os.path.exists(filepath):
+                                    # QuantStats 0.0.59 may save to project root with default name
+                                    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                                    default_file = os.path.join(project_root, "quantstats-tearsheet.html")
+                                    if os.path.exists(default_file):
+                                        # Move file to our desired location
+                                        import shutil
+                                        shutil.move(default_file, filepath)
+                                
+                                # Read the generated HTML file for display
+                                with open(filepath, 'r', encoding='utf-8') as f:
+                                    html_content = f.read()
+                                
+                                # Success message
+                                st.success("✅ Tearsheet generated successfully!")
+                                
+                                # Display HTML content using iframe for better chart rendering
+                                st.subheader("QuantStats Tearsheet")
+                                
+                                # Use iframe to display the HTML with proper chart rendering
+                                import streamlit.components.v1 as components
+                                components.html(html_content, height=2000, scrolling=True)
+                                
+                                # Download button
+                                with open(filepath, "rb") as file:
+                                    st.download_button(
+                                        label="📥 Download HTML Report",
+                                        data=file.read(),
+                                        file_name=filename,
+                                        mime="text/html",
+                                        help="Download the tearsheet as an HTML file"
+                                    )
+                                    
+                            except Exception as e:
+                                st.error(f"Error generating tearsheet: {str(e)}")
+                                st.info("Please ensure you have sufficient data points for analysis.")
+                    else:
+                        st.warning("⚠️ No returns data available. Please ensure stock data is loaded properly.")
+                else:
+                    st.info("👆 Click 'Generate Tearsheet' to create a comprehensive performance analysis report using QuantStats.")
+                    
+                    # Show what will be included in the tearsheet
+                    st.markdown("### 📋 Tearsheet Contents")
+                    st.markdown("""
+                    The QuantStats tearsheet will include:
+                    - **Performance Metrics**: Sharpe, Sortino, and Calmar ratios
+                    - **Risk Analysis**: VaR, CVaR, maximum drawdown, volatility
+                    - **Visual Charts**: Cumulative returns, drawdown periods, monthly heatmap
+                    - **Statistical Summary**: Win rate, best/worst performance, tail ratio
+                    - **Distribution Analysis**: Returns histogram and risk-return scatter
+                    """)
+            
+            with metrics_tab:
+                st.write("Quick performance metrics overview")
+                
+                if 'stock_returns' in st.session_state and len(st.session_state.stock_returns) > 0:
+                    returns_data = st.session_state.stock_returns
+                    
+                    # Calculate additional metrics using QuantStats
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.metric("Sharpe Ratio", f"{qs.stats.sharpe(returns_data):.4f}")
+                        st.metric("Sortino Ratio", f"{qs.stats.sortino(returns_data):.4f}")
+                        st.metric("Max Drawdown", f"{qs.stats.max_drawdown(returns_data):.2%}")
+                    
+                    with col2:
+                        st.metric("Calmar Ratio", f"{qs.stats.calmar(returns_data):.4f}")
+                        st.metric("VaR (95%)", f"{qs.stats.value_at_risk(returns_data):.2%}")
+                        st.metric("Win Rate", f"{qs.stats.win_rate(returns_data):.2%}")
+                else:
+                    st.warning("⚠️ No returns data available for metrics calculation.")
             
             # Create interactive chart with Altair
             st.subheader("Stock Performance")
@@ -163,12 +275,12 @@ if ticker:
             st.subheader("Candlestick Chart with Volume")
             
             # Prepare data for Bokeh
-            stock_price_bokeh = stock_price_mpf.copy()
+            stock_price_bokeh = stock_price.copy()
             stock_price_bokeh['date'] = stock_price_bokeh.index
             
             # Calculate candlestick properties
             stock_price_bokeh['color'] = ['green' if close >= open_price else 'red' 
-                                          for close, open_price in zip(stock_price_bokeh['Close'], stock_price_bokeh['Open'])]
+                                          for close, open_price in zip(stock_price_bokeh['close'], stock_price_bokeh['open'])]
             
             # Create two subplots: price and volume with proper alignment
             from bokeh.layouts import column
@@ -177,7 +289,7 @@ if ticker:
             # Calculate min/max values for consistent scaling
             min_date = stock_price_bokeh.index.min()
             max_date = stock_price_bokeh.index.max()
-            max_volume = stock_price_bokeh['Volume'].max()
+            max_volume = stock_price_bokeh['volume'].max()
             
             # Price chart - use responsive sizing
             price = figure(
@@ -192,8 +304,8 @@ if ticker:
             
             # Add segments for high-low range
             price.segment(
-                x0='date', y0='High', 
-                x1='date', y1='Low',
+                x0='date', y0='high', 
+                x1='date', y1='low',
                 source=stock_price_bokeh,
                 color='black',
                 line_width=1
@@ -203,8 +315,8 @@ if ticker:
             price.vbar(
                 x='date',
                 width=12*60*60*1000,  # 12 hours in milliseconds
-                top='Open',
-                bottom='Close',
+                top='open',
+                bottom='close',
                 source=stock_price_bokeh,
                 fill_color='color',
                 line_color='black',
@@ -230,7 +342,7 @@ if ticker:
             volume.vbar(
                 x='date',
                 width=12*60*60*1000,
-                top='Volume',
+                top='volume',
                 bottom=0,
                 source=stock_price_bokeh,
                 fill_color='color',
@@ -248,11 +360,11 @@ if ticker:
             hover_price = HoverTool(
                 tooltips=[
                     ('Date', '@date{%F}'),
-                    ('Open', '@Open{0,0}'),
-                    ('High', '@High{0,0}'),
-                    ('Low', '@Low{0,0}'),
-                    ('Close', '@Close{0,0}'),
-                    ('Volume', '@Volume{0,0}')
+                    ('Open', '@open{0,0}'),
+                    ('High', '@high{0,0}'),
+                    ('Low', '@low{0,0}'),
+                    ('Close', '@close{0,0}'),
+                    ('Volume', '@volume{0,0}')
                 ],
                 formatters={'@date': 'datetime'},
                 mode='vline'
@@ -262,7 +374,7 @@ if ticker:
             hover_volume = HoverTool(
                 tooltips=[
                     ('Date', '@date{%F}'),
-                    ('Volume', '@Volume{0,0}')
+                    ('Volume', '@volume{0,0}')
                 ],
                 formatters={'@date': 'datetime'},
                 mode='vline'

@@ -77,13 +77,17 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
 5. Chart generation and export
 
 ### Critical Dependencies
-**NEVER upgrade pandas or pandasai independently.** The app requires:
+**NEVER upgrade pandas, pandasai, or quantstats independently.** The app requires:
 - **Python** - Exact version `3.10.11` (specified in pyproject.toml)
 - `pandasai==2.3.0` (stable)
 - `pandas==1.5.3` (compatible with pandasai 2.x)
+- `quantstats==0.0.59` (last version compatible with pandas 1.5.3)
 - Uses `uv` for dependency management (recommended over pip)
 
-PandasAI 3.x has breaking changes and requires different pandas versions.
+**Version Compatibility Notes:**
+- PandasAI 3.x has breaking changes and requires different pandas versions
+- QuantStats 0.0.60+ uses pandas 2.0+ frequency aliases (`ME`, `QE`, `YE`) incompatible with pandas 1.5.3
+- QuantStats 0.0.59 uses legacy frequency aliases (`M`, `Q`, `A`) compatible with pandas 1.5.3
 
 ### Session State Management
 Key session variables:
