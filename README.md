@@ -5,11 +5,14 @@
 ## Features
 
 - 📊 **Vietnamese Stock Data** - Load financial data using Vnstock (VCI/TCBS sources)
-- 🤖 **AI Chat Interface** - Natural language queries about financial metrics
-- 💬 **Interactive Analysis** - Real-time conversation with AI analyst
-- 📈 **Financial Metrics** - ROIC, debt ratios, dividend yields, cash flow analysis
-- 🏢 **Company Analysis** - Ownership structure, management team, subsidiaries, and foreign transaction analysis
-- 🔐 **Secure API Key Management** - Environment variables or secure UI input
+- 🤖 **AI Chat Interface** - Natural language queries about financial metrics with PandasAI integration
+- 💬 **Interactive Analysis** - Real-time conversation with AI analyst including file upload support
+- 📈 **Advanced Technical Analysis** - Interactive price charts with 75+ QuantStats metrics and professional tearsheets
+- 🎯 **Intelligent Stock Screener** - Multi-criteria filtering with 6 advanced filters (Beta, Alpha, Financial Health, etc.)
+- 💼 **Portfolio Optimization** - Modern Portfolio Theory, Hierarchical Risk Parity, and risk analysis with riskfolio-lib
+- 🏢 **Comprehensive Company Analysis** - Ownership structure, management team, subsidiaries, and foreign transaction analysis
+- 📊 **Professional Visualizations** - Interactive charts with Altair, Bokeh, and custom styling
+- 🔐 **Secure Authentication** - Google OAuth integration with API key management
 
 ## Quick Start
 
@@ -118,9 +121,10 @@ streamlit run app.py
 
 ### Step 3: Explore Other Analysis Tools
 7. **🚀 Navigate to Other Pages**: Now you can efficiently use other analysis tools:
-   - **📈 Price Analysis**: Interactive price charts and technical analysis
+   - **📈 Price Analysis**: Interactive price charts with 75+ QuantStats metrics and professional tearsheets
    - **🏢 Company Overview**: Company profile with ownership structure, management team, subsidiaries, and foreign transaction analysis
-   - **💼 Portfolio Optimization**: Modern Portfolio Theory-based optimization
+   - **💼 Portfolio Optimization**: Modern Portfolio Theory, Hierarchical Risk Parity, and comprehensive risk analysis
+   - **🎯 Stock Screener**: Multi-criteria stock filtering with advanced metrics (Beta, Alpha, Financial Health) and quick presets
 
 ### Recommended Setup for Best Experience
 
@@ -176,13 +180,21 @@ streamlit run app.py
 
 ✅ **WORKING COMBINATION:**
 - `pandasai==2.3.0` (stable)
-- `pandas>=1.5.3,<2.0.0` (compatible range)
+- `pandas==1.5.3` (exact version required for compatibility)
+- `quantstats==0.0.59` (last version compatible with pandas 1.5.3)
 - Built-in OpenAI LLM (no separate extension needed)
 
 ❌ **AVOID:**
 - `pandasai>=3.0.0` (beta, unstable)
 - `pandas>=2.0.0` (incompatible with pandasai 2.3.0)
+- `quantstats>=0.0.60` (requires pandas 2.0+ frequency aliases)
 - `pandasai-openai` extension (not needed in v2.3.0)
+
+### Critical QuantStats Compatibility
+**NEVER upgrade quantstats independently.** The app uses:
+- **QuantStats v0.0.59** - Last version compatible with pandas 1.5.3 legacy frequency aliases (`M`, `Q`, `A`)
+- **Issue with newer versions**: QuantStats 0.0.60+ uses pandas 2.0+ frequency aliases (`ME`, `QE`, `YE`) causing "Invalid frequency" errors
+- **Solution**: Version pinned in requirements.txt to maintain compatibility
 
 ### If You Need to Upgrade
 
@@ -193,11 +205,15 @@ streamlit run app.py
 
 ## Technology Stack
 
-- **Frontend:** Streamlit
-- **AI Engine:** PandasAI v2.3.0 (stable)
-- **Stock Data:** Vnstock v3.2.5
-- **LLM:** OpenAI GPT models
+- **Frontend:** Streamlit v1.47.0 with Google OAuth authentication
+- **AI Engine:** PandasAI v2.3.0 (stable) with OpenAI GPT integration
+- **Stock Data:** Vnstock v3.2.5 (VCI/TCBS sources for Vietnamese market)
 - **Data Processing:** Pandas v1.5.3 (compatible with pandasai 2.3.0)
+- **Financial Analysis:** QuantStats v0.0.59 (75+ performance metrics and tearsheets)
+- **Portfolio Optimization:** PyPortfolioOpt (Modern Portfolio Theory, Efficient Frontier)
+- **Risk Analysis:** riskfolio-lib v5.0.1+ (Hierarchical Risk Parity, advanced risk metrics)
+- **Visualizations:** Altair v5.5.0+, Bokeh v2.4.3, mplfinance for interactive charts
+- **Authentication:** Authlib v1.3.2+ for Google OAuth integration
 
 ## Future Refactor: PandasAI 3.x Migration
 
@@ -225,15 +241,25 @@ dependencies = [
 
 ```
 finance-bro/
-├── app.py              # Main Streamlit application entry point
-├── requirements.txt    # Python dependencies
-├── pyproject.toml     # Project configuration
-├── README.md          # Project documentation
-├── Dockerfile         # Docker configuration
-├── docker-compose.yml # Docker Compose configuration
-├── .env.example       # Environment variables template
-├── .dockerignore      # Docker ignore rules
-└── .gitignore         # Git ignore rules
+├── app.py                     # Main entry point with auth & navigation
+├── pages/                     # Multi-page Streamlit application
+│   ├── bro.py                # Main AI chat interface (Stock Analysis)
+│   ├── Stock_Price_Analysis.py  # Technical analysis & QuantStats
+│   ├── Company_Overview.py   # Company profiles & ownership
+│   ├── Portfolio_Optimization.py # Modern Portfolio Theory & HRP
+│   └── Screener.py           # Stock screening & filtering
+├── static/style.css          # Custom CSS styling
+├── .streamlit/               # Streamlit configuration
+│   ├── config.toml          # Custom theme & colors
+│   └── secrets.example.toml # OAuth configuration template
+├── requirements.txt          # Python dependencies
+├── pyproject.toml           # Project configuration (Python 3.10.11)
+├── Dockerfile               # Docker configuration
+├── docker-compose.yml       # Docker Compose configuration
+├── .env.example             # Environment variables template
+├── CHANGELOG.md             # Version history
+├── CLAUDE.md                # AI assistant instructions
+└── Reference/               # Legacy code & documentation
 ```
 
 ## Docker Deployment
@@ -441,12 +467,27 @@ docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/gahoccode/finance-bro
 
 ## Dependencies
 
+### Core Dependencies
 - `pandasai==2.3.0` - AI-powered data analysis
-- `pandas>=1.5.3,<2.0.0` - Data manipulation
-- `vnstock==3.2.5` - Vietnamese stock data
+- `pandas==1.5.3` - Data manipulation (exact version for compatibility)
+- `vnstock==3.2.5` - Vietnamese stock data (VCI/TCBS sources)
 - `openai>=1.61.0` - OpenAI API client
-- `streamlit==1.47.0` - Web application framework
+- `streamlit==1.47.0` - Web application framework with OAuth support
 - `python-dotenv==1.0.1` - Environment variable management
+
+### Financial Analysis
+- `quantstats==0.0.59` - Performance analytics and tearsheets (75+ metrics)
+- `pyportfolioopt>=1.5.6` - Modern Portfolio Theory optimization
+- `riskfolio-lib>=5.0.1` - Advanced risk analysis and HRP
+- `mplfinance>=0.12.10b0` - Financial data visualization
+
+### Visualization & UI
+- `altair>=5.5.0` - Interactive statistical visualizations  
+- `bokeh==2.4.3` - Interactive web plots
+- `Authlib>=1.3.2` - Google OAuth authentication
+
+### System Dependencies (Docker)
+- `osqp==0.6.2.post8` - Quadratic programming solver (specific version for stability)
 
 ## Contributing
 
