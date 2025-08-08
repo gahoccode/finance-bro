@@ -17,6 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Separation of Concerns**: HRP analysis cleanly separated from Modern Portfolio Theory content in dedicated tab
   - **Real Data Testing**: Designed for testing with actual Vietnamese stock market data via vnstock API
 
+- [2025-08-08] **Discrete Portfolio Allocation**: Added comprehensive discrete allocation functionality with Vietnamese market integration
+  - **DiscreteAllocation Implementation**: Integrated `pypfopt.discrete_allocation.DiscreteAllocation` for realistic portfolio allocation
+  - **Portfolio Value Input**: User-configurable portfolio value with Vietnamese Dong (VND) denomination and sensible defaults
+  - **Strategy Selection**: Dropdown to choose allocation strategy from Max Sharpe, Min Volatility, or Max Utility portfolios
+  - **Latest Prices Integration**: Uses `get_latest_prices()` with proper Vietnamese market price conversion (multiply by 1000)
+  - **Greedy Allocation Algorithm**: Implements `greedy_portfolio()` method for optimal share allocation within budget constraints
+  - **Comprehensive Results Display**: Shows allocation table with shares, prices, total values, and weight percentages
+  - **Summary Metrics**: Three-column layout displaying allocated amount, leftover cash, and number of stocks
+  - **Investment Summary**: Professional overview with strategy details and allocation breakdown
+  - **Vietnamese Market Formatting**: Proper VND currency formatting with thousand separators for professional presentation
+
 ### Changed
 - [2025-08-08] **Portfolio Optimization Page Restructuring**: Reorganized content into tab-based layout for better user experience
   - **Tab Architecture**: Split single-page content into two focused tabs:

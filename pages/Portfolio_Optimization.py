@@ -3,6 +3,7 @@ from vnstock import Quote
 import pandas as pd
 import matplotlib.pyplot as plt
 from pypfopt import EfficientFrontier, risk_models, expected_returns, DiscreteAllocation, HRPOpt
+from pypfopt.discrete_allocation import get_latest_prices
 from pypfopt.exceptions import OptimizationError
 from pypfopt.expected_returns import mean_historical_return
 from pypfopt.risk_models import sample_cov
@@ -275,7 +276,7 @@ with col3:
     )
 
 # Create tabs for different analysis views
-tab1, tab2 = st.tabs(["📈 Efficient Frontier & Weights", "🌳 Hierarchical Risk Parity"])
+tab1, tab2, tab3 = st.tabs(["📈 Efficient Frontier & Weights", "🌳 Hierarchical Risk Parity", "💰 Dollars Allocation"])
 
 with tab1:
     # Efficient Frontier Plot
@@ -437,6 +438,103 @@ with tab2:
         st.pyplot(fig_dendro)
     else:
         st.warning("Returns data not available. Please refresh the page.")
+
+with tab3:
+    st.subheader("Discrete Portfolio Allocation")
+    
+    # Portfolio value input
+    portfolio_value = st.number_input(
+        "Portfolio Value (VND)",
+        min_value=1000000,  # 1 million VND minimum
+        max_value=100000000000,  # 100 billion VND maximum
+        value=100000000,  # Default 100 million VND
+        step=1000000,  # 1 million VND steps
+        help="Enter your total portfolio value in Vietnamese Dong (VND)"
+    )
+    
+    # Portfolio selection
+    portfolio_choice = st.selectbox(
+        "Select Portfolio Strategy",
+        ["Max Sharpe Portfolio", "Min Volatility Portfolio", "Max Utility Portfolio"],
+        help="Choose which optimized portfolio weights to use for allocation"
+    )
+    
+    # Get the selected weights
+    if portfolio_choice == "Max Sharpe Portfolio":
+        selected_weights = weights_max_sharpe
+        portfolio_label = "Max Sharpe"
+    elif portfolio_choice == "Min Volatility Portfolio":
+        selected_weights = weights_min_vol
+        portfolio_label = "Min Volatility"
+    else:  # Max Utility Portfolio
+        selected_weights = weights_max_utility
+        portfolio_label = "Max Utility"
+    
+    # Calculate discrete allocation
+    if st.button("Calculate Allocation", key="discrete_allocation"):
+        try:
+            # Get latest prices and convert from thousands to actual VND
+            latest_prices = get_latest_prices(prices_df)
+            # Convert prices from thousands to actual VND (multiply by 1000)
+            latest_prices_actual = latest_prices * 1000
+            
+            # Create DiscreteAllocation object
+            da = DiscreteAllocation(selected_weights, latest_prices_actual, total_portfolio_value=portfolio_value)
+            allocation, leftover = da.greedy_portfolio()
+            
+            # Display results
+            st.success(f"✅ Allocation calculated successfully for {portfolio_label} Portfolio!")
+            
+            # Show allocation results
+            st.subheader("Stock Allocation")
+            allocation_df = pd.DataFrame(list(allocation.items()), columns=['Symbol', 'Shares'])
+            allocation_df['Latest Price (VND)'] = allocation_df['Symbol'].map(latest_prices_actual)
+            allocation_df['Total Value (VND)'] = allocation_df['Shares'] * allocation_df['Latest Price (VND)']
+            allocation_df['Weight %'] = (allocation_df['Total Value (VND)'] / portfolio_value * 100).round(2)
+            
+            # Format numbers for display
+            allocation_df['Latest Price (VND)'] = allocation_df['Latest Price (VND)'].apply(lambda x: f"{x:,.0f}")
+            allocation_df['Total Value (VND)'] = allocation_df['Total Value (VND)'].apply(lambda x: f"{x:,.0f}")
+            
+            st.dataframe(allocation_df, hide_index=True)
+            
+            # Summary metrics
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                allocated_value = portfolio_value - leftover
+                st.metric(
+                    "Allocated Amount",
+                    f"{allocated_value:,.0f} VND",
+                    f"{(allocated_value/portfolio_value*100):.1f}% of portfolio"
+                )
+            
+            with col2:
+                st.metric(
+                    "Leftover Cash", 
+                    f"{leftover:,.0f} VND",
+                    f"{(leftover/portfolio_value*100):.1f}% of portfolio"
+                )
+            
+            with col3:
+                total_stocks = len(allocation)
+                st.metric("Stocks to Buy", total_stocks)
+            
+            # Investment summary
+            st.subheader("Investment Summary")
+            st.info(f"""
+            **Portfolio Strategy**: {portfolio_label}  
+            **Total Investment**: {portfolio_value:,.0f} VND  
+            **Allocated**: {allocated_value:,.0f} VND ({(allocated_value/portfolio_value*100):.1f}%)  
+            **Remaining Cash**: {leftover:,.0f} VND ({(leftover/portfolio_value*100):.1f}%)  
+            **Number of Stocks**: {total_stocks} stocks
+            """)
+            
+        except Exception as e:
+            st.error(f"Error calculating allocation: {str(e)}")
+            st.error("Please ensure you have selected stocks and loaded price data first.")
+    else:
+        st.info("👆 Click 'Calculate Allocation' to see how many shares to buy for each stock based on your selected portfolio strategy and investment amount.")
 
 # Footer
 st.markdown("---")

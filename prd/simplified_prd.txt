@@ -1,14 +1,16 @@
+# This extracts the last row of prices_df and converts it to a Series
 
-1. Create another tab @Portfolio_Optimization.py and implement from pypfopt import HRPOpt
-hrp = HRPOpt(returns=returns) #create the object
-weights = hrp.optimize() #optimize the object. The weights should gives an OrderedDict with type np.float64. For example, OrderedDict([('DHC', np.float64(0.280008567778799)),
-             ('FMC', np.float64(0.4150523222546779)),
-             ('REE', np.float64(0.30493910996652307))])
+from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
+latest_prices = get_latest_prices(prices_df) #Alternatives: latest_prices = prices_df.iloc[-1]
+# Assuming you already have optimized weights (e.g., from max_sharpe or min_volatility)
+# And a total portfolio value
+portfolio_value = 100000  # 1 million VND
 
-2. Create the visualization using from pypfopt import plotting
-plotting.plot_dendrogram(hrp, ax=None, show_tickers=True)
-All imports should be place on top of the file. 
+# You can use either the Series or dict version of latest_prices
+da = DiscreteAllocation(weights, latest_prices, total_portfolio_value=portfolio_value)
+allocation, leftover = da.greedy_portfolio()
 
 Acceptance criteria:
-Successfully visualize the weights in dendrogram
-Resuse existing variable 'returns' to plot dendrogram
+- Create a tab called "Dollars Allocation" and implement the above code in that tab.
+- successfully display the allocation and leftover. 
+- Create user input for portfolio_value and use that for the calculation. 
