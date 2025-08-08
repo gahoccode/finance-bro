@@ -128,3 +128,35 @@ Charts are generated via PandasAI and saved to `exports/charts/temp_chart.png`. 
 - API key validation on startup
 - Graceful handling of vnstock API errors
 - PandasAI error recovery with fallback responses
+
+### Development Workflow
+- Use **uv** for dependency management over pip (faster and more reliable)
+- **Critical**: Never upgrade pandas/pandasai without checking compatibility
+- Python exact version `3.10.11` required (no newer versions supported)
+- Run `uv sync` after pulling changes to ensure dependency consistency
+
+### Testing and Quality Assurance
+```bash
+# Run all quality checks before committing
+uv run pytest          # Run tests
+uv run black .          # Format code  
+uv run flake8           # Lint code
+uv run mypy .           # Type checking
+
+# Run single test file/function
+uv run pytest tests/test_specific.py
+uv run pytest tests/test_file.py::test_function_name
+```
+
+### Docker and CI/CD
+- GitHub Actions automatically builds and publishes Docker images
+- Multi-platform support (linux/amd64, linux/arm64)
+- Images published to `ghcr.io/gahoccode/finance-bro` 
+- Use `docker-compose up --build` for local development
+- Production images available at `ghcr.io/gahoccode/finance-bro:latest`
+
+### Data Sources and APIs
+- **vnstock** v3.2.5 - Vietnamese stock data (VCI/TCBS sources)  
+- **OpenAI API** - Required for AI functionality
+- **Google OAuth** - Required for user authentication
+- Stock data cached in `cache/` directory for performance

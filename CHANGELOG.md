@@ -5,6 +5,43 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.11] - 2025-08-08
+
+### Added
+- [2025-08-08] **Hierarchical Risk Parity (HRP) Portfolio Optimization**: Added comprehensive HRP analysis with dendrogram visualization
+  - **HRP Implementation**: Integrated `pypfopt.HRPOpt` for hierarchical risk parity portfolio optimization using clustering-based approach
+  - **Dendrogram Visualization**: Added interactive dendrogram chart using `plotting.plot_dendrogram()` with ticker symbols display
+  - **Portfolio Weights Display**: HRP portfolio weights shown in formatted table with percentage values
+  - **Tab-Based Interface**: Added dedicated "🌳 Hierarchical Risk Parity" tab alongside existing "📈 Efficient Frontier & Weights" tab
+  - **Session State Integration**: Returns data stored in `st.session_state.portfolio_returns` for cross-tab data sharing
+  - **Separation of Concerns**: HRP analysis cleanly separated from Modern Portfolio Theory content in dedicated tab
+  - **Real Data Testing**: Designed for testing with actual Vietnamese stock market data via vnstock API
+
+### Changed
+- [2025-08-08] **Portfolio Optimization Page Restructuring**: Reorganized content into tab-based layout for better user experience
+  - **Tab Architecture**: Split single-page content into two focused tabs:
+    - **Tab 1**: "📈 Efficient Frontier & Weights" - Contains all existing MPT analysis (efficient frontier plot, portfolio weights tables, pie charts, performance analysis)
+    - **Tab 2**: "🌳 Hierarchical Risk Parity" - Contains HRP optimization and dendrogram visualization
+  - **Content Organization**: Moved efficient frontier, weights comparison, pie charts, and performance tables to first tab
+  - **Main Page Preservation**: Data summary and performance metrics remain in main content area above tabs
+  - **User Workflow**: Users can easily switch between traditional MPT analysis and modern HRP approach
+
+### Technical Implementation
+- **Import Enhancement**: Added `HRPOpt` to existing pypfopt imports for hierarchical clustering functionality
+- **Session State Management**: Portfolio returns calculated once and stored for reuse across analysis methods
+- **Error Handling**: Basic validation with user-friendly warnings when returns data unavailable
+- **Data Flow**: Seamless integration with existing portfolio optimization workflow and caching system
+- **Chart Integration**: Dendrogram uses matplotlib with consistent styling and responsive design
+
+### User Experience Improvements
+- **Progressive Analysis**: Users can perform traditional MPT analysis first, then explore HRP approach using same data
+- **Visual Insights**: Dendrogram provides intuitive visualization of asset clustering and hierarchical relationships
+- **Comparative Analysis**: Easy switching between MPT and HRP approaches for comprehensive portfolio analysis
+- **Professional Interface**: Clean tab separation maintains focus while providing access to different optimization strategies
+
+### Files Modified
+- `pages/Portfolio_Optimization.py`: Added HRP import, session state storage, tab structure, and HRP implementation
+
 ## [0.2.10] - 2025-08-06
 
 ### Changed

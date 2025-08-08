@@ -1,14 +1,14 @@
-Use context7 to get the latest docs on: 
-- Streamlit multipages web app
-- st.navigation and position = top
-- St.Page
 
-Action:
-- Refactor @app.py
-- Integrate ./pages to @app.py
-- Retain existing feature. 
+1. Create another tab @Portfolio_Optimization.py and implement from pypfopt import HRPOpt
+hrp = HRPOpt(returns=returns) #create the object
+weights = hrp.optimize() #optimize the object. The weights should gives an OrderedDict with type np.float64. For example, OrderedDict([('DHC', np.float64(0.280008567778799)),
+             ('FMC', np.float64(0.4150523222546779)),
+             ('REE', np.float64(0.30493910996652307))])
 
-Rules: 
-- Do not add more pages to the navigation menu unless you're told to do so. 
-- Do not remove any existing feature from @app.py
-- Discuss if you need to remove any existing feature from @app.py by calling mcp_feedback_enhanced mcp server
+2. Create the visualization using from pypfopt import plotting
+plotting.plot_dendrogram(hrp, ax=None, show_tickers=True)
+All imports should be place on top of the file. 
+
+Acceptance criteria:
+Successfully visualize the weights in dendrogram
+Resuse existing variable 'returns' to plot dendrogram

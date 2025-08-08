@@ -2,7 +2,7 @@ import streamlit as st
 from vnstock import Quote
 import pandas as pd
 import matplotlib.pyplot as plt
-from pypfopt import EfficientFrontier, risk_models, expected_returns, DiscreteAllocation
+from pypfopt import EfficientFrontier, risk_models, expected_returns, DiscreteAllocation, HRPOpt
 from pypfopt.exceptions import OptimizationError
 from pypfopt.expected_returns import mean_historical_return
 from pypfopt.risk_models import sample_cov
@@ -221,6 +221,8 @@ with st.expander("View Price Data"):
 # Calculate returns and optimize portfolio
 status_text.text("Calculating portfolio optimization...")
 returns = prices_df.pct_change().dropna()
+# Store returns in session state for HRP tab
+st.session_state.portfolio_returns = returns
 mu = expected_returns.mean_historical_return(prices_df)
 S = risk_models.sample_cov(prices_df)
 
@@ -272,143 +274,169 @@ with col3:
         f"Return: {(ret_utility*100):.2f}"
     )
 
-# Efficient Frontier Plot
-st.subheader("Efficient Frontier Analysis")
-fig, ax = plt.subplots(figsize=(12, 8))
+# Create tabs for different analysis views
+tab1, tab2 = st.tabs(["📈 Efficient Frontier & Weights", "🌳 Hierarchical Risk Parity"])
 
-# Plot efficient frontier
-ef_plot = EfficientFrontier(mu, S)
-plotting.plot_efficient_frontier(ef_plot, ax=ax, show_assets=True)
+with tab1:
+    # Efficient Frontier Plot
+    st.subheader("Efficient Frontier Analysis")
+    fig, ax = plt.subplots(figsize=(12, 8))
 
-# Plot portfolios
-ax.scatter(std_tangent, ret_tangent, marker="*", s=200, c="red", label="Max Sharpe", zorder=5)
-ax.scatter(std_min_vol, ret_min_vol, marker="*", s=200, c="green", label="Min Volatility", zorder=5)
-ax.scatter(std_utility, ret_utility, marker="*", s=200, c="blue", label="Max Utility", zorder=5)
+    # Plot efficient frontier
+    ef_plot = EfficientFrontier(mu, S)
+    plotting.plot_efficient_frontier(ef_plot, ax=ax, show_assets=True)
 
-# Generate random portfolios
-n_samples = 5000
-w = np.random.dirichlet(np.ones(ef_plot.n_assets), n_samples)
-rets = w.dot(ef_plot.expected_returns)
-stds = np.sqrt(np.diag(w @ ef_plot.cov_matrix @ w.T))
-sharpes = rets / stds
+    # Plot portfolios
+    ax.scatter(std_tangent, ret_tangent, marker="*", s=200, c="red", label="Max Sharpe", zorder=5)
+    ax.scatter(std_min_vol, ret_min_vol, marker="*", s=200, c="green", label="Min Volatility", zorder=5)
+    ax.scatter(std_utility, ret_utility, marker="*", s=200, c="blue", label="Max Utility", zorder=5)
 
-scatter = ax.scatter(stds, rets, marker=".", c=sharpes, cmap=colormap, alpha=0.6)
-plt.colorbar(scatter, label='Sharpe Ratio')
+    # Generate random portfolios
+    n_samples = 5000
+    w = np.random.dirichlet(np.ones(ef_plot.n_assets), n_samples)
+    rets = w.dot(ef_plot.expected_returns)
+    stds = np.sqrt(np.diag(w @ ef_plot.cov_matrix @ w.T))
+    sharpes = rets / stds
 
-ax.set_title("Efficient Frontier with Random Portfolios")
-ax.set_xlabel("Annual Volatility")
-ax.set_ylabel("Annual Return")
-ax.legend()
-#ax.grid(True, alpha=0.3)
+    scatter = ax.scatter(stds, rets, marker=".", c=sharpes, cmap=colormap, alpha=0.6)
+    plt.colorbar(scatter, label='Sharpe Ratio')
 
-st.pyplot(fig)
+    ax.set_title("Efficient Frontier with Random Portfolios")
+    ax.set_xlabel("Annual Volatility")
+    ax.set_ylabel("Annual Return")
+    ax.legend()
+    #ax.grid(True, alpha=0.3)
 
-# Portfolio Weights
-st.subheader("Portfolio Weights")
-col1, col2, col3 = st.columns(3)
+    st.pyplot(fig)
 
-with col1:
-    st.write("**Max Sharpe Portfolio**")
-    weights_df = pd.DataFrame(list(weights_max_sharpe.items()), columns=['Symbol', 'Weight'])
-    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.2%}")
-    st.dataframe(weights_df, hide_index=True)
+    # Portfolio Weights
+    st.subheader("Portfolio Weights")
+    col1, col2, col3 = st.columns(3)
 
-with col2:
-    st.write("**Min Volatility Portfolio**")
-    weights_df = pd.DataFrame(list(weights_min_vol.items()), columns=['Symbol', 'Weight'])
-    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.2%}")
-    st.dataframe(weights_df, hide_index=True)
+    with col1:
+        st.write("**Max Sharpe Portfolio**")
+        weights_df = pd.DataFrame(list(weights_max_sharpe.items()), columns=['Symbol', 'Weight'])
+        weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.2%}")
+        st.dataframe(weights_df, hide_index=True)
 
-with col3:
-    st.write("**Max Utility Portfolio**")
-    weights_df = pd.DataFrame(list(weights_max_utility.items()), columns=['Symbol', 'Weight'])
-    weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.2%}")
-    st.dataframe(weights_df, hide_index=True)
+    with col2:
+        st.write("**Min Volatility Portfolio**")
+        weights_df = pd.DataFrame(list(weights_min_vol.items()), columns=['Symbol', 'Weight'])
+        weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.2%}")
+        st.dataframe(weights_df, hide_index=True)
 
-# Weight visualization
-st.subheader("Portfolio Weights Visualization")
+    with col3:
+        st.write("**Max Utility Portfolio**")
+        weights_df = pd.DataFrame(list(weights_max_utility.items()), columns=['Symbol', 'Weight'])
+        weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.2%}")
+        st.dataframe(weights_df, hide_index=True)
 
-# Define colors for pie charts
-pie_colors = ["#56524D", "#76706C", "#AAA39F"]
+    # Weight visualization
+    st.subheader("Portfolio Weights Visualization")
 
-def create_pie_chart(weights_dict, title, colors):
-    """Create a Bokeh pie chart for portfolio weights."""
-    # Filter out zero weights and prepare data
-    data = pd.DataFrame(list(weights_dict.items()), columns=['Symbol', 'Weight'])
-    data = data[data['Weight'] > 0.01]  # Filter out very small weights
-    data = data.sort_values('Weight', ascending=False)
-    
-    if len(data) == 0:
-        return None
-    
-    # Calculate angles for pie chart
-    data['angle'] = data['Weight'] / data['Weight'].sum() * 2 * pi
-    data['color'] = colors[:len(data)] if len(data) <= len(colors) else colors + ["#D3D3D3"] * (len(data) - len(colors))
-    
-    # Create pie chart with increased height for better visibility
-    p = figure(
-        height=400, 
-        width=350, 
-        title=title,
-        toolbar_location=None,
-        tools="hover",
-        tooltips="@Symbol: @Weight{0.00%}",
-        x_range=(-0.5, 0.5), 
-        y_range=(-0.5, 0.5),
-        sizing_mode="scale_both"
-    )
-    
-    p.wedge(
-        x=0, y=0, radius=0.35,
-        start_angle=cumsum('angle', include_zero=True), 
-        end_angle=cumsum('angle'),
-        line_color="white", 
-        fill_color='color',
-        legend_field='Symbol',
-        source=data
-    )
-    
-    p.axis.axis_label = None
-    p.axis.visible = False
-    p.grid.grid_line_color = None
-    p.title.text_font_size = "12pt"
-    p.legend.label_text_font_size = "10pt"
-    
-    return p
+    # Define colors for pie charts
+    pie_colors = ["#56524D", "#76706C", "#AAA39F"]
 
-# Create three pie charts in columns
-col1, col2, col3 = st.columns(3)
+    def create_pie_chart(weights_dict, title, colors):
+        """Create a Bokeh pie chart for portfolio weights."""
+        # Filter out zero weights and prepare data
+        data = pd.DataFrame(list(weights_dict.items()), columns=['Symbol', 'Weight'])
+        data = data[data['Weight'] > 0.01]  # Filter out very small weights
+        data = data.sort_values('Weight', ascending=False)
+        
+        if len(data) == 0:
+            return None
+        
+        # Calculate angles for pie chart
+        data['angle'] = data['Weight'] / data['Weight'].sum() * 2 * pi
+        data['color'] = colors[:len(data)] if len(data) <= len(colors) else colors + ["#D3D3D3"] * (len(data) - len(colors))
+        
+        # Create pie chart with increased height for better visibility
+        p = figure(
+            height=400, 
+            width=350, 
+            title=title,
+            toolbar_location=None,
+            tools="hover",
+            tooltips="@Symbol: @Weight{0.00%}",
+            x_range=(-0.5, 0.5), 
+            y_range=(-0.5, 0.5),
+            sizing_mode="scale_both"
+        )
+        
+        p.wedge(
+            x=0, y=0, radius=0.35,
+            start_angle=cumsum('angle', include_zero=True), 
+            end_angle=cumsum('angle'),
+            line_color="white", 
+            fill_color='color',
+            legend_field='Symbol',
+            source=data
+        )
+        
+        p.axis.axis_label = None
+        p.axis.visible = False
+        p.grid.grid_line_color = None
+        p.title.text_font_size = "12pt"
+        p.legend.label_text_font_size = "10pt"
+        
+        return p
 
-with col1:
-    pie1 = create_pie_chart(weights_max_sharpe, "Max Sharpe Portfolio", pie_colors)
-    if pie1:
-        st.bokeh_chart(pie1, use_container_width=True)
+    # Create three pie charts in columns
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        pie1 = create_pie_chart(weights_max_sharpe, "Max Sharpe Portfolio", pie_colors)
+        if pie1:
+            st.bokeh_chart(pie1, use_container_width=True)
+        else:
+            st.write("No significant weights in Max Sharpe Portfolio")
+
+    with col2:
+        pie2 = create_pie_chart(weights_min_vol, "Min Volatility Portfolio", pie_colors)
+        if pie2:
+            st.bokeh_chart(pie2, use_container_width=True)
+        else:
+            st.write("No significant weights in Min Volatility Portfolio")
+
+    with col3:
+        pie3 = create_pie_chart(weights_max_utility, "Max Utility Portfolio", pie_colors)
+        if pie3:
+            st.bokeh_chart(pie3, use_container_width=True)
+        else:
+            st.write("No significant weights in Max Utility Portfolio")
+
+    # Detailed performance table
+    st.subheader("Detailed Performance Analysis")
+    performance_df = pd.DataFrame({
+        'Portfolio': ['Max Sharpe', 'Min Volatility', 'Max Utility'],
+        'Expected Return': [f"{ret_tangent:.4f}", f"{ret_min_vol:.4f}", f"{ret_utility:.4f}"],
+        'Volatility': [f"{std_tangent:.4f}", f"{std_min_vol:.4f}", f"{std_utility:.4f}"],
+        'Sharpe Ratio': [f"{sharpe:.4f}", f"{sharpe_min_vol:.4f}", f"{sharpe_utility:.4f}"]
+    })
+    st.dataframe(performance_df, hide_index=True)
+
+with tab2:
+    if 'portfolio_returns' in st.session_state:
+        returns = st.session_state.portfolio_returns
+        
+        # HRP Implementation
+        hrp = HRPOpt(returns=returns)
+        weights_hrp = hrp.optimize()
+        
+        # Display HRP weights
+        st.subheader("HRP Portfolio Weights")
+        weights_df = pd.DataFrame(list(weights_hrp.items()), columns=['Symbol', 'Weight'])
+        weights_df['Weight'] = weights_df['Weight'].apply(lambda x: f"{x:.2%}")
+        st.dataframe(weights_df, hide_index=True)
+        
+        # Dendrogram Visualization
+        st.subheader("HRP Dendrogram")
+        fig_dendro, ax_dendro = plt.subplots(figsize=(12, 8))
+        plotting.plot_dendrogram(hrp, ax=ax_dendro, show_tickers=True)
+        st.pyplot(fig_dendro)
     else:
-        st.write("No significant weights in Max Sharpe Portfolio")
-
-with col2:
-    pie2 = create_pie_chart(weights_min_vol, "Min Volatility Portfolio", pie_colors)
-    if pie2:
-        st.bokeh_chart(pie2, use_container_width=True)
-    else:
-        st.write("No significant weights in Min Volatility Portfolio")
-
-with col3:
-    pie3 = create_pie_chart(weights_max_utility, "Max Utility Portfolio", pie_colors)
-    if pie3:
-        st.bokeh_chart(pie3, use_container_width=True)
-    else:
-        st.write("No significant weights in Max Utility Portfolio")
-
-# Detailed performance table
-st.subheader("Detailed Performance Analysis")
-performance_df = pd.DataFrame({
-    'Portfolio': ['Max Sharpe', 'Min Volatility', 'Max Utility'],
-    'Expected Return': [f"{ret_tangent:.4f}", f"{ret_min_vol:.4f}", f"{ret_utility:.4f}"],
-    'Volatility': [f"{std_tangent:.4f}", f"{std_min_vol:.4f}", f"{std_utility:.4f}"],
-    'Sharpe Ratio': [f"{sharpe:.4f}", f"{sharpe_min_vol:.4f}", f"{sharpe_utility:.4f}"]
-})
-st.dataframe(performance_df, hide_index=True)
+        st.warning("Returns data not available. Please refresh the page.")
 
 # Footer
 st.markdown("---")
