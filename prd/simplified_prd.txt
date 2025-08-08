@@ -1,13 +1,11 @@
 import riskfolio as rp
 
-# Method 1: Convert OrderedDict to DataFrame
-converted_weights_sharpe = pd.DataFrame.from_dict(weights_max_sharpe, orient='index', columns=['Max Sharpe'])
+ax = rp.plot_table(returns=returns,
+                   w=pd.Series(weights_max_sharpe),
+                   MAR=0,
+                   alpha=0.05,
+                   ax=None)
 
-rp.excel_report(returns,
-                w=converted_weights_sharpe,
-                rf=0, # could =0 or =risk_free-rate
-                alpha=0.05,
-                t_factor=252,
-                ini_days=1,
-                days_per_year=252,
-                name="./outputs/report")
+Acceptance criteria:
+- successfully reuse the returns variable stored in session state. 
+- Reuse the existing weight variables for max sharpe ratio portfolio

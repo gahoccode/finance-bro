@@ -232,6 +232,8 @@ S = risk_models.sample_cov(prices_df)
 ef_tangent = EfficientFrontier(mu, S)
 weights_tangent = ef_tangent.max_sharpe()
 weights_max_sharpe = ef_tangent.clean_weights()
+# Store weights dictionary in session state for riskfolio plot_table
+st.session_state.weights_max_sharpe = weights_max_sharpe
 ret_tangent, std_tangent, sharpe = ef_tangent.portfolio_performance()
 
 # Min Volatility Portfolio
@@ -277,7 +279,7 @@ with col3:
     )
 
 # Create tabs for different analysis views
-tab1, tab2, tab3, tab4 = st.tabs(["📈 Efficient Frontier & Weights", "🌳 Hierarchical Risk Parity", "💰 Dollars Allocation", "📊 Report"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["📈 Efficient Frontier & Weights", "🌳 Hierarchical Risk Parity", "💰 Dollars Allocation", "📊 Report", "📋 Risk Analysis"])
 
 with tab1:
     # Efficient Frontier Plot
@@ -617,6 +619,52 @@ with tab4:
         - **Asset Statistics**: Individual asset performance data
         - **Correlation Matrix**: Asset correlation analysis
         """)
+
+with tab5:
+    st.subheader("Risk Analysis Table")
+    
+    # Check if required data is available in session state
+    if 'portfolio_returns' in st.session_state and 'weights_max_sharpe' in st.session_state:
+        returns = st.session_state.portfolio_returns
+        
+        # Convert weights dictionary to DataFrame as required by riskfolio plot_table
+        weights_max_sharpe_df = pd.DataFrame.from_dict(st.session_state.weights_max_sharpe, orient='index', columns=['Weights'])
+        
+        # Create matplotlib figure for riskfolio plot_table
+        fig, ax = plt.subplots(figsize=(12, 8))
+        
+        # Generate risk analysis table using riskfolio-lib
+        ax = rp.plot_table(
+            returns=returns,
+            w=weights_max_sharpe_df,
+            MAR=0,
+            alpha=0.05,
+            ax=ax
+        )
+        
+        # Display the risk analysis table
+        st.pyplot(fig)
+        
+        # Add informational expander
+        with st.expander("📚 Understanding the Risk Analysis Table"):
+            st.markdown("""
+            This table provides comprehensive risk metrics for your Max Sharpe portfolio:
+            
+            **Key Metrics:**
+            - **Expected Return**: Annualized expected portfolio return
+            - **Volatility**: Portfolio standard deviation (risk measure)
+            - **Sharpe Ratio**: Risk-adjusted return measure
+            - **VaR**: Value at Risk - potential loss at 95% confidence
+            - **CVaR**: Conditional Value at Risk - expected loss beyond VaR
+            - **Max Drawdown**: Largest peak-to-trough decline
+            - **Calmar Ratio**: Return to max drawdown ratio
+            
+            *Generated using riskfolio-lib risk analysis framework*
+            """)
+    
+    else:
+        st.warning("⚠️ Risk analysis requires portfolio data.")
+        st.info("Please visit the 'Efficient Frontier & Weights' tab first to calculate portfolio optimization, then return here for risk analysis.")
 
 # Footer
 st.markdown("---")

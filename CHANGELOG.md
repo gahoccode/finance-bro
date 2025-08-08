@@ -5,6 +5,43 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.12] - 2025-08-08
+
+### Added
+- [2025-08-08] **Riskfolio-lib Risk Analysis Table**: Added comprehensive risk analysis visualization to Portfolio Optimization page
+  - **New Tab**: Added "📋 Risk Analysis" as 5th tab alongside existing portfolio analysis tabs
+  - **Risk Metrics Table**: Integrated `rp.plot_table()` function from riskfolio-lib for comprehensive risk assessment
+  - **Data Integration**: Uses session state `portfolio_returns` and `weights_max_sharpe` for seamless data flow
+  - **DataFrame Conversion**: Automatic conversion of weights dictionary to DataFrame format required by riskfolio-lib
+  - **Matplotlib Integration**: Professional risk analysis table displayed via matplotlib with proper figure sizing (12x8)
+  - **Session State Management**: Stores `weights_max_sharpe` dictionary in session state for cross-tab access
+  - **User Education**: Informational expander explaining risk metrics (VaR, CVaR, Calmar Ratio, Max Drawdown, etc.)
+  - **Error-Free Debugging**: Removed try-except blocks to allow on-screen error display for development
+
+### Changed
+- [2025-08-08] **Portfolio Optimization Tab Structure**: Expanded from 4 to 5 tabs for better analysis organization
+  - **Tab Layout**: Updated tab definition to include Risk Analysis as 5th tab
+  - **Tab Names**: "📈 Efficient Frontier & Weights", "🌳 Hierarchical Risk Parity", "💰 Dollars Allocation", "📊 Report", "📋 Risk Analysis"
+  - **Session State Storage**: Simplified weights storage from Series conversion to direct dictionary storage
+  - **Data Requirements**: Risk Analysis tab validates both `portfolio_returns` and `weights_max_sharpe` availability
+
+### Technical Implementation
+- **Riskfolio Integration**: Uses `rp.plot_table()` with parameters: returns, weights DataFrame, MAR=0, alpha=0.05
+- **Weight Processing**: Converts weights dictionary to DataFrame using `pd.DataFrame.from_dict()` with `orient='index'`
+- **Variable Naming**: Clear variable naming with `weights_max_sharpe_df` for DataFrame representation
+- **Session State Efficiency**: Direct dictionary storage eliminates unnecessary Series intermediate conversion
+- **Error Handling**: Removed try-except blocks for transparent error display during development
+
+### User Experience Improvements
+- **Comprehensive Risk Assessment**: Users can now view detailed risk metrics for Max Sharpe portfolio
+- **Professional Risk Table**: Industry-standard risk analysis table with multiple risk measures
+- **Educational Content**: Detailed explanations of risk metrics for better user understanding
+- **Seamless Integration**: Risk analysis automatically available after portfolio optimization completion
+- **Visual Consistency**: Risk table maintains consistent styling with existing portfolio analysis
+
+### Files Modified
+- `pages/Portfolio_Optimization.py`: Added riskfolio risk analysis tab, session state management, and DataFrame conversion logic
+
 ## [0.2.11] - 2025-08-08
 
 ### Added
