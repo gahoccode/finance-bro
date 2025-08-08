@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.14] - 2025-08-08
 
+### Added
+- [2025-08-08] **Comprehensive QuantStats Custom Metrics Selector**: Implemented advanced custom metrics interface with 75 QuantStats metrics
+  - **Organized Categories**: 7 logical metric categories (Core Performance, Risk Analysis, Return Analysis, Advanced Ratios, Rolling Metrics, Specialized)
+  - **Smart Multi-Select Interface**: Category-based dropdown with intelligent defaults for Core Performance metrics
+  - **Professional Metric Formatting**: Custom `format_metric_name()` function converts snake_case to readable names with special cases (CAGR, VaR, CVaR, etc.)
+  - **Responsive Grid Layout**: User-configurable grid columns (2, 3, or 4 columns) for optimal metric display
+  - **Educational Descriptions**: Optional metric descriptions via `get_metric_descriptions()` with hover help tooltips
+  - **Advanced Calculations**: `calculate_custom_metrics()` function with error handling and appropriate number formatting
+  - **Performance-Based Formatting**: Intelligent formatting based on metric type (percentages, ratios, decimals)
+  - **Session State Integration**: Seamlessly uses existing `st.session_state.stock_returns` data
+  - **User Control Features**: Include descriptions toggle, customizable grid layout, category-based filtering
+
 ### Fixed
 - [2025-08-08] **QuantStats Pandas Compatibility Issue**: Fixed "Invalid frequency: ME" error by downgrading to compatible QuantStats version
   - **Issue**: QuantStats latest versions use pandas 2.0+ frequency aliases (`ME`, `QE`, `YE`) incompatible with pandas 1.5.3
@@ -35,6 +47,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Code Cleanup**: Removed 15 lines of broken pandas compatibility patches and warning suppressions
 
 ### User Experience Improvements
+- **Advanced Metrics Analysis**: Users can select from 75 professional-grade QuantStats metrics organized by category
+- **Customizable Display**: Flexible grid layout and optional descriptions for personalized analytics experience
+- **Intelligent Defaults**: Smart metric preselection for common performance analysis workflows
 - **Reliable Tearsheet Generation**: QuantStats tearsheets now generate without pandas frequency errors
 - **Complete Visualization**: All charts, performance metrics, and analytical plots display correctly in tearsheets
 - **Professional Output**: Full-featured tearsheets with comprehensive portfolio analytics comparable to institutional tools
@@ -42,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Files Modified
 - `requirements.txt`: Added quantstats version pin
-- `pages/Stock_Price_Analysis.py`: Removed compatibility patches, added file path fallback, improved chart rendering
+- `pages/Stock_Price_Analysis.py`: Removed compatibility patches, added file path fallback, improved chart rendering, implemented comprehensive custom metrics selector
 - `CLAUDE.md`: Updated critical dependencies documentation with quantstats compatibility notes
 
 ## [0.2.13] - 2025-08-08
