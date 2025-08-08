@@ -627,8 +627,26 @@ with tab5:
     if 'portfolio_returns' in st.session_state and 'weights_max_sharpe' in st.session_state:
         returns = st.session_state.portfolio_returns
         
+        # Portfolio selection
+        portfolio_choice = st.selectbox(
+            "Select Portfolio for Risk Analysis:",
+            ["Max Sharpe Portfolio", "Min Volatility Portfolio", "Max Utility Portfolio"],
+            help="Choose which optimized portfolio to analyze for risk metrics"
+        )
+        
+        # Get the selected weights
+        if portfolio_choice == "Max Sharpe Portfolio":
+            selected_weights = st.session_state.weights_max_sharpe
+            portfolio_label = "Max Sharpe"
+        elif portfolio_choice == "Min Volatility Portfolio":
+            selected_weights = weights_min_vol
+            portfolio_label = "Min Volatility"
+        else:  # Max Utility Portfolio
+            selected_weights = weights_max_utility
+            portfolio_label = "Max Utility"
+        
         # Convert weights dictionary to DataFrame as required by riskfolio plot_table
-        weights_max_sharpe_df = pd.DataFrame.from_dict(st.session_state.weights_max_sharpe, orient='index', columns=['Weights'])
+        weights_df = pd.DataFrame.from_dict(selected_weights, orient='index', columns=['Weights'])
         
         # Create matplotlib figure for riskfolio plot_table
         fig, ax = plt.subplots(figsize=(12, 8))
@@ -636,7 +654,7 @@ with tab5:
         # Generate risk analysis table using riskfolio-lib
         ax = rp.plot_table(
             returns=returns,
-            w=weights_max_sharpe_df,
+            w=weights_df,
             MAR=0,
             alpha=0.05,
             ax=ax
@@ -647,8 +665,8 @@ with tab5:
         
         # Add informational expander
         with st.expander("📚 Understanding the Risk Analysis Table"):
-            st.markdown("""
-            This table provides comprehensive risk metrics for your Max Sharpe portfolio:
+            st.markdown(f"""
+            This table provides comprehensive risk metrics for your {portfolio_label} portfolio:
             
             **Key Metrics:**
             - **Expected Return**: Annualized expected portfolio return

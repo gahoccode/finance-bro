@@ -33,9 +33,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Error Handling**: Removed try-except blocks for transparent error display during development
 
 ### User Experience Improvements
-- **Comprehensive Risk Assessment**: Users can now view detailed risk metrics for Max Sharpe portfolio
-- **Professional Risk Table**: Industry-standard risk analysis table with multiple risk measures
-- **Educational Content**: Detailed explanations of risk metrics for better user understanding
+- **Multi-Portfolio Risk Analysis**: Users can analyze risk metrics for any portfolio strategy (Max Sharpe, Min Volatility, Max Utility)
+- **Portfolio Selection Interface**: Intuitive dropdown to choose which optimized portfolio to analyze
+- **Professional Risk Table**: Industry-standard risk analysis table with multiple risk measures for selected portfolio
+- **Dynamic Context**: Educational content updates to reflect the selected portfolio (e.g., "your Min Volatility portfolio")
 - **Seamless Integration**: Risk analysis automatically available after portfolio optimization completion
 - **Visual Consistency**: Risk table maintains consistent styling with existing portfolio analysis
 
