@@ -67,3 +67,6 @@ temp_chart.png
 .serena/
 .mcp.json
 prd/
+
+# Tests
+.coverage

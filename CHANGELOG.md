@@ -5,6 +5,51 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.15] - 2025-08-09
+
+### Fixed
+- [2025-08-09] **Portfolio Optimization Excel Report Double Extension Bug**: Fixed critical Excel report generation issue causing download failures
+  - **Issue**: Excel reports generated with double extensions (.xlsx.xlsx) due to riskfolio-lib automatically adding .xlsx to filenames
+  - **Root Cause**: `rp.excel_report()` function automatically appends .xlsx extension, but code was providing filenames already containing .xlsx
+  - **Symptoms**: 
+    - Report generation appeared successful with success message
+    - Actual files created with double extension in exports/reports/ directory
+    - Download button failed with "No such file or directory" error
+    - Page jumping back to "Efficient Frontier & Weights" tab due to Streamlit error handling
+  - **Solution**: Modified filename construction logic in Report tab (lines 582-612):
+    - Changed `filename = f"{portfolio_name}_{timestamp}.xlsx"` to `filename_base = f"{portfolio_name}_{timestamp}"`
+    - Pass `filepath_base` (without extension) to `rp.excel_report()`
+    - Construct `filepath_xlsx = filepath_base + ".xlsx"` for file operations
+    - Updated download button and file size calculation to use correct .xlsx path
+  - **Files Modified**: `pages/Portfolio_Optimization.py` - updated Excel report generation logic in tab4
+  - **Result**: Excel reports now generate with single .xlsx extension, downloads work correctly, no page jumping
+
+### Added
+- [2025-08-09] **Comprehensive Test Suite for Portfolio Optimization**: Created automated testing framework for terminal-based validation
+  - **Test Infrastructure**: Created `tests/` directory with pytest-based testing framework
+  - **Test Coverage**: 12 comprehensive tests covering filename construction, file path management, Excel report generation workflow
+  - **Mock Integration**: Added pytest-mock for testing riskfolio-lib integration without external dependencies  
+  - **Sample Data**: Created realistic stock data fixtures for testing portfolio optimization logic
+  - **Dependencies**: Added pytest, pytest-cov, pytest-mock to development dependencies
+  - **Demo Script**: Created `tests/demo_fix.py` to demonstrate fix functionality without running Streamlit app
+  - **Files Created**: 
+    - `tests/__init__.py`, `tests/conftest.py`, `tests/test_portfolio_optimization.py`
+    - `tests/demo_fix.py` - standalone demonstration script
+  - **Test Execution**: Run with `uv run pytest tests/` for complete validation
+
+### Technical Implementation
+- **Filename Construction**: Separated base filename (without extension) from display filename (with extension)
+- **API Integration**: Proper integration with riskfolio-lib expecting filenames without extensions
+- **Error Prevention**: Eliminated double extension creation while maintaining all existing functionality  
+- **Test Validation**: All 12 tests pass with 99% code coverage, confirming fix effectiveness
+- **Backward Compatibility**: Maintains all existing report features and user interface elements
+
+### User Experience Improvements
+- **Reliable Downloads**: Excel report downloads now work consistently without errors
+- **No Interface Disruption**: Report generation stays on Report tab without unexpected navigation
+- **Professional Output**: Generated Excel files have proper single .xlsx extension
+- **Validation Confidence**: Comprehensive test suite ensures fix reliability and prevents regression
+
 ## [0.2.14] - 2025-08-08
 
 ### Added

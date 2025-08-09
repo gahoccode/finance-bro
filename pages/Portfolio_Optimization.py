@@ -580,11 +580,11 @@ with tab4:
         
         # Create filename with timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{portfolio_name}_{timestamp}.xlsx"
-        filepath = os.path.join(reports_dir, filename)
+        filename_base = f"{portfolio_name}_{timestamp}"
+        filepath_base = os.path.join(reports_dir, filename_base)
         
         # Generate Excel report using riskfolio-lib
-        rp.excel_report(returns=returns, w=selected_weights_df, name=filepath)
+        rp.excel_report(returns=returns, w=selected_weights_df, name=filepath_base)
         
         # Success message and download interface
         st.success(f"✅ Excel report generated successfully!")
@@ -597,18 +597,19 @@ with tab4:
             st.info(f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         
         # File download
-        with open(filepath, "rb") as file:
+        filepath_xlsx = filepath_base + ".xlsx"
+        with open(filepath_xlsx, "rb") as file:
             st.download_button(
                 label="📥 Download Excel Report",
                 data=file.read(),
-                file_name=filename,
+                file_name=filename_base + ".xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 help=f"Download the {portfolio_label} portfolio Excel report"
             )
         
         # Show file details
-        file_size = os.path.getsize(filepath) / 1024  # Size in KB
-        st.caption(f"File: {filename} ({file_size:.1f} KB)")
+        file_size = os.path.getsize(filepath_xlsx) / 1024  # Size in KB
+        st.caption(f"File: {filename_base}.xlsx ({file_size:.1f} KB)")
     
     else:
         st.info("👆 Select a portfolio strategy and click 'Generate Report' to create a comprehensive Excel analysis.")

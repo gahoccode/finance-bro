@@ -139,6 +139,18 @@ Charts are generated via PandasAI and saved to `exports/charts/temp_chart.png`. 
 - Python exact version `3.10.11` required (no newer versions supported)
 - Run `uv sync` after pulling changes to ensure dependency consistency
 
+### Code Style and Architecture Guidelines
+- **Function-first approach**: Prioritize functions over classes for simplicity
+- **Import organization**: Always place imports at the top of files (never inside try-except blocks)
+- **Documentation requirement**: Document changes for every fix or feature before committing
+- **Complex problem solving**: Use sequential thinking for multi-step problems
+
+### Version Management
+- Uses semantic versioning (MAJOR.MINOR.PATCH) starting from 0.1.0 (pyproject.toml)
+- Patch increment only on actual changes (features/fixes/improvements)
+- Date-based versioning with chronological organization
+- No empty increments - skip dates without actual changes
+
 ### Testing and Quality Assurance
 ```bash
 # Run all quality checks before committing
