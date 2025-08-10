@@ -5,6 +5,55 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.19] - 2025-08-10
+
+### Added
+- [2025-08-10] **Triple Filter System for Technical Analysis**: Implemented comprehensive filtering system for heating stocks with data metrics
+  - **Foreign Transaction Filter**: "Foreign Buy > Sell Only" checkbox filters for `foreign_transaction == 'Buy > Sell'`
+  - **Strong Buy Signal Filter**: "Strong Buy Signal Only" checkbox filters for `tcbs_buy_sell_signal == 'Strong buy'`
+  - **Buy Signal Filter**: "Buy Signal Only" checkbox filters for `tcbs_buy_sell_signal == 'Buy'`
+  - **Independent Toggles**: All three filters can be used independently or in combination for precise stock selection
+  - **Dynamic Filter Feedback**: Real-time filter results with stock counts showing progressive filtering effects
+  - **Intelligent Warning Messages**: Context-aware warnings when no stocks match selected filter criteria
+  - **Sequential Filter Logic**: Filters applied in sequence (Foreign → Strong Buy → Buy) with transparent progress tracking
+  - **Smart UI Integration**: All filters integrated in sidebar "📈 Data Filters" section with helpful tooltips
+
+### Added
+- [2025-08-10] **Dual Trading Value Metrics Display**: Added comprehensive trading volume analytics with side-by-side metrics layout
+  - **Average 5-Day Trading Value**: Displays mean of `avg_trading_value_5d` across all filtered heating stocks
+  - **Average Total Trading Value**: Displays mean of `total_trading_value` across all filtered heating stocks
+  - **Raw Value Display**: Shows actual trading values with comma formatting (no conversion to billions)
+  - **Dynamic Updates**: Both metrics automatically recalculate when filters are applied/removed
+  - **Responsive Layout**: Two-column layout (`st.columns(2)`) for optimal space utilization
+  - **Error Handling**: Shows "N/A" for missing or invalid data with column existence validation
+  - **Filter Responsive**: Trading metrics reflect only the stocks that match current filter criteria
+
+### Changed
+- [2025-08-10] **DataFrame Display Enhancement**: Removed index column from heating stocks DataFrame for cleaner presentation
+  - **Clean Display**: Added `hide_index=True` parameter to `st.dataframe()` for heating stocks summary table
+  - **Focus on Data**: Eliminates distracting row numbers to focus attention on actual stock information
+  - **Consistent Styling**: Maintains full width (`use_container_width=True`) and fixed height (`height=300`) for optimal viewing
+
+### Technical Implementation
+- **Filter Architecture**: Simple string comparison filters with boolean masking for optimal performance
+  - `heating_stocks['foreign_transaction'] == 'Buy > Sell'` for foreign investor filter
+  - `heating_stocks['tcbs_buy_sell_signal'] == 'Strong buy'` for TCBS strong buy filter  
+  - `heating_stocks['tcbs_buy_sell_signal'] == 'Buy'` for TCBS buy filter
+- **Progressive Filtering**: Each filter operates on the results of previous filters with count tracking at each stage
+- **User Feedback System**: Comprehensive messaging system showing active filters and stock counts
+- **Session State Integration**: Filter states persist across page interactions using Streamlit session state
+- **Trading Metrics Calculation**: Uses pandas `.mean()` with null value handling and comma formatting
+
+### User Experience Improvements
+- **Precision Filtering**: Users can find exact stocks matching their investment criteria using multiple filter combinations
+- **Visual Feedback**: Clear indication of how many stocks match each filter combination with original stock count reference
+- **Professional Interface**: Clean, institutional-grade filtering system with professional tooltips and descriptions
+- **Trading Volume Insights**: Immediate understanding of average trading liquidity across filtered stock selections
+- **Streamlined Display**: Clean DataFrame presentation focuses attention on stock data rather than technical details
+
+### Files Modified
+- `pages/Technical_Analysis.py`: Added triple filter system, trading value metrics, and DataFrame display enhancements with comprehensive filter logic and UI improvements
+
 ## [0.2.18] - 2025-08-10
 
 ### Fixed

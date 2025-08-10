@@ -440,6 +440,26 @@ def main():
         if "ta_interval" not in st.session_state:
             st.session_state.ta_interval = "1D"
 
+        # Foreign Transaction Filter
+        st.subheader("📈 Data Filters")
+        show_foreign_buy_only = st.checkbox(
+            "Foreign Buy > Sell Only", 
+            value=False,
+            help="Filter stocks where foreign investors are net buyers (Buy > Sell)"
+        )
+        
+        show_strong_buy_only = st.checkbox(
+            "Strong Buy Signal Only",
+            value=False,
+            help="Filter stocks with TCBS Strong Buy recommendation"
+        )
+        
+        show_buy_only = st.checkbox(
+            "Buy Signal Only",
+            value=False,
+            help="Filter stocks with TCBS Buy recommendation"
+        )
+
         # Add a button to clear cache if needed
         if st.button("🔄 Refresh Data", help="Clear cached data and reload"):
             st.cache_data.clear()
@@ -459,12 +479,88 @@ def main():
         )
         st.stop()
 
+    # Apply filters if enabled
+    original_count = len(heating_stocks)
+    filter_messages = []
+    
+    # Foreign transaction filter
+    if show_foreign_buy_only and 'foreign_transaction' in heating_stocks.columns:
+        foreign_buy_mask = heating_stocks['foreign_transaction'] == 'Buy > Sell'
+        heating_stocks = heating_stocks[foreign_buy_mask].copy()
+        filtered_count = len(heating_stocks)
+        if filtered_count < original_count:
+            filter_messages.append(f"Foreign Buy > Sell: {filtered_count} stocks")
+    
+    # TCBS Strong Buy filter
+    if show_strong_buy_only and 'tcbs_buy_sell_signal' in heating_stocks.columns:
+        before_strong_buy = len(heating_stocks)
+        strong_buy_mask = heating_stocks['tcbs_buy_sell_signal'] == 'Strong buy'
+        heating_stocks = heating_stocks[strong_buy_mask].copy()
+        final_count = len(heating_stocks)
+        if final_count < before_strong_buy or not filter_messages:
+            filter_messages.append(f"Strong Buy Signal: {final_count} stocks")
+    
+    # TCBS Buy filter
+    if show_buy_only and 'tcbs_buy_sell_signal' in heating_stocks.columns:
+        before_buy = len(heating_stocks)
+        buy_mask = heating_stocks['tcbs_buy_sell_signal'] == 'Buy'
+        heating_stocks = heating_stocks[buy_mask].copy()
+        final_count = len(heating_stocks)
+        if final_count < before_buy or not filter_messages:
+            filter_messages.append(f"Buy Signal: {final_count} stocks")
+    
+    # Show combined filter results
+    if filter_messages:
+        st.info(f"📊 **Filters Applied**: {' | '.join(filter_messages)} (from {original_count} original stocks)")
+    
+    # Check if any stocks remain after filtering
+    if heating_stocks.empty:
+        if show_foreign_buy_only or show_strong_buy_only or show_buy_only:
+            active_filters = []
+            if show_foreign_buy_only:
+                active_filters.append("Foreign Buy > Sell")
+            if show_strong_buy_only:
+                active_filters.append("Strong Buy Signal")
+            if show_buy_only:
+                active_filters.append("Buy Signal")
+            st.warning(f"🔍 No heating stocks found matching: {' + '.join(active_filters)}. Try disabling some filters.")
+        else:
+            st.info("🔥 No stocks showing 'Overheated in previous trading session' signal today.")
+        st.stop()
+
     # Display results summary
     st.success(f"🔥 Found **{len(heating_stocks)}** stocks with heating up signals!")
+    
+    # Display trading value metrics
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if 'avg_trading_value_5d' in heating_stocks.columns:
+            mean_trading_value = heating_stocks['avg_trading_value_5d'].mean()
+            if not pd.isna(mean_trading_value):
+                st.metric(
+                    "📊 Average 5-Day Trading Value", 
+                    f"{mean_trading_value:,.0f}",
+                    help="Mean of avg_trading_value_5d across all filtered heating stocks"
+                )
+            else:
+                st.metric("📊 Average 5-Day Trading Value", "N/A")
+    
+    with col2:
+        if 'total_trading_value' in heating_stocks.columns:
+            mean_total_trading_value = heating_stocks['total_trading_value'].mean()
+            if not pd.isna(mean_total_trading_value):
+                st.metric(
+                    "📈 Average Total Trading Value", 
+                    f"{mean_total_trading_value:,.0f}",
+                    help="Mean of total_trading_value across all filtered heating stocks"
+                )
+            else:
+                st.metric("📈 Average Total Trading Value", "N/A")
 
     # Display the heating stocks DataFrame
     st.subheader("📋 Heating Up Stocks Summary")
-    st.dataframe(heating_stocks, use_container_width=True, height=300)
+    st.dataframe(heating_stocks, use_container_width=True, height=300, hide_index=True)
 
     # Technical indicators summary
     st.subheader("📊 Technical Indicators Summary")
