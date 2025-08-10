@@ -7,7 +7,7 @@
 - 📊 **Vietnamese Stock Data** - Load financial data using Vnstock (VCI/TCBS sources)
 - 🤖 **AI Chat Interface** - Natural language queries about financial metrics with PandasAI integration
 - 💬 **Interactive Analysis** - Real-time conversation with AI analyst including file upload support
-- 📈 **Advanced Technical Analysis** - Interactive price charts with 75+ QuantStats metrics and professional tearsheets
+- 📈 **Advanced Technical Analysis** - Interactive price charts with 75+ QuantStats metrics, professional tearsheets, and comprehensive technical indicators (RSI, MACD, Bollinger Bands, OBV, ADX) with robust error handling
 - 🎯 **Intelligent Stock Screener** - Multi-criteria filtering with 6 advanced filters (Beta, Alpha, Financial Health, etc.)
 - 💼 **Portfolio Optimization** - Modern Portfolio Theory, Hierarchical Risk Parity, and risk analysis with riskfolio-lib
 - 🏢 **Comprehensive Company Analysis** - Ownership structure, management team, subsidiaries, and foreign transaction analysis
@@ -122,6 +122,7 @@ streamlit run app.py
 ### Step 3: Explore Other Analysis Tools
 7. **🚀 Navigate to Other Pages**: Now you can efficiently use other analysis tools:
    - **📈 Price Analysis**: Interactive price charts with 75+ QuantStats metrics and professional tearsheets
+   - **📊 Technical Analysis**: Advanced technical indicators with heating stock discovery and robust error handling
    - **🏢 Company Overview**: Company profile with ownership structure, management team, subsidiaries, and foreign transaction analysis
    - **💼 Portfolio Optimization**: Modern Portfolio Theory, Hierarchical Risk Parity, and comprehensive risk analysis
    - **🎯 Stock Screener**: Multi-criteria stock filtering with advanced metrics (Beta, Alpha, Financial Health) and quick presets
@@ -162,6 +163,65 @@ streamlit run app.py
 - "What is the company's debt-to-equity ratio?"
 - "Compare revenue growth across years"
 - "What are the key financial strengths and weaknesses?"
+
+## 📊 Technical Analysis Features
+
+**Finance Bro** includes a comprehensive Technical Analysis page that automatically discovers and analyzes "heating up" stocks from the Vietnamese market using advanced technical indicators.
+
+### Key Features
+
+**🔥 Automatic Stock Discovery**
+- Scans entire Vietnamese stock market (HOSE, HNX, UPCOM exchanges)
+- Identifies stocks with "Overheated in previous trading session" signals
+- Displays comprehensive market data including industry, market cap, and trading metrics
+
+**📈 Advanced Technical Indicators**
+- **RSI (Relative Strength Index)**: Momentum oscillator for overbought/oversold conditions
+- **MACD (Moving Average Convergence Divergence)**: Trend-following momentum indicator
+- **Bollinger Bands**: Volatility bands for price channel analysis
+- **OBV (On-Balance Volume)**: Volume flow indicator for price movement validation
+- **ADX (Average Directional Index)**: Trend strength measurement
+
+**🎯 Interactive Candlestick Charts**
+- Professional mplfinance integration with custom Finance Bro theme
+- Multi-panel layouts with synchronized indicators
+- Configurable time intervals (Daily, Weekly, Monthly)
+- Earth-toned color scheme for professional analysis
+
+**⚙️ Robust Error Handling**
+- Comprehensive pandas-ta integration with graceful error recovery
+- Individual indicator validation with specific failure explanations
+- Enhanced data validation for optimal ADX calculation (30+ data points required)
+- Transparent warning system explaining exactly why indicators might fail
+- Optimized date ranges (90 days for daily analysis) for reliable calculations
+
+### Technical Implementation Highlights
+
+**Production-Ready Error Handling**
+- Fixed `TypeError: 'NoneType' object is not subscriptable` from pandas-ta None returns
+- Resolved `ValueError: zero-size array to reduction operation maximum` in ADX calculations
+- Safe chart creation with fallback mechanisms for partial indicator availability
+- Professional user feedback with success/failure indicator reporting
+
+**Performance Optimizations**
+- Intelligent data validation before indicator calculation
+- Graceful degradation when indicators fail while maintaining core functionality
+- Date range optimization for sufficient technical analysis data
+- Cached indicator calculations with TTL for better performance
+
+### Usage Notes
+
+**Data Requirements**
+- Minimum 20 data points required for most indicators
+- ADX requires 30+ data points for reliable calculation
+- Daily interval provides 90 days of data for comprehensive analysis
+- Weekly and monthly intervals provide extended historical coverage
+
+**Error Recovery**
+- App continues functioning with available indicators if some calculations fail
+- Clear warnings explain specific reasons for any indicator failures
+- Comprehensive fallback system maintains professional user experience
+- All error handling designed for production stability
 
 ## ⚠️ Critical: Package Compatibility
 
@@ -212,6 +272,7 @@ streamlit run app.py
 - **Financial Analysis:** QuantStats v0.0.59 (75+ performance metrics and tearsheets)
 - **Portfolio Optimization:** PyPortfolioOpt (Modern Portfolio Theory, Efficient Frontier)
 - **Risk Analysis:** riskfolio-lib v5.0.1+ (Hierarchical Risk Parity, advanced risk metrics)
+- **Technical Analysis:** pandas-ta for 150+ technical indicators with robust error handling
 - **Visualizations:** Altair v5.5.0+, Bokeh v2.4.3, mplfinance for interactive charts
 - **Authentication:** Authlib v1.3.2+ for Google OAuth integration
 
@@ -341,7 +402,8 @@ finance-bro/
 ├── app.py                     # Main entry point with auth & navigation
 ├── pages/                     # Multi-page Streamlit application
 │   ├── bro.py                # Main AI chat interface (Stock Analysis)
-│   ├── Stock_Price_Analysis.py  # Technical analysis & QuantStats
+│   ├── Stock_Price_Analysis.py  # Price charts & QuantStats tearsheets
+│   ├── Technical_Analysis.py # Advanced technical indicators with heating stocks
 │   ├── Company_Overview.py   # Company profiles & ownership
 │   ├── Portfolio_Optimization.py # Modern Portfolio Theory & HRP
 │   └── Screener.py           # Stock screening & filtering

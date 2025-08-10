@@ -684,6 +684,7 @@ dependencies = [
     { name = "numpy" },
     { name = "openai" },
     { name = "pandas" },
+    { name = "pandas-ta" },
     { name = "pandasai" },
     { name = "pyportfolioopt" },
     { name = "python-dotenv" },
@@ -722,6 +723,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=1.26.4,<2.0.0" },
     { name = "openai", specifier = ">=1.61.0" },
     { name = "pandas", specifier = "==1.5.3" },
+    { name = "pandas-ta", specifier = ">=0.3.14b0" },
     { name = "pandasai", specifier = "==2.3.0" },
     { name = "pyportfolioopt", specifier = ">=1.5.6" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "==8.3.2" },
@@ -1607,6 +1609,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/49/e2/79e46612dc25ebc7603dc11c560baa7266c90f9e48537ecf1a02a0dd6bff/pandas-1.5.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7a0a56cef15fd1586726dace5616db75ebcfec9179a3a55e78f72c5639fa2a23", size = 12062104, upload-time = "2023-01-19T08:29:30.695Z" },
     { url = "https://files.pythonhosted.org/packages/d9/cd/f27c2992cbe05a3e39937f73a4be635a9ec149ec3ca4467d8cf039718994/pandas-1.5.3-cp310-cp310-win_amd64.whl", hash = "sha256:478ff646ca42b20376e4ed3fa2e8d7341e8a63105586efe54fa2508ee087f328", size = 10362473, upload-time = "2023-01-19T08:29:37.506Z" },
 ]
+
+[[package]]
+name = "pandas-ta"
+version = "0.3.14b0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pandas" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f7/0b/1666f0a185d4f08215f53cc088122a73c92421447b04028f0464fabe1ce6/pandas_ta-0.3.14b.tar.gz", hash = "sha256:0fa35aec831d2815ea30b871688a8d20a76b288a7be2d26cc00c35cd8c09a993", size = 115089, upload-time = "2021-07-28T20:51:17.456Z" }
 
 [[package]]
 name = "pandasai"

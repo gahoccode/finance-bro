@@ -5,6 +5,28 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.18] - 2025-08-10
+
+### Fixed
+- [2025-08-10] **Technical Analysis TypeError and ValueError Fixes**: Comprehensive error handling implementation for pandas-ta integration
+  - **Primary Issue**: `TypeError: 'NoneType' object is not subscriptable` when pandas-ta functions returned None instead of DataFrames
+  - **Secondary Issue**: `ValueError: zero-size array to reduction operation maximum` when turning on ADX indicator
+  - **Root Causes**: 
+    - pandas-ta functions returning None for insufficient data, then code attempting subscript access
+    - ADX calculation requiring more data than other indicators (30+ points vs 14-20)
+    - Daily interval (1D) only providing 30 days of data, insufficient for reliable ADX calculation
+  - **Solution Implementation**:
+    - **Enhanced `calculate_indicators()` function**: Individual None checks for all 5 indicators (RSI, MACD, Bollinger Bands, OBV, ADX)
+    - **Specific ADX Validation**: Minimum 30 data points, High/Low consistency checks, sufficient price variation validation
+    - **Safe Chart Creation**: Protected `create_technical_chart()` with comprehensive indicator validation
+    - **Protected Display Sections**: Safe metric display with "N/A" values and explanatory captions instead of crashes
+    - **Optimized Date Ranges**: Daily (1D) increased from 30 to 90 days for sufficient ADX calculation data
+    - **Transparent Error Handling**: Clear warning messages explaining why indicators failed with specific reasons
+  - **Files Modified**: 
+    - `pages/Technical_Analysis.py` - comprehensive error handling for all indicators and chart creation
+  - **User Experience**: Graceful degradation with clear feedback, app continues working with available indicators
+  - **Technical Result**: Production-ready Technical Analysis page with robust pandas-ta integration
+
 ## [0.2.17] - 2025-08-10
 
 ### Added

@@ -23,6 +23,7 @@ dependencies = [
     "Authlib>=1.3.2",
     "riskfolio-lib>=5.0.1",
     "quantstats==0.0.59",
+    "pandas-ta>=0.3.14b0",
 ]
 
 [project.optional-dependencies]
