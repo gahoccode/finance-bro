@@ -5,6 +5,66 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.16] - 2025-08-10
+
+### Fixed
+- [2025-08-10] **Portfolio Strategy Consistency Issue**: Fixed confusing UX where users had to repeatedly select portfolio strategies across 3 different tabs
+  - **Issue**: Users encountered 3 separate portfolio selection widgets (Tab 3, Tab 4, Tab 5) causing confusion and inconsistent analysis
+  - **Root Cause**: Each analysis tab (Dollar Allocation, Report, Risk Analysis) had independent strategy selection widgets
+  - **Solution**: Implemented two-level single source of truth hierarchy:
+    - **Level 1**: Sidebar multiselect for symbol selection (already perfect)
+    - **Level 2**: Tab 4 (Report) radio button as master control for portfolio strategy selection
+  - **Implementation Changes**:
+    - **Tab 4 Enhancement** (lines 550-559): Enhanced radio button as master control center with session state storage
+    - **Tab 3 Refactor** (lines 462-472): Removed selectbox, reads strategy from session state with user guidance
+    - **Tab 5 Refactor** (lines 646-656): Removed selectbox, reads strategy from session state with user guidance
+  - **User Guidance**: Added informational messages directing users to Report tab for strategy selection
+  - **Session State Integration**: `st.session_state.portfolio_strategy_choice` provides consistent strategy across all tabs
+  - **Files Modified**: `pages/Portfolio_Optimization.py` - updated portfolio strategy selection logic across all three tabs
+  - **Result**: Single strategy selection workflow eliminates confusion and ensures consistent analysis across all tabs
+
+### Changed
+- [2025-08-10] **Portfolio Analysis Workflow Enhancement**: Streamlined user experience with clear hierarchy and guidance
+  - **Two-Level Hierarchy**: **symbols → strategy → analysis** creates logical progression through portfolio optimization
+  - **Master Control**: Tab 4 (Report) serves as strategy selection hub for all strategy-dependent analysis tabs
+  - **User Navigation**: Clear guidance messages help users understand the selection flow and current strategy
+  - **Consistent Analysis**: All tabs (Dollar Allocation, Report, Risk Analysis) use identical portfolio strategy ensuring comparable results
+  - **Session Persistence**: Strategy selection persists across tab navigation maintaining user context
+
+### Session State Architecture Enhancement
+Finance Bro's comprehensive session state management enables seamless data sharing and persistence across all pages and tabs:
+
+**New Portfolio Strategy Variable**
+- **Added**: `st.session_state.portfolio_strategy_choice` - Master control for portfolio strategy selection across all analysis tabs
+- **Scope**: Shared between Tab 3 (Dollar Allocation), Tab 4 (Report), and Tab 5 (Risk Analysis)
+- **Pattern**: Master-slave architecture where Tab 4 writes, other tabs read from session state
+
+**Existing Session State Variables Used**
+- `st.session_state.stock_symbol` - Current stock symbol shared across all pages
+- `st.session_state.portfolio_returns` - Stock returns data shared across portfolio tabs  
+- `st.session_state.weights_max_sharpe` - Max Sharpe portfolio weights
+- `st.session_state.weights_min_vol` - Min Volatility portfolio weights
+- `st.session_state.weights_max_utility` - Max Utility portfolio weights
+
+**Cross-Tab Communication Pattern**
+- **Master Control**: Tab 4 radio button stores selection in `st.session_state.portfolio_strategy_choice`
+- **Slave Tabs**: Tab 3 and Tab 5 read strategy from session state instead of having independent widgets
+- **Fallback Logic**: Default to "Max Sharpe Portfolio" when session state unavailable
+- **User Guidance**: Clear messages directing users to Report tab for strategy selection
+
+### Technical Implementation
+- **Session State Management**: Centralized portfolio strategy storage in `st.session_state.portfolio_strategy_choice`
+- **User Interface**: Enhanced radio button with help text explaining master control functionality
+- **Code Cleanup**: Removed redundant selection widgets while maintaining all existing functionality
+- **State Persistence**: Strategy selection persists across tab navigation and page refreshes
+
+### User Experience Improvements
+- **Elimination of Confusion**: Single strategy selection point removes need to remember and synchronize choices across tabs
+- **Clear Information Flow**: Logical progression from symbol selection to strategy selection to analysis results
+- **Reduced Cognitive Load**: Users focus on analysis rather than managing multiple selection interfaces
+- **Consistent Results**: All analysis tabs guaranteed to use same strategy ensuring meaningful comparisons
+- **Professional Workflow**: Streamlined interface matches institutional portfolio analysis tools
+
 ## [0.2.15] - 2025-08-09
 
 ### Fixed

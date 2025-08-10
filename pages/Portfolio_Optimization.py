@@ -459,12 +459,16 @@ with tab3:
         help="Enter your total portfolio value in Vietnamese Dong (VND)"
     )
     
-    # Portfolio selection
-    portfolio_choice = st.selectbox(
-        "Select Portfolio Strategy",
-        ["Max Sharpe Portfolio", "Min Volatility Portfolio", "Max Utility Portfolio"],
-        help="Choose which optimized portfolio weights to use for allocation"
-    )
+    # Get portfolio strategy from session state (set in Tab 4)
+    if 'portfolio_strategy_choice' in st.session_state:
+        portfolio_choice = st.session_state.portfolio_strategy_choice
+    else:
+        portfolio_choice = "Max Sharpe Portfolio"  # Default fallback
+        st.info("💡 Go to the **Report** tab to select portfolio strategy for all analysis tabs")
+    
+    # Display current selection for user awareness
+    symbol_display = ', '.join(symbols[:3]) + ('...' if len(symbols) > 3 else '')
+    st.info(f"📊 **Using Strategy**: {portfolio_choice} | **Symbols**: {symbol_display}")
     
     # Get the selected weights
     if portfolio_choice == "Max Sharpe Portfolio":
@@ -547,12 +551,19 @@ with tab4:
     st.subheader("Portfolio Excel Report Generator")
     st.write("Generate comprehensive Excel reports for your optimized portfolios using Riskfolio-lib.")
     
-    # Portfolio selection
+    # Portfolio selection - Master control for all strategy-dependent tabs
     portfolio_choice = st.radio(
-        "Select Portfolio Strategy for Report:",
+        "Select Portfolio Strategy for All Tabs:",
         ["Max Sharpe Portfolio", "Min Volatility Portfolio", "Max Utility Portfolio"],
-        help="Choose which optimized portfolio to generate a detailed Excel report for"
+        help="This selection applies to Dollar Allocation, Report, and Risk Analysis tabs",
+        key="portfolio_strategy_master"
     )
+    
+    # Store in session state for other tabs to access
+    st.session_state.portfolio_strategy_choice = portfolio_choice
+    
+    # Display info about master control
+    st.info(f"📊 **Current Strategy**: {portfolio_choice} (applies to all analysis tabs)")
     
     # Generate report button
     if st.button("Generate Report", key="generate_excel_report"):
@@ -632,12 +643,16 @@ with tab5:
     if 'portfolio_returns' in st.session_state and 'weights_max_sharpe' in st.session_state:
         returns = st.session_state.portfolio_returns
         
-        # Portfolio selection
-        portfolio_choice = st.selectbox(
-            "Select Portfolio for Risk Analysis:",
-            ["Max Sharpe Portfolio", "Min Volatility Portfolio", "Max Utility Portfolio"],
-            help="Choose which optimized portfolio to analyze for risk metrics"
-        )
+        # Get portfolio strategy from session state (set in Tab 4)
+        if 'portfolio_strategy_choice' in st.session_state:
+            portfolio_choice = st.session_state.portfolio_strategy_choice
+        else:
+            portfolio_choice = "Max Sharpe Portfolio"  # Default fallback
+            st.info("💡 Go to the **Report** tab to select portfolio strategy for all analysis tabs")
+        
+        # Display current selection for user awareness
+        symbol_display = ', '.join(symbols[:3]) + ('...' if len(symbols) > 3 else '')
+        st.info(f"📊 **Analyzing Strategy**: {portfolio_choice} | **Symbols**: {symbol_display}")
         
         # Get the selected weights
         if portfolio_choice == "Max Sharpe Portfolio":

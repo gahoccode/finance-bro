@@ -237,6 +237,95 @@ dependencies = [
 - **Testing Required**: Full regression testing needed before migration
 - **Compatibility**: Verify vnstock integration with new pandas versions
 
+## Session State Management
+
+Finance Bro uses Streamlit's `st.session_state` for comprehensive data sharing and persistence across pages. This ensures a seamless user experience where data, settings, and user interactions are maintained throughout the session.
+
+### Global Session State Variables
+
+**Authentication & API**
+- `api_key` - OpenAI API key for AI functionality
+- `stock_symbol` - Currently selected stock symbol (shared across all pages)
+
+**Data Caching & Performance**
+- `stock_symbols_list` - Cached list of all available Vietnamese stock symbols
+- `symbols_df` - Full DataFrame with stock symbols and company names for performance
+- `last_period` - Previously selected period (year/quarter) for change detection
+
+### Page-Specific Session State Variables
+
+#### Stock Analysis Page (bro.py)
+**Data Storage**
+- `dataframes` - AI-optimized financial dataframes with Quarter column names for better PandasAI queries
+- `display_dataframes` - Original financial dataframes with lengthReport for proper display formatting
+- `uploaded_dataframes` - User-uploaded CSV/Excel files for AI analysis
+- `messages` - Chat message history for conversation continuity
+
+**AI Agent Management**
+- `agent` - PandasAI agent instance for financial analysis
+- `agent_key` - Cache key for intelligent agent recreation when data changes
+- `pending_question` - Queued question from sidebar for processing
+
+#### Stock Price Analysis Page
+**Price & Returns Data**
+- `stock_price_data` - Historical stock price data with caching
+- `stock_returns` - Calculated stock returns for QuantStats analysis
+
+#### Portfolio Optimization Page
+**Portfolio Data**
+- `portfolio_returns` - Stock returns data shared across all portfolio tabs
+- `weights_max_sharpe` - Max Sharpe portfolio weights for cross-tab sharing
+- `weights_min_vol` - Min Volatility portfolio weights
+- `weights_max_utility` - Max Utility portfolio weights
+
+**Portfolio Strategy Selection**
+- `portfolio_strategy_choice` - Master control for portfolio strategy selection across all tabs (new in v0.2.16)
+
+#### Screener Page
+**Screening Data**
+- `screener_data` - Filtered stock results from screening criteria
+
+**Filter Presets (Dynamic Keys)**
+- `preset_industries` - Selected industries for quick filter presets
+- `preset_market_cap` - Market cap filter preset activation
+- `preset_roe` - ROE filter preset activation
+- `preset_roa` - ROA filter preset activation
+- `preset_dividend` - Dividend yield filter preset activation
+- `preset_beta` - Beta risk filter preset activation
+- `preset_financial_health` - Financial health filter preset activation
+- `preset_stock_rating` - Stock rating filter preset activation
+- `auto_run_screener` - Automatic screener execution trigger
+
+### Session State Architecture Benefits
+
+**Data Consistency**
+- Single source of truth for stock symbol selection across all pages
+- Portfolio strategy selection shared between Dollar Allocation, Report, and Risk Analysis tabs
+- Financial data loaded once and reused across different analysis tools
+
+**Performance Optimization**
+- Stock symbols loaded once in Stock Analysis page and cached for entire session
+- Financial dataframes cached to avoid repeated API calls
+- Agent recreation only when data actually changes
+
+**User Experience**
+- Seamless navigation between pages without data loss
+- Chat history persistence during analysis sessions
+- Filter presets remember user preferences across screening sessions
+
+**Memory Management**
+- Intelligent caching with change detection to prevent unnecessary data reloading
+- Cleanup mechanisms for dynamic preset keys to prevent memory bloat
+
+### Session State Flow
+
+1. **App Entry (app.py)**: Loads API key, stock symbols list, and handles symbol selection
+2. **Stock Analysis (bro.py)**: Creates comprehensive data cache and AI agent
+3. **Other Pages**: Access shared data from session state for analysis
+4. **Cross-Page Navigation**: All data persists seamlessly across page switches
+
+This architecture ensures optimal performance while maintaining a professional user experience comparable to institutional financial analysis tools.
+
 ## Project Structure
 
 ```

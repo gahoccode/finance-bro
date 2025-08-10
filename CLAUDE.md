@@ -142,8 +142,15 @@ Charts are generated via PandasAI and saved to `exports/charts/temp_chart.png`. 
 ### Code Style and Architecture Guidelines
 - **Function-first approach**: Prioritize functions over classes for simplicity
 - **Import organization**: Always place imports at the top of files (never inside try-except blocks)
+- **Try-except blocks**: Don't attempt to use try-except blocks when implementing new features on first try, add try-except blocks after the feature is implemented and has passed all tests, if bugs occur, add try-except blocks to fix the bug
 - **Documentation requirement**: Document changes for every fix or feature before committing
 - **Complex problem solving**: Use sequential thinking for multi-step problems
+
+**NO Conditional Imports**: 
+  - Never use try/except blocks for imports of required packages
+  - If a package is in pyproject.toml, import it directly at the top of the file
+  - Handle specific errors during usage, not during import
+ 
 
 ### Version Management
 - Uses semantic versioning (MAJOR.MINOR.PATCH) starting from 0.1.0 (pyproject.toml)
