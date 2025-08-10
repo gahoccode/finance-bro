@@ -5,6 +5,24 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.17] - 2025-08-10
+
+### Added
+- [2025-08-10] **Single Source of Truth for Date Consistency**: Implemented centralized date management across all analysis pages
+  - **Issue**: Inconsistent date defaults between Stock Price Analysis (hardcoded 2024-12-31) and Portfolio Optimization (today-1)
+  - **Root Cause**: Each page had independent date selection with different default values, causing data inconsistency
+  - **Solution**: Centralized date management in session state with synchronized sidebar date selection
+  - **Implementation Changes**:
+    - **Global Date Session State**: Added `analysis_start_date`, `analysis_end_date`, and `date_range_changed` variables
+    - **Standardized today-1 Default**: All pages now use `pd.to_datetime("today") - pd.Timedelta(days=1)` as end_date default
+    - **Smart Cache Invalidation**: Automatic cache refresh when date ranges change to ensure data consistency
+    - **Synchronized Sidebar Selection**: Date changes in any page automatically apply to all analysis pages
+  - **Files Modified**: 
+    - `pages/Stock_Price_Analysis.py` - replaced hardcoded dates with session state management
+    - `pages/Portfolio_Optimization.py` - connected existing date inputs to session state
+    - `README.md` - documented new date-related session state variables
+  - **Result**: Consistent date ranges across all pages ensure comparable analysis and eliminate data mismatch issues
+
 ## [0.2.16] - 2025-08-10
 
 ### Fixed

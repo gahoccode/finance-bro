@@ -61,21 +61,37 @@ symbols = st.sidebar.multiselect(
     help="Select multiple stock symbols for portfolio optimization (main symbol included by default)"
 )
 
-# Date range inputs
+# Initialize global date session state variables (if not already set)
+if 'analysis_start_date' not in st.session_state:
+    st.session_state.analysis_start_date = pd.to_datetime('2024-01-01')
+
+if 'analysis_end_date' not in st.session_state:
+    st.session_state.analysis_end_date = pd.to_datetime("today") - pd.Timedelta(days=1)
+
+if 'date_range_changed' not in st.session_state:
+    st.session_state.date_range_changed = False
+
+# Date range inputs connected to session state
 col1, col2 = st.sidebar.columns(2)
 with col1:
     start_date = st.date_input(
         "Start Date",
-        value=pd.to_datetime("2024-01-01"),
+        value=st.session_state.analysis_start_date,
         max_value=pd.to_datetime("today")
     )
 
 with col2:
     end_date = st.date_input(
         "End Date", 
-        value=pd.to_datetime("today") - pd.Timedelta(days=1), # Default to yesterday
+        value=st.session_state.analysis_end_date,
         max_value=pd.to_datetime("today")
     )
+
+# Update session state and detect changes
+if start_date != st.session_state.analysis_start_date or end_date != st.session_state.analysis_end_date:
+    st.session_state.analysis_start_date = start_date
+    st.session_state.analysis_end_date = end_date
+    st.session_state.date_range_changed = True
 
 # Risk parameters
 
@@ -100,9 +116,9 @@ colormap = st.sidebar.selectbox(
 # Interval selection
 interval = '1D'
 
-# Convert dates to strings
-start_date_str = start_date.strftime('%Y-%m-%d')
-end_date_str = end_date.strftime('%Y-%m-%d')
+# Convert session state dates to strings for API calls
+start_date_str = st.session_state.analysis_start_date.strftime('%Y-%m-%d')
+end_date_str = st.session_state.analysis_end_date.strftime('%Y-%m-%d')
 
 # Main title
 st.title("Stock Portfolio Optimization")
@@ -113,7 +129,7 @@ if len(symbols) < 2:
     st.error("Please enter at least 2 ticker symbols.")
     st.stop()
 
-if start_date >= end_date:
+if st.session_state.analysis_start_date >= st.session_state.analysis_end_date:
     st.error("Start date must be before end date.")
     st.stop()
 
@@ -149,6 +165,12 @@ def fetch_stock_data(symbols, start_date_str, end_date_str, interval):
 
 # Fetch historical data with caching
 status_text.text("Fetching historical data...")
+
+# Clear cache if date range changed
+if st.session_state.date_range_changed:
+    st.cache_data.clear()
+    st.session_state.date_range_changed = False
+
 all_historical_data = fetch_stock_data(symbols, start_date_str, end_date_str, interval)
 
 progress_bar.empty()

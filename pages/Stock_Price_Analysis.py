@@ -30,12 +30,43 @@ else:
 
 st.title("Stock Price Analysis")
 
+# Initialize global date session state variables
+if 'analysis_start_date' not in st.session_state:
+    st.session_state.analysis_start_date = pd.to_datetime('2024-01-01')
+
+if 'analysis_end_date' not in st.session_state:
+    st.session_state.analysis_end_date = pd.to_datetime("today") - pd.Timedelta(days=1)
+
+if 'date_range_changed' not in st.session_state:
+    st.session_state.date_range_changed = False
+
 # Sidebar for user inputs
 with st.sidebar:
     st.header("Settings")
     st.metric("Current Symbol", ticker)
-    start_date = st.date_input("Start Date:", value=pd.to_datetime('2024-01-01'))
-    end_date = st.date_input("End Date:", value=pd.to_datetime('2024-12-31'))
+    
+    # Date range inputs connected to session state
+    start_date = st.date_input(
+        "Start Date:", 
+        value=st.session_state.analysis_start_date,
+        max_value=pd.to_datetime("today")
+    )
+    end_date = st.date_input(
+        "End Date:", 
+        value=st.session_state.analysis_end_date,
+        max_value=pd.to_datetime("today")
+    )
+    
+    # Update session state and detect changes
+    if start_date != st.session_state.analysis_start_date or end_date != st.session_state.analysis_end_date:
+        st.session_state.analysis_start_date = start_date
+        st.session_state.analysis_end_date = end_date
+        st.session_state.date_range_changed = True
+    
+    # Validate date range
+    if start_date >= end_date:
+        st.error("Start date must be before end date.")
+        st.stop()
     
     # Chart type selector
     chart_type = st.selectbox(
@@ -236,8 +267,13 @@ def fetch_stock_data(ticker, start_date, end_date):
 if ticker:
     try:
         with st.spinner(f"Loading data for {ticker}..."):
-            # Fetch cached stock data
-            stock_price = fetch_stock_data(ticker, start_date, end_date)
+            # Clear cache if date range changed
+            if st.session_state.date_range_changed:
+                st.cache_data.clear()
+                st.session_state.date_range_changed = False
+            
+            # Fetch cached stock data using session state dates
+            stock_price = fetch_stock_data(ticker, st.session_state.analysis_start_date, st.session_state.analysis_end_date)
             
 
             

@@ -252,6 +252,11 @@ Finance Bro uses Streamlit's `st.session_state` for comprehensive data sharing a
 - `symbols_df` - Full DataFrame with stock symbols and company names for performance
 - `last_period` - Previously selected period (year/quarter) for change detection
 
+**Date Range Management**
+- `analysis_start_date` - Global start date for data analysis (default: 2024-01-01), shared across all analysis pages
+- `analysis_end_date` - Global end date for data analysis (default: today-1), shared across all analysis pages  
+- `date_range_changed` - Boolean flag to trigger cache invalidation when date range changes
+
 ### Page-Specific Session State Variables
 
 #### Stock Analysis Page (bro.py)
@@ -300,16 +305,19 @@ Finance Bro uses Streamlit's `st.session_state` for comprehensive data sharing a
 
 **Data Consistency**
 - Single source of truth for stock symbol selection across all pages
+- **Consistent date ranges**: Global start/end dates (today-1 default) shared across Stock Price Analysis and Portfolio Optimization pages
 - Portfolio strategy selection shared between Dollar Allocation, Report, and Risk Analysis tabs
 - Financial data loaded once and reused across different analysis tools
 
 **Performance Optimization**
 - Stock symbols loaded once in Stock Analysis page and cached for entire session
 - Financial dataframes cached to avoid repeated API calls
+- **Smart cache invalidation**: Automatic cache refresh when date ranges change across pages
 - Agent recreation only when data actually changes
 
 **User Experience**
 - Seamless navigation between pages without data loss
+- **Synchronized date selection**: Date changes in one page automatically apply to all analysis pages
 - Chat history persistence during analysis sessions
 - Filter presets remember user preferences across screening sessions
 
