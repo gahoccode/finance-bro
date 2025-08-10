@@ -140,6 +140,10 @@ def main_page():
         with col1:
             if st.button("🔍 Stock Screener", use_container_width=True):
                 st.switch_page("pages/Screener.py")
+        
+        with col2:
+            if st.button("📊 Technical Analysis", use_container_width=True):
+                st.switch_page("pages/Technical_Analysis.py")
     
     # Instructions and app information
     st.markdown("---")
@@ -157,6 +161,7 @@ def main_page():
         **Available Analysis Tools:**
         - **📊 Stock Analysis (Main Bro)** - AI-powered chat interface for comprehensive financial analysis
         - **📈 Price Analysis** - Interactive price charts and technical analysis
+        - **📊 Technical Analysis** - Candlestick charts for stocks with heating up technical signals
         - **🏢 Company Overview** - Company profile, ownership structure, and management team
         - **💼 Portfolio Optimization** - Modern Portfolio Theory-based portfolio optimization
         - **🔍 Stock Screener** - Filter and analyze stocks by financial metrics across industries
@@ -180,6 +185,7 @@ pages = {
     "Analysis": [
         st.Page("pages/bro.py", title="Stock Analysis", icon="📊"),
         st.Page("pages/Stock_Price_Analysis.py", title="Price Analysis", icon="📈"),
+        st.Page("pages/Technical_Analysis.py", title="Technical Analysis", icon="📊"),
         st.Page("pages/Company_Overview.py", title="Company Overview", icon="🏢"),
         st.Page("pages/Portfolio_Optimization.py", title="Portfolio Optimization", icon="💼"),
         st.Page("pages/Screener.py", title="Stock Screener", icon="🔍"),
