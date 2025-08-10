@@ -29,3 +29,5 @@ trading_stats = company.trading_stats()
 from vnstock import Company
 company = Company(symbol='REE', source='TCBS')
 insider_trading_info= company.insider_deals()
+
+
