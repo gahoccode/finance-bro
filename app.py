@@ -15,19 +15,7 @@ st.set_page_config(
 
 # CSS loading removed
 
-# Authentication handling
-if not st.user.is_logged_in:
-    st.title("🔒 Authentication Required")
-    st.markdown("Please authenticate with Google to access Finance Bro")
-    
-    # Create a clean login interface
-    st.button("Login with Google", on_click=st.login)
-    
-    # Show helpful information
-    st.markdown("---")
-    st.info("After logging in, you'll be redirected back to the app automatically.")
-    
-    st.stop()
+# No authentication required
 
 # API Key handling
 if 'api_key' not in st.session_state:
@@ -195,9 +183,6 @@ pages = {
 # Sidebar for user controls
 with st.sidebar:
     st.header("🔧 Controls")        
-    # User logout option
-    if st.button("🚪 Logout", use_container_width=True):
-        st.logout()
     # GitHub link
     st.markdown("[Finance Bro on GitHub](https://github.com/gahoccode/finance-bro) by Tam Le")
 

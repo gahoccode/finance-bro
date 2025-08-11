@@ -9,19 +9,7 @@ warnings.filterwarnings('ignore')
 st.markdown('# 🔍 Stock Screener')
 st.markdown('Filter and analyze Vietnamese stocks based on various financial metrics')
 
-# Authentication handling
-if not st.user.is_logged_in:
-    st.title("🔒 Authentication Required")
-    st.markdown("Please authenticate with Google to access Finance Bro")
-    
-    # Create a clean login interface
-    st.button("Login with Google", on_click=st.login)
-    
-    # Show helpful information
-    st.markdown("---")
-    st.info("After logging in, you'll be redirected back to the app automatically.")
-    
-    st.stop()
+# No authentication required
 
 # Load stock symbols and cache in session state if not already loaded (for consistent experience across app)
 if 'stock_symbols_list' not in st.session_state:
