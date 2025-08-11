@@ -9,7 +9,7 @@ warnings.filterwarnings('ignore')
 st.markdown('# 🔍 Stock Screener')
 st.markdown('Filter and analyze Vietnamese stocks based on various financial metrics')
 
-# Authentication removed - now open access
+# No authentication required
 
 # Load stock symbols and cache in session state if not already loaded (for consistent experience across app)
 if 'stock_symbols_list' not in st.session_state:

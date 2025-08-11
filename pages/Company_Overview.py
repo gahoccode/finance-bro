@@ -262,7 +262,7 @@ if stock_symbol:
                         )
                         
                         # Create bars
-                        subs_bars = subs_base.mark_bar(color='steelblue').encode(
+                        subs_bars = subs_base.mark_bar(color='#56524D').encode(
                             tooltip=[
                                 alt.Tooltip('organ_name:N', title='Subsidiary'),
                                 alt.Tooltip('ownership_percent:Q', title='Ownership %', format='.1f'),

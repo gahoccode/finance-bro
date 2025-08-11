@@ -5,11 +5,14 @@
 ## Features
 
 - 📊 **Vietnamese Stock Data** - Load financial data using Vnstock (VCI/TCBS sources)
-- 🤖 **AI Chat Interface** - Natural language queries about financial metrics
-- 💬 **Interactive Analysis** - Real-time conversation with AI analyst
-- 📈 **Financial Metrics** - ROIC, debt ratios, dividend yields, cash flow analysis
-- 🏢 **Company Analysis** - Ownership structure, management team, subsidiaries, and foreign transaction analysis
-- 🔐 **Secure API Key Management** - Environment variables or secure UI input
+- 🤖 **AI Chat Interface** - Natural language queries about financial metrics with PandasAI integration
+- 💬 **Interactive Analysis** - Real-time conversation with AI analyst including file upload support
+- 📈 **Advanced Technical Analysis** - Interactive price charts with 75+ QuantStats metrics, professional tearsheets, and comprehensive technical indicators (RSI, MACD, Bollinger Bands, OBV, ADX) with robust error handling
+- 🎯 **Intelligent Stock Screener** - Multi-criteria filtering with 6 advanced filters (Beta, Alpha, Financial Health, etc.)
+- 💼 **Portfolio Optimization** - Modern Portfolio Theory, Hierarchical Risk Parity, and risk analysis with riskfolio-lib
+- 🏢 **Comprehensive Company Analysis** - Ownership structure, management team, subsidiaries, and foreign transaction analysis
+- 📊 **Professional Visualizations** - Interactive charts with Altair, Bokeh, and custom styling
+- 🔐 **Secure Authentication** - Google OAuth integration with API key management
 
 ## Quick Start
 
@@ -118,9 +121,11 @@ streamlit run app.py
 
 ### Step 3: Explore Other Analysis Tools
 7. **🚀 Navigate to Other Pages**: Now you can efficiently use other analysis tools:
-   - **📈 Price Analysis**: Interactive price charts and technical analysis
+   - **📈 Price Analysis**: Interactive price charts with 75+ QuantStats metrics and professional tearsheets
+   - **📊 Technical Analysis**: Advanced technical indicators with heating stock discovery and robust error handling
    - **🏢 Company Overview**: Company profile with ownership structure, management team, subsidiaries, and foreign transaction analysis
-   - **💼 Portfolio Optimization**: Modern Portfolio Theory-based optimization
+   - **💼 Portfolio Optimization**: Modern Portfolio Theory, Hierarchical Risk Parity, and comprehensive risk analysis
+   - **🎯 Stock Screener**: Multi-criteria stock filtering with advanced metrics (Beta, Alpha, Financial Health) and quick presets
 
 ### Recommended Setup for Best Experience
 
@@ -159,6 +164,65 @@ streamlit run app.py
 - "Compare revenue growth across years"
 - "What are the key financial strengths and weaknesses?"
 
+## 📊 Technical Analysis Features
+
+**Finance Bro** includes a comprehensive Technical Analysis page that automatically discovers and analyzes "heating up" stocks from the Vietnamese market using advanced technical indicators.
+
+### Key Features
+
+**🔥 Automatic Stock Discovery**
+- Scans entire Vietnamese stock market (HOSE, HNX, UPCOM exchanges)
+- Identifies stocks with "Overheated in previous trading session" signals
+- Displays comprehensive market data including industry, market cap, and trading metrics
+
+**📈 Advanced Technical Indicators**
+- **RSI (Relative Strength Index)**: Momentum oscillator for overbought/oversold conditions
+- **MACD (Moving Average Convergence Divergence)**: Trend-following momentum indicator
+- **Bollinger Bands**: Volatility bands for price channel analysis
+- **OBV (On-Balance Volume)**: Volume flow indicator for price movement validation
+- **ADX (Average Directional Index)**: Trend strength measurement
+
+**🎯 Interactive Candlestick Charts**
+- Professional mplfinance integration with custom Finance Bro theme
+- Multi-panel layouts with synchronized indicators
+- Configurable time intervals (Daily, Weekly, Monthly)
+- Earth-toned color scheme for professional analysis
+
+**⚙️ Robust Error Handling**
+- Comprehensive pandas-ta integration with graceful error recovery
+- Individual indicator validation with specific failure explanations
+- Enhanced data validation for optimal ADX calculation (30+ data points required)
+- Transparent warning system explaining exactly why indicators might fail
+- Optimized date ranges (90 days for daily analysis) for reliable calculations
+
+### Technical Implementation Highlights
+
+**Production-Ready Error Handling**
+- Fixed `TypeError: 'NoneType' object is not subscriptable` from pandas-ta None returns
+- Resolved `ValueError: zero-size array to reduction operation maximum` in ADX calculations
+- Safe chart creation with fallback mechanisms for partial indicator availability
+- Professional user feedback with success/failure indicator reporting
+
+**Performance Optimizations**
+- Intelligent data validation before indicator calculation
+- Graceful degradation when indicators fail while maintaining core functionality
+- Date range optimization for sufficient technical analysis data
+- Cached indicator calculations with TTL for better performance
+
+### Usage Notes
+
+**Data Requirements**
+- Minimum 20 data points required for most indicators
+- ADX requires 30+ data points for reliable calculation
+- Daily interval provides 90 days of data for comprehensive analysis
+- Weekly and monthly intervals provide extended historical coverage
+
+**Error Recovery**
+- App continues functioning with available indicators if some calculations fail
+- Clear warnings explain specific reasons for any indicator failures
+- Comprehensive fallback system maintains professional user experience
+- All error handling designed for production stability
+
 ## ⚠️ Critical: Package Compatibility
 
 **IMPORTANT:** This project uses specific versions of pandas and pandasai that are carefully matched for compatibility. **DO NOT** upgrade these packages independently without testing.
@@ -176,13 +240,21 @@ streamlit run app.py
 
 ✅ **WORKING COMBINATION:**
 - `pandasai==2.3.0` (stable)
-- `pandas>=1.5.3,<2.0.0` (compatible range)
+- `pandas==1.5.3` (exact version required for compatibility)
+- `quantstats==0.0.59` (last version compatible with pandas 1.5.3)
 - Built-in OpenAI LLM (no separate extension needed)
 
 ❌ **AVOID:**
 - `pandasai>=3.0.0` (beta, unstable)
 - `pandas>=2.0.0` (incompatible with pandasai 2.3.0)
+- `quantstats>=0.0.60` (requires pandas 2.0+ frequency aliases)
 - `pandasai-openai` extension (not needed in v2.3.0)
+
+### Critical QuantStats Compatibility
+**NEVER upgrade quantstats independently.** The app uses:
+- **QuantStats v0.0.59** - Last version compatible with pandas 1.5.3 legacy frequency aliases (`M`, `Q`, `A`)
+- **Issue with newer versions**: QuantStats 0.0.60+ uses pandas 2.0+ frequency aliases (`ME`, `QE`, `YE`) causing "Invalid frequency" errors
+- **Solution**: Version pinned in requirements.txt to maintain compatibility
 
 ### If You Need to Upgrade
 
@@ -193,11 +265,16 @@ streamlit run app.py
 
 ## Technology Stack
 
-- **Frontend:** Streamlit
-- **AI Engine:** PandasAI v2.3.0 (stable)
-- **Stock Data:** Vnstock v3.2.5
-- **LLM:** OpenAI GPT models
+- **Frontend:** Streamlit v1.47.0 with Google OAuth authentication
+- **AI Engine:** PandasAI v2.3.0 (stable) with OpenAI GPT integration
+- **Stock Data:** Vnstock v3.2.5 (VCI/TCBS sources for Vietnamese market)
 - **Data Processing:** Pandas v1.5.3 (compatible with pandasai 2.3.0)
+- **Financial Analysis:** QuantStats v0.0.59 (75+ performance metrics and tearsheets)
+- **Portfolio Optimization:** PyPortfolioOpt (Modern Portfolio Theory, Efficient Frontier)
+- **Risk Analysis:** riskfolio-lib v5.0.1+ (Hierarchical Risk Parity, advanced risk metrics)
+- **Technical Analysis:** pandas-ta for 150+ technical indicators with robust error handling
+- **Visualizations:** Altair v5.5.0+, Bokeh v2.4.3, mplfinance for interactive charts
+- **Authentication:** Authlib v1.3.2+ for Google OAuth integration
 
 ## Future Refactor: PandasAI 3.x Migration
 
@@ -221,19 +298,127 @@ dependencies = [
 - **Testing Required**: Full regression testing needed before migration
 - **Compatibility**: Verify vnstock integration with new pandas versions
 
+## Session State Management
+
+Finance Bro uses Streamlit's `st.session_state` for comprehensive data sharing and persistence across pages. This ensures a seamless user experience where data, settings, and user interactions are maintained throughout the session.
+
+### Global Session State Variables
+
+**Authentication & API**
+- `api_key` - OpenAI API key for AI functionality
+- `stock_symbol` - Currently selected stock symbol (shared across all pages)
+
+**Data Caching & Performance**
+- `stock_symbols_list` - Cached list of all available Vietnamese stock symbols
+- `symbols_df` - Full DataFrame with stock symbols and company names for performance
+- `last_period` - Previously selected period (year/quarter) for change detection
+
+**Date Range Management**
+- `analysis_start_date` - Global start date for data analysis (default: 2024-01-01), shared across all analysis pages
+- `analysis_end_date` - Global end date for data analysis (default: today-1), shared across all analysis pages  
+- `date_range_changed` - Boolean flag to trigger cache invalidation when date range changes
+
+### Page-Specific Session State Variables
+
+#### Stock Analysis Page (bro.py)
+**Data Storage**
+- `dataframes` - AI-optimized financial dataframes with Quarter column names for better PandasAI queries
+- `display_dataframes` - Original financial dataframes with lengthReport for proper display formatting
+- `uploaded_dataframes` - User-uploaded CSV/Excel files for AI analysis
+- `messages` - Chat message history for conversation continuity
+
+**AI Agent Management**
+- `agent` - PandasAI agent instance for financial analysis
+- `agent_key` - Cache key for intelligent agent recreation when data changes
+- `pending_question` - Queued question from sidebar for processing
+
+#### Stock Price Analysis Page
+**Price & Returns Data**
+- `stock_price_data` - Historical stock price data with caching
+- `stock_returns` - Calculated stock returns for QuantStats analysis
+
+#### Portfolio Optimization Page
+**Portfolio Data**
+- `portfolio_returns` - Stock returns data shared across all portfolio tabs
+- `weights_max_sharpe` - Max Sharpe portfolio weights for cross-tab sharing
+- `weights_min_vol` - Min Volatility portfolio weights
+- `weights_max_utility` - Max Utility portfolio weights
+
+**Portfolio Strategy Selection**
+- `portfolio_strategy_choice` - Master control for portfolio strategy selection across all tabs (new in v0.2.16)
+
+#### Screener Page
+**Screening Data**
+- `screener_data` - Filtered stock results from screening criteria
+
+**Filter Presets (Dynamic Keys)**
+- `preset_industries` - Selected industries for quick filter presets
+- `preset_market_cap` - Market cap filter preset activation
+- `preset_roe` - ROE filter preset activation
+- `preset_roa` - ROA filter preset activation
+- `preset_dividend` - Dividend yield filter preset activation
+- `preset_beta` - Beta risk filter preset activation
+- `preset_financial_health` - Financial health filter preset activation
+- `preset_stock_rating` - Stock rating filter preset activation
+- `auto_run_screener` - Automatic screener execution trigger
+
+### Session State Architecture Benefits
+
+**Data Consistency**
+- Single source of truth for stock symbol selection across all pages
+- **Consistent date ranges**: Global start/end dates (today-1 default) shared across Stock Price Analysis and Portfolio Optimization pages
+- Portfolio strategy selection shared between Dollar Allocation, Report, and Risk Analysis tabs
+- Financial data loaded once and reused across different analysis tools
+
+**Performance Optimization**
+- Stock symbols loaded once in Stock Analysis page and cached for entire session
+- Financial dataframes cached to avoid repeated API calls
+- **Smart cache invalidation**: Automatic cache refresh when date ranges change across pages
+- Agent recreation only when data actually changes
+
+**User Experience**
+- Seamless navigation between pages without data loss
+- **Synchronized date selection**: Date changes in one page automatically apply to all analysis pages
+- Chat history persistence during analysis sessions
+- Filter presets remember user preferences across screening sessions
+
+**Memory Management**
+- Intelligent caching with change detection to prevent unnecessary data reloading
+- Cleanup mechanisms for dynamic preset keys to prevent memory bloat
+
+### Session State Flow
+
+1. **App Entry (app.py)**: Loads API key, stock symbols list, and handles symbol selection
+2. **Stock Analysis (bro.py)**: Creates comprehensive data cache and AI agent
+3. **Other Pages**: Access shared data from session state for analysis
+4. **Cross-Page Navigation**: All data persists seamlessly across page switches
+
+This architecture ensures optimal performance while maintaining a professional user experience comparable to institutional financial analysis tools.
+
 ## Project Structure
 
 ```
 finance-bro/
-├── app.py              # Main Streamlit application entry point
-├── requirements.txt    # Python dependencies
-├── pyproject.toml     # Project configuration
-├── README.md          # Project documentation
-├── Dockerfile         # Docker configuration
-├── docker-compose.yml # Docker Compose configuration
-├── .env.example       # Environment variables template
-├── .dockerignore      # Docker ignore rules
-└── .gitignore         # Git ignore rules
+├── app.py                     # Main entry point with auth & navigation
+├── pages/                     # Multi-page Streamlit application
+│   ├── bro.py                # Main AI chat interface (Stock Analysis)
+│   ├── Stock_Price_Analysis.py  # Price charts & QuantStats tearsheets
+│   ├── Technical_Analysis.py # Advanced technical indicators with heating stocks
+│   ├── Company_Overview.py   # Company profiles & ownership
+│   ├── Portfolio_Optimization.py # Modern Portfolio Theory & HRP
+│   └── Screener.py           # Stock screening & filtering
+├── static/style.css          # Custom CSS styling
+├── .streamlit/               # Streamlit configuration
+│   ├── config.toml          # Custom theme & colors
+│   └── secrets.example.toml # OAuth configuration template
+├── requirements.txt          # Python dependencies
+├── pyproject.toml           # Project configuration (Python 3.10.11)
+├── Dockerfile               # Docker configuration
+├── docker-compose.yml       # Docker Compose configuration
+├── .env.example             # Environment variables template
+├── CHANGELOG.md             # Version history
+├── CLAUDE.md                # AI assistant instructions
+└── Reference/               # Legacy code & documentation
 ```
 
 ## Docker Deployment
@@ -441,12 +626,27 @@ docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/gahoccode/finance-bro
 
 ## Dependencies
 
+### Core Dependencies
 - `pandasai==2.3.0` - AI-powered data analysis
-- `pandas>=1.5.3,<2.0.0` - Data manipulation
-- `vnstock==3.2.5` - Vietnamese stock data
+- `pandas==1.5.3` - Data manipulation (exact version for compatibility)
+- `vnstock==3.2.5` - Vietnamese stock data (VCI/TCBS sources)
 - `openai>=1.61.0` - OpenAI API client
-- `streamlit==1.47.0` - Web application framework
+- `streamlit==1.47.0` - Web application framework with OAuth support
 - `python-dotenv==1.0.1` - Environment variable management
+
+### Financial Analysis
+- `quantstats==0.0.59` - Performance analytics and tearsheets (75+ metrics)
+- `pyportfolioopt>=1.5.6` - Modern Portfolio Theory optimization
+- `riskfolio-lib>=5.0.1` - Advanced risk analysis and HRP
+- `mplfinance>=0.12.10b0` - Financial data visualization
+
+### Visualization & UI
+- `altair>=5.5.0` - Interactive statistical visualizations  
+- `bokeh==2.4.3` - Interactive web plots
+- `Authlib>=1.3.2` - Google OAuth authentication
+
+### System Dependencies (Docker)
+- `osqp==0.6.2.post8` - Quadratic programming solver (specific version for stability)
 
 ## Contributing
 

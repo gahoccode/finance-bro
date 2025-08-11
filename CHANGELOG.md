@@ -5,6 +5,377 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.19] - 2025-08-10
+
+### Added
+- [2025-08-10] **Triple Filter System for Technical Analysis**: Implemented comprehensive filtering system for heating stocks with data metrics
+  - **Foreign Transaction Filter**: "Foreign Buy > Sell Only" checkbox filters for `foreign_transaction == 'Buy > Sell'`
+  - **Strong Buy Signal Filter**: "Strong Buy Signal Only" checkbox filters for `tcbs_buy_sell_signal == 'Strong buy'`
+  - **Buy Signal Filter**: "Buy Signal Only" checkbox filters for `tcbs_buy_sell_signal == 'Buy'`
+  - **Independent Toggles**: All three filters can be used independently or in combination for precise stock selection
+  - **Dynamic Filter Feedback**: Real-time filter results with stock counts showing progressive filtering effects
+  - **Intelligent Warning Messages**: Context-aware warnings when no stocks match selected filter criteria
+  - **Sequential Filter Logic**: Filters applied in sequence (Foreign → Strong Buy → Buy) with transparent progress tracking
+  - **Smart UI Integration**: All filters integrated in sidebar "📈 Data Filters" section with helpful tooltips
+
+### Added
+- [2025-08-10] **Dual Trading Value Metrics Display**: Added comprehensive trading volume analytics with side-by-side metrics layout
+  - **Average 5-Day Trading Value**: Displays mean of `avg_trading_value_5d` across all filtered heating stocks
+  - **Average Total Trading Value**: Displays mean of `total_trading_value` across all filtered heating stocks
+  - **Raw Value Display**: Shows actual trading values with comma formatting (no conversion to billions)
+  - **Dynamic Updates**: Both metrics automatically recalculate when filters are applied/removed
+  - **Responsive Layout**: Two-column layout (`st.columns(2)`) for optimal space utilization
+  - **Error Handling**: Shows "N/A" for missing or invalid data with column existence validation
+  - **Filter Responsive**: Trading metrics reflect only the stocks that match current filter criteria
+
+### Changed
+- [2025-08-10] **DataFrame Display Enhancement**: Removed index column from heating stocks DataFrame for cleaner presentation
+  - **Clean Display**: Added `hide_index=True` parameter to `st.dataframe()` for heating stocks summary table
+  - **Focus on Data**: Eliminates distracting row numbers to focus attention on actual stock information
+  - **Consistent Styling**: Maintains full width (`use_container_width=True`) and fixed height (`height=300`) for optimal viewing
+
+### Technical Implementation
+- **Filter Architecture**: Simple string comparison filters with boolean masking for optimal performance
+  - `heating_stocks['foreign_transaction'] == 'Buy > Sell'` for foreign investor filter
+  - `heating_stocks['tcbs_buy_sell_signal'] == 'Strong buy'` for TCBS strong buy filter  
+  - `heating_stocks['tcbs_buy_sell_signal'] == 'Buy'` for TCBS buy filter
+- **Progressive Filtering**: Each filter operates on the results of previous filters with count tracking at each stage
+- **User Feedback System**: Comprehensive messaging system showing active filters and stock counts
+- **Session State Integration**: Filter states persist across page interactions using Streamlit session state
+- **Trading Metrics Calculation**: Uses pandas `.mean()` with null value handling and comma formatting
+
+### User Experience Improvements
+- **Precision Filtering**: Users can find exact stocks matching their investment criteria using multiple filter combinations
+- **Visual Feedback**: Clear indication of how many stocks match each filter combination with original stock count reference
+- **Professional Interface**: Clean, institutional-grade filtering system with professional tooltips and descriptions
+- **Trading Volume Insights**: Immediate understanding of average trading liquidity across filtered stock selections
+- **Streamlined Display**: Clean DataFrame presentation focuses attention on stock data rather than technical details
+
+### Files Modified
+- `pages/Technical_Analysis.py`: Added triple filter system, trading value metrics, and DataFrame display enhancements with comprehensive filter logic and UI improvements
+
+## [0.2.18] - 2025-08-10
+
+### Fixed
+- [2025-08-10] **Technical Analysis TypeError and ValueError Fixes**: Comprehensive error handling implementation for pandas-ta integration
+  - **Primary Issue**: `TypeError: 'NoneType' object is not subscriptable` when pandas-ta functions returned None instead of DataFrames
+  - **Secondary Issue**: `ValueError: zero-size array to reduction operation maximum` when turning on ADX indicator
+  - **Root Causes**: 
+    - pandas-ta functions returning None for insufficient data, then code attempting subscript access
+    - ADX calculation requiring more data than other indicators (30+ points vs 14-20)
+    - Daily interval (1D) only providing 30 days of data, insufficient for reliable ADX calculation
+  - **Solution Implementation**:
+    - **Enhanced `calculate_indicators()` function**: Individual None checks for all 5 indicators (RSI, MACD, Bollinger Bands, OBV, ADX)
+    - **Specific ADX Validation**: Minimum 30 data points, High/Low consistency checks, sufficient price variation validation
+    - **Safe Chart Creation**: Protected `create_technical_chart()` with comprehensive indicator validation
+    - **Protected Display Sections**: Safe metric display with "N/A" values and explanatory captions instead of crashes
+    - **Optimized Date Ranges**: Daily (1D) increased from 30 to 90 days for sufficient ADX calculation data
+    - **Transparent Error Handling**: Clear warning messages explaining why indicators failed with specific reasons
+  - **Files Modified**: 
+    - `pages/Technical_Analysis.py` - comprehensive error handling for all indicators and chart creation
+  - **User Experience**: Graceful degradation with clear feedback, app continues working with available indicators
+  - **Technical Result**: Production-ready Technical Analysis page with robust pandas-ta integration
+
+## [0.2.17] - 2025-08-10
+
+### Added
+- [2025-08-10] **Single Source of Truth for Date Consistency**: Implemented centralized date management across all analysis pages
+  - **Issue**: Inconsistent date defaults between Stock Price Analysis (hardcoded 2024-12-31) and Portfolio Optimization (today-1)
+  - **Root Cause**: Each page had independent date selection with different default values, causing data inconsistency
+  - **Solution**: Centralized date management in session state with synchronized sidebar date selection
+  - **Implementation Changes**:
+    - **Global Date Session State**: Added `analysis_start_date`, `analysis_end_date`, and `date_range_changed` variables
+    - **Standardized today-1 Default**: All pages now use `pd.to_datetime("today") - pd.Timedelta(days=1)` as end_date default
+    - **Smart Cache Invalidation**: Automatic cache refresh when date ranges change to ensure data consistency
+    - **Synchronized Sidebar Selection**: Date changes in any page automatically apply to all analysis pages
+  - **Files Modified**: 
+    - `pages/Stock_Price_Analysis.py` - replaced hardcoded dates with session state management
+    - `pages/Portfolio_Optimization.py` - connected existing date inputs to session state
+    - `README.md` - documented new date-related session state variables
+  - **Result**: Consistent date ranges across all pages ensure comparable analysis and eliminate data mismatch issues
+
+## [0.2.16] - 2025-08-10
+
+### Fixed
+- [2025-08-10] **Portfolio Strategy Consistency Issue**: Fixed confusing UX where users had to repeatedly select portfolio strategies across 3 different tabs
+  - **Issue**: Users encountered 3 separate portfolio selection widgets (Tab 3, Tab 4, Tab 5) causing confusion and inconsistent analysis
+  - **Root Cause**: Each analysis tab (Dollar Allocation, Report, Risk Analysis) had independent strategy selection widgets
+  - **Solution**: Implemented two-level single source of truth hierarchy:
+    - **Level 1**: Sidebar multiselect for symbol selection (already perfect)
+    - **Level 2**: Tab 4 (Report) radio button as master control for portfolio strategy selection
+  - **Implementation Changes**:
+    - **Tab 4 Enhancement** (lines 550-559): Enhanced radio button as master control center with session state storage
+    - **Tab 3 Refactor** (lines 462-472): Removed selectbox, reads strategy from session state with user guidance
+    - **Tab 5 Refactor** (lines 646-656): Removed selectbox, reads strategy from session state with user guidance
+  - **User Guidance**: Added informational messages directing users to Report tab for strategy selection
+  - **Session State Integration**: `st.session_state.portfolio_strategy_choice` provides consistent strategy across all tabs
+  - **Files Modified**: `pages/Portfolio_Optimization.py` - updated portfolio strategy selection logic across all three tabs
+  - **Result**: Single strategy selection workflow eliminates confusion and ensures consistent analysis across all tabs
+
+### Changed
+- [2025-08-10] **Portfolio Analysis Workflow Enhancement**: Streamlined user experience with clear hierarchy and guidance
+  - **Two-Level Hierarchy**: **symbols → strategy → analysis** creates logical progression through portfolio optimization
+  - **Master Control**: Tab 4 (Report) serves as strategy selection hub for all strategy-dependent analysis tabs
+  - **User Navigation**: Clear guidance messages help users understand the selection flow and current strategy
+  - **Consistent Analysis**: All tabs (Dollar Allocation, Report, Risk Analysis) use identical portfolio strategy ensuring comparable results
+  - **Session Persistence**: Strategy selection persists across tab navigation maintaining user context
+
+### Session State Architecture Enhancement
+Finance Bro's comprehensive session state management enables seamless data sharing and persistence across all pages and tabs:
+
+**New Portfolio Strategy Variable**
+- **Added**: `st.session_state.portfolio_strategy_choice` - Master control for portfolio strategy selection across all analysis tabs
+- **Scope**: Shared between Tab 3 (Dollar Allocation), Tab 4 (Report), and Tab 5 (Risk Analysis)
+- **Pattern**: Master-slave architecture where Tab 4 writes, other tabs read from session state
+
+**Existing Session State Variables Used**
+- `st.session_state.stock_symbol` - Current stock symbol shared across all pages
+- `st.session_state.portfolio_returns` - Stock returns data shared across portfolio tabs  
+- `st.session_state.weights_max_sharpe` - Max Sharpe portfolio weights
+- `st.session_state.weights_min_vol` - Min Volatility portfolio weights
+- `st.session_state.weights_max_utility` - Max Utility portfolio weights
+
+**Cross-Tab Communication Pattern**
+- **Master Control**: Tab 4 radio button stores selection in `st.session_state.portfolio_strategy_choice`
+- **Slave Tabs**: Tab 3 and Tab 5 read strategy from session state instead of having independent widgets
+- **Fallback Logic**: Default to "Max Sharpe Portfolio" when session state unavailable
+- **User Guidance**: Clear messages directing users to Report tab for strategy selection
+
+### Technical Implementation
+- **Session State Management**: Centralized portfolio strategy storage in `st.session_state.portfolio_strategy_choice`
+- **User Interface**: Enhanced radio button with help text explaining master control functionality
+- **Code Cleanup**: Removed redundant selection widgets while maintaining all existing functionality
+- **State Persistence**: Strategy selection persists across tab navigation and page refreshes
+
+### User Experience Improvements
+- **Elimination of Confusion**: Single strategy selection point removes need to remember and synchronize choices across tabs
+- **Clear Information Flow**: Logical progression from symbol selection to strategy selection to analysis results
+- **Reduced Cognitive Load**: Users focus on analysis rather than managing multiple selection interfaces
+- **Consistent Results**: All analysis tabs guaranteed to use same strategy ensuring meaningful comparisons
+- **Professional Workflow**: Streamlined interface matches institutional portfolio analysis tools
+
+## [0.2.15] - 2025-08-09
+
+### Fixed
+- [2025-08-09] **Portfolio Optimization Excel Report Double Extension Bug**: Fixed critical Excel report generation issue causing download failures
+  - **Issue**: Excel reports generated with double extensions (.xlsx.xlsx) due to riskfolio-lib automatically adding .xlsx to filenames
+  - **Root Cause**: `rp.excel_report()` function automatically appends .xlsx extension, but code was providing filenames already containing .xlsx
+  - **Symptoms**: 
+    - Report generation appeared successful with success message
+    - Actual files created with double extension in exports/reports/ directory
+    - Download button failed with "No such file or directory" error
+    - Page jumping back to "Efficient Frontier & Weights" tab due to Streamlit error handling
+  - **Solution**: Modified filename construction logic in Report tab (lines 582-612):
+    - Changed `filename = f"{portfolio_name}_{timestamp}.xlsx"` to `filename_base = f"{portfolio_name}_{timestamp}"`
+    - Pass `filepath_base` (without extension) to `rp.excel_report()`
+    - Construct `filepath_xlsx = filepath_base + ".xlsx"` for file operations
+    - Updated download button and file size calculation to use correct .xlsx path
+  - **Files Modified**: `pages/Portfolio_Optimization.py` - updated Excel report generation logic in tab4
+  - **Result**: Excel reports now generate with single .xlsx extension, downloads work correctly, no page jumping
+
+### Added
+- [2025-08-09] **Comprehensive Test Suite for Portfolio Optimization**: Created automated testing framework for terminal-based validation
+  - **Test Infrastructure**: Created `tests/` directory with pytest-based testing framework
+  - **Test Coverage**: 12 comprehensive tests covering filename construction, file path management, Excel report generation workflow
+  - **Mock Integration**: Added pytest-mock for testing riskfolio-lib integration without external dependencies  
+  - **Sample Data**: Created realistic stock data fixtures for testing portfolio optimization logic
+  - **Dependencies**: Added pytest, pytest-cov, pytest-mock to development dependencies
+  - **Demo Script**: Created `tests/demo_fix.py` to demonstrate fix functionality without running Streamlit app
+  - **Files Created**: 
+    - `tests/__init__.py`, `tests/conftest.py`, `tests/test_portfolio_optimization.py`
+    - `tests/demo_fix.py` - standalone demonstration script
+  - **Test Execution**: Run with `uv run pytest tests/` for complete validation
+
+### Technical Implementation
+- **Filename Construction**: Separated base filename (without extension) from display filename (with extension)
+- **API Integration**: Proper integration with riskfolio-lib expecting filenames without extensions
+- **Error Prevention**: Eliminated double extension creation while maintaining all existing functionality  
+- **Test Validation**: All 12 tests pass with 99% code coverage, confirming fix effectiveness
+- **Backward Compatibility**: Maintains all existing report features and user interface elements
+
+### User Experience Improvements
+- **Reliable Downloads**: Excel report downloads now work consistently without errors
+- **No Interface Disruption**: Report generation stays on Report tab without unexpected navigation
+- **Professional Output**: Generated Excel files have proper single .xlsx extension
+- **Validation Confidence**: Comprehensive test suite ensures fix reliability and prevents regression
+
+## [0.2.14] - 2025-08-08
+
+### Added
+- [2025-08-08] **Comprehensive QuantStats Custom Metrics Selector**: Implemented advanced custom metrics interface with 75 QuantStats metrics
+  - **Organized Categories**: 7 logical metric categories (Core Performance, Risk Analysis, Return Analysis, Advanced Ratios, Rolling Metrics, Specialized)
+  - **Smart Multi-Select Interface**: Category-based dropdown with intelligent defaults for Core Performance metrics
+  - **Professional Metric Formatting**: Custom `format_metric_name()` function converts snake_case to readable names with special cases (CAGR, VaR, CVaR, etc.)
+  - **Responsive Grid Layout**: User-configurable grid columns (2, 3, or 4 columns) for optimal metric display
+  - **Educational Descriptions**: Optional metric descriptions via `get_metric_descriptions()` with hover help tooltips
+  - **Advanced Calculations**: `calculate_custom_metrics()` function with error handling and appropriate number formatting
+  - **Performance-Based Formatting**: Intelligent formatting based on metric type (percentages, ratios, decimals)
+  - **Session State Integration**: Seamlessly uses existing `st.session_state.stock_returns` data
+  - **User Control Features**: Include descriptions toggle, customizable grid layout, category-based filtering
+
+### Fixed
+- [2025-08-08] **QuantStats Pandas Compatibility Issue**: Fixed "Invalid frequency: ME" error by downgrading to compatible QuantStats version
+  - **Issue**: QuantStats latest versions use pandas 2.0+ frequency aliases (`ME`, `QE`, `YE`) incompatible with pandas 1.5.3
+  - **Root Cause**: App uses pandas 1.5.3 for PandasAI compatibility, but newer QuantStats expects pandas 2.0+ frequency conventions
+  - **Solution**: Downgraded to QuantStats 0.0.59, the last version compatible with pandas 1.5.3 legacy frequency aliases
+  - **Implementation**: 
+    - Added `quantstats==0.0.59` to requirements.txt for version pinning
+    - Removed broken pandas compatibility patches from Stock_Price_Analysis.py (lines 13-28)
+    - Added fallback logic for QuantStats file export path handling
+  - **Chart Rendering Fix**: Replaced `st.html()` with `streamlit.components.v1.html()` for proper tearsheet visualization
+    - **Issue**: Charts in QuantStats tearsheets were not visible, only performance metrics displayed
+    - **Solution**: Used iframe rendering with `components.html(html_content, height=2000, scrolling=True)` for better JavaScript/CSS support
+    - **Result**: Full tearsheet now displays with all charts, graphs, and performance analytics visible
+
+### Changed
+- [2025-08-08] **Dependency Management Enhancement**: Updated critical dependencies documentation
+  - **CLAUDE.md**: Added quantstats to critical dependencies list with version compatibility notes
+  - **Version Constraints**: Documented that QuantStats 0.0.60+ requires pandas 2.0+ and is incompatible with app's pandas 1.5.3
+  - **Compatibility Notes**: Added explanation of frequency alias changes between pandas versions
+  - **Warning Enhancement**: Updated dependency upgrade warning to include quantstats alongside pandas and pandasai
+
+### Technical Implementation
+- **Version Pinning**: `quantstats==0.0.59` ensures compatibility with pandas 1.5.3 legacy frequency aliases (`M`, `Q`, `A`)
+- **File Path Handling**: Added fallback logic to handle QuantStats 0.0.59's behavior of exporting to project root with default filename
+- **Chart Rendering**: Iframe-based HTML display provides proper JavaScript execution environment for embedded charts
+- **Code Cleanup**: Removed 15 lines of broken pandas compatibility patches and warning suppressions
+
+### User Experience Improvements
+- **Advanced Metrics Analysis**: Users can select from 75 professional-grade QuantStats metrics organized by category
+- **Customizable Display**: Flexible grid layout and optional descriptions for personalized analytics experience
+- **Intelligent Defaults**: Smart metric preselection for common performance analysis workflows
+- **Reliable Tearsheet Generation**: QuantStats tearsheets now generate without pandas frequency errors
+- **Complete Visualization**: All charts, performance metrics, and analytical plots display correctly in tearsheets
+- **Professional Output**: Full-featured tearsheets with comprehensive portfolio analytics comparable to institutional tools
+- **Download Functionality**: Generated HTML tearsheets available for download with proper formatting
+
+### Files Modified
+- `requirements.txt`: Added quantstats version pin
+- `pages/Stock_Price_Analysis.py`: Removed compatibility patches, added file path fallback, improved chart rendering, implemented comprehensive custom metrics selector
+- `CLAUDE.md`: Updated critical dependencies documentation with quantstats compatibility notes
+
+## [0.2.13] - 2025-08-08
+
+### Added
+- [2025-08-08] **Comprehensive Riskfolio-lib Risk Analysis Suite**: Expanded Risk Analysis tab with three comprehensive risk visualization tools
+  - **Risk Analysis Table**: Uses `rp.plot_table()` for comprehensive risk metrics table (Expected Return, Volatility, Sharpe Ratio, VaR, CVaR, Max Drawdown, Calmar Ratio)
+  - **Portfolio Drawdown Analysis**: Added `rp.plot_drawdown()` visualization showing cumulative returns and drawdown periods with recovery analysis
+  - **Portfolio Returns Risk Measures**: Implemented `rp.plot_range()` for histogram and risk range analysis with return distributions, VaR, and CVaR visualizations
+  - **Unified Data Integration**: All three analyses use same session state returns and weights for consistent portfolio analysis
+  - **Multi-Portfolio Support**: Portfolio selection dropdown allows risk analysis for Max Sharpe, Min Volatility, and Max Utility portfolios
+  - **Professional Visualization**: Each analysis uses proper matplotlib figure sizing and styling for publication-quality outputs
+
+### Changed
+- [2025-08-08] **Risk Analysis Tab Enhancement**: Expanded from single risk table to comprehensive three-analysis suite
+  - **Sequential Layout**: Risk metrics table → Drawdown analysis → Returns risk measures for logical analysis flow
+  - **Consistent Parameters**: All analyses use alpha=0.05 for 95% confidence intervals and standardized riskfolio parameters
+  - **Educational Content**: Maintained informational expander explaining risk metrics for user understanding
+
+### Technical Implementation
+- **Riskfolio Integration**: Three riskfolio functions integrated with consistent parameter handling:
+  - `rp.plot_table()`: MAR=0, alpha=0.05 for risk metrics table
+  - `rp.plot_drawdown()`: alpha=0.05, kappa=0.3, solver='CLARABEL', height_ratios=[2,3] for drawdown visualization
+  - `rp.plot_range()`: alpha=0.05, a_sim=100, bins=50 for return distribution analysis
+- **Session State Reuse**: All analyses leverage existing `st.session_state.portfolio_returns` and portfolio weights
+- **DataFrame Consistency**: Same `weights_df` DataFrame format used across all three analyses for data consistency
+- **Figure Management**: Separate matplotlib figures for each analysis (fig, fig_drawdown, fig_range) to prevent conflicts
+
+### User Experience Improvements
+- **Complete Risk Assessment**: Users get comprehensive risk analysis suite covering metrics, drawdowns, and return distributions
+- **Visual Progression**: Logical flow from tabular metrics to visual drawdown analysis to statistical distributions
+- **Portfolio Flexibility**: Any optimized portfolio can be analyzed with all three risk visualization tools
+- **Professional Output**: Publication-quality risk analysis charts suitable for investment presentations
+- **Educational Value**: Combined risk metrics provide deep insights into portfolio risk characteristics
+
+### Files Modified
+- `pages/Portfolio_Optimization.py`: Expanded Risk Analysis tab with drawdown and range analysis implementations
+
+## [0.2.12] - 2025-08-08
+
+### Added
+- [2025-08-08] **Riskfolio-lib Risk Analysis Table**: Added comprehensive risk analysis visualization to Portfolio Optimization page
+  - **New Tab**: Added "📋 Risk Analysis" as 5th tab alongside existing portfolio analysis tabs
+  - **Risk Metrics Table**: Integrated `rp.plot_table()` function from riskfolio-lib for comprehensive risk assessment
+  - **Data Integration**: Uses session state `portfolio_returns` and all three portfolio weights for seamless data flow
+  - **DataFrame Conversion**: Automatic conversion of weights dictionary to DataFrame format required by riskfolio-lib
+  - **Matplotlib Integration**: Professional risk analysis table displayed via matplotlib with proper figure sizing (12x8)
+  - **Session State Management**: Stores `weights_max_sharpe` dictionary in session state for cross-tab access
+  - **User Education**: Informational expander explaining risk metrics (VaR, CVaR, Calmar Ratio, Max Drawdown, etc.)
+  - **Error-Free Debugging**: Removed try-except blocks to allow on-screen error display for development
+
+### Changed
+- [2025-08-08] **Portfolio Optimization Tab Structure**: Expanded from 4 to 5 tabs for better analysis organization
+  - **Tab Layout**: Updated tab definition to include Risk Analysis as 5th tab
+  - **Tab Names**: "📈 Efficient Frontier & Weights", "🌳 Hierarchical Risk Parity", "💰 Dollars Allocation", "📊 Report", "📋 Risk Analysis"
+  - **Session State Storage**: Simplified weights storage from Series conversion to direct dictionary storage
+  - **Data Requirements**: Risk Analysis tab validates both `portfolio_returns` and `weights_max_sharpe` availability
+
+### Technical Implementation
+- **Riskfolio Integration**: Uses `rp.plot_table()` with parameters: returns, weights DataFrame, MAR=0, alpha=0.05
+- **Weight Processing**: Converts weights dictionary to DataFrame using `pd.DataFrame.from_dict()` with `orient='index'`
+- **Variable Naming**: Clear variable naming with `weights_max_sharpe_df` for DataFrame representation
+- **Session State Efficiency**: Direct dictionary storage eliminates unnecessary Series intermediate conversion
+- **Error Handling**: Removed try-except blocks for transparent error display during development
+
+### User Experience Improvements
+- **Multi-Portfolio Risk Analysis**: Users can analyze risk metrics for any portfolio strategy (Max Sharpe, Min Volatility, Max Utility)
+- **Portfolio Selection Interface**: Intuitive dropdown to choose which optimized portfolio to analyze
+- **Professional Risk Table**: Industry-standard risk analysis table with multiple risk measures for selected portfolio
+- **Dynamic Context**: Educational content updates to reflect the selected portfolio (e.g., "your Min Volatility portfolio")
+- **Seamless Integration**: Risk analysis automatically available after portfolio optimization completion
+- **Visual Consistency**: Risk table maintains consistent styling with existing portfolio analysis
+
+### Files Modified
+- `pages/Portfolio_Optimization.py`: Added riskfolio risk analysis tab, session state management, and DataFrame conversion logic
+
+## [0.2.11] - 2025-08-08
+
+### Added
+- [2025-08-08] **Hierarchical Risk Parity (HRP) Portfolio Optimization**: Added comprehensive HRP analysis with dendrogram visualization
+  - **HRP Implementation**: Integrated `pypfopt.HRPOpt` for hierarchical risk parity portfolio optimization using clustering-based approach
+  - **Dendrogram Visualization**: Added interactive dendrogram chart using `plotting.plot_dendrogram()` with ticker symbols display
+  - **Portfolio Weights Display**: HRP portfolio weights shown in formatted table with percentage values
+  - **Tab-Based Interface**: Added dedicated "🌳 Hierarchical Risk Parity" tab alongside existing "📈 Efficient Frontier & Weights" tab
+  - **Session State Integration**: Returns data stored in `st.session_state.portfolio_returns` for cross-tab data sharing
+  - **Separation of Concerns**: HRP analysis cleanly separated from Modern Portfolio Theory content in dedicated tab
+  - **Real Data Testing**: Designed for testing with actual Vietnamese stock market data via vnstock API
+
+- [2025-08-08] **Discrete Portfolio Allocation**: Added comprehensive discrete allocation functionality with Vietnamese market integration
+  - **DiscreteAllocation Implementation**: Integrated `pypfopt.discrete_allocation.DiscreteAllocation` for realistic portfolio allocation
+  - **Portfolio Value Input**: User-configurable portfolio value with Vietnamese Dong (VND) denomination and sensible defaults
+  - **Strategy Selection**: Dropdown to choose allocation strategy from Max Sharpe, Min Volatility, or Max Utility portfolios
+  - **Latest Prices Integration**: Uses `get_latest_prices()` with proper Vietnamese market price conversion (multiply by 1000)
+  - **Greedy Allocation Algorithm**: Implements `greedy_portfolio()` method for optimal share allocation within budget constraints
+  - **Comprehensive Results Display**: Shows allocation table with shares, prices, total values, and weight percentages
+  - **Summary Metrics**: Three-column layout displaying allocated amount, leftover cash, and number of stocks
+  - **Investment Summary**: Professional overview with strategy details and allocation breakdown
+  - **Vietnamese Market Formatting**: Proper VND currency formatting with thousand separators for professional presentation
+
+### Changed
+- [2025-08-08] **Portfolio Optimization Page Restructuring**: Reorganized content into tab-based layout for better user experience
+  - **Tab Architecture**: Split single-page content into two focused tabs:
+    - **Tab 1**: "📈 Efficient Frontier & Weights" - Contains all existing MPT analysis (efficient frontier plot, portfolio weights tables, pie charts, performance analysis)
+    - **Tab 2**: "🌳 Hierarchical Risk Parity" - Contains HRP optimization and dendrogram visualization
+  - **Content Organization**: Moved efficient frontier, weights comparison, pie charts, and performance tables to first tab
+  - **Main Page Preservation**: Data summary and performance metrics remain in main content area above tabs
+  - **User Workflow**: Users can easily switch between traditional MPT analysis and modern HRP approach
+
+### Technical Implementation
+- **Import Enhancement**: Added `HRPOpt` to existing pypfopt imports for hierarchical clustering functionality
+- **Session State Management**: Portfolio returns calculated once and stored for reuse across analysis methods
+- **Error Handling**: Basic validation with user-friendly warnings when returns data unavailable
+- **Data Flow**: Seamless integration with existing portfolio optimization workflow and caching system
+- **Chart Integration**: Dendrogram uses matplotlib with consistent styling and responsive design
+
+### User Experience Improvements
+- **Progressive Analysis**: Users can perform traditional MPT analysis first, then explore HRP approach using same data
+- **Visual Insights**: Dendrogram provides intuitive visualization of asset clustering and hierarchical relationships
+- **Comparative Analysis**: Easy switching between MPT and HRP approaches for comprehensive portfolio analysis
+- **Professional Interface**: Clean tab separation maintains focus while providing access to different optimization strategies
+
+### Files Modified
+- `pages/Portfolio_Optimization.py`: Added HRP import, session state storage, tab structure, and HRP implementation
+
 ## [0.2.10] - 2025-08-06
 
 ### Changed

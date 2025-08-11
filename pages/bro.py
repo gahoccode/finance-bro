@@ -168,7 +168,7 @@ else:
 st.markdown('# Finance Bro')
 st.markdown('Ask your finance bro about your company\'s financial statements')
 
-# Authentication is handled in main app, so we assume user is already logged in
+# No authentication required
 
 # Load stock symbols and cache in session state if not already loaded
 if 'stock_symbols_list' not in st.session_state:
