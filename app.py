@@ -15,7 +15,6 @@ st.set_page_config(
 
 # CSS loading removed
 
-# No authentication required
 
 # API Key handling
 if 'api_key' not in st.session_state:

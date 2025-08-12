@@ -1,5 +1,6 @@
 import os
 import glob
+from src.services.chart_service import detect_latest_chart
 import streamlit as st
 import pandas as pd
 from vnstock import Vnstock, Listing
@@ -42,21 +43,7 @@ def get_generated_code(response, agent):
     except Exception as e:
         return f"# Error accessing code: {str(e)}"
 
-def detect_latest_chart():
-    """Detect the most recently generated chart file"""
-    try:
-        chart_dir = "exports/charts/"
-        if os.path.exists(chart_dir):
-            chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
-            if chart_files:
-                latest_chart = max(chart_files, key=os.path.getctime)
-                return {
-                    "type": "image",
-                    "path": latest_chart
-                }
-    except Exception:
-        pass
-    return None
+
 
 def process_agent_response(agent, question):
     """Process agent response and return formatted message data"""
@@ -168,7 +155,6 @@ else:
 st.markdown('# Finance Bro')
 st.markdown('Ask your finance bro about your company\'s financial statements')
 
-# No authentication required
 
 # Load stock symbols and cache in session state if not already loaded
 if 'stock_symbols_list' not in st.session_state:

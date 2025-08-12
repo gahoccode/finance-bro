@@ -1,62 +1,17 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-from vnstock import Company, Vnstock
-from vnstock.explorer.vci import Company
 import warnings
 warnings.filterwarnings('ignore')
 
-# Cache data to reduce API calls
-@st.cache_data(ttl=3600)  # Cache for 1 hour
-def get_ownership_data(symbol):
-    """Get ownership data with caching"""
-    try:
-        stock = Vnstock().stock(symbol=symbol, source='VCI')
-        company_info = stock.company
-        return company_info.shareholders()
-    except Exception as e:
-        st.error(f"Error fetching ownership data: {str(e)}")
-        return pd.DataFrame()
-
-@st.cache_data(ttl=3600)  # Cache for 1 hour
-def get_management_data(symbol):
-    """Get management data with caching"""
-    try:
-        company = Company(symbol=symbol)
-        return company.officers()
-    except Exception as e:
-        st.error(f"Error fetching management data: {str(e)}")
-        return pd.DataFrame()
-
-@st.cache_data(ttl=3600)  # Cache for 1 hour
-def get_subsidiaries_data(symbol):
-    """Get subsidiaries data with caching"""
-    try:
-        company = Company(symbol=symbol)
-        return company.subsidiaries()
-    except Exception as e:
-        st.error(f"Error fetching subsidiaries data: {str(e)}")
-        return pd.DataFrame()
-
-@st.cache_data(ttl=3600)  # Cache for 1 hour
-def get_insider_deals_data(symbol):
-    """Get insider deals data with caching"""
-    try:
-        stock = Vnstock().stock(symbol=symbol, source='TCBS')
-        return stock.company.insider_deals()
-    except Exception as e:
-        st.error(f"Error fetching insider deals data: {str(e)}")
-        return pd.DataFrame()
-
-@st.cache_data(ttl=3600)  # Cache for 1 hour
-def get_foreign_trading_data(symbol):
-    """Get foreign trading data with caching"""
-    try:
-        company = Company(symbol=symbol)
-        return company.trading_stats()
-    except Exception as e:
-        st.error(f"Error fetching foreign trading data: {str(e)}")
-        return pd.DataFrame()
+# Import from modular utilities - preserves ALL caching and session state
+from src.services.vnstock_api import (
+    get_ownership_data,
+    get_management_data, 
+    get_subsidiaries_data,
+    get_insider_deals_data,
+    get_foreign_trading_data
+)
 
 # Set page configuration
 st.set_page_config(

@@ -4,12 +4,12 @@ import altair as alt
 from vnstock import Screener, Listing
 import warnings
 warnings.filterwarnings('ignore')
+from src.services.vnstock_api import get_screener_data
 
 # Title and header
 st.markdown('# 🔍 Stock Screener')
 st.markdown('Filter and analyze Vietnamese stocks based on various financial metrics')
 
-# No authentication required
 
 # Load stock symbols and cache in session state if not already loaded (for consistent experience across app)
 if 'stock_symbols_list' not in st.session_state:
@@ -34,17 +34,7 @@ industry_list = [
 ]
 
 # Cache data to reduce API calls
-@st.cache_data(ttl=3600)  # Cache for 1 hour
-def get_screener_data(params, source='TCBS', limit=1700):
-    """Get screener data with caching"""
-    try:
-        screener = Screener(source=source)
-        result = screener.stock(params=params, limit=limit, lang='en')
-        return result
-    except Exception as e:
-        st.error(f"Error fetching screener data: {str(e)}")
-        st.error(f"API parameters used: {params}")
-        return pd.DataFrame()
+
 
 def create_scatter_chart(df, x_col, y_col, title, y_scale=None):
     """Create scatter plot with Altair"""
