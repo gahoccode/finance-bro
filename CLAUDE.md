@@ -59,6 +59,13 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
   - **Technical_Analysis.py** - Advanced technical indicators with pandas-ta integration
   - **Portfolio_Optimization.py** - Modern Portfolio Theory optimization
   - **Screener.py** - Stock screening and filtering functionality
+- **src/** - Modular utilities and services (NEW):
+  - **core/config.py** - Centralized app configuration and constants
+  - **services/vnstock_api.py** - All VnStock API functions (26 centralized)
+  - **services/chart_service.py** - Chart generation utilities (7 functions)
+  - **services/data_service.py** - Data transformation utilities
+  - **components/** - Reusable UI components (stock_selector.py, date_picker.py)
+  - **utils/** - General utilities (session_utils.py, validation.py)
 - **static/** - CSS styling with custom theme configuration
 - **cache/** - Data caching for performance
 - **exports/charts/** - Generated chart storage
@@ -140,6 +147,29 @@ Charts are generated via PandasAI and saved to `exports/charts/temp_chart.png`. 
 - **Critical**: Never upgrade pandas/pandasai without checking compatibility
 - Python exact version `3.10.11` required (no newer versions supported)
 - Run `uv sync` after pulling changes to ensure dependency consistency
+
+### Modular Architecture (Version 0.2.20+)
+The codebase follows a modular architecture pattern with centralized services:
+
+**Import Patterns:**
+```python
+# Pages import from services
+from src.services.vnstock_api import get_stock_data, get_company_overview
+from src.services.chart_service import create_technical_chart, create_altair_line_chart
+from src.core.config import DEFAULT_SYMBOLS, CACHE_TTL_SETTINGS
+
+# Services are self-contained with @st.cache_data decorators
+# Components can be reused across pages
+from src.components.stock_selector import render_stock_selector
+```
+
+**Development Guidelines:**
+- **API Functions**: Add new VnStock functions to `src/services/vnstock_api.py`
+- **Charts**: Add new visualizations to `src/services/chart_service.py`
+- **Configuration**: Update constants in `src/core/config.py`
+- **UI Components**: Create reusable widgets in `src/components/`
+- **Page Logic**: Focus pages on user interaction, import from services
+- **No Code Duplication**: All repeated functionality centralized in src/
 
 ### Code Style and Architecture Guidelines
 - **Function-first approach**: Prioritize functions over classes for simplicity
