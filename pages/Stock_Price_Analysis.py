@@ -244,25 +244,8 @@ def calculate_custom_metrics(returns_data, selected_metrics, include_description
     
     return results
 
-@st.cache_data(ttl=3600, show_spinner="Loading stock data...")
-def fetch_stock_data(ticker, start_date, end_date):
-    """Fetch stock data with caching to prevent repeated API calls."""
-    stock = Vnstock().stock(symbol=ticker, source='VCI')
-    stock_price = stock.quote.history(
-        symbol=ticker,
-        start=start_date.strftime('%Y-%m-%d'),
-        end=end_date.strftime('%Y-%m-%d'),
-        interval='1D'
-    )
-    
-    # Set time column as datetime index
-    stock_price['time'] = pd.to_datetime(stock_price['time'])
-    stock_price = stock_price.set_index('time')
-    
-    # Store in session state for cross-page access
-    st.session_state.stock_price_data = stock_price
-    
-    return stock_price
+# Import cached function from modular utilities
+from src.services.vnstock_api import fetch_stock_price_data
 
 if ticker:
     try:
@@ -273,7 +256,7 @@ if ticker:
                 st.session_state.date_range_changed = False
             
             # Fetch cached stock data using session state dates
-            stock_price = fetch_stock_data(ticker, st.session_state.analysis_start_date, st.session_state.analysis_end_date)
+            stock_price = fetch_stock_price_data(ticker, st.session_state.analysis_start_date, st.session_state.analysis_end_date)
             
 
             
