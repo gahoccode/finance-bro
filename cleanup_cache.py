@@ -5,6 +5,9 @@ Cache and Charts Cleanup Script for Finance Bro
 This script cleans up temporary files from:
 - ./cache/*.db (database cache files)
 - ./exports/charts/*.png (generated chart images)
+- ./exports/tearsheets/*.html (generated tearsheet reports)
+- ./exports/reports/*.xlsx (generated Excel reports)
+- ./pandasai.log (PandasAI log file)
 
 Usage:
     python cleanup_cache.py
@@ -81,13 +84,39 @@ def main():
     )
     total_deleted += deleted
     
+    # Clean exports/tearsheets directory - *.html files
+    tearsheets_dir = script_dir / "exports" / "tearsheets"
+    deleted = cleanup_directory(
+        str(tearsheets_dir), 
+        "*.html", 
+        "tearsheet HTML files"
+    )
+    total_deleted += deleted
+    
+    # Clean exports/reports directory - *.xlsx files
+    reports_dir = script_dir / "exports" / "reports"
+    deleted = cleanup_directory(
+        str(reports_dir), 
+        "*.xlsx", 
+        "Excel report files"
+    )
+    total_deleted += deleted
+    
+    # Clean pandasai.log file in project root
+    deleted = cleanup_directory(
+        str(script_dir), 
+        "pandasai.log", 
+        "PandasAI log file"
+    )
+    total_deleted += deleted
+    
     print("=" * 40)
     print(f"🎉 Cleanup complete! Total files deleted: {total_deleted}")
     
     if total_deleted == 0:
         print("💡 No files needed cleanup - directories are already clean!")
     else:
-        print("✨ Cache and charts directories have been cleaned!")
+        print("✨ Cache, charts, tearsheets, reports, and log files have been cleaned!")
 
 
 if __name__ == "__main__":
