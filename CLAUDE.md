@@ -76,14 +76,12 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
 - **PandasAI** - AI data analysis (v2.3.0 - stable, compatible with pandas 1.5.3)
 - **vnstock** - Vietnamese stock market data (v3.2.5)
 - **OpenAI API** - LLM for natural language queries
-- **Google OAuth** - User authentication
 
 ### Data Flow
-1. Authentication via Google OAuth (required)
-2. Stock symbol selection (shared across pages via session state)
-3. Data loading from vnstock API with caching
-4. AI analysis through PandasAI agent
-5. Chart generation and export
+1. Stock symbol selection (shared across pages via session state)
+2. Data loading from vnstock API with caching
+3. AI analysis through PandasAI agent
+4. Chart generation and export
 
 ### Critical Dependencies
 **NEVER upgrade pandas, pandasai, or quantstats independently.** The app requires:
@@ -111,17 +109,6 @@ Key session variables:
 - Charts exported to `exports/charts/`
 - Symbol data loaded once per session
 - Visit "Stock Analysis" page first for optimal loading
-
-### Authentication Setup
-Requires Google OAuth configuration in `.streamlit/secrets.toml`:
-```toml
-[auth]
-client_id = "your-google-client-id"
-client_secret = "your-google-client-secret"
-redirect_uri = "http://localhost:8501/oauth2callback"
-cookie_secret = "your-random-secret-string"
-server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"
-```
 
 ### Theme Configuration
 Custom theme is configured in `.streamlit/config.toml` with:
@@ -217,5 +204,4 @@ uv run pytest tests/test_portfolio_optimization.py::test_function_name
 ### Data Sources and APIs
 - **vnstock** v3.2.5 - Vietnamese stock data (VCI/TCBS sources)  
 - **OpenAI API** - Required for AI functionality
-- **Google OAuth** - Required for user authentication
 - Stock data cached in `cache/` directory for performance
