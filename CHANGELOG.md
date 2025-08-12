@@ -5,6 +5,94 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.20] - 2025-08-12
+
+### Added
+- [2025-08-12] **Complete Modular Refactoring**: Implemented comprehensive codebase modularization with centralized utilities and services
+  - **Phase 1: Core Infrastructure** - Created `src/` directory structure with core utilities:
+    - `src/core/config.py`: Centralized configuration constants (cache TTL, default symbols, colors)
+    - `src/utils/session_utils.py`: Session state helper functions that work WITH existing patterns
+    - `src/utils/validation.py`: Input validation utilities for stock symbols and data integrity
+    - `src/components/stock_selector.py`: Reusable stock selector supporting both selectbox and multiselect patterns
+    - `src/components/date_picker.py`: Date range picker with session state integration
+    - `src/services/data_service.py`: Data transformation utilities (financial DataFrame transposition)
+  
+  - **Phase 2: API Centralization** - Extracted all @st.cache_data functions to `src/services/vnstock_api.py`:
+    - **26 cached functions** moved from individual pages to centralized module
+    - All Company Overview functions: `get_ownership_data`, `get_management_data`, `get_subsidiaries_data`, `get_insider_deals_data`, `get_foreign_trading_data`
+    - Stock price functions: `fetch_stock_price_data`, `fetch_portfolio_stock_data`
+    - Technical analysis functions: `get_heating_up_stocks`, `get_technical_stock_data`, `calculate_technical_indicators`
+    - Screener function: `get_screener_data`
+    - **Preserved exact caching patterns** and TTL values from original implementation
+  
+  - **Phase 3: Chart Generation Service** - Created `src/services/chart_service.py` with centralized chart utilities:
+    - **Technical Analysis Charts**: `create_technical_chart()` with mplfinance and Finance Bro theme
+    - **Stock Price Charts**: `create_altair_line_chart()`, `create_altair_area_chart()`, `create_bokeh_candlestick_chart()`
+    - **Chart Detection**: `detect_latest_chart()` for PandasAI generated charts
+    - **Theme Management**: `get_finance_bro_theme()`, `create_mplfinance_style()` for consistent styling
+  
+  - **Phase 4: Page Integration** - Updated all pages to use new modular structure:
+    - **Company_Overview.py**: Replaced 5 local functions with vnstock_api imports
+    - **Stock_Price_Analysis.py**: Replaced local function and integrated chart_service functions
+    - **Technical_Analysis.py**: Replaced 3 local functions with vnstock_api/chart_service imports
+    - **Portfolio_Optimization.py**: Replaced local function with vnstock_api import
+    - **Screener.py**: Replaced local function with vnstock_api import
+    - **bro.py**: Integrated chart_service for chart detection
+
+### Technical Architecture
+- **Zero Breaking Changes**: All existing functionality preserved exactly as implemented
+- **Session State Preservation**: All 30+ session state variables maintained with exact naming and behavior
+- **Import Consolidation**: Eliminated code duplication across pages while maintaining individual page functionality
+- **Performance Optimization**: Centralized caching reduces memory usage and improves data consistency
+- **Maintainable Structure**: Single source of truth for API calls, chart generation, and utility functions
+
+### Code Organization Benefits
+- **Developer Experience**: Clear separation of concerns with logical module structure
+- **Consistency**: Unified approach to API calls, caching, and chart generation across all pages
+- **Scalability**: New features can leverage existing utilities and follow established patterns
+- **Theme Management**: Single location for all Finance Bro styling and color schemes
+- **Error Handling**: Centralized error handling and validation patterns
+
+### Project Structure Changes
+- **NEW**: Created `src/` directory with modular architecture
+  - `src/core/config.py`: Centralized configuration constants
+  - `src/utils/`: Session state helpers and validation utilities  
+  - `src/components/`: Reusable UI components (stock selector, date picker)
+  - `src/services/`: Business logic services (vnstock_api.py, chart_service.py, data_service.py)
+- **UPDATED**: All pages/ now import from centralized modules instead of local functions
+- **PRESERVED**: All existing directories (cache/, exports/, static/, tests/) unchanged
+
+### New Project Structure
+```
+finance-bro/
+├── src/                          # NEW: Modular utilities and services
+│   ├── core/                    # Core configuration and constants
+│   │   └── config.py           # Centralized app configuration
+│   ├── utils/                   # General utility functions
+│   │   ├── session_utils.py    # Session state management helpers
+│   │   └── validation.py       # Input validation and data integrity
+│   ├── components/              # Reusable UI components
+│   │   ├── stock_selector.py   # Stock selection widgets
+│   │   └── date_picker.py      # Date range selection components
+│   └── services/                # Business logic and data services
+│       ├── vnstock_api.py      # Centralized VnStock API functions (26 functions)
+│       ├── data_service.py     # Data transformation utilities
+│       └── chart_service.py    # Chart generation and theming (7 functions)
+├── pages/                        # Streamlit multi-page application (updated)
+├── cache/                        # Data caching directory for performance
+├── exports/                      # Generated files and outputs
+├── static/                       # Static assets and styling
+├── tests/                        # Test suite (pytest)
+└── [existing files...]          # Configuration and deployment files
+```
+
+### Module Import Hierarchy
+- **pages/**: All pages import from `src/services/vnstock_api.py` for data functions
+- **Technical Analysis & Stock Price**: Import from `src/services/chart_service.py` for visualizations
+- **Reusable Components**: Available from `src/components/` for consistent UI elements
+- **Configuration**: Centralized in `src/core/config.py` for app-wide settings
+- **Utilities**: Session state and validation helpers in `src/utils/`
+
 ## [0.2.19] - 2025-08-10
 
 ### Added

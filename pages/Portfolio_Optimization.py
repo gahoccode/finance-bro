@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from bokeh.plotting import figure
 from bokeh.transform import cumsum
 from bokeh.palettes import Spectral
+from src.services.vnstock_api import fetch_portfolio_stock_data
 from bokeh.models import ColumnDataSource
 from math import pi
 import riskfolio as rp
@@ -137,31 +138,7 @@ if st.session_state.analysis_start_date >= st.session_state.analysis_end_date:
 progress_bar = st.progress(0)
 status_text = st.empty()
 
-@st.cache_data(ttl=3600)  # Cache for 1 hour
-def fetch_stock_data(symbols, start_date_str, end_date_str, interval):
-    """Cache stock data to avoid repeated API calls."""
-    all_data = {}
-    
-    for symbol in symbols:
-        try:
-            quote = Quote(symbol=symbol)
-            historical_data = quote.history(
-                start=start_date_str,
-                end=end_date_str,
-                interval=interval,
-                to_df=True
-            )
-            
-            if not historical_data.empty:
-                # Ensure we have the required columns
-                if 'time' not in historical_data.columns:
-                    historical_data['time'] = historical_data.index
-                
-                all_data[symbol] = historical_data
-        except Exception as e:
-            st.error(f"Error fetching data for {symbol}: {e}")
-    
-    return all_data
+
 
 # Fetch historical data with caching
 status_text.text("Fetching historical data...")
@@ -171,7 +148,7 @@ if st.session_state.date_range_changed:
     st.cache_data.clear()
     st.session_state.date_range_changed = False
 
-all_historical_data = fetch_stock_data(symbols, start_date_str, end_date_str, interval)
+all_historical_data = fetch_portfolio_stock_data(symbols, start_date_str, end_date_str, interval)
 
 progress_bar.empty()
 status_text.empty()
