@@ -13,7 +13,11 @@ from src.services.vnstock_api import (
     get_technical_stock_data,
     calculate_technical_indicators
 )
-from src.services.chart_service import create_technical_chart
+from src.services.chart_service import (
+    create_technical_chart,
+    display_fibonacci_summary,
+    get_fibonacci_level_alerts,
+)
 
 st.set_page_config(
     page_title="Technical Analysis - Finance Bro", page_icon="📊", layout="wide"
@@ -66,6 +70,40 @@ def main():
         bb_period = st.slider("BB Period", 10, 50, 20)
         rsi_period = st.slider("RSI Period", 5, 30, 14)
         adx_period = st.slider("ADX Period", 5, 30, 14)
+
+        # Fibonacci Retracement Controls
+        st.subheader("📈 Fibonacci Retracement")
+        show_fibonacci = st.checkbox("Show Fibonacci Retracements", value=False)
+
+        if show_fibonacci:
+            fib_lookback = st.slider(
+                "Swing Lookback Period",
+                20,
+                100,
+                50,
+                help="Number of bars to analyze for swing detection",
+            )
+            fib_sensitivity = st.slider(
+                "Swing Sensitivity",
+                3,
+                15,
+                5,
+                help="Lower values = more sensitive swing detection",
+            )
+            show_extensions = st.checkbox(
+                "Include Extension Levels",
+                value=False,
+                help="Show 138.2%, 161.8%, 200%, 261.8% levels",
+            )
+
+            # Alert threshold for price proximity to Fibonacci levels
+            alert_threshold = st.slider(
+                "Price Alert Threshold (%)",
+                1.0,
+                5.0,
+                2.0,
+                help="Alert when price is within this % of a Fibonacci level",
+            )
 
         # Store in session state for persistence
         if "ta_interval" not in st.session_state:
@@ -231,6 +269,15 @@ def main():
         "show_adx": show_adx,
     }
 
+    # Create Fibonacci configuration
+    fibonacci_config = {
+        "show_fibonacci": show_fibonacci,
+        "lookback_bars": fib_lookback if show_fibonacci else 50,
+        "swing_order": fib_sensitivity if show_fibonacci else 5,
+        "include_extensions": show_extensions if show_fibonacci else False,
+        "alert_threshold_pct": alert_threshold if show_fibonacci else 2.0,
+    }
+
     # Create tabs for better organization if many stocks
     tickers = heating_stocks["ticker"].tolist()
 
@@ -247,11 +294,26 @@ def main():
                         indicators = calculate_technical_indicators(stock_data)
                         if indicators:
                             fig = create_technical_chart(
-                                ticker, stock_data, indicators, indicator_config
+                                ticker,
+                                stock_data,
+                                indicators,
+                                indicator_config,
+                                fibonacci_config,
                             )
                             if fig:
                                 st.pyplot(fig)
                                 plt.close(fig)
+
+                                # Display Fibonacci summary if enabled
+                                display_fibonacci_summary(fibonacci_config, ticker)
+
+                                # Show Fibonacci level alerts if enabled
+                                if show_fibonacci:
+                                    alerts = get_fibonacci_level_alerts(
+                                        stock_data, fibonacci_config
+                                    )
+                                    for alert in alerts:
+                                        st.info(f"📍 {alert}")
 
                                 # Display indicator values with safe validation
                                 st.subheader("📊 Indicator Values")
@@ -327,11 +389,28 @@ def main():
                                 indicators = calculate_technical_indicators(stock_data)
                                 if indicators:
                                     fig = create_technical_chart(
-                                        ticker, stock_data, indicators, indicator_config
+                                        ticker,
+                                        stock_data,
+                                        indicators,
+                                        indicator_config,
+                                        fibonacci_config,
                                     )
                                     if fig:
                                         st.pyplot(fig)
                                         plt.close(fig)
+
+                                        # Display Fibonacci summary if enabled
+                                        display_fibonacci_summary(
+                                            fibonacci_config, ticker
+                                        )
+
+                                        # Show Fibonacci level alerts if enabled
+                                        if show_fibonacci:
+                                            alerts = get_fibonacci_level_alerts(
+                                                stock_data, fibonacci_config
+                                            )
+                                            for alert in alerts:
+                                                st.info(f"📍 {alert}")
 
                                         # Display indicator values with safe validation
                                         st.subheader("📊 Indicator Values")
@@ -394,6 +473,13 @@ def main():
     - **Bollinger Bands**: Price volatility and potential reversal points
     - **OBV**: On-Balance Volume (volume flow indicator)
     - **ADX**: Average Directional Index (trend strength)
+    - **Fibonacci Retracements**: Support/resistance levels at 23.6%, 38.2%, 50%, 61.8%, 78.6%
+    
+    **Fibonacci Features:**
+    - Automatic swing high/low detection using SciPy algorithms
+    - Configurable lookback period and sensitivity
+    - Optional extension levels (138.2%, 161.8%, 200%, 261.8%)
+    - Price proximity alerts when near Fibonacci levels
     """)
 
 

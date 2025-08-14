@@ -15,11 +15,16 @@ from datetime import datetime
 from bokeh.plotting import figure
 from bokeh.layouts import column
 from bokeh.models import HoverTool
+from typing import Dict, Optional, Any
 
 # Technical Analysis Chart Functions
 
 def create_technical_chart(
-    ticker: str, data: pd.DataFrame, indicators: dict, config: dict
+    ticker: str,
+    data: pd.DataFrame,
+    indicators: dict,
+    config: dict,
+    fibonacci_config: Optional[Dict] = None,
 ) -> plt.Figure:
     """Create technical analysis chart with indicators using mplfinance with safe validation
     
@@ -131,6 +136,12 @@ def create_technical_chart(
                 skipped_indicators.append("ADX: Missing required columns")
         else:
             skipped_indicators.append("ADX: Calculation failed or unavailable")
+
+    # Add Fibonacci retracement levels if provided
+    if fibonacci_config and fibonacci_config.get("show_fibonacci", False):
+        fib_plots = _create_fibonacci_overlays(data, fibonacci_config)
+        if fib_plots:
+            addplots.extend(fib_plots)
     
     # Show warning for skipped indicators
     if skipped_indicators:
@@ -409,3 +420,211 @@ def create_mplfinance_style():
     )
     
     return style
+
+
+# Fibonacci Overlay Functions
+
+
+def _create_fibonacci_overlays(data: pd.DataFrame, fibonacci_config: Dict) -> list:
+    """
+    Create Fibonacci retracement level overlays for mplfinance charts.
+
+    Args:
+        data: OHLCV DataFrame
+        fibonacci_config: Configuration dictionary with Fibonacci settings
+
+    Returns:
+        List of mplfinance addplot objects for Fibonacci levels
+    """
+    try:
+        from src.services.fibonacci_service import (
+            get_recent_swing_fibonacci,
+            get_fibonacci_colors,
+        )
+
+        # Get Fibonacci analysis
+        fib_data = get_recent_swing_fibonacci(
+            data,
+            lookback_bars=fibonacci_config.get("lookback_bars", 50),
+            swing_order=fibonacci_config.get("swing_order", 5),
+            include_extensions=fibonacci_config.get("include_extensions", False),
+        )
+
+        if not fib_data or "fibonacci_levels" not in fib_data:
+            return []
+
+        fibonacci_levels = fib_data["fibonacci_levels"]
+        fibonacci_colors = get_fibonacci_colors()
+
+        # Create horizontal line overlays for each Fibonacci level
+        addplots = []
+
+        for level_name, price in fibonacci_levels.items():
+            # Skip extension levels if not requested
+            if (
+                not fibonacci_config.get("include_extensions", False)
+                and float(level_name.replace("%", "")) > 100
+            ):
+                continue
+
+            # Create horizontal line data (same price across all time points)
+            fib_line = pd.Series([price] * len(data), index=data.index)
+
+            # Get color for this level
+            color = fibonacci_colors.get(level_name, "#56524D")
+
+            # Create line style based on importance
+            line_style = "solid"
+            line_width = 1.5
+            alpha = 0.7
+
+            # Emphasize key levels
+            if level_name in ["38.2%", "50.0%", "61.8%"]:
+                line_width = 2.0
+                alpha = 0.9
+            elif level_name in ["0.0%", "100.0%"]:
+                line_style = "dashed"
+                line_width = 1.8
+                alpha = 0.8
+
+            # Create addplot for this Fibonacci level
+            addplots.append(
+                mpf.make_addplot(
+                    fib_line,
+                    color=color,
+                    width=line_width,
+                    alpha=alpha,
+                    secondary_y=False,
+                    panel=0,  # Main price panel
+                )
+            )
+
+        # Store Fibonacci data for summary display
+        if "fibonacci_summary" not in st.session_state:
+            st.session_state.fibonacci_summary = {}
+        st.session_state.fibonacci_summary[data.index[-1].strftime("%Y-%m-%d")] = (
+            fib_data
+        )
+
+        return addplots
+
+    except Exception as e:
+        st.warning(f"Error creating Fibonacci overlays: {str(e)}")
+        return []
+
+
+def display_fibonacci_summary(fibonacci_config: Dict, ticker: str) -> None:
+    """
+    Display Fibonacci retracement summary information.
+
+    Args:
+        fibonacci_config: Fibonacci configuration
+        ticker: Stock ticker symbol
+    """
+    try:
+        if not fibonacci_config.get("show_fibonacci", False):
+            return
+
+        # Get stored Fibonacci summary from session state
+        if (
+            "fibonacci_summary" in st.session_state
+            and st.session_state.fibonacci_summary
+        ):
+            latest_date = max(st.session_state.fibonacci_summary.keys())
+            fib_data = st.session_state.fibonacci_summary[latest_date]
+
+            if fib_data:
+                from src.services.fibonacci_service import format_fibonacci_summary
+
+                st.subheader(f"📈 Fibonacci Analysis - {ticker}")
+
+                # Display summary
+                summary = format_fibonacci_summary(fib_data)
+                st.markdown(summary)
+
+                # Display current price context if available
+                current_price = fib_data.get("current_price")
+                if current_price:
+                    swing_high = fib_data["swing_high"]
+                    swing_low = fib_data["swing_low"]
+
+                    # Calculate where current price sits relative to Fibonacci levels
+                    fib_levels = fib_data["fibonacci_levels"]
+
+                    closest_level = None
+                    min_distance = float("inf")
+
+                    for level_name, level_price in fib_levels.items():
+                        distance = abs(current_price - level_price)
+                        if distance < min_distance:
+                            min_distance = distance
+                            closest_level = (level_name, level_price)
+
+                    if closest_level:
+                        level_name, level_price = closest_level
+                        distance_pct = (min_distance / level_price) * 100
+
+                        st.info(
+                            f"""
+                        **Current Price Context:**
+                        - Current: {current_price:,.2f}
+                        - Nearest Fib Level: {level_name} at {level_price:,.2f}
+                        - Distance: {distance_pct:.1f}%
+                        """
+                        )
+
+    except Exception as e:
+        st.error(f"Error displaying Fibonacci summary: {str(e)}")
+
+
+def get_fibonacci_level_alerts(data: pd.DataFrame, fibonacci_config: Dict) -> list:
+    """
+    Check if current price is near any Fibonacci levels and return alerts.
+
+    Args:
+        data: OHLCV DataFrame
+        fibonacci_config: Fibonacci configuration
+
+    Returns:
+        List of alert messages
+    """
+    try:
+        if not fibonacci_config.get("show_fibonacci", False) or data.empty:
+            return []
+
+        from src.services.fibonacci_service import get_recent_swing_fibonacci
+
+        # Get current Fibonacci analysis
+        fib_data = get_recent_swing_fibonacci(
+            data,
+            lookback_bars=fibonacci_config.get("lookback_bars", 50),
+            swing_order=fibonacci_config.get("swing_order", 5),
+            include_extensions=fibonacci_config.get("include_extensions", False),
+        )
+
+        if not fib_data:
+            return []
+
+        # Handle both lowercase and capitalized column names
+        close_col = "Close" if "Close" in data.columns else "close"
+        current_price = data[close_col].iloc[-1]
+        fibonacci_levels = fib_data["fibonacci_levels"]
+        alerts = []
+
+        # Check proximity to each level (within 2% by default)
+        proximity_threshold = fibonacci_config.get("alert_threshold_pct", 2.0) / 100
+
+        for level_name, level_price in fibonacci_levels.items():
+            distance_pct = abs(current_price - level_price) / level_price
+
+            if distance_pct <= proximity_threshold:
+                direction = "above" if current_price > level_price else "below"
+                alerts.append(
+                    f"Price near {level_name} Fibonacci level ({level_price:,.2f}) - currently {direction}"
+                )
+
+        return alerts
+
+    except Exception as e:
+        st.warning(f"Error checking Fibonacci alerts: {str(e)}")
+        return []

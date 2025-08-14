@@ -5,6 +5,74 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.21] - 2025-08-14
+
+### Added
+- [2025-08-14] **Fibonacci Retracement Analysis**: Comprehensive Fibonacci retracement feature with SciPy-based swing detection
+  - **Professional Swing Detection**: Uses `scipy.signal.argrelextrema` for accurate swing high/low identification
+  - **Complete Fibonacci Levels**: Standard retracement levels (0%, 23.6%, 38.2%, 50%, 61.8%, 78.6%, 100%) with optional extensions (138.2%, 161.8%, 200%, 261.8%)
+  - **Visual Integration**: Horizontal Fibonacci lines overlaid on mplfinance candlestick charts with Finance Bro theme colors
+  - **Interactive Controls**: Sidebar controls for swing lookback period (20-100 bars), sensitivity (3-15), extension levels toggle, and price alert threshold (1-5%)
+  - **Price Proximity Alerts**: Real-time notifications when current price approaches Fibonacci levels within configurable threshold
+  - **Analysis Summary**: Detailed swing point analysis with date stamps, price ranges, and key retracement level displays
+  - **Chart Integration**: Seamless integration with existing Technical Analysis charts without disrupting existing indicators
+
+### Technical Implementation
+- [2025-08-14] **New Service Module**: Created `src/services/fibonacci_service.py` with professional Fibonacci analysis tools
+  - **Swing Detection Functions**: `find_swing_points()` using SciPy's `argrelextrema` with configurable order and minimum distance filtering
+  - **Level Calculations**: `calculate_fibonacci_levels()` for both retracement and extension level computation
+  - **Main Analysis**: `get_recent_swing_fibonacci()` for comprehensive swing analysis with column format compatibility
+  - **Data Validation**: `validate_fibonacci_data()` supporting both lowercase and capitalized OHLCV columns
+  - **Theme Integration**: `get_fibonacci_colors()` using Finance Bro color scheme for consistent visual styling
+  - **Display Formatting**: `format_fibonacci_summary()` for user-friendly analysis presentation
+
+- [2025-08-14] **Chart Service Enhancement**: Extended `src/services/chart_service.py` with Fibonacci overlay capabilities
+  - **Chart Function Update**: Enhanced `create_technical_chart()` with optional `fibonacci_config` parameter
+  - **Overlay Creation**: `_create_fibonacci_overlays()` generates mplfinance addplot objects for horizontal Fibonacci lines
+  - **Summary Display**: `display_fibonacci_summary()` shows detailed swing analysis and key retracement levels
+  - **Alert System**: `get_fibonacci_level_alerts()` provides price proximity notifications with column format compatibility
+  - **Session State Integration**: Fibonacci data stored in session state for cross-function access and summary displays
+
+- [2025-08-14] **Technical Analysis Page Integration**: Enhanced `pages/Technical_Analysis.py` with comprehensive Fibonacci controls
+  - **UI Controls**: Added Fibonacci retracement section with checkbox, lookback period slider, sensitivity slider, extensions toggle, and alert threshold configuration
+  - **Chart Integration**: Updated chart generation calls to include `fibonacci_config` parameter for overlay rendering
+  - **Display Integration**: Added Fibonacci summary display and alert notifications below charts
+  - **Documentation Update**: Enhanced footer documentation with Fibonacci features and SciPy algorithm details
+
+- [2025-08-14] **Dependency Management**: Added `scipy>=1.11.0,<1.12.0` to `pyproject.toml` for swing detection compatibility
+  - **Version Compatibility**: Carefully selected SciPy version compatible with existing pandas==1.5.3 and numpy constraints
+  - **Signal Processing**: Access to `scipy.signal.argrelextrema` for professional swing point identification
+  - **Performance Optimization**: 5-minute caching with `@st.cache_data` for Fibonacci calculations
+
+### Column Format Compatibility
+- [2025-08-14] **Dual Format Support**: Robust handling of both lowercase and capitalized OHLCV column formats
+  - **vnstock Integration**: Handles capitalized columns (`'Open', 'High', 'Low', 'Close', 'Volume'`) from vnstock API after mplfinance conversion
+  - **Test Compatibility**: Supports lowercase columns (`'open', 'high', 'low', 'close', 'volume'`) for development testing
+  - **Dynamic Detection**: Automatic column format detection in all Fibonacci functions
+  - **Error Prevention**: Fixed column name errors that were causing "Error calculating Fibonacci levels: 'high'" and "Error checking Fibonacci alerts: 'close'" issues
+
+### User Experience Enhancements
+- [2025-08-14] **Professional Analysis Tools**: Advanced technical analysis capabilities matching institutional trading platforms
+  - **Configurable Parameters**: Users control swing detection sensitivity and lookback periods for different market conditions
+  - **Visual Feedback**: Fibonacci levels rendered as horizontal lines with varying thickness and transparency based on importance
+  - **Educational Content**: Comprehensive documentation explaining Fibonacci features, SciPy algorithms, and optimal settings
+  - **Price Context**: Real-time price proximity analysis showing distance to nearest Fibonacci levels
+  - **Clean Integration**: Fibonacci controls seamlessly integrated into existing Technical Analysis workflow
+
+### Performance & Quality
+- [2025-08-14] **Comprehensive Testing**: Complete test suite validating all Fibonacci functionality
+  - **Unit Tests**: Validated swing detection, level calculation, chart integration, and alert generation
+  - **Integration Tests**: Confirmed compatibility with vnstock data pipeline and mplfinance charts
+  - **Column Format Tests**: Verified support for both lowercase and capitalized OHLCV formats
+  - **Error Handling Tests**: Validated graceful handling of insufficient data and edge cases
+  - **Type Checking**: MyPy validation successful with proper typing throughout codebase
+
+### Files Modified
+- `pyproject.toml`: Added SciPy dependency with version constraints
+- `src/services/fibonacci_service.py`: New comprehensive Fibonacci analysis service (288 lines)
+- `src/services/chart_service.py`: Enhanced with Fibonacci overlay functions (+203 lines)
+- `pages/Technical_Analysis.py`: Added Fibonacci UI controls and integration (+50 lines)
+
 ## [0.2.20] - 2025-08-12
 
 ### Added
