@@ -150,6 +150,10 @@ def main_page():
         with col3:
             if st.button("🏦 Fund Analysis", use_container_width=True):
                 st.switch_page("pages/Fund_Analysis.py")
+        
+        with col4:
+            if st.button("🏥 Financial Health", use_container_width=True):
+                st.switch_page("pages/Financial_Health_Report.py")
     
     # Instructions and app information
     st.markdown("---")
@@ -172,6 +176,7 @@ def main_page():
         - **💼 Portfolio Optimization** - Modern Portfolio Theory-based portfolio optimization
         - **🔍 Stock Screener** - Filter and analyze stocks by financial metrics across industries
         - **🏦 Fund Analysis** - Vietnamese investment fund analysis with NAV performance and allocation charts
+        - **🏥 Financial Health Report** - CrewAI multi-agent system for comprehensive financial health analysis
         
         **Tips:**
         - Your selected stock symbol persists across all pages
@@ -197,6 +202,7 @@ pages = {
         st.Page("pages/Portfolio_Optimization.py", title="Portfolio Optimization", icon="💼"),
         st.Page("pages/Screener.py", title="Stock Screener", icon="🔍"),
         st.Page("pages/Fund_Analysis.py", title="Fund Analysis", icon="🏦"),
+        st.Page("pages/Financial_Health_Report.py", title="Financial Health Report", icon="🏥"),
     ]
 }
 

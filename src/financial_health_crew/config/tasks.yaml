@@ -1,0 +1,176 @@
+analyze_financial_data:
+  description: |
+    Perform comprehensive analysis of the annual financial statements with deep focus on current year specifics and multi-year trends.
+    
+    CRITICAL REQUIREMENTS:
+    1. CURRENT YEAR KEY LINE ITEMS - Clearly identify and analyze the most important line items from each statement:
+       - INCOME STATEMENT: Revenue, Gross Profit, Operating Income, Net Income, EPS
+       - BALANCE SHEET: Total Assets, Current Assets, Total Liabilities, Current Liabilities, Shareholders' Equity
+       - CASH FLOW STATEMENT: Operating Cash Flow, Investing Cash Flow, Financing Cash Flow, Free Cash Flow
+    
+    2. MULTI-YEAR HOLISTIC TRENDS (3-5 years if available):
+       - Revenue growth patterns and consistency
+       - Profitability trends (gross margin, operating margin, net margin)
+       - Balance sheet evolution (asset composition, debt levels, equity growth)
+       - Cash generation and utilization patterns
+       - Return on assets (ROA) and return on equity (ROE) trends
+    
+    3. FINANCIAL RATIOS ANALYSIS:
+       - Liquidity: Current ratio, Quick ratio, Cash ratio
+       - Efficiency: Asset turnover, Inventory turnover, Receivables turnover
+       - Leverage: Debt-to-equity, Interest coverage, Debt-to-assets
+       - Profitability: Gross margin, Operating margin, Net margin, ROE, ROA
+    
+    Use the dataframes to extract exact figures and calculate comprehensive metrics.
+  expected_output: |
+    A comprehensive financial statements analysis report containing:
+    
+    SECTION 1: CURRENT YEAR FINANCIAL HIGHLIGHTS
+    - Specific current year figures for key line items from all three statements
+    - Current year financial ratios with exact calculations
+    - Notable current year financial achievements or concerns
+    
+    SECTION 2: MULTI-YEAR TREND ANALYSIS  
+    - 3-5 year trends in revenue, profitability, and key balance sheet items
+    - Holistic assessment of financial trajectory and consistency
+    - Identification of cyclical patterns or structural changes
+    
+    SECTION 3: FINANCIAL STRENGTH ASSESSMENT
+    - Liquidity position analysis with trend context
+    - Capital structure evaluation over time  
+    - Cash generation capability assessment
+    - Overall financial performance scoring with historical context
+
+assess_financial_risks:
+  description: |
+    Conduct comprehensive financial risk assessment based on the detailed financial analysis, focusing on multi-year trends and current year financial position.
+    
+    CRITICAL RISK ASSESSMENT AREAS:
+    1. LIQUIDITY & SOLVENCY RISKS:
+       - Current liquidity position vs multi-year trends
+       - Working capital management effectiveness
+       - Cash conversion cycle analysis
+       - Short-term debt obligations vs available cash
+    
+    2. LEVERAGE & CREDIT RISKS:
+       - Debt-to-equity trends and current levels vs industry benchmarks
+       - Interest coverage capacity and trends
+       - Debt maturity profile and refinancing risks
+       - Credit rating implications from financial metrics
+    
+    3. OPERATIONAL & PROFITABILITY RISKS:
+       - Margin stability and sustainability over time
+       - Revenue concentration and diversification risks
+       - Cost structure efficiency and scalability
+       - Competitive positioning reflected in financial performance
+    
+    4. STRATEGIC & SUSTAINABILITY RISKS:
+       - Capital allocation effectiveness (ROIC trends)
+       - Free cash flow generation consistency
+       - Investment in growth vs maintenance capex
+       - Financial flexibility for strategic initiatives
+    
+    Provide specific risk scoring and early warning indicators based on quantitative thresholds.
+  expected_output: |
+    A detailed risk assessment report containing:
+    
+    SECTION 1: OVERALL RISK RATING
+    - Composite financial risk score (Low/Medium/High) with justification
+    - Risk trend direction (Improving/Stable/Deteriorating)
+    - Comparison to industry risk benchmarks
+    
+    SECTION 2: SPECIFIC RISK FACTORS
+    - Liquidity risks with specific metrics and thresholds
+    - Leverage risks with debt service capability analysis
+    - Profitability sustainability risks with trend analysis
+    - Operational efficiency risks with multi-year context
+    
+    SECTION 3: EARLY WARNING INDICATORS
+    - Quantitative red flags from current and trend analysis
+    - Leading indicators of potential financial distress
+    - Risk monitoring metrics and threshold recommendations
+
+generate_health_report:
+  description: |
+    Create a comprehensive, executive-level financial health report that synthesizes the detailed financial analysis 
+    and risk assessment into a clear, actionable document for senior management and investors.
+    
+    MANDATORY REPORT STRUCTURE:
+    1. EXECUTIVE SUMMARY
+       - Overall financial health score with clear justification
+       - Key current year financial highlights from all 3 statements
+       - Critical multi-year trends summary
+       - Primary risk factors and overall risk rating
+    
+    2. CURRENT YEAR FINANCIAL PERFORMANCE
+       - Detailed breakdown of current year key line items:
+         * Income Statement: Revenue, Gross Profit, Operating Income, Net Income, EPS
+         * Balance Sheet: Total Assets, Current Assets, Total Liabilities, Current Liabilities, Equity
+         * Cash Flow: Operating Cash Flow, Investing Cash Flow, Financing Cash Flow, Free Cash Flow
+       - Current year financial ratios with benchmarking context
+    
+    3. MULTI-YEAR PERFORMANCE TRENDS
+       - 3-5 year holistic analysis of financial trajectory
+       - Revenue growth patterns and sustainability assessment
+       - Profitability trends with margin analysis
+       - Balance sheet strength evolution
+       - Cash generation and capital allocation effectiveness
+    
+    4. COMPREHENSIVE RISK ASSESSMENT
+       - Financial risk profile with specific quantitative metrics
+       - Risk trend analysis and early warning indicators
+       - Stress testing scenarios and financial resilience
+    
+    5. STRATEGIC RECOMMENDATIONS
+       - Investment thesis based on financial analysis
+       - Specific action items for management consideration
+       - Financial monitoring and improvement recommendations
+    
+    Present all findings with specific figures, percentages, and clear business implications.
+  expected_output: |
+    A professional financial health report structured as follows:
+    
+    # FINANCIAL HEALTH REPORT
+    
+    ## EXECUTIVE SUMMARY
+    - **Overall Health Score**: [Score with justification]
+    - **Current Year Highlights**: Key figures from all three statements
+    - **Multi-Year Assessment**: Trend analysis summary
+    - **Risk Rating**: Overall risk assessment with key factors
+    
+    ## CURRENT YEAR FINANCIAL ANALYSIS
+    **Income Statement Key Metrics:**
+    - Revenue: [Amount and analysis]
+    - Gross Profit: [Amount and margin analysis] 
+    - Operating Income: [Amount and margin analysis]
+    - Net Income: [Amount and analysis]
+    - EPS: [Amount and growth analysis]
+    
+    **Balance Sheet Key Metrics:**
+    - Total Assets: [Amount and composition analysis]
+    - Current Assets: [Amount and liquidity analysis]
+    - Total Liabilities: [Amount and structure analysis]
+    - Current Liabilities: [Amount and working capital impact]
+    - Shareholders' Equity: [Amount and growth analysis]
+    
+    **Cash Flow Key Metrics:**
+    - Operating Cash Flow: [Amount and quality analysis]
+    - Investing Cash Flow: [Amount and capex analysis]
+    - Financing Cash Flow: [Amount and capital structure analysis]
+    - Free Cash Flow: [Amount and generation analysis]
+    
+    ## MULTI-YEAR TREND ANALYSIS
+    - **Revenue Trajectory**: [3-5 year growth pattern analysis]
+    - **Profitability Evolution**: [Margin trends and sustainability]
+    - **Balance Sheet Strength**: [Capital structure and efficiency trends]
+    - **Cash Generation**: [FCF trends and capital allocation]
+    
+    ## RISK ASSESSMENT
+    - **Overall Risk Rating**: [Rating with quantitative justification]
+    - **Key Risk Factors**: [Specific risks with metrics]
+    - **Early Warning Indicators**: [Monitoring metrics]
+    
+    ## RECOMMENDATIONS
+    - **Investment Conclusion**: [Buy/Hold/Sell recommendation with rationale]
+    - **Management Actions**: [Specific operational recommendations]
+    - **Monitoring Framework**: [Key metrics to watch]

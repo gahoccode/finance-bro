@@ -1,0 +1,20 @@
+.
+├── README.md
+├── knowledge
+│   └── user_preference.txt
+├── pyproject.toml
+├── src
+│   └── test_structure
+│       ├── __init__.py
+│       ├── config
+│       │   ├── agents.yaml
+│       │   └── tasks.yaml
+│       ├── crew.py
+│       ├── main.py
+│       └── tools
+│           ├── __init__.py
+│           └── custom_tool.py
+├── structure.txt
+└── tests
+
+7 directories, 11 files
