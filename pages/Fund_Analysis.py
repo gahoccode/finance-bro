@@ -138,10 +138,8 @@ if 'nav_change_36m_annualized' in fund_list.columns:
     valid_funds = fund_list.dropna(subset=['nav_change_36m_annualized'])
     
     if len(valid_funds) > 0:
-        # Sort and take top 15 funds for readability
-        top_funds = valid_funds.nlargest(15, 'nav_change_36m_annualized')
-        
-        comparison_chart = create_fund_comparison_bar_chart(top_funds)
+        # Create comparison chart for all funds
+        comparison_chart = create_fund_comparison_bar_chart(valid_funds)
         
         st.altair_chart(comparison_chart, use_container_width=True)
 
@@ -284,8 +282,7 @@ with export_col4:
             nav_chart = create_fund_nav_line_chart(nav_data, selected_fund_name)
             
             valid_funds = fund_list.dropna(subset=['nav_change_36m_annualized'])
-            top_funds = valid_funds.nlargest(15, 'nav_change_36m_annualized')
-            comparison_chart = create_fund_comparison_bar_chart(top_funds)
+            comparison_chart = create_fund_comparison_bar_chart(valid_funds)
             
             asset_chart = create_fund_asset_pie_chart(asset_data, selected_fund_name)
             industry_chart = create_fund_industry_pie_chart(industry_data, selected_fund_name)

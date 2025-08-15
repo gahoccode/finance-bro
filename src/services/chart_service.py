@@ -667,19 +667,19 @@ def create_fund_nav_line_chart(nav_data: pd.DataFrame, fund_name: str) -> alt.Ch
     return nav_chart
 
 
-def create_fund_comparison_bar_chart(fund_data: pd.DataFrame, limit: int = 15) -> alt.Chart:
+def create_fund_comparison_bar_chart(fund_data: pd.DataFrame, limit: int = None) -> alt.Chart:
     """Create fund performance comparison bar chart
     
     Args:
         fund_data: DataFrame with fund performance data
-        limit: Number of top funds to display (default: 15)
+        limit: Number of top funds to display (default: None for all funds)
         
     Returns:
         Altair Chart object with Finance Bro theming
     """
     from src.core.config import THEME_COLORS
     
-    # Filter funds with valid 36m data and get top performers
+    # Filter funds with valid 36m data
     valid_funds = fund_data.dropna(subset=['nav_change_36m_annualized'])
     
     if len(valid_funds) == 0:
@@ -687,16 +687,19 @@ def create_fund_comparison_bar_chart(fund_data: pd.DataFrame, limit: int = 15) -
             text=alt.value("No data available")
         )
     
-    # Sort and take top funds for readability
-    top_funds = valid_funds.nlargest(limit, 'nav_change_36m_annualized')
+    # Sort funds by performance (show all funds or apply limit if specified)
+    if limit is not None:
+        display_funds = valid_funds.nlargest(limit, 'nav_change_36m_annualized')
+    else:
+        display_funds = valid_funds.sort_values('nav_change_36m_annualized', ascending=False)
     
-    comparison_chart = alt.Chart(top_funds).mark_bar(
+    comparison_chart = alt.Chart(display_funds).mark_bar(
         color=THEME_COLORS["tertiary"],
         stroke=THEME_COLORS["primary"],
         strokeWidth=1
     ).encode(
-        x=alt.X('short_name:N', title='Fund Name', sort='-y'),
-        y=alt.Y('nav_change_36m_annualized:Q', title='36-Month Annualized Return (%)'),
+        x=alt.X('short_name:N', title='Fund Name', sort='-y', axis=alt.Axis(grid=False)),
+        y=alt.Y('nav_change_36m_annualized:Q', title='36-Month Annualized Return (%)', axis=alt.Axis(grid=False)),
         tooltip=[
             alt.Tooltip('short_name:N', title='Fund Name'),
             alt.Tooltip('nav_change_36m_annualized:Q', title='36M Return (%)', format='.2f'),
@@ -704,9 +707,9 @@ def create_fund_comparison_bar_chart(fund_data: pd.DataFrame, limit: int = 15) -
             alt.Tooltip('fund_owner_name:N', title='Fund Owner')
         ]
     ).properties(
-        width=700,
+        width=max(800, len(display_funds) * 15),  # Dynamic width based on number of funds
         height=400,
-        title="Top 15 Funds - 36-Month Annualized Returns"
+        title=f"All Funds - 36-Month Annualized Returns ({len(display_funds)} funds)"
     )
     
     return comparison_chart
