@@ -628,3 +628,174 @@ def get_fibonacci_level_alerts(data: pd.DataFrame, fibonacci_config: Dict) -> li
     except Exception as e:
         st.warning(f"Error checking Fibonacci alerts: {str(e)}")
         return []
+
+
+# Fund Analysis Chart Functions
+
+def create_fund_nav_line_chart(nav_data: pd.DataFrame, fund_name: str) -> alt.Chart:
+    """Create NAV performance line chart for fund analysis
+    
+    Args:
+        nav_data: DataFrame with 'date' and 'nav_per_unit' columns
+        fund_name: Name of the fund for chart title
+        
+    Returns:
+        Altair Chart object with Finance Bro theming
+    """
+    from src.core.config import THEME_COLORS
+    
+    nav_chart = alt.Chart(nav_data).mark_line(
+        color=THEME_COLORS["primary"],
+        strokeWidth=3
+    ).add_params(
+        alt.selection_interval(bind='scales')
+    ).encode(
+        x=alt.X('date:T', title='Date', axis=alt.Axis(format='%Y-%m')),
+        y=alt.Y('nav_per_unit:Q', title='NAV per Unit', scale=alt.Scale(zero=False)),
+        tooltip=[
+            alt.Tooltip('date:T', title='Date', format='%Y-%m-%d'),
+            alt.Tooltip('nav_per_unit:Q', title='NAV per Unit', format='.2f')
+        ]
+    ).properties(
+        width=700,
+        height=400,
+        title=f"NAV Performance - {fund_name}"
+    ).resolve_scale(
+        color='independent'
+    )
+    
+    return nav_chart
+
+
+def create_fund_comparison_bar_chart(fund_data: pd.DataFrame, limit: int = 15) -> alt.Chart:
+    """Create fund performance comparison bar chart
+    
+    Args:
+        fund_data: DataFrame with fund performance data
+        limit: Number of top funds to display (default: 15)
+        
+    Returns:
+        Altair Chart object with Finance Bro theming
+    """
+    from src.core.config import THEME_COLORS
+    
+    # Filter funds with valid 36m data and get top performers
+    valid_funds = fund_data.dropna(subset=['nav_change_36m_annualized'])
+    
+    if len(valid_funds) == 0:
+        return alt.Chart(pd.DataFrame()).mark_text().encode(
+            text=alt.value("No data available")
+        )
+    
+    # Sort and take top funds for readability
+    top_funds = valid_funds.nlargest(limit, 'nav_change_36m_annualized')
+    
+    comparison_chart = alt.Chart(top_funds).mark_bar(
+        color=THEME_COLORS["tertiary"],
+        stroke=THEME_COLORS["primary"],
+        strokeWidth=1
+    ).encode(
+        x=alt.X('nav_change_36m_annualized:Q', title='36-Month Annualized Return (%)'),
+        y=alt.Y('short_name:N', title='Fund Name', sort='-x'),
+        tooltip=[
+            alt.Tooltip('short_name:N', title='Fund Name'),
+            alt.Tooltip('nav_change_36m_annualized:Q', title='36M Return (%)', format='.2f'),
+            alt.Tooltip('fund_type:N', title='Fund Type'),
+            alt.Tooltip('fund_owner_name:N', title='Fund Owner')
+        ]
+    ).properties(
+        width=700,
+        height=400,
+        title="Top 15 Funds - 36-Month Annualized Returns"
+    )
+    
+    return comparison_chart
+
+
+def create_fund_asset_pie_chart(asset_data: pd.DataFrame, fund_name: str) -> alt.Chart:
+    """Create asset allocation pie chart for fund analysis
+    
+    Args:
+        asset_data: DataFrame with 'asset_type' and 'net_asset_percent' columns
+        fund_name: Name of the fund for chart title
+        
+    Returns:
+        Altair Chart object with Finance Bro theming
+    """
+    from src.core.config import THEME_COLORS
+    
+    if asset_data.empty:
+        return alt.Chart(pd.DataFrame()).mark_text().encode(
+            text=alt.value("No asset allocation data available")
+        )
+    
+    # Handle different column name formats
+    percent_col = 'asset_percent' if 'asset_percent' in asset_data.columns else 'net_asset_percent'
+    
+    asset_chart = alt.Chart(asset_data).mark_arc(
+        innerRadius=50,
+        stroke='white',
+        strokeWidth=2
+    ).encode(
+        theta=alt.Theta(f'{percent_col}:Q', title='Percentage'),
+        color=alt.Color('asset_type:N', 
+                      scale=alt.Scale(range=[THEME_COLORS["primary"], 
+                                           THEME_COLORS["secondary"], 
+                                           THEME_COLORS["tertiary"], 
+                                           "#8B7D7B", "#A59B96"])),
+        tooltip=[
+            alt.Tooltip('asset_type:N', title='Asset Type'),
+            alt.Tooltip(f'{percent_col}:Q', title='Percentage (%)', format='.2f')
+        ]
+    ).properties(
+        width=300,
+        height=300,
+        title=f"Asset Allocation - {fund_name}"
+    )
+    
+    return asset_chart
+
+
+def create_fund_industry_pie_chart(industry_data: pd.DataFrame, fund_name: str) -> alt.Chart:
+    """Create industry allocation pie chart for fund analysis
+    
+    Args:
+        industry_data: DataFrame with 'industry' and allocation percentage columns
+        fund_name: Name of the fund for chart title
+        
+    Returns:
+        Altair Chart object with Finance Bro theming
+    """
+    from src.core.config import THEME_COLORS
+    
+    if industry_data.empty:
+        return alt.Chart(pd.DataFrame()).mark_text().encode(
+            text=alt.value("No industry allocation data available")
+        )
+    
+    # Handle different column name formats
+    percent_col = 'industry_percent' if 'industry_percent' in industry_data.columns else 'net_asset_percent'
+    
+    industry_chart = alt.Chart(industry_data).mark_arc(
+        innerRadius=50,
+        stroke='white',
+        strokeWidth=2
+    ).encode(
+        theta=alt.Theta(f'{percent_col}:Q', title='Percentage'),
+        color=alt.Color('industry:N', 
+                      scale=alt.Scale(range=[THEME_COLORS["primary"], 
+                                           THEME_COLORS["secondary"], 
+                                           THEME_COLORS["tertiary"], 
+                                           "#8B7D7B", "#A59B96", 
+                                           "#6B6B6B", "#9A9A9A", "#B5B5B5"])),
+        tooltip=[
+            alt.Tooltip('industry:N', title='Industry'),
+            alt.Tooltip(f'{percent_col}:Q', title='Allocation (%)', format='.2f')
+        ]
+    ).properties(
+        width=300,
+        height=300,
+        title=f"Industry Allocation - {fund_name}"
+    )
+    
+    return industry_chart

@@ -10,7 +10,12 @@ from src.services.vnstock_api import (
     get_fund_asset_allocation,
     get_fund_industry_allocation
 )
-from src.core.config import THEME_COLORS
+from src.services.chart_service import (
+    create_fund_nav_line_chart,
+    create_fund_comparison_bar_chart,
+    create_fund_asset_pie_chart,
+    create_fund_industry_pie_chart
+)
 
 st.set_page_config(page_title="Fund Analysis", layout="wide")
 
@@ -52,23 +57,23 @@ with col1:
             metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
             
             with metric_col1:
-                st.metric("NAV", f"{highest_nav_fund['nav']:,.2f}")
+                st.metric("NAV", f"{highest_nav_fund['nav']:,.0f}")
             
             with metric_col2:
                 if pd.notna(highest_nav_fund.get('nav_change_inception')):
-                    st.metric("Since Inception", f"{highest_nav_fund['nav_change_inception']:.2f}%")
+                    st.metric("Since Inception", f"{highest_nav_fund['nav_change_inception']:,.0f}%")
                 else:
                     st.metric("Since Inception", "N/A")
             
             with metric_col3:
                 if pd.notna(highest_nav_fund.get('nav_change_36m_annualized')):
-                    st.metric("3Y Annualized", f"{highest_nav_fund['nav_change_36m_annualized']:.2f}%")
+                    st.metric("3Y Annualized", f"{highest_nav_fund['nav_change_36m_annualized']:,.0f}%")
                 else:
                     st.metric("3Y Annualized", "N/A")
             
             with metric_col4:
                 if pd.notna(highest_nav_fund.get('management_fee')):
-                    st.metric("Management Fee", f"{highest_nav_fund['management_fee']:.2f}%")
+                    st.metric("Management Fee", f"{highest_nav_fund['management_fee']:,.0f}%")
                 else:
                     st.metric("Management Fee", "N/A")
 
@@ -94,30 +99,8 @@ st.subheader("📈 Fund Performance Analysis")
 nav_data = get_fund_nav_report(selected_fund_name)
 
 if not nav_data.empty:
-    # Prepare NAV chart data
-    nav_chart_data = nav_data.copy()
-    
-    # Create NAV Performance Line Chart with Finance Bro colors
-    nav_chart = alt.Chart(nav_chart_data).mark_line(
-        color=THEME_COLORS["primary"],
-        strokeWidth=3
-    ).add_selection(
-        alt.selection_interval(bind='scales')
-    ).encode(
-        x=alt.X('date:T', title='Date', axis=alt.Axis(format='%Y-%m')),
-        y=alt.Y('nav_per_unit:Q', title='NAV per Unit', scale=alt.Scale(zero=False)),
-        tooltip=[
-            alt.Tooltip('date:T', title='Date', format='%Y-%m-%d'),
-            alt.Tooltip('nav_per_unit:Q', title='NAV per Unit', format='.2f')
-        ]
-    ).properties(
-        width=700,
-        height=400,
-        title=f"NAV Performance - {selected_fund_name}"
-    ).resolve_scale(
-        color='independent'
-    )
-    
+    # Create NAV Performance Line Chart using chart service
+    nav_chart = create_fund_nav_line_chart(nav_data, selected_fund_name)
     st.altair_chart(nav_chart, use_container_width=True)
     
     # Display additional performance metrics
@@ -129,13 +112,13 @@ if not nav_data.empty:
         perf_col1, perf_col2, perf_col3 = st.columns(3)
         
         with perf_col1:
-            st.metric("Latest NAV", f"{latest_nav:.2f}")
+            st.metric("Latest NAV", f"{latest_nav:,.0f}")
         
         with perf_col2:
-            st.metric("First NAV", f"{first_nav:.2f}")
+            st.metric("First NAV", f"{first_nav:,.0f}")
         
         with perf_col3:
-            st.metric("Total Return", f"{total_return:.2f}%")
+            st.metric("Total Return", f"{total_return:,.0f}%")
 
 else:
     st.warning(f"⚠️ NAV data not available for {selected_fund_name}")
@@ -152,24 +135,7 @@ if 'nav_change_36m_annualized' in fund_list.columns:
         # Sort and take top 15 funds for readability
         top_funds = valid_funds.nlargest(15, 'nav_change_36m_annualized')
         
-        comparison_chart = alt.Chart(top_funds).mark_bar(
-            color=THEME_COLORS["tertiary"],
-            stroke=THEME_COLORS["primary"],
-            strokeWidth=1
-        ).encode(
-            x=alt.X('nav_change_36m_annualized:Q', title='36-Month Annualized Return (%)'),
-            y=alt.Y('short_name:N', title='Fund Name', sort='-x'),
-            tooltip=[
-                alt.Tooltip('short_name:N', title='Fund Name'),
-                alt.Tooltip('nav_change_36m_annualized:Q', title='36M Return (%)', format='.2f'),
-                alt.Tooltip('fund_type:N', title='Fund Type'),
-                alt.Tooltip('fund_owner_name:N', title='Fund Owner')
-            ]
-        ).properties(
-            width=700,
-            height=400,
-            title="Top 15 Funds - 36-Month Annualized Returns"
-        )
+        comparison_chart = create_fund_comparison_bar_chart(top_funds)
         
         st.altair_chart(comparison_chart, use_container_width=True)
 
@@ -183,33 +149,15 @@ with allocation_col1:
     asset_data = get_fund_asset_allocation(selected_fund_name)
     
     if not asset_data.empty:
-        # Create pie chart for asset allocation
-        asset_chart = alt.Chart(asset_data).mark_arc(
-            innerRadius=50,
-            stroke='white',
-            strokeWidth=2
-        ).encode(
-            theta=alt.Theta('net_asset_percent:Q', title='Percentage'),
-            color=alt.Color('asset_type:N', 
-                          scale=alt.Scale(range=[THEME_COLORS["primary"], 
-                                               THEME_COLORS["secondary"], 
-                                               THEME_COLORS["tertiary"], 
-                                               "#8B7D7B", "#A59B96"])),
-            tooltip=[
-                alt.Tooltip('asset_type:N', title='Asset Type'),
-                alt.Tooltip('net_asset_percent:Q', title='Percentage (%)', format='.2f')
-            ]
-        ).properties(
-            width=300,
-            height=300,
-            title=f"Asset Allocation - {selected_fund_name}"
-        )
+        # Create asset allocation pie chart using chart service
+        asset_chart = create_fund_asset_pie_chart(asset_data, selected_fund_name)
         
         st.altair_chart(asset_chart, use_container_width=True)
         
-        # Display asset allocation table
-        if 'asset_type' in asset_data.columns and 'net_asset_percent' in asset_data.columns:
-            asset_display = asset_data[['asset_type', 'net_asset_percent']].copy()
+        # Display asset allocation table - handle different column names
+        percent_col = 'asset_percent' if 'asset_percent' in asset_data.columns else 'net_asset_percent'
+        if 'asset_type' in asset_data.columns and percent_col in asset_data.columns:
+            asset_display = asset_data[['asset_type', percent_col]].copy()
             asset_display.columns = ['Asset Type', 'Allocation (%)']
             asset_display['Allocation (%)'] = asset_display['Allocation (%)'].round(2)
             st.dataframe(asset_display, hide_index=True)
@@ -221,23 +169,8 @@ with allocation_col2:
     industry_data = get_fund_industry_allocation(selected_fund_name)
     
     if not industry_data.empty:
-        # Create horizontal bar chart for industry allocation
-        industry_chart = alt.Chart(industry_data).mark_bar(
-            color=THEME_COLORS["tertiary"],
-            stroke=THEME_COLORS["primary"],
-            strokeWidth=1
-        ).encode(
-            x=alt.X('net_asset_percent:Q', title='Allocation (%)'),
-            y=alt.Y('industry:N', title='Industry', sort='-x'),
-            tooltip=[
-                alt.Tooltip('industry:N', title='Industry'),
-                alt.Tooltip('net_asset_percent:Q', title='Allocation (%)', format='.2f')
-            ]
-        ).properties(
-            width=300,
-            height=300,
-            title=f"Industry Allocation - {selected_fund_name}"
-        )
+        # Create industry allocation pie chart using chart service
+        industry_chart = create_fund_industry_pie_chart(industry_data, selected_fund_name)
         
         st.altair_chart(industry_chart, use_container_width=True)
         
