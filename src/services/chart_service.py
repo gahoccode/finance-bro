@@ -695,8 +695,8 @@ def create_fund_comparison_bar_chart(fund_data: pd.DataFrame, limit: int = 15) -
         stroke=THEME_COLORS["primary"],
         strokeWidth=1
     ).encode(
-        x=alt.X('nav_change_36m_annualized:Q', title='36-Month Annualized Return (%)'),
-        y=alt.Y('short_name:N', title='Fund Name', sort='-x'),
+        x=alt.X('short_name:N', title='Fund Name', sort='-y'),
+        y=alt.Y('nav_change_36m_annualized:Q', title='36-Month Annualized Return (%)'),
         tooltip=[
             alt.Tooltip('short_name:N', title='Fund Name'),
             alt.Tooltip('nav_change_36m_annualized:Q', title='36M Return (%)', format='.2f'),
