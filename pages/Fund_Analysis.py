@@ -19,6 +19,52 @@ from src.services.chart_service import (
 
 st.set_page_config(page_title="Fund Analysis", layout="wide")
 
+# Custom CSS to change success alert color to primary color and markdown container to tertiary color
+st.html("""
+<style>
+
+/* Target success alerts - try multiple approaches */
+div[data-testid="stAlert"][data-baseweb="notification"] {
+    background-color: #D4D4D4 !important;
+    border-color: #D4D4D4 !important;
+    color: #56524D !important;
+}
+
+.stAlert {
+    background-color: #D4D4D4 !important;
+    border-color: #D4D4D4 !important;
+    color: #56524D !important;
+}
+
+/* Success alert specific targeting */
+.stSuccess, .st-success {
+    background-color: #D4D4D4 !important;
+    border-color: #D4D4D4 !important;
+    color: #56524D !important;
+}
+
+/* Target the alert content */
+div[data-testid="stAlert"] > div {
+    background-color: #D4D4D4 !important;
+    color: #56524D !important;
+}
+
+/* Target the markdown content inside alerts */
+div[data-testid="stAlert"] .stMarkdown {
+    color: #56524D !important;
+}
+
+/* Target alert content more specifically */
+div[data-testid="stAlert"] p {
+    color: #56524D !important;
+}
+
+.stMarkdownContainer {
+    background-color: #76706C !important;
+}
+</style>
+""")
+
 st.title("🏦 Vietnamese Fund Analysis")
 
 # Main content
@@ -220,27 +266,31 @@ st.subheader("💾 Data Export")
 export_col1, export_col2, export_col3 = st.columns(3)
 
 with export_col1:
-    if st.button("📊 Export Fund List"):
-        csv_data = fund_list.to_csv(index=False)
-        st.download_button(
-            label="Download Fund List CSV",
-            data=csv_data,
-            file_name=f"vietnamese_funds_{datetime.now().strftime('%Y%m%d')}.csv",
-            mime="text/csv"
-        )
+    # Prepare fund list CSV data
+    csv_data = fund_list.to_csv(index=False)
+    st.download_button(
+        label="📊 Download Fund List CSV",
+        data=csv_data,
+        file_name=f"vietnamese_funds_{datetime.now().strftime('%Y%m%d')}.csv",
+        mime="text/csv"
+    )
 
 with export_col2:
-    if not nav_data.empty and st.button("📈 Export NAV Data"):
+    # Prepare NAV data CSV (only show if data exists)
+    if not nav_data.empty:
         nav_csv = nav_data.to_csv(index=False)
         st.download_button(
-            label="Download NAV Data CSV",
+            label="📈 Download NAV Data CSV",
             data=nav_csv,
             file_name=f"nav_data_{selected_fund_code}_{datetime.now().strftime('%Y%m%d')}.csv",
             mime="text/csv"
         )
+    else:
+        st.write("📈 NAV Data (Not Available)")
 
 with export_col3:
-    if not industry_data.empty and st.button("🏭 Export Allocations"):
+    # Prepare allocation data CSV (only show if data exists)
+    if not industry_data.empty or not asset_data.empty:
         allocation_data = pd.concat([
             asset_data.assign(type='Asset') if not asset_data.empty else pd.DataFrame(),
             industry_data.assign(type='Industry') if not industry_data.empty else pd.DataFrame()
@@ -248,11 +298,15 @@ with export_col3:
         if not allocation_data.empty:
             allocation_csv = allocation_data.to_csv(index=False)
             st.download_button(
-                label="Download Allocation CSV",
+                label="🏭 Download Allocations CSV",
                 data=allocation_csv,
                 file_name=f"allocations_{selected_fund_code}_{datetime.now().strftime('%Y%m%d')}.csv",
                 mime="text/csv"
             )
+        else:
+            st.write("🏭 Allocations (Not Available)")
+    else:
+        st.write("🏭 Allocations (Not Available)")
 
 # Footer
 st.markdown("---")

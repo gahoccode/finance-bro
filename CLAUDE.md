@@ -134,6 +134,27 @@ Custom theme is configured in `.streamlit/config.toml` with:
 - Sequential colors for data progression charts
 - Serif font for professional appearance
 
+### Custom CSS Styling
+The application uses `st.html()` to inject custom CSS for consistent theming:
+- **Success alerts**: Light gray background (`#D4D4D4`) with earth-tone text (`#56524D`)
+- **Markdown containers**: Tertiary color background (`#76706C`) 
+- **Alert targeting**: Multiple CSS selectors ensure compatibility across Streamlit versions
+- **Implementation**: CSS injected after `st.set_page_config()` and before page content
+
+Example implementation in pages:
+```python
+st.html("""
+<style>
+div[data-testid="stAlert"] {
+    background-color: #D4D4D4 !important;
+    color: #56524D !important;
+}
+.stMarkdownContainer {
+    background-color: #76706C !important;
+}
+</style>
+""")
+
 ### Environment Variables
 - `OPENAI_API_KEY` - Required for AI functionality
 - Optional Docker environment variables in `.env`
