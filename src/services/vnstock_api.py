@@ -7,7 +7,7 @@ PRESERVES ALL @st.cache_data decorators and vnstock API instantiation patterns e
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
-from vnstock import Vnstock, Company, Quote, Screener
+from vnstock import Vnstock, Company, Quote, Screener, Fund
 import pandas_ta as ta
 
 
@@ -449,3 +449,70 @@ def get_cache_info():
     }
     
     return cached_functions
+
+
+# ================================
+# FUND DATA FUNCTIONS
+# Based on Reference/funds.md
+# ================================
+
+@st.cache_data(ttl=3600)  # Cache for 1 hour
+def get_fund_listing():
+    """Get list of all funds with caching
+    
+    Based on Reference/funds.md lines 1-4
+    """
+    try:
+        fund = Fund()
+        fund_list = fund.listing()
+        return fund_list
+    except Exception as e:
+        st.error(f"Error fetching fund listing: {str(e)}")
+        return pd.DataFrame()
+
+
+@st.cache_data(ttl=3600)  # Cache for 1 hour  
+def get_fund_nav_report(fund_code):
+    """Get NAV report for specific fund with caching
+    
+    Based on Reference/funds.md lines 22-26
+    """
+    try:
+        fund = Fund()
+        fund_details = fund.details.nav_report(fund_code)
+        if not fund_details.empty:
+            fund_details['date'] = pd.to_datetime(fund_details['date'])
+        return fund_details
+    except Exception as e:
+        st.error(f"Error fetching NAV report for {fund_code}: {str(e)}")
+        return pd.DataFrame()
+
+
+@st.cache_data(ttl=3600)  # Cache for 1 hour
+def get_fund_asset_allocation(fund_code):
+    """Get asset allocation for specific fund with caching
+    
+    Based on Reference/funds.md lines 82
+    """
+    try:
+        fund = Fund()
+        asset_allocation = fund.details.asset_holding(fund_code)
+        return asset_allocation
+    except Exception as e:
+        st.error(f"Error fetching asset allocation for {fund_code}: {str(e)}")
+        return pd.DataFrame()
+
+
+@st.cache_data(ttl=3600)  # Cache for 1 hour
+def get_fund_industry_allocation(fund_code):
+    """Get industry allocation for specific fund with caching
+    
+    Based on Reference/funds.md lines 85
+    """
+    try:
+        fund = Fund()
+        industry_allocation = fund.details.industry_holding(fund_code)
+        return industry_allocation
+    except Exception as e:
+        st.error(f"Error fetching industry allocation for {fund_code}: {str(e)}")
+        return pd.DataFrame()

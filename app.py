@@ -144,6 +144,10 @@ def main_page():
         with col2:
             if st.button("📊 Technical Analysis", use_container_width=True):
                 st.switch_page("pages/Technical_Analysis.py")
+        
+        with col3:
+            if st.button("🏦 Fund Analysis", use_container_width=True):
+                st.switch_page("pages/Fund_Analysis.py")
     
     # Instructions and app information
     st.markdown("---")
@@ -165,6 +169,7 @@ def main_page():
         - **🏢 Company Overview** - Company profile, ownership structure, and management team
         - **💼 Portfolio Optimization** - Modern Portfolio Theory-based portfolio optimization
         - **🔍 Stock Screener** - Filter and analyze stocks by financial metrics across industries
+        - **🏦 Fund Analysis** - Vietnamese investment fund analysis with NAV performance and allocation charts
         
         **Tips:**
         - Your selected stock symbol persists across all pages
@@ -189,6 +194,7 @@ pages = {
         st.Page("pages/Company_Overview.py", title="Company Overview", icon="🏢"),
         st.Page("pages/Portfolio_Optimization.py", title="Portfolio Optimization", icon="💼"),
         st.Page("pages/Screener.py", title="Stock Screener", icon="🔍"),
+        st.Page("pages/Fund_Analysis.py", title="Fund Analysis", icon="🏦"),
     ]
 }
 

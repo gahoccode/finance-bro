@@ -59,12 +59,14 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
   - **Technical_Analysis.py** - Advanced technical indicators with pandas-ta integration
   - **Portfolio_Optimization.py** - Modern Portfolio Theory optimization
   - **Screener.py** - Stock screening and filtering functionality
+  - **Fund_Analysis.py** - Vietnamese investment fund analysis with NAV performance and allocation charts
 - **src/** - Modular utilities and services (NEW):
   - **core/config.py** - Centralized app configuration and constants
-  - **services/vnstock_api.py** - All VnStock API functions (26 centralized)
-  - **services/chart_service.py** - Chart generation utilities (7 functions)
+  - **services/vnstock_api.py** - All VnStock API functions (30 centralized, including fund data)
+  - **services/chart_service.py** - Chart generation utilities (10 functions, including Fibonacci overlays)
   - **services/data_service.py** - Data transformation utilities
-  - **components/** - Reusable UI components (stock_selector.py, date_picker.py)
+  - **services/fibonacci_service.py** - Fibonacci retracement analysis with SciPy swing detection
+  - **components/** - Reusable UI components (stock_selector.py, date_picker.py, ui_components.py)
   - **utils/** - General utilities (session_utils.py, validation.py)
 - **static/** - CSS styling with custom theme configuration
 - **cache/** - Data caching for performance
@@ -77,6 +79,8 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
 - **vnstock** - Vietnamese stock market data (v3.2.5)
 - **OpenAI API** - LLM for natural language queries
 - **Google OAuth** - User authentication
+- **SciPy** - Scientific computing for Fibonacci swing point detection
+- **Altair** - Interactive statistical visualizations with Finance Bro theming
 
 ### Data Flow
 1. Authentication via Google OAuth (required)
@@ -216,6 +220,9 @@ uv run pytest tests/test_portfolio_optimization.py::test_function_name
 
 ### Data Sources and APIs
 - **vnstock** v3.2.5 - Vietnamese stock data (VCI/TCBS sources)  
+  - Stock price data, company information, technical indicators
+  - Investment fund data (NAV reports, asset/industry allocations)
+  - 57+ Vietnamese investment funds with historical performance
 - **OpenAI API** - Required for AI functionality
 - **Google OAuth** - Required for user authentication
 - Stock data cached in `cache/` directory for performance
