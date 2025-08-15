@@ -11,6 +11,7 @@ from typing import List, Optional, Dict, Any
 from ..utils.session_utils import get_stock_symbol, get_symbols_list
 from ..utils.validation import validate_stock_symbol
 from ..core.config import DEFAULT_STOCK_SYMBOLS
+from .ui_components import inject_custom_success_styling
 
 
 def render_stock_selector(
@@ -139,6 +140,9 @@ def handle_stock_selection(selected_symbol: str) -> None:
         selected_symbol: The newly selected symbol
     """
     if selected_symbol:
+        # Apply custom CSS styling for success alerts
+        inject_custom_success_styling()
+        
         # Use exact same logic as existing code
         if 'stock_symbol' not in st.session_state or st.session_state.stock_symbol != selected_symbol:
             st.session_state.stock_symbol = selected_symbol
@@ -158,6 +162,9 @@ def render_symbol_validation(symbol: str, available_symbols: List[str]) -> bool:
     Returns:
         True if valid, False otherwise
     """
+    # Apply custom CSS styling for success alerts
+    inject_custom_success_styling()
+    
     validation_result = validate_stock_symbol(symbol, available_symbols)
     
     if validation_result["valid"]:
@@ -278,6 +285,9 @@ def render_multi_symbol_selector(
     )
     
     # Validation feedback (matching existing patterns)
+    # Apply custom CSS styling for success alerts
+    inject_custom_success_styling()
+    
     if len(selected_symbols) < min_selections:
         st.warning(f"Please select at least {min_selections} symbol(s)")
     elif len(selected_symbols) > max_selections:

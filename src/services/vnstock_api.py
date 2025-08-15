@@ -10,6 +10,8 @@ from datetime import datetime, timedelta
 from vnstock import Vnstock, Company, Quote, Screener, Fund
 import pandas_ta as ta
 
+from ..components.ui_components import inject_custom_success_styling
+
 
 # ================================
 # COMPANY DATA FUNCTIONS
@@ -382,6 +384,9 @@ def calculate_technical_indicators(data: pd.DataFrame) -> dict:
     
     # Show success summary
     if indicators:
+        # Apply custom CSS styling for success alerts
+        inject_custom_success_styling()
+        
         success_indicators = list(indicators.keys())
         st.success(f"✅ **Successfully calculated indicators**: {', '.join(success_indicators).upper()}")
     

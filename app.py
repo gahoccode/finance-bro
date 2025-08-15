@@ -2,6 +2,7 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 from vnstock import Listing
+from src.components.ui_components import inject_custom_success_styling
 
 # Load environment variables from .env file
 load_dotenv()
@@ -13,7 +14,8 @@ st.set_page_config(
     layout="wide"
 )
 
-# CSS loading removed
+# Apply custom CSS styling for success alerts
+inject_custom_success_styling()
 
 # Authentication handling
 if not st.user.is_logged_in:

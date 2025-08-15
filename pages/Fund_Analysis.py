@@ -16,54 +16,12 @@ from src.services.chart_service import (
     create_fund_asset_pie_chart,
     create_fund_industry_pie_chart
 )
+from src.components.ui_components import inject_custom_success_styling
 
 st.set_page_config(page_title="Fund Analysis", layout="wide")
 
-# Custom CSS to change success alert color to primary color and markdown container to tertiary color
-st.html("""
-<style>
-
-/* Target success alerts - try multiple approaches */
-div[data-testid="stAlert"][data-baseweb="notification"] {
-    background-color: #D4D4D4 !important;
-    border-color: #D4D4D4 !important;
-    color: #56524D !important;
-}
-
-.stAlert {
-    background-color: #D4D4D4 !important;
-    border-color: #D4D4D4 !important;
-    color: #56524D !important;
-}
-
-/* Success alert specific targeting */
-.stSuccess, .st-success {
-    background-color: #D4D4D4 !important;
-    border-color: #D4D4D4 !important;
-    color: #56524D !important;
-}
-
-/* Target the alert content */
-div[data-testid="stAlert"] > div {
-    background-color: #D4D4D4 !important;
-    color: #56524D !important;
-}
-
-/* Target the markdown content inside alerts */
-div[data-testid="stAlert"] .stMarkdown {
-    color: #56524D !important;
-}
-
-/* Target alert content more specifically */
-div[data-testid="stAlert"] p {
-    color: #56524D !important;
-}
-
-.stMarkdownContainer {
-    background-color: #76706C !important;
-}
-</style>
-""")
+# Apply custom CSS styling for success alerts
+inject_custom_success_styling()
 
 st.title("🏦 Vietnamese Fund Analysis")
 

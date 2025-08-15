@@ -18,10 +18,14 @@ from src.services.chart_service import (
     display_fibonacci_summary,
     get_fibonacci_level_alerts,
 )
+from src.components.ui_components import inject_custom_success_styling
 
 st.set_page_config(
     page_title="Technical Analysis - Finance Bro", page_icon="📊", layout="wide"
 )
+
+# Apply custom CSS styling for success alerts
+inject_custom_success_styling()
 
 
 

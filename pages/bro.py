@@ -10,6 +10,7 @@ import warnings
 # pandasai v2.4.2 imports
 from pandasai import Agent
 from pandasai.llm import OpenAI
+from src.components.ui_components import inject_custom_success_styling
 
 warnings.filterwarnings("ignore")
 
@@ -141,7 +142,8 @@ st.set_page_config(
     layout="wide"
 )
 
-# CSS loading removed
+# Apply custom CSS styling for success alerts
+inject_custom_success_styling()
 
 # Get stock symbol from session state (set in main app)
 # If not available, show message to use main app first

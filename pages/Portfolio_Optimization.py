@@ -17,6 +17,7 @@ from src.services.vnstock_api import fetch_portfolio_stock_data
 from bokeh.models import ColumnDataSource
 from math import pi
 import riskfolio as rp
+from src.components.ui_components import inject_custom_success_styling
 
 # Streamlit page configuration
 st.set_page_config(
@@ -25,9 +26,10 @@ st.set_page_config(
     layout="wide"
 )
 
-import os
+# Apply custom CSS styling for success alerts
+inject_custom_success_styling()
 
-# CSS loading removed
+import os
 
 # Get stock symbol from session state (set in main app)
 # If not available, show message to use main app first

@@ -13,6 +13,7 @@ from typing import Tuple, Optional
 from ..utils.session_utils import get_analysis_dates, has_date_range_changed
 from ..utils.validation import validate_date_range
 from ..core.config import DEFAULT_ANALYSIS_START_DATE
+from .ui_components import inject_custom_success_styling
 
 
 def render_date_range_picker(
@@ -94,6 +95,9 @@ def render_date_validation(start_date: datetime, end_date: datetime) -> bool:
     Returns:
         True if valid, False otherwise
     """
+    # Apply custom CSS styling for success alerts
+    inject_custom_success_styling()
+    
     validation_result = validate_date_range(start_date, end_date)
     
     if validation_result["valid"]:

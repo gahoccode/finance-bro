@@ -12,13 +12,15 @@ import altair as alt
 import os
 import quantstats as qs
 from datetime import datetime
+from src.components.ui_components import inject_custom_success_styling
 
 st.set_page_config(page_title="Stock Price Analysis", layout="wide")
 
+# Apply custom CSS styling for success alerts
+inject_custom_success_styling()
+
 # Extend pandas functionality with QuantStats
 qs.extend_pandas()
-
-# CSS loading removed
 
 # Get stock symbol from session state (set in main app)
 # If not available, show message to use main app first

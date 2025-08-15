@@ -287,3 +287,59 @@ def render_allocation_summary_metrics(allocated_value: float, leftover: float, p
     
     with col3:
         st.metric("Stocks to Buy", total_stocks)
+
+def inject_custom_success_styling():
+    """
+    Inject custom CSS styling for Streamlit success alerts.
+    
+    This function applies the Finance Bro earth-tone theme to all st.success() elements:
+    - Background color: #D4D4D4 (light gray)
+    - Text color: #56524D (earth tone)
+    - Also styles markdown containers with tertiary color: #76706C
+    
+    Should be called after st.set_page_config() and before any st.success() usage.
+    """
+    st.html("""
+<style>
+
+/* Target success alerts - try multiple approaches */
+div[data-testid="stAlert"][data-baseweb="notification"] {
+    background-color: #D4D4D4 !important;
+    border-color: #D4D4D4 !important;
+    color: #56524D !important;
+}
+
+.stAlert {
+    background-color: #D4D4D4 !important;
+    border-color: #D4D4D4 !important;
+    color: #56524D !important;
+}
+
+/* Success alert specific targeting */
+.stSuccess, .st-success {
+    background-color: #D4D4D4 !important;
+    border-color: #D4D4D4 !important;
+    color: #56524D !important;
+}
+
+/* Target the alert content */
+div[data-testid="stAlert"] > div {
+    background-color: #D4D4D4 !important;
+    color: #56524D !important;
+}
+
+/* Target the markdown content inside alerts */
+div[data-testid="stAlert"] .stMarkdown {
+    color: #56524D !important;
+}
+
+/* Target alert content more specifically */
+div[data-testid="stAlert"] p {
+    color: #56524D !important;
+}
+
+.stMarkdownContainer {
+    background-color: #76706C !important;
+}
+</style>
+""")

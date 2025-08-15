@@ -135,25 +135,28 @@ Custom theme is configured in `.streamlit/config.toml` with:
 - Serif font for professional appearance
 
 ### Custom CSS Styling
-The application uses `st.html()` to inject custom CSS for consistent theming:
+The application uses a centralized CSS component system for consistent theming:
 - **Success alerts**: Light gray background (`#D4D4D4`) with earth-tone text (`#56524D`)
 - **Markdown containers**: Tertiary color background (`#76706C`) 
 - **Alert targeting**: Multiple CSS selectors ensure compatibility across Streamlit versions
-- **Implementation**: CSS injected after `st.set_page_config()` and before page content
+- **Component-based**: Centralized in `src/components/ui_components.py` for reusability
 
-Example implementation in pages:
+**Reusable CSS Component:**
 ```python
-st.html("""
-<style>
-div[data-testid="stAlert"] {
-    background-color: #D4D4D4 !important;
-    color: #56524D !important;
-}
-.stMarkdownContainer {
-    background-color: #76706C !important;
-}
-</style>
-""")
+from src.components.ui_components import inject_custom_success_styling
+
+# Apply custom styling for all st.success() calls
+inject_custom_success_styling()
+
+# Now all st.success() calls will use consistent earth-tone styling
+st.success("✅ Success message with custom styling")
+```
+
+**Implementation Pattern:**
+- Import the CSS component function from `src.components.ui_components`
+- Call `inject_custom_success_styling()` after `st.set_page_config()` in pages
+- For component functions, call before `st.success()` usage
+- All success alerts across the application now use consistent styling
 
 ### Environment Variables
 - `OPENAI_API_KEY` - Required for AI functionality
