@@ -5,6 +5,45 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.22] - 2025-08-15
+
+### Added
+- [2025-08-15] **CrewAI Financial Health Analysis System**: Multi-agent AI system for comprehensive financial health reporting
+  - **Multi-Agent Architecture**: Three specialized agents (Senior Financial Analyst, Risk & Sustainability Expert, Executive Report Writer) with collaborative workflow
+  - **Comprehensive Financial Analysis**: Deep analysis of Income Statement, Balance Sheet, and Cash Flow Statement with multi-year trends
+  - **Vietnamese Market Integration**: Exact column name matching for vnstock API data with precise financial metrics extraction
+  - **Current Year Focus**: Detailed analysis of current year line items across all three financial statements
+  - **Holistic Multi-Year Analysis**: Trend analysis and opinions spanning multiple years of financial data
+  - **Interactive Streamlit Interface**: User-friendly Financial Health Report page with data validation and progress tracking
+
+### Technical Implementation
+- [2025-08-15] **CrewAI Framework Integration**: Added `crewai>=0.35.8` dependency with YAML configuration system
+  - **Agent Configuration**: `src/financial_health_crew/config/agents.yaml` with detailed roles, goals, and backstories
+  - **Task Configuration**: `src/financial_health_crew/config/tasks.yaml` with comprehensive analysis requirements
+  - **Crew Orchestration**: `src/financial_health_crew/crew.py` with sequential processing and proper verbose configuration
+
+- [2025-08-15] **Enhanced Financial Analysis Tool**: `src/financial_health_crew/tools/financial_analysis_tool.py`
+  - **Exact Column Matching**: Precise mapping of Vietnamese stock data column names from vnstock API
+  - **Multi-Analysis Types**: Support for 'overview', 'ratios', 'trends', and 'detailed' analysis modes
+  - **Real Financial Data**: Direct access to actual financial values instead of metadata
+  - **Comprehensive Context**: Detailed financial data extraction with current year specifics and multi-year comparisons
+  - **Vietnamese Column Names**: Exact patterns for `'TOTAL ASSETS (Bn. VND)'`, `'Net cash inflows/outflows from operating activities'`, `"OWNER'S EQUITY(Bn.VND)"`
+
+- [2025-08-15] **Streamlit Integration**: New Financial Health Report page and navigation updates
+  - **Page Implementation**: `pages/Financial_Health_Report.py` with session state validation and user-friendly interface
+  - **Navigation Integration**: Added to app.py navigation menu and quick buttons
+  - **Service Wrapper**: `src/services/crewai_service.py` for session state management and caching
+
+### Bug Fixes
+- [2025-08-15] **Import Error Fixes**: Corrected CrewAI tool imports from `crewai_tools` to `crewai.tools`
+- [2025-08-15] **Validation Error Fix**: Changed verbose parameter from integer `2` to boolean `True` for CrewAI compliance
+- [2025-08-15] **Type Import Fix**: Added `List` to typing imports for proper type annotations
+
+### Key Learning and Documentation
+- [2025-08-15] **Context7 Integration**: Learned CrewAI `allow_delegation` parameter functionality for agent collaboration
+- [2025-08-15] **Column Name Precision**: User-provided exact column names from Vietnamese stock data for 100% matching accuracy
+- [2025-08-15] **Multi-Agent Workflow**: Implemented sequential task processing with specialized financial analysis agents
+
 ## [0.2.21] - 2025-08-14
 
 ### Added
