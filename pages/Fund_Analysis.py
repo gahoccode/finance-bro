@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+import os
 from datetime import datetime, timedelta
 
 # Import from modular services
@@ -14,7 +15,8 @@ from src.services.chart_service import (
     create_fund_nav_line_chart,
     create_fund_comparison_bar_chart,
     create_fund_asset_pie_chart,
-    create_fund_industry_pie_chart
+    create_fund_industry_pie_chart,
+    generate_fund_charts_2x2_png
 )
 from src.components.ui_components import inject_custom_success_styling
 
@@ -221,7 +223,7 @@ if len(selected_fund_info) > 0:
 # Data Export Section
 st.subheader("💾 Data Export")
 
-export_col1, export_col2, export_col3 = st.columns(3)
+export_col1, export_col2, export_col3, export_col4 = st.columns(4)
 
 with export_col1:
     # Prepare fund list CSV data
@@ -265,6 +267,58 @@ with export_col3:
             st.write("🏭 Allocations (Not Available)")
     else:
         st.write("🏭 Allocations (Not Available)")
+
+with export_col4:
+    # Check if all charts are available for download
+    charts_available = (
+        not nav_data.empty and 
+        'nav_change_36m_annualized' in fund_list.columns and
+        len(fund_list.dropna(subset=['nav_change_36m_annualized'])) > 0 and
+        (not asset_data.empty or not industry_data.empty)
+    )
+    
+    if charts_available:
+        # Generate chart data for download
+        try:
+            # Create all charts
+            nav_chart = create_fund_nav_line_chart(nav_data, selected_fund_name)
+            
+            valid_funds = fund_list.dropna(subset=['nav_change_36m_annualized'])
+            top_funds = valid_funds.nlargest(15, 'nav_change_36m_annualized')
+            comparison_chart = create_fund_comparison_bar_chart(top_funds)
+            
+            asset_chart = create_fund_asset_pie_chart(asset_data, selected_fund_name)
+            industry_chart = create_fund_industry_pie_chart(industry_data, selected_fund_name)
+            
+            # Generate PNG data directly for download
+            png_data = generate_fund_charts_2x2_png(
+                nav_chart,
+                comparison_chart, 
+                asset_chart,
+                industry_chart,
+                selected_fund_name,
+                selected_fund_code
+            )
+            
+            if png_data:
+                # Generate download filename
+                download_filename = f"fund_dashboard_{selected_fund_code}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+                
+                # Single download button that generates and downloads immediately
+                st.download_button(
+                    label="📊 Download Charts PNG",
+                    data=png_data,
+                    file_name=download_filename,
+                    mime="image/png",
+                    type="primary"
+                )
+            else:
+                st.error("❌ Error generating chart dashboard")
+                
+        except Exception as e:
+            st.error(f"❌ Error creating charts: {str(e)}")
+    else:
+        st.write("📊 Charts (Insufficient Data)")
 
 # Footer
 st.markdown("---")

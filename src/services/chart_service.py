@@ -799,3 +799,73 @@ def create_fund_industry_pie_chart(industry_data: pd.DataFrame, fund_name: str) 
     )
     
     return industry_chart
+
+
+def generate_fund_charts_2x2_png(
+    nav_chart: alt.Chart,
+    comparison_chart: alt.Chart,
+    asset_chart: alt.Chart,
+    industry_chart: alt.Chart,
+    fund_name: str,
+    fund_code: str
+) -> bytes:
+    """
+    Generate all fund charts in a 2x2 layout as PNG data
+    
+    Args:
+        nav_chart: NAV performance line chart
+        comparison_chart: Fund comparison bar chart
+        asset_chart: Asset allocation pie chart
+        industry_chart: Industry allocation pie chart
+        fund_name: Name of the fund for chart title
+        fund_code: Fund code for chart title
+        
+    Returns:
+        PNG data as bytes for direct download
+    """
+    import altair as alt
+    import io
+    
+    # Create 2x2 layout
+    # Top row: NAV Performance and Fund Comparison
+    top_row = alt.hconcat(
+        nav_chart.resolve_scale(color='independent').properties(width=400, height=300),
+        comparison_chart.resolve_scale(color='independent').properties(width=400, height=300),
+        spacing=20
+    )
+    
+    # Bottom row: Asset Allocation and Industry Allocation  
+    bottom_row = alt.hconcat(
+        asset_chart.resolve_scale(color='independent').properties(width=400, height=300),
+        industry_chart.resolve_scale(color='independent').properties(width=400, height=300),
+        spacing=20
+    )
+    
+    # Combine into 2x2 grid
+    combined_chart = alt.vconcat(
+        top_row,
+        bottom_row,
+        spacing=20
+    ).resolve_scale(
+        color='independent'
+    ).properties(
+        title=f"Fund Analysis Dashboard - {fund_name} ({fund_code})"
+    )
+    
+    # Generate PNG data directly in memory
+    try:
+        # Save to memory buffer
+        png_buffer = io.BytesIO()
+        combined_chart.save(png_buffer, format='png', scale_factor=2.0)
+        png_buffer.seek(0)
+        return png_buffer.getvalue()
+    except ImportError as e:
+        if "vl-convert-python" in str(e):
+            st.error("📦 Missing required package for PNG export. Please install vl-convert-python.")
+            st.info("Run: `pip install vl-convert-python` or `uv add vl-convert-python`")
+        else:
+            st.error(f"Import error generating chart: {str(e)}")
+        return None
+    except Exception as e:
+        st.error(f"Error generating chart: {str(e)}")
+        return None

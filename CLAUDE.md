@@ -210,7 +210,25 @@ from src.components.stock_selector import render_stock_selector
   - Never use try/except blocks for imports of required packages
   - If a package is in pyproject.toml, import it directly at the top of the file
   - Handle specific errors during usage, not during import
- 
+
+**Download Button Pattern**:
+  - Always use single `st.download_button()` for file downloads
+  - Never create multi-step processes (generate → download buttons)
+  - Generate data directly in memory and pass to download button
+  - Example pattern:
+    ```python
+    # Generate data for download
+    data = generate_data_function()
+    
+    # Single download button - no intermediate steps
+    st.download_button(
+        label="📊 Download File",
+        data=data,
+        file_name="filename.png",
+        mime="image/png"
+    )
+    ```
+  - Users expect immediate download when clicking download buttons
 
 ### Version Management
 - Uses semantic versioning (MAJOR.MINOR.PATCH) starting from 0.1.0 (pyproject.toml)
