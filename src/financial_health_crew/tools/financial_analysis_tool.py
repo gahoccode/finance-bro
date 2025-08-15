@@ -142,33 +142,57 @@ class FinancialAnalysisTool(BaseTool):
             
         latest_row = data.iloc[-1] if len(data) > 1 else data.iloc[0]
         
-        # Common patterns for key line items (Vietnamese and English)
+        # Exact column names from Vietnamese stock data (vnstock API)
         income_patterns = {
+            'Net Profit Before Tax': ['Net Profit/Loss before tax'],
+            'Interest Expense': ['Interest Expense'],
+            'Depreciation and Amortisation': ['Depreciation and Amortisation'],
+            'Operating Profit (Before WC Changes)': ['Operating profit before changes in working capital'],
+            'Interest Paid': ['Interest paid'],
+            'Business Income Tax Paid': ['Business Income Tax paid'],
+            # Fallback patterns for other income statement columns
             'Total Revenue': ['revenue', 'net_sales', 'sales', 'total_revenue', 'doanh_thu', 'netsales'],
             'Gross Profit': ['gross_profit', 'gross_income', 'loi_nhuan_gop', 'grossprofit'],
-            'Operating Income': ['operating_income', 'operating_profit', 'ebit', 'loi_nhuan_hoat_dong', 'operatingincome'],
             'Net Income': ['net_income', 'net_profit', 'profit_after_tax', 'loi_nhuan_rong', 'netincome'],
-            'EPS': ['eps', 'earnings_per_share', 'thu_nhap_co_phieu', 'basiceps'],
-            'EBITDA': ['ebitda', 'earnings_before_interest_tax'],
-            'Interest Expense': ['interest_expense', 'financial_cost', 'chi_phi_tai_chinh', 'interestexpense']
+            'EPS': ['eps', 'earnings_per_share', 'thu_nhap_co_phieu', 'basiceps']
         }
         
         balance_patterns = {
-            'Total Assets': ['total_assets', 'tong_tai_san', 'totalassets', 'asset'],
-            'Current Assets': ['current_assets', 'tai_san_ngan_han', 'currentassets'],
-            'Cash and Equivalents': ['cash', 'cash_equivalents', 'tien_mat', 'cashandequivalents'],
-            'Total Liabilities': ['total_liabilities', 'tong_no_phai_tra', 'totalliabilities', 'liability'],
-            'Current Liabilities': ['current_liabilities', 'no_ngan_han', 'currentliabilities'],
-            'Total Debt': ['total_debt', 'debt', 'borrowing', 'totaldebt'],
-            'Shareholders Equity': ['shareholders_equity', 'equity', 'von_chu_so_huu', 'shareholdersequity', 'totalequity']
+            'Total Assets': ['TOTAL ASSETS (Bn. VND)'],
+            'Current Assets': ['CURRENT ASSETS (Bn. VND)'],
+            'Cash and Cash Equivalents': ['Cash and cash equivalents (Bn. VND)'],
+            'Short-term Investments': ['Short-term investments (Bn. VND)'],
+            'Accounts Receivable': ['Accounts receivable (Bn. VND)'],
+            'Net Inventories': ['Net Inventories', 'Inventories, Net (Bn. VND)'],
+            'Long-term Assets': ['LONG-TERM ASSETS (Bn. VND)'],
+            'Fixed Assets': ['Fixed assets (Bn. VND)'],
+            'Long-term Investments': ['Long-term investments (Bn. VND)'],
+            'Total Liabilities': ['LIABILITIES (Bn. VND)'],
+            'Current Liabilities': ['Current liabilities (Bn. VND)'],
+            'Long-term Liabilities': ['Long-term liabilities (Bn. VND)'],
+            'Short-term Borrowings': ['Short-term borrowings (Bn. VND)'],
+            'Long-term Borrowings': ['Long-term borrowings (Bn. VND)'],
+            'Shareholders Equity': ["OWNER'S EQUITY(Bn.VND)"],
+            'Capital and Reserves': ['Capital and reserves (Bn. VND)'],
+            'Undistributed Earnings': ['Undistributed earnings (Bn. VND)'],
+            'Paid-in Capital': ['Paid-in capital (Bn. VND)'],
+            'Quick Ratio': ['Quick Ratio']
         }
         
         cashflow_patterns = {
-            'Operating Cash Flow': ['operating_cash_flow', 'cash_from_operations', 'tien_hoat_dong', 'operatingcashflow'],
-            'Investing Cash Flow': ['investing_cash_flow', 'cash_from_investing', 'tien_dau_tu', 'investingcashflow'],
-            'Financing Cash Flow': ['financing_cash_flow', 'cash_from_financing', 'tien_tai_chinh', 'financingcashflow'],
-            'Free Cash Flow': ['free_cash_flow', 'fcf', 'tien_tu_do', 'freecashflow'],
-            'Capital Expenditure': ['capex', 'capital_expenditure', 'dau_tu_tai_san', 'capitalexpenditure']
+            'Operating Cash Flow': ['Net cash inflows/outflows from operating activities'],
+            'Investing Cash Flow': ['Net Cash Flows from Investing Activities'],
+            'Financing Cash Flow': ['Cash flows from financial activities'],
+            'Net Profit Before Tax': ['Net Profit/Loss before tax'],
+            'Interest Expense': ['Interest Expense'],
+            'Interest Paid': ['Interest paid'],
+            'Purchase of Fixed Assets': ['Purchase of fixed assets'],
+            'Proceeds from Asset Disposal': ['Proceeds from disposal of fixed assets'],
+            'Proceeds from Borrowings': ['Proceeds from borrowings'],
+            'Repayment of Borrowings': ['Repayment of borrowings'],
+            'Dividends Paid': ['Dividends paid'],
+            'Net Cash Change': ['Net increase/decrease in cash and cash equivalents'],
+            'Cash at End of Period': ['Cash and Cash Equivalents at the end of period']
         }
         
         ratio_patterns = {
