@@ -1,26 +1,16 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-from vnstock import Screener, Vnstock
-import mplfinance as mpf
-import pandas_ta as ta
-from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
-import io
-import base64
 from src.services.vnstock_api import (
     get_heating_up_stocks,
     get_technical_stock_data,
-    calculate_technical_indicators
+    calculate_technical_indicators,
 )
 from src.services.chart_service import create_technical_chart
 
 st.set_page_config(
     page_title="Technical Analysis - Finance Bro", page_icon="📊", layout="wide"
 )
-
-
-
 
 
 def main():
@@ -74,21 +64,21 @@ def main():
         # Foreign Transaction Filter
         st.subheader("📈 Data Filters")
         show_foreign_buy_only = st.checkbox(
-            "Foreign Buy > Sell Only", 
+            "Foreign Buy > Sell Only",
             value=False,
-            help="Filter stocks where foreign investors are net buyers (Buy > Sell)"
+            help="Filter stocks where foreign investors are net buyers (Buy > Sell)",
         )
-        
+
         show_strong_buy_only = st.checkbox(
             "Strong Buy Signal Only",
             value=False,
-            help="Filter stocks with TCBS Strong Buy recommendation"
+            help="Filter stocks with TCBS Strong Buy recommendation",
         )
-        
+
         show_buy_only = st.checkbox(
             "Buy Signal Only",
             value=False,
-            help="Filter stocks with TCBS Buy recommendation"
+            help="Filter stocks with TCBS Buy recommendation",
         )
 
         # Add a button to clear cache if needed
@@ -113,37 +103,39 @@ def main():
     # Apply filters if enabled
     original_count = len(heating_stocks)
     filter_messages = []
-    
+
     # Foreign transaction filter
-    if show_foreign_buy_only and 'foreign_transaction' in heating_stocks.columns:
-        foreign_buy_mask = heating_stocks['foreign_transaction'] == 'Buy > Sell'
+    if show_foreign_buy_only and "foreign_transaction" in heating_stocks.columns:
+        foreign_buy_mask = heating_stocks["foreign_transaction"] == "Buy > Sell"
         heating_stocks = heating_stocks[foreign_buy_mask].copy()
         filtered_count = len(heating_stocks)
         if filtered_count < original_count:
             filter_messages.append(f"Foreign Buy > Sell: {filtered_count} stocks")
-    
+
     # TCBS Strong Buy filter
-    if show_strong_buy_only and 'tcbs_buy_sell_signal' in heating_stocks.columns:
+    if show_strong_buy_only and "tcbs_buy_sell_signal" in heating_stocks.columns:
         before_strong_buy = len(heating_stocks)
-        strong_buy_mask = heating_stocks['tcbs_buy_sell_signal'] == 'Strong buy'
+        strong_buy_mask = heating_stocks["tcbs_buy_sell_signal"] == "Strong buy"
         heating_stocks = heating_stocks[strong_buy_mask].copy()
         final_count = len(heating_stocks)
         if final_count < before_strong_buy or not filter_messages:
             filter_messages.append(f"Strong Buy Signal: {final_count} stocks")
-    
+
     # TCBS Buy filter
-    if show_buy_only and 'tcbs_buy_sell_signal' in heating_stocks.columns:
+    if show_buy_only and "tcbs_buy_sell_signal" in heating_stocks.columns:
         before_buy = len(heating_stocks)
-        buy_mask = heating_stocks['tcbs_buy_sell_signal'] == 'Buy'
+        buy_mask = heating_stocks["tcbs_buy_sell_signal"] == "Buy"
         heating_stocks = heating_stocks[buy_mask].copy()
         final_count = len(heating_stocks)
         if final_count < before_buy or not filter_messages:
             filter_messages.append(f"Buy Signal: {final_count} stocks")
-    
+
     # Show combined filter results
     if filter_messages:
-        st.info(f"📊 **Filters Applied**: {' | '.join(filter_messages)} (from {original_count} original stocks)")
-    
+        st.info(
+            f"📊 **Filters Applied**: {' | '.join(filter_messages)} (from {original_count} original stocks)"
+        )
+
     # Check if any stocks remain after filtering
     if heating_stocks.empty:
         if show_foreign_buy_only or show_strong_buy_only or show_buy_only:
@@ -154,37 +146,41 @@ def main():
                 active_filters.append("Strong Buy Signal")
             if show_buy_only:
                 active_filters.append("Buy Signal")
-            st.warning(f"🔍 No heating stocks found matching: {' + '.join(active_filters)}. Try disabling some filters.")
+            st.warning(
+                f"🔍 No heating stocks found matching: {' + '.join(active_filters)}. Try disabling some filters."
+            )
         else:
-            st.info("🔥 No stocks showing 'Overheated in previous trading session' signal today.")
+            st.info(
+                "🔥 No stocks showing 'Overheated in previous trading session' signal today."
+            )
         st.stop()
 
     # Display results summary
     st.success(f"🔥 Found **{len(heating_stocks)}** stocks with heating up signals!")
-    
+
     # Display trading value metrics
     col1, col2 = st.columns(2)
-    
+
     with col1:
-        if 'avg_trading_value_5d' in heating_stocks.columns:
-            mean_trading_value = heating_stocks['avg_trading_value_5d'].mean()
+        if "avg_trading_value_5d" in heating_stocks.columns:
+            mean_trading_value = heating_stocks["avg_trading_value_5d"].mean()
             if not pd.isna(mean_trading_value):
                 st.metric(
-                    "📊 Average 5-Day Trading Value", 
+                    "📊 Average 5-Day Trading Value",
                     f"{mean_trading_value:,.0f}",
-                    help="Mean of avg_trading_value_5d across all filtered heating stocks"
+                    help="Mean of avg_trading_value_5d across all filtered heating stocks",
                 )
             else:
                 st.metric("📊 Average 5-Day Trading Value", "N/A")
-    
+
     with col2:
-        if 'total_trading_value' in heating_stocks.columns:
-            mean_total_trading_value = heating_stocks['total_trading_value'].mean()
+        if "total_trading_value" in heating_stocks.columns:
+            mean_total_trading_value = heating_stocks["total_trading_value"].mean()
             if not pd.isna(mean_total_trading_value):
                 st.metric(
-                    "📈 Average Total Trading Value", 
+                    "📈 Average Total Trading Value",
                     f"{mean_total_trading_value:,.0f}",
-                    help="Mean of total_trading_value across all filtered heating stocks"
+                    help="Mean of total_trading_value across all filtered heating stocks",
                 )
             else:
                 st.metric("📈 Average Total Trading Value", "N/A")
@@ -241,7 +237,9 @@ def main():
                 with st.spinner(
                     f"Loading technical analysis for {ticker} ({current_interval})..."
                 ):
-                    stock_data = get_technical_stock_data(ticker, interval=current_interval)
+                    stock_data = get_technical_stock_data(
+                        ticker, interval=current_interval
+                    )
 
                     if not stock_data.empty:
                         indicators = calculate_technical_indicators(stock_data)
@@ -256,9 +254,13 @@ def main():
                                 # Display indicator values with safe validation
                                 st.subheader("📊 Indicator Values")
                                 col1, col2, col3 = st.columns(3)
-                                
+
                                 with col1:
-                                    if "rsi" in indicators and indicators["rsi"] is not None and not indicators["rsi"].empty:
+                                    if (
+                                        "rsi" in indicators
+                                        and indicators["rsi"] is not None
+                                        and not indicators["rsi"].empty
+                                    ):
                                         try:
                                             rsi_value = indicators["rsi"].iloc[-1]
                                             st.metric("RSI", f"{rsi_value:.2f}")
@@ -267,12 +269,21 @@ def main():
                                     else:
                                         st.metric("RSI", "N/A")
                                         st.caption("⚠️ RSI calculation failed")
-                                        
+
                                 with col2:
-                                    if "macd" in indicators and indicators["macd"] is not None and not indicators["macd"].empty:
+                                    if (
+                                        "macd" in indicators
+                                        and indicators["macd"] is not None
+                                        and not indicators["macd"].empty
+                                    ):
                                         try:
-                                            if "MACD_12_26_9" in indicators["macd"].columns:
-                                                macd_value = indicators["macd"]["MACD_12_26_9"].iloc[-1]
+                                            if (
+                                                "MACD_12_26_9"
+                                                in indicators["macd"].columns
+                                            ):
+                                                macd_value = indicators["macd"][
+                                                    "MACD_12_26_9"
+                                                ].iloc[-1]
                                                 st.metric("MACD", f"{macd_value:.2f}")
                                             else:
                                                 st.metric("MACD", "N/A")
@@ -281,12 +292,18 @@ def main():
                                     else:
                                         st.metric("MACD", "N/A")
                                         st.caption("⚠️ MACD calculation failed")
-                                        
+
                                 with col3:
-                                    if "adx" in indicators and indicators["adx"] is not None and not indicators["adx"].empty:
+                                    if (
+                                        "adx" in indicators
+                                        and indicators["adx"] is not None
+                                        and not indicators["adx"].empty
+                                    ):
                                         try:
                                             if "ADX_14" in indicators["adx"].columns:
-                                                adx_value = indicators["adx"]["ADX_14"].iloc[-1]
+                                                adx_value = indicators["adx"][
+                                                    "ADX_14"
+                                                ].iloc[-1]
                                                 st.metric("ADX", f"{adx_value:.2f}")
                                             else:
                                                 st.metric("ADX", "N/A")
@@ -336,24 +353,41 @@ def main():
                                         # Display indicator values with safe validation
                                         st.subheader("📊 Indicator Values")
                                         col1, col2, col3 = st.columns(3)
-                                        
+
                                         with col1:
-                                            if "rsi" in indicators and indicators["rsi"] is not None and not indicators["rsi"].empty:
+                                            if (
+                                                "rsi" in indicators
+                                                and indicators["rsi"] is not None
+                                                and not indicators["rsi"].empty
+                                            ):
                                                 try:
-                                                    rsi_value = indicators["rsi"].iloc[-1]
+                                                    rsi_value = indicators["rsi"].iloc[
+                                                        -1
+                                                    ]
                                                     st.metric("RSI", f"{rsi_value:.2f}")
                                                 except Exception:
                                                     st.metric("RSI", "N/A")
                                             else:
                                                 st.metric("RSI", "N/A")
                                                 st.caption("⚠️ RSI calculation failed")
-                                                
+
                                         with col2:
-                                            if "macd" in indicators and indicators["macd"] is not None and not indicators["macd"].empty:
+                                            if (
+                                                "macd" in indicators
+                                                and indicators["macd"] is not None
+                                                and not indicators["macd"].empty
+                                            ):
                                                 try:
-                                                    if "MACD_12_26_9" in indicators["macd"].columns:
-                                                        macd_value = indicators["macd"]["MACD_12_26_9"].iloc[-1]
-                                                        st.metric("MACD", f"{macd_value:.2f}")
+                                                    if (
+                                                        "MACD_12_26_9"
+                                                        in indicators["macd"].columns
+                                                    ):
+                                                        macd_value = indicators["macd"][
+                                                            "MACD_12_26_9"
+                                                        ].iloc[-1]
+                                                        st.metric(
+                                                            "MACD", f"{macd_value:.2f}"
+                                                        )
                                                     else:
                                                         st.metric("MACD", "N/A")
                                                 except Exception:
@@ -361,13 +395,24 @@ def main():
                                             else:
                                                 st.metric("MACD", "N/A")
                                                 st.caption("⚠️ MACD calculation failed")
-                                                
+
                                         with col3:
-                                            if "adx" in indicators and indicators["adx"] is not None and not indicators["adx"].empty:
+                                            if (
+                                                "adx" in indicators
+                                                and indicators["adx"] is not None
+                                                and not indicators["adx"].empty
+                                            ):
                                                 try:
-                                                    if "ADX_14" in indicators["adx"].columns:
-                                                        adx_value = indicators["adx"]["ADX_14"].iloc[-1]
-                                                        st.metric("ADX", f"{adx_value:.2f}")
+                                                    if (
+                                                        "ADX_14"
+                                                        in indicators["adx"].columns
+                                                    ):
+                                                        adx_value = indicators["adx"][
+                                                            "ADX_14"
+                                                        ].iloc[-1]
+                                                        st.metric(
+                                                            "ADX", f"{adx_value:.2f}"
+                                                        )
                                                     else:
                                                         st.metric("ADX", "N/A")
                                                 except Exception:
