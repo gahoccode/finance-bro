@@ -66,18 +66,27 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
   - **services/chart_service.py** - Chart generation utilities (10 functions, including Fibonacci overlays)
   - **services/data_service.py** - Data transformation utilities
   - **services/fibonacci_service.py** - Fibonacci retracement analysis with SciPy swing detection
+  - **services/crewai_service.py** - CrewAI financial health analysis orchestration with multi-agent system
+  - **financial_health_crew/** - CrewAI multi-agent financial health analysis system:
+    - **crew.py** - Multi-agent crew configuration with 3 specialized agents (data analyst, risk specialist, report writer)
+    - **config/agents.yaml** - Agent roles and expertise definitions for Vietnamese market analysis
+    - **config/tasks.yaml** - Task definitions for comprehensive financial health assessment
+    - **tools/financial_analysis_tool.py** - Custom CrewAI tools for financial data analysis
+    - **main.py** - CrewAI crew execution entry point
   - **components/** - Reusable UI components (stock_selector.py, date_picker.py, ui_components.py)
   - **utils/** - General utilities (session_utils.py, validation.py)
 - **static/** - CSS styling with custom theme configuration
 - **cache/** - Data caching for performance
 - **exports/charts/** - Generated chart storage
 - **tests/** - Test suite with pytest framework
+- **docs/architecture/** - Comprehensive architecture documentation with C4 Model diagrams
 
 ### Key Technologies
 - **Streamlit** - Web framework (v1.47.0)
 - **PandasAI** - AI data analysis (v2.3.0 - stable, compatible with pandas 1.5.3)
+- **CrewAI** - Multi-agent AI system (v0.35.8+) for financial health analysis
 - **vnstock** - Vietnamese stock market data (v3.2.5)
-- **OpenAI API** - LLM for natural language queries
+- **OpenAI API** - LLM for natural language queries and agent communication
 - **Google OAuth** - User authentication
 - **SciPy** - Scientific computing for Fibonacci swing point detection
 - **Altair** - Interactive statistical visualizations with Finance Bro theming
@@ -86,7 +95,7 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
 1. Authentication via Google OAuth (required)
 2. Stock symbol selection (shared across pages via session state)
 3. Data loading from vnstock API with caching
-4. AI analysis through PandasAI agent
+4. AI analysis through PandasAI agent or CrewAI multi-agent system
 5. Chart generation and export
 
 ### Critical Dependencies
@@ -95,6 +104,7 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
 - `pandasai==2.3.0` (stable)
 - `pandas==1.5.3` (compatible with pandasai 2.x)
 - `quantstats==0.0.59` (last version compatible with pandas 1.5.3)
+- `crewai>=0.35.8` (multi-agent AI system for financial health analysis)
 - Uses `uv` for dependency management (recommended over pip)
 
 **Version Compatibility Notes:**
@@ -194,6 +204,7 @@ from src.components.stock_selector import render_stock_selector
 **Development Guidelines:**
 - **API Functions**: Add new VnStock functions to `src/services/vnstock_api.py`
 - **Charts**: Add new visualizations to `src/services/chart_service.py`
+- **CrewAI Agents**: Add new financial analysis agents to `src/financial_health_crew/`
 - **Configuration**: Update constants in `src/core/config.py`
 - **UI Components**: Create reusable widgets in `src/components/`
 - **Page Logic**: Focus pages on user interaction, import from services
@@ -260,11 +271,40 @@ uv run pytest tests/test_portfolio_optimization.py::test_function_name
 - Use `docker-compose up --build` for local development
 - Production images available at `ghcr.io/gahoccode/finance-bro:latest`
 
+### CrewAI Financial Health Analysis System
+
+The application includes a sophisticated multi-agent AI system for comprehensive financial health analysis:
+
+**Multi-Agent Architecture:**
+- **Financial Data Analyst Agent** - 15+ years experience analyzing Vietnamese public companies, specialized in financial statements analysis
+- **Risk Assessment Specialist Agent** - Expert in Vietnamese market dynamics and comprehensive risk evaluation  
+- **Report Writer Agent** - Professional financial communications expert for executive-level reports
+
+**Analysis Capabilities:**
+- **Current Year Analysis** - Key line items from Income Statement, Balance Sheet, and Cash Flow Statement
+- **Multi-Year Trends** - 3-5 year holistic analysis of financial trajectory and patterns
+- **Comprehensive Risk Assessment** - Liquidity, leverage, operational, and strategic risk evaluation
+- **Executive Reporting** - Professional financial health reports with specific recommendations
+
+**Integration:**
+- Seamless integration with session state and financial dataframes
+- Cached results for 5-minute TTL to optimize performance
+- Vietnamese market-specific expertise and benchmarking
+
+### Architecture Documentation
+Comprehensive architecture documentation is available in `docs/architecture/` following C4 Model methodology:
+- **System Context** - High-level boundaries and external interactions
+- **Container Architecture** - Service boundaries and deployment view  
+- **Component Architecture** - Internal module structure and relationships
+- **Data Architecture** - Data models, flow, and storage strategies
+- **Security Architecture** - Authentication, authorization, and security patterns
+- **Quality Attributes** - Performance, scalability, and reliability characteristics
+
 ### Data Sources and APIs
 - **vnstock** v3.2.5 - Vietnamese stock data (VCI/TCBS sources)  
   - Stock price data, company information, technical indicators
   - Investment fund data (NAV reports, asset/industry allocations)
   - 57+ Vietnamese investment funds with historical performance
-- **OpenAI API** - Required for AI functionality
+- **OpenAI API** - Required for AI functionality and CrewAI agent communication
 - **Google OAuth** - Required for user authentication
 - Stock data cached in `cache/` directory for performance
