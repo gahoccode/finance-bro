@@ -406,19 +406,49 @@ finance-bro/
 │   ├── Technical_Analysis.py # Advanced technical indicators with heating stocks
 │   ├── Company_Overview.py   # Company profiles & ownership
 │   ├── Portfolio_Optimization.py # Modern Portfolio Theory & HRP
-│   └── Screener.py           # Stock screening & filtering
-├── static/style.css          # Custom CSS styling
-├── .streamlit/               # Streamlit configuration
+│   ├── Screener.py           # Stock screening & filtering
+│   └── Fund_Analysis.py      # Vietnamese investment fund analysis
+├── src/                      # Modular utilities and services
+│   ├── core/
+│   │   └── config.py         # Centralized app configuration
+│   ├── services/
+│   │   ├── vnstock_api.py    # VnStock API functions (30+ functions)
+│   │   ├── chart_service.py  # Chart generation utilities
+│   │   ├── data_service.py   # Data transformation utilities
+│   │   └── fibonacci_service.py # Fibonacci retracement analysis
+│   ├── components/
+│   │   ├── stock_selector.py # Stock selection UI component
+│   │   ├── date_picker.py    # Date range picker component
+│   │   └── ui_components.py  # Reusable UI components
+│   └── utils/
+│       ├── session_utils.py  # Session state management
+│       └── validation.py     # Data validation utilities
+├── static/
+│   └── style.css            # Custom CSS styling
+├── .streamlit/              # Streamlit configuration
 │   ├── config.toml          # Custom theme & colors
 │   └── secrets.example.toml # OAuth configuration template
-├── requirements.txt          # Python dependencies
-├── pyproject.toml           # Project configuration (Python 3.10.11)
-├── Dockerfile               # Docker configuration
-├── docker-compose.yml       # Docker Compose configuration
-├── .env.example             # Environment variables template
-├── CHANGELOG.md             # Version history
-├── CLAUDE.md                # AI assistant instructions
-└── Reference/               # Legacy code & documentation
+├── cache/                   # Data caching for performance
+├── exports/                 # Chart and file exports
+│   └── charts/              # Generated chart storage
+├── tests/                   # Test suite with pytest framework
+│   ├── conftest.py          # Test configuration and fixtures
+│   └── test_portfolio_optimization.py # Portfolio optimization tests
+├── .github/
+│   └── workflows/
+│       └── docker-publish.yml # CI/CD Docker publishing
+├── .claude/                 # Claude Code configuration
+│   ├── commands/            # Custom commands
+│   └── settings.local.json  # Local Claude settings
+├── requirements.txt         # Python dependencies
+├── pyproject.toml          # Project configuration (Python 3.10.11)
+├── Dockerfile              # Docker configuration
+├── docker-compose.yml      # Docker Compose configuration
+├── .env.example            # Environment variables template
+├── .gitignore              # Git ignore patterns
+├── CHANGELOG.md            # Version history
+├── CLAUDE.md               # AI assistant instructions
+└── README.md               # Project documentation
 ```
 
 ## Docker Deployment
