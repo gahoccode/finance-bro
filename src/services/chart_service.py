@@ -19,6 +19,7 @@ from typing import Dict, Optional, Any
 
 # Technical Analysis Chart Functions
 
+
 def create_technical_chart(
     ticker: str,
     data: pd.DataFrame,
@@ -27,7 +28,7 @@ def create_technical_chart(
     fibonacci_config: Optional[Dict] = None,
 ) -> plt.Figure:
     """Create technical analysis chart with indicators using mplfinance with safe validation
-    
+
     Extracted from Technical_Analysis.py lines 22-168 - EXACT same logic preserved.
     """
 
@@ -46,7 +47,9 @@ def create_technical_chart(
                         [
                             mpf.make_addplot(bb["BBU_20_2.0"], color="red", width=0.7),
                             mpf.make_addplot(bb["BBM_20_2.0"], color="blue", width=0.7),
-                            mpf.make_addplot(bb["BBL_20_2.0"], color="green", width=0.7),
+                            mpf.make_addplot(
+                                bb["BBL_20_2.0"], color="green", width=0.7
+                            ),
                         ]
                     )
                 except Exception as e:
@@ -54,7 +57,9 @@ def create_technical_chart(
             else:
                 skipped_indicators.append("Bollinger Bands: Missing required columns")
         else:
-            skipped_indicators.append("Bollinger Bands: Calculation failed or unavailable")
+            skipped_indicators.append(
+                "Bollinger Bands: Calculation failed or unavailable"
+            )
 
     # RSI Panel - Safe validation
     if config.get("show_rsi", True):
@@ -63,7 +68,9 @@ def create_technical_chart(
             if not rsi.empty:
                 try:
                     addplots.append(
-                        mpf.make_addplot(rsi, panel=panels, color="purple", ylabel="RSI")
+                        mpf.make_addplot(
+                            rsi, panel=panels, color="purple", ylabel="RSI"
+                        )
                     )
                     panels += 1
                 except Exception as e:
@@ -83,9 +90,14 @@ def create_technical_chart(
                     addplots.extend(
                         [
                             mpf.make_addplot(
-                                macd["MACD_12_26_9"], panel=panels, color="blue", ylabel="MACD"
+                                macd["MACD_12_26_9"],
+                                panel=panels,
+                                color="blue",
+                                ylabel="MACD",
                             ),
-                            mpf.make_addplot(macd["MACDs_12_26_9"], panel=panels, color="red"),
+                            mpf.make_addplot(
+                                macd["MACDs_12_26_9"], panel=panels, color="red"
+                            ),
                         ]
                     )
                     panels += 1
@@ -103,7 +115,9 @@ def create_technical_chart(
             if not obv.empty:
                 try:
                     addplots.append(
-                        mpf.make_addplot(obv, panel=panels, color="orange", ylabel="OBV")
+                        mpf.make_addplot(
+                            obv, panel=panels, color="orange", ylabel="OBV"
+                        )
                     )
                     panels += 1
                 except Exception as e:
@@ -125,7 +139,9 @@ def create_technical_chart(
                             mpf.make_addplot(
                                 adx["ADX_14"], panel=panels, color="brown", ylabel="ADX"
                             ),
-                            mpf.make_addplot(adx["DMP_14"], panel=panels, color="green"),
+                            mpf.make_addplot(
+                                adx["DMP_14"], panel=panels, color="green"
+                            ),
                             mpf.make_addplot(adx["DMN_14"], panel=panels, color="red"),
                         ]
                     )
@@ -142,10 +158,12 @@ def create_technical_chart(
         fib_plots = _create_fibonacci_overlays(data, fibonacci_config)
         if fib_plots:
             addplots.extend(fib_plots)
-    
+
     # Show warning for skipped indicators
     if skipped_indicators:
-        warning_text = "⚠️ **Skipped indicators in chart:**\n" + "\n".join(f"• {s}" for s in skipped_indicators)
+        warning_text = "⚠️ **Skipped indicators in chart:**\n" + "\n".join(
+            f"• {s}" for s in skipped_indicators
+        )
         st.warning(warning_text)
 
     # Create chart with Finance Bro theme
@@ -183,178 +201,193 @@ def create_technical_chart(
 
 # Stock Price Analysis Chart Functions
 
+
 def create_altair_line_chart(chart_data: pd.DataFrame, ticker: str) -> alt.Chart:
     """Create Altair line chart for stock price analysis
-    
+
     Extracted from Stock_Price_Analysis.py lines 447-464.
     """
-    stock_chart = alt.Chart(chart_data).mark_line(
-        color='black',
-        strokeWidth=2
-    ).encode(
-        x=alt.X('date:T', title='Date'),
-        y=alt.Y('price:Q', title='Close Price (in thousands)', 
-               axis=alt.Axis(format=',.0f')),
-        tooltip=[
-            alt.Tooltip('date:T', title='Date'),
-            alt.Tooltip('price:Q', title='Close Price', format=',.0f')
-        ]
-    ).properties(
-        width='container',
-        height=400,
-        title=f'{ticker}'
-    ).interactive()
-    
+    stock_chart = (
+        alt.Chart(chart_data)
+        .mark_line(color="black", strokeWidth=2)
+        .encode(
+            x=alt.X("date:T", title="Date"),
+            y=alt.Y(
+                "price:Q",
+                title="Close Price (in thousands)",
+                axis=alt.Axis(format=",.0f"),
+            ),
+            tooltip=[
+                alt.Tooltip("date:T", title="Date"),
+                alt.Tooltip("price:Q", title="Close Price", format=",.0f"),
+            ],
+        )
+        .properties(width="container", height=400, title=f"{ticker}")
+        .interactive()
+    )
+
     return stock_chart
 
 
 def create_altair_area_chart(chart_data: pd.DataFrame, ticker: str) -> alt.Chart:
     """Create Altair area chart with gradient for stock price analysis
-    
+
     Extracted from Stock_Price_Analysis.py lines 465-489.
     """
-    stock_chart = alt.Chart(chart_data).mark_area(
-        line={'color': '#3C3C3C', 'strokeWidth': 2},
-        color=alt.Gradient(
-            gradient='linear',
-            stops=[
-                alt.GradientStop(color='#3C3C3C', offset=0),
-                alt.GradientStop(color='#807F80', offset=1)
-            ],
-            x1=1, x2=1, y1=1, y2=0
+    stock_chart = (
+        alt.Chart(chart_data)
+        .mark_area(
+            line={"color": "#3C3C3C", "strokeWidth": 2},
+            color=alt.Gradient(
+                gradient="linear",
+                stops=[
+                    alt.GradientStop(color="#3C3C3C", offset=0),
+                    alt.GradientStop(color="#807F80", offset=1),
+                ],
+                x1=1,
+                x2=1,
+                y1=1,
+                y2=0,
+            ),
         )
-    ).encode(
-        x=alt.X('date:T', title='Date'),
-        y=alt.Y('price:Q', title='Close Price (in thousands)', 
-               axis=alt.Axis(format=',.0f')),
-        tooltip=[
-            alt.Tooltip('date:T', title='Date'),
-            alt.Tooltip('price:Q', title='Close Price', format=',.0f')
-        ]
-    ).properties(
-        width='container',
-        height=400,
-        title=f'{ticker}'
-    ).interactive()
-    
+        .encode(
+            x=alt.X("date:T", title="Date"),
+            y=alt.Y(
+                "price:Q",
+                title="Close Price (in thousands)",
+                axis=alt.Axis(format=",.0f"),
+            ),
+            tooltip=[
+                alt.Tooltip("date:T", title="Date"),
+                alt.Tooltip("price:Q", title="Close Price", format=",.0f"),
+            ],
+        )
+        .properties(width="container", height=400, title=f"{ticker}")
+        .interactive()
+    )
+
     return stock_chart
 
 
 def create_bokeh_candlestick_chart(stock_price_bokeh: pd.DataFrame, ticker: str):
     """Create Bokeh candlestick chart with volume for stock price analysis
-    
+
     Extracted from Stock_Price_Analysis.py lines 494-606.
     """
     # Calculate candlestick properties
-    stock_price_bokeh['color'] = ['green' if close >= open_price else 'red' 
-                                  for close, open_price in zip(stock_price_bokeh['close'], stock_price_bokeh['open'])]
-    
+    stock_price_bokeh["color"] = [
+        "green" if close >= open_price else "red"
+        for close, open_price in zip(
+            stock_price_bokeh["close"], stock_price_bokeh["open"]
+        )
+    ]
+
     # Calculate min/max values for consistent scaling
     min_date = stock_price_bokeh.index.min()
     max_date = stock_price_bokeh.index.max()
-    max_volume = stock_price_bokeh['volume'].max()
-    
+    max_volume = stock_price_bokeh["volume"].max()
+
     # Price chart - use responsive sizing
     price = figure(
-        x_axis_type='datetime',
-        title=f'{ticker} - Candlestick Chart',
+        x_axis_type="datetime",
+        title=f"{ticker} - Candlestick Chart",
         height=400,
         tools="pan,wheel_zoom,box_zoom,reset,save",
         toolbar_location="above",
         x_range=(min_date, max_date),
-        sizing_mode="stretch_width"
+        sizing_mode="stretch_width",
     )
-    
+
     # Add segments for high-low range
     price.segment(
-        x0='date', y0='high', 
-        x1='date', y1='low',
+        x0="date",
+        y0="high",
+        x1="date",
+        y1="low",
         source=stock_price_bokeh,
-        color='black',
-        line_width=1
+        color="black",
+        line_width=1,
     )
-    
+
     # Add rectangles for open-close range
     price.vbar(
-        x='date',
-        width=12*60*60*1000,  # 12 hours in milliseconds
-        top='open',
-        bottom='close',
+        x="date",
+        width=12 * 60 * 60 * 1000,  # 12 hours in milliseconds
+        top="open",
+        bottom="close",
         source=stock_price_bokeh,
-        fill_color='color',
-        line_color='black',
-        line_width=1
+        fill_color="color",
+        line_color="black",
+        line_width=1,
     )
-    
+
     # Customize price plot
-    price.yaxis.axis_label = 'Price (in thousands)'
+    price.yaxis.axis_label = "Price (in thousands)"
     price.grid.grid_line_alpha = 0.3
     price.xaxis.visible = False  # Hide x-axis labels on price chart
-    
+
     # Volume chart - use same responsive sizing
     volume = figure(
-        x_axis_type='datetime',
+        x_axis_type="datetime",
         height=200,
         tools="pan,wheel_zoom,box_zoom,reset,save",
         toolbar_location=None,
         x_range=price.x_range,  # Link x-axis with price chart
-        sizing_mode="stretch_width"
+        sizing_mode="stretch_width",
     )
-    
+
     # Add volume bars
     volume.vbar(
-        x='date',
-        width=12*60*60*1000,
-        top='volume',
+        x="date",
+        width=12 * 60 * 60 * 1000,
+        top="volume",
         bottom=0,
         source=stock_price_bokeh,
-        fill_color='color',
-        line_color='black',
+        fill_color="color",
+        line_color="black",
         line_width=0.5,
-        alpha=0.7
+        alpha=0.7,
     )
-    
+
     # Customize volume plot
-    volume.yaxis.axis_label = 'Volume'
+    volume.yaxis.axis_label = "Volume"
     volume.grid.grid_line_alpha = 0.3
-    volume.xaxis.axis_label = 'Date'
-    
+    volume.xaxis.axis_label = "Date"
+
     # Add hover tools for both charts
     hover_price = HoverTool(
         tooltips=[
-            ('Date', '@date{%F}'),
-            ('Open', '@open{0,0}'),
-            ('High', '@high{0,0}'),
-            ('Low', '@low{0,0}'),
-            ('Close', '@close{0,0}'),
-            ('Volume', '@volume{0,0}')
+            ("Date", "@date{%F}"),
+            ("Open", "@open{0,0}"),
+            ("High", "@high{0,0}"),
+            ("Low", "@low{0,0}"),
+            ("Close", "@close{0,0}"),
+            ("Volume", "@volume{0,0}"),
         ],
-        formatters={'@date': 'datetime'},
-        mode='vline'
+        formatters={"@date": "datetime"},
+        mode="vline",
     )
     price.add_tools(hover_price)
-    
+
     hover_volume = HoverTool(
-        tooltips=[
-            ('Date', '@date{%F}'),
-            ('Volume', '@volume{0,0}')
-        ],
-        formatters={'@date': 'datetime'},
-        mode='vline'
+        tooltips=[("Date", "@date{%F}"), ("Volume", "@volume{0,0}")],
+        formatters={"@date": "datetime"},
+        mode="vline",
     )
     volume.add_tools(hover_volume)
-    
+
     # Combine charts vertically with proper alignment
     combined_chart = column(price, volume, sizing_mode="stretch_width")
-    
+
     return combined_chart
 
 
 # Chart Detection Functions (from bro.py)
 
+
 def detect_latest_chart():
     """Detect the most recently generated chart file
-    
+
     Extracted from bro.py lines 45-59 - EXACT same logic preserved.
     """
     try:
@@ -363,16 +396,14 @@ def detect_latest_chart():
             chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
             if chart_files:
                 latest_chart = max(chart_files, key=os.path.getctime)
-                return {
-                    "type": "image",
-                    "path": latest_chart
-                }
+                return {"type": "image", "path": latest_chart}
     except Exception:
         pass
     return None
 
 
 # Chart Theme Functions
+
 
 def get_finance_bro_theme():
     """Get Finance Bro standard chart theme colors and styling"""
@@ -381,12 +412,12 @@ def get_finance_bro_theme():
             "up": "#76706C",
             "down": "#2B2523",
             "neutral": "#3C3C3C",
-            "accent": "#807F80"
+            "accent": "#807F80",
         },
         "gradients": {
             "area_chart": [
                 {"color": "#3C3C3C", "offset": 0},
-                {"color": "#807F80", "offset": 1}
+                {"color": "#807F80", "offset": 1},
             ]
         },
         "mplfinance": {
@@ -394,15 +425,15 @@ def get_finance_bro_theme():
             "down": "#2B2523",
             "wick": {"up": "#76706C", "down": "#2B2523"},
             "facecolor": "white",
-            "figcolor": "white"
-        }
+            "figcolor": "white",
+        },
     }
 
 
 def create_mplfinance_style():
     """Create mplfinance style with Finance Bro theme"""
     theme = get_finance_bro_theme()
-    
+
     marketcolors = mpf.make_marketcolors(
         up=theme["mplfinance"]["up"],
         down=theme["mplfinance"]["down"],
@@ -418,7 +449,7 @@ def create_mplfinance_style():
         facecolor=theme["mplfinance"]["facecolor"],
         figcolor=theme["mplfinance"]["figcolor"],
     )
-    
+
     return style
 
 
@@ -632,175 +663,219 @@ def get_fibonacci_level_alerts(data: pd.DataFrame, fibonacci_config: Dict) -> li
 
 # Fund Analysis Chart Functions
 
+
 def create_fund_nav_line_chart(nav_data: pd.DataFrame, fund_name: str) -> alt.Chart:
     """Create NAV performance line chart for fund analysis
-    
+
     Args:
         nav_data: DataFrame with 'date' and 'nav_per_unit' columns
         fund_name: Name of the fund for chart title
-        
+
     Returns:
         Altair Chart object with Finance Bro theming
     """
     from src.core.config import THEME_COLORS
-    
-    nav_chart = alt.Chart(nav_data).mark_line(
-        color=THEME_COLORS["primary"],
-        strokeWidth=3
-    ).add_params(
-        alt.selection_interval(bind='scales')
-    ).encode(
-        x=alt.X('date:T', title='Date', axis=alt.Axis(format='%Y-%m')),
-        y=alt.Y('nav_per_unit:Q', title='NAV per Unit', scale=alt.Scale(zero=False)),
-        tooltip=[
-            alt.Tooltip('date:T', title='Date', format='%Y-%m-%d'),
-            alt.Tooltip('nav_per_unit:Q', title='NAV per Unit', format='.2f')
-        ]
-    ).properties(
-        width=700,
-        height=400,
-        title=f"NAV Performance - {fund_name}"
-    ).resolve_scale(
-        color='independent'
+
+    nav_chart = (
+        alt.Chart(nav_data)
+        .mark_line(color=THEME_COLORS["primary"], strokeWidth=3)
+        .add_params(alt.selection_interval(bind="scales"))
+        .encode(
+            x=alt.X("date:T", title="Date", axis=alt.Axis(format="%Y-%m")),
+            y=alt.Y(
+                "nav_per_unit:Q", title="NAV per Unit", scale=alt.Scale(zero=False)
+            ),
+            tooltip=[
+                alt.Tooltip("date:T", title="Date", format="%Y-%m-%d"),
+                alt.Tooltip("nav_per_unit:Q", title="NAV per Unit", format=".2f"),
+            ],
+        )
+        .properties(width=700, height=400, title=f"NAV Performance - {fund_name}")
+        .resolve_scale(color="independent")
     )
-    
+
     return nav_chart
 
 
-def create_fund_comparison_bar_chart(fund_data: pd.DataFrame, limit: int = None) -> alt.Chart:
+def create_fund_comparison_bar_chart(
+    fund_data: pd.DataFrame, limit: int = None
+) -> alt.Chart:
     """Create fund performance comparison bar chart
-    
+
     Args:
         fund_data: DataFrame with fund performance data
         limit: Number of top funds to display (default: None for all funds)
-        
+
     Returns:
         Altair Chart object with Finance Bro theming
     """
     from src.core.config import THEME_COLORS
-    
+
     # Filter funds with valid 36m data
-    valid_funds = fund_data.dropna(subset=['nav_change_36m_annualized'])
-    
+    valid_funds = fund_data.dropna(subset=["nav_change_36m_annualized"])
+
     if len(valid_funds) == 0:
-        return alt.Chart(pd.DataFrame()).mark_text().encode(
-            text=alt.value("No data available")
+        return (
+            alt.Chart(pd.DataFrame())
+            .mark_text()
+            .encode(text=alt.value("No data available"))
         )
-    
+
     # Sort funds by performance (show all funds or apply limit if specified)
     if limit is not None:
-        display_funds = valid_funds.nlargest(limit, 'nav_change_36m_annualized')
+        display_funds = valid_funds.nlargest(limit, "nav_change_36m_annualized")
     else:
-        display_funds = valid_funds.sort_values('nav_change_36m_annualized', ascending=False)
-    
-    comparison_chart = alt.Chart(display_funds).mark_bar(
-        color=THEME_COLORS["tertiary"],
-        stroke=THEME_COLORS["primary"],
-        strokeWidth=1
-    ).encode(
-        x=alt.X('short_name:N', title='Fund Name', sort='-y', axis=alt.Axis(grid=False)),
-        y=alt.Y('nav_change_36m_annualized:Q', title='36-Month Annualized Return (%)', axis=alt.Axis(grid=False)),
-        tooltip=[
-            alt.Tooltip('short_name:N', title='Fund Name'),
-            alt.Tooltip('nav_change_36m_annualized:Q', title='36M Return (%)', format='.2f'),
-            alt.Tooltip('fund_type:N', title='Fund Type'),
-            alt.Tooltip('fund_owner_name:N', title='Fund Owner')
-        ]
-    ).properties(
-        width=max(800, len(display_funds) * 15),  # Dynamic width based on number of funds
-        height=400,
-        title=f"All Funds - 36-Month Annualized Returns ({len(display_funds)} funds)"
+        display_funds = valid_funds.sort_values(
+            "nav_change_36m_annualized", ascending=False
+        )
+
+    comparison_chart = (
+        alt.Chart(display_funds)
+        .mark_bar(
+            color=THEME_COLORS["tertiary"],
+            stroke=THEME_COLORS["primary"],
+            strokeWidth=1,
+        )
+        .encode(
+            x=alt.X(
+                "short_name:N", title="Fund Name", sort="-y", axis=alt.Axis(grid=False)
+            ),
+            y=alt.Y(
+                "nav_change_36m_annualized:Q",
+                title="36-Month Annualized Return (%)",
+                axis=alt.Axis(grid=False),
+            ),
+            tooltip=[
+                alt.Tooltip("short_name:N", title="Fund Name"),
+                alt.Tooltip(
+                    "nav_change_36m_annualized:Q", title="36M Return (%)", format=".2f"
+                ),
+                alt.Tooltip("fund_type:N", title="Fund Type"),
+                alt.Tooltip("fund_owner_name:N", title="Fund Owner"),
+            ],
+        )
+        .properties(
+            width=max(
+                800, len(display_funds) * 15
+            ),  # Dynamic width based on number of funds
+            height=400,
+            title=f"All Funds - 36-Month Annualized Returns ({len(display_funds)} funds)",
+        )
     )
-    
+
     return comparison_chart
 
 
 def create_fund_asset_pie_chart(asset_data: pd.DataFrame, fund_name: str) -> alt.Chart:
     """Create asset allocation pie chart for fund analysis
-    
+
     Args:
         asset_data: DataFrame with 'asset_type' and 'net_asset_percent' columns
         fund_name: Name of the fund for chart title
-        
+
     Returns:
         Altair Chart object with Finance Bro theming
     """
     from src.core.config import THEME_COLORS
-    
+
     if asset_data.empty:
-        return alt.Chart(pd.DataFrame()).mark_text().encode(
-            text=alt.value("No asset allocation data available")
+        return (
+            alt.Chart(pd.DataFrame())
+            .mark_text()
+            .encode(text=alt.value("No asset allocation data available"))
         )
-    
+
     # Handle different column name formats
-    percent_col = 'asset_percent' if 'asset_percent' in asset_data.columns else 'net_asset_percent'
-    
-    asset_chart = alt.Chart(asset_data).mark_arc(
-        innerRadius=50,
-        stroke='white',
-        strokeWidth=2
-    ).encode(
-        theta=alt.Theta(f'{percent_col}:Q', title='Percentage'),
-        color=alt.Color('asset_type:N', 
-                      scale=alt.Scale(range=[THEME_COLORS["primary"], 
-                                           THEME_COLORS["secondary"], 
-                                           THEME_COLORS["tertiary"], 
-                                           "#8B7D7B", "#A59B96"])),
-        tooltip=[
-            alt.Tooltip('asset_type:N', title='Asset Type'),
-            alt.Tooltip(f'{percent_col}:Q', title='Percentage (%)', format='.2f')
-        ]
-    ).properties(
-        width=300,
-        height=300,
-        title=f"Asset Allocation - {fund_name}"
+    percent_col = (
+        "asset_percent"
+        if "asset_percent" in asset_data.columns
+        else "net_asset_percent"
     )
-    
+
+    asset_chart = (
+        alt.Chart(asset_data)
+        .mark_arc(innerRadius=50, stroke="white", strokeWidth=2)
+        .encode(
+            theta=alt.Theta(f"{percent_col}:Q", title="Percentage"),
+            color=alt.Color(
+                "asset_type:N",
+                scale=alt.Scale(
+                    range=[
+                        THEME_COLORS["primary"],
+                        THEME_COLORS["secondary"],
+                        THEME_COLORS["tertiary"],
+                        "#8B7D7B",
+                        "#A59B96",
+                    ]
+                ),
+            ),
+            tooltip=[
+                alt.Tooltip("asset_type:N", title="Asset Type"),
+                alt.Tooltip(f"{percent_col}:Q", title="Percentage (%)", format=".2f"),
+            ],
+        )
+        .properties(width=300, height=300, title=f"Asset Allocation - {fund_name}")
+    )
+
     return asset_chart
 
 
-def create_fund_industry_pie_chart(industry_data: pd.DataFrame, fund_name: str) -> alt.Chart:
+def create_fund_industry_pie_chart(
+    industry_data: pd.DataFrame, fund_name: str
+) -> alt.Chart:
     """Create industry allocation pie chart for fund analysis
-    
+
     Args:
         industry_data: DataFrame with 'industry' and allocation percentage columns
         fund_name: Name of the fund for chart title
-        
+
     Returns:
         Altair Chart object with Finance Bro theming
     """
     from src.core.config import THEME_COLORS
-    
+
     if industry_data.empty:
-        return alt.Chart(pd.DataFrame()).mark_text().encode(
-            text=alt.value("No industry allocation data available")
+        return (
+            alt.Chart(pd.DataFrame())
+            .mark_text()
+            .encode(text=alt.value("No industry allocation data available"))
         )
-    
+
     # Handle different column name formats
-    percent_col = 'industry_percent' if 'industry_percent' in industry_data.columns else 'net_asset_percent'
-    
-    industry_chart = alt.Chart(industry_data).mark_arc(
-        innerRadius=50,
-        stroke='white',
-        strokeWidth=2
-    ).encode(
-        theta=alt.Theta(f'{percent_col}:Q', title='Percentage'),
-        color=alt.Color('industry:N', 
-                      scale=alt.Scale(range=[THEME_COLORS["primary"], 
-                                           THEME_COLORS["secondary"], 
-                                           THEME_COLORS["tertiary"], 
-                                           "#8B7D7B", "#A59B96", 
-                                           "#6B6B6B", "#9A9A9A", "#B5B5B5"])),
-        tooltip=[
-            alt.Tooltip('industry:N', title='Industry'),
-            alt.Tooltip(f'{percent_col}:Q', title='Allocation (%)', format='.2f')
-        ]
-    ).properties(
-        width=300,
-        height=300,
-        title=f"Industry Allocation - {fund_name}"
+    percent_col = (
+        "industry_percent"
+        if "industry_percent" in industry_data.columns
+        else "net_asset_percent"
     )
-    
+
+    industry_chart = (
+        alt.Chart(industry_data)
+        .mark_arc(innerRadius=50, stroke="white", strokeWidth=2)
+        .encode(
+            theta=alt.Theta(f"{percent_col}:Q", title="Percentage"),
+            color=alt.Color(
+                "industry:N",
+                scale=alt.Scale(
+                    range=[
+                        THEME_COLORS["primary"],
+                        THEME_COLORS["secondary"],
+                        THEME_COLORS["tertiary"],
+                        "#8B7D7B",
+                        "#A59B96",
+                        "#6B6B6B",
+                        "#9A9A9A",
+                        "#B5B5B5",
+                    ]
+                ),
+            ),
+            tooltip=[
+                alt.Tooltip("industry:N", title="Industry"),
+                alt.Tooltip(f"{percent_col}:Q", title="Allocation (%)", format=".2f"),
+            ],
+        )
+        .properties(width=300, height=300, title=f"Industry Allocation - {fund_name}")
+    )
+
     return industry_chart
 
 
@@ -810,11 +885,11 @@ def generate_fund_charts_2x2_png(
     asset_chart: alt.Chart,
     industry_chart: alt.Chart,
     fund_name: str,
-    fund_code: str
+    fund_code: str,
 ) -> bytes:
     """
     Generate all fund charts in a 2x2 layout as PNG data
-    
+
     Args:
         nav_chart: NAV performance line chart
         comparison_chart: Fund comparison bar chart
@@ -822,50 +897,56 @@ def generate_fund_charts_2x2_png(
         industry_chart: Industry allocation pie chart
         fund_name: Name of the fund for chart title
         fund_code: Fund code for chart title
-        
+
     Returns:
         PNG data as bytes for direct download
     """
     import altair as alt
     import io
-    
+
     # Create 2x2 layout
     # Top row: NAV Performance and Fund Comparison
     top_row = alt.hconcat(
-        nav_chart.resolve_scale(color='independent').properties(width=400, height=300),
-        comparison_chart.resolve_scale(color='independent').properties(width=400, height=300),
-        spacing=20
+        nav_chart.resolve_scale(color="independent").properties(width=400, height=300),
+        comparison_chart.resolve_scale(color="independent").properties(
+            width=400, height=300
+        ),
+        spacing=20,
     )
-    
-    # Bottom row: Asset Allocation and Industry Allocation  
+
+    # Bottom row: Asset Allocation and Industry Allocation
     bottom_row = alt.hconcat(
-        asset_chart.resolve_scale(color='independent').properties(width=400, height=300),
-        industry_chart.resolve_scale(color='independent').properties(width=400, height=300),
-        spacing=20
+        asset_chart.resolve_scale(color="independent").properties(
+            width=400, height=300
+        ),
+        industry_chart.resolve_scale(color="independent").properties(
+            width=400, height=300
+        ),
+        spacing=20,
     )
-    
+
     # Combine into 2x2 grid
-    combined_chart = alt.vconcat(
-        top_row,
-        bottom_row,
-        spacing=20
-    ).resolve_scale(
-        color='independent'
-    ).properties(
-        title=f"Fund Analysis Dashboard - {fund_name} ({fund_code})"
+    combined_chart = (
+        alt.vconcat(top_row, bottom_row, spacing=20)
+        .resolve_scale(color="independent")
+        .properties(title=f"Fund Analysis Dashboard - {fund_name} ({fund_code})")
     )
-    
+
     # Generate PNG data directly in memory
     try:
         # Save to memory buffer
         png_buffer = io.BytesIO()
-        combined_chart.save(png_buffer, format='png', scale_factor=2.0)
+        combined_chart.save(png_buffer, format="png", scale_factor=2.0)
         png_buffer.seek(0)
         return png_buffer.getvalue()
     except ImportError as e:
         if "vl-convert-python" in str(e):
-            st.error("📦 Missing required package for PNG export. Please install vl-convert-python.")
-            st.info("Run: `pip install vl-convert-python` or `uv add vl-convert-python`")
+            st.error(
+                "📦 Missing required package for PNG export. Please install vl-convert-python."
+            )
+            st.info(
+                "Run: `pip install vl-convert-python` or `uv add vl-convert-python`"
+            )
         else:
             st.error(f"Import error generating chart: {str(e)}")
         return None

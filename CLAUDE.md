@@ -251,8 +251,8 @@ from src.components.stock_selector import render_stock_selector
 ```bash
 # Run all quality checks before committing
 uv run pytest          # Run tests
-uv run black .          # Format code  
-uv run flake8           # Lint code
+uv run ruff check .     # Lint code (replaces flake8)
+uv run ruff format .    # Format code (can replace black)
 uv run mypy .           # Type checking
 
 # Run single test file/function

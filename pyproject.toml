@@ -35,7 +35,7 @@ dev = [
     "pytest-cov>=4.0.0",
     "pytest-mock>=3.10.0",
     "black==24.4.2",
-    "flake8==7.1.1",
+    "ruff>=0.8.0",
     "mypy==1.11.1",
 ]
 
@@ -45,3 +45,91 @@ dev = [
     "jupyterlab>=4.0.0",
     "notebook>=7.0.0",
 ]
+
+[tool.ruff]
+# Set the maximum line length to 88 (same as Black)
+line-length = 88
+# Target Python 3.10.11 (exact version from project requirements)
+target-version = "py310"
+# Exclude common directories
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pycache__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "cache",
+    "exports",
+]
+
+[tool.ruff.lint]
+# Python-specific code review standards
+select = [
+    # Pyflakes - Essential Python errors
+    "F401",  # Unused imports
+    "F402",  # Import module from line N shadowed by loop variable
+    "F403",  # 'from module import *' used; unable to detect undefined names
+    "F404",  # Future import(s) name after other statements
+    "F405",  # Name may be undefined, or defined from star imports
+    "F811",  # Redefinition of unused name from line N
+    "F821",  # Undefined name
+    "F822",  # Undefined name in __all__
+    "F823",  # Local variable referenced before assignment
+    "F841",  # Local variable assigned but never used
+    
+    # pycodestyle - Python style issues
+    "E101",  # Indentation contains mixed spaces and tabs
+    "E111",  # Indentation is not a multiple of four
+    "E112",  # Expected an indented block
+    "E113",  # Unexpected indentation
+    "W291",  # Trailing whitespace
+    "W292",  # No newline at end of file
+    "W293",  # Blank line contains whitespace
+    "W391",  # Blank line at end of file
+]
+# Allow fix for all enabled rules
+fixable = ["ALL"]
+unfixable = []
+# Allow unused variables when underscore-prefixed
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Use double quotes for strings (same as Black)
+quote-style = "double"
+# Indent with spaces (same as Black)
+indent-style = "space"
+# Respect magic trailing commas (same as Black)
+skip-magic-trailing-comma = false
+# Automatically detect line ending (same as Black)
+line-ending = "auto"
+# Enable docstring code formatting
+docstring-code-format = true
+
+[tool.ruff.lint.mccabe]
+# Set maximum complexity
+max-complexity = 10
+
+[tool.ruff.lint.isort]
+# Configure import sorting to match project structure
+known-first-party = ["src", "pages", "tests"]
+force-single-line = false
+lines-after-imports = 2

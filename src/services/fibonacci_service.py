@@ -148,7 +148,9 @@ def get_recent_swing_fibonacci(
         close_col = "Close" if "Close" in recent_data.columns else "close"
 
         # Validate required columns exist
-        if not all(col in recent_data.columns for col in [high_col, low_col, close_col]):
+        if not all(
+            col in recent_data.columns for col in [high_col, low_col, close_col]
+        ):
             return None
 
         # Find swing points using high and low prices
@@ -250,7 +252,7 @@ def validate_fibonacci_data(data: pd.DataFrame) -> bool:
     # Check if either lowercase or capitalized columns exist
     has_lowercase = all(col in data.columns for col in required_columns)
     has_capitalized = all(col in data.columns for col in required_columns_cap)
-    
+
     if not (has_lowercase or has_capitalized):
         return False
 
@@ -285,8 +287,8 @@ def format_fibonacci_summary(fib_data: Dict) -> str:
 
     summary = f"""
     **Fibonacci Analysis Summary**
-    - Swing High: {swing_high:,.2f} (on {fib_data['swing_high_date'].strftime('%Y-%m-%d')})
-    - Swing Low: {swing_low:,.2f} (on {fib_data['swing_low_date'].strftime('%Y-%m-%d')})
+    - Swing High: {swing_high:,.2f} (on {fib_data["swing_high_date"].strftime("%Y-%m-%d")})
+    - Swing Low: {swing_low:,.2f} (on {fib_data["swing_low_date"].strftime("%Y-%m-%d")})
     - Range: {range_pct:.1f}%
     
     **Key Retracement Levels:**

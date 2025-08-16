@@ -6,10 +6,8 @@ def run():
     """
     Run the Financial Health Analysis crew.
     """
-    inputs = {
-        'stock_symbol': 'Default analysis for loaded financial data'
-    }
-    
+    inputs = {"stock_symbol": "Default analysis for loaded financial data"}
+
     crew = FinancialHealthCrew()
     result = crew.crew().kickoff(inputs=inputs)
     return result
