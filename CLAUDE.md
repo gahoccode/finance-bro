@@ -255,6 +255,12 @@ uv run ruff check .     # Lint code (replaces flake8)
 uv run ruff format .    # Format code (can replace black)
 uv run mypy .           # Type checking
 
+# Ruff commands for code quality
+uv run ruff check .              # Check for linting issues
+uv run ruff check . --fix        # Auto-fix issues where possible
+uv run ruff format .             # Apply code formatting
+uv run ruff check . --verbose    # Detailed linting output
+
 # Run single test file/function
 uv run pytest tests/test_portfolio_optimization.py
 uv run pytest tests/test_portfolio_optimization.py::test_function_name
