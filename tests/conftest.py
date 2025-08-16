@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import tempfile
 import os
-from datetime import datetime, timedelta
 
 
 @pytest.fixture

@@ -1,13 +1,6 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-from vnstock import Screener, Vnstock
-import mplfinance as mpf
-import pandas_ta as ta
-from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
-import io
-import base64
 from src.services.vnstock_api import (
     get_heating_up_stocks,
     get_technical_stock_data,

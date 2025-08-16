@@ -98,13 +98,9 @@ select = [
     
     # pycodestyle - Python style issues
     "E101",  # Indentation contains mixed spaces and tabs
-    "E111",  # Indentation is not a multiple of four
-    "E112",  # Expected an indented block
-    "E113",  # Unexpected indentation
     "W291",  # Trailing whitespace
     "W292",  # No newline at end of file
     "W293",  # Blank line contains whitespace
-    "W391",  # Blank line at end of file
 ]
 # Allow fix for all enabled rules
 fixable = ["ALL"]

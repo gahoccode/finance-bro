@@ -6,7 +6,7 @@ Provides swing detection using SciPy and Fibonacci level calculations.
 import pandas as pd
 import numpy as np
 from scipy.signal import argrelextrema
-from typing import Dict, List, Tuple, Optional, Union
+from typing import Dict, Tuple, Optional
 import streamlit as st
 
 

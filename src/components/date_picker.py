@@ -9,9 +9,9 @@ This component works WITH existing session state patterns.
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
-from typing import Tuple, Optional
+from typing import Tuple
 
-from ..utils.session_utils import get_analysis_dates, has_date_range_changed
+from ..utils.session_utils import get_analysis_dates
 from ..utils.validation import validate_date_range
 from ..core.config import DEFAULT_ANALYSIS_START_DATE
 from .ui_components import inject_custom_success_styling

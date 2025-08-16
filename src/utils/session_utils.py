@@ -9,7 +9,7 @@ These utilities just provide convenient helpers for common patterns.
 
 import streamlit as st
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional, List, Tuple, Dict, Any
 
 from ..core.config import DEFAULT_STOCK_SYMBOLS, DEFAULT_ANALYSIS_START_DATE

@@ -7,7 +7,7 @@ This component works WITH existing session state patterns.
 """
 
 import streamlit as st
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 
 from ..utils.session_utils import get_stock_symbol, get_symbols_list
 from ..utils.validation import validate_stock_symbol

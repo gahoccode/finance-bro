@@ -7,7 +7,6 @@ and orchestrate the multi-agent financial health analysis crew.
 """
 
 import streamlit as st
-from src.financial_health_crew.main import run as run_crew
 from src.financial_health_crew.crew import FinancialHealthCrew
 
 

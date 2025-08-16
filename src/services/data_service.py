@@ -9,7 +9,6 @@ These utilities work WITH existing data processing patterns.
 import pandas as pd
 import numpy as np
 from typing import Dict, Any, Optional, List, Tuple
-from datetime import datetime
 
 
 def transpose_financial_dataframe(
@@ -115,7 +114,7 @@ def transpose_financial_dataframe(
         # For other dataframes, return as-is
         return df
 
-    except Exception as e:
+    except Exception:
         # If transposition fails, return original dataframe
         return df
 
@@ -164,7 +163,7 @@ def prepare_ohlcv_data(data: pd.DataFrame, for_mplfinance: bool = True) -> pd.Da
 
         return data
 
-    except Exception as e:
+    except Exception:
         return pd.DataFrame()
 
 
@@ -206,7 +205,7 @@ def calculate_stock_returns(
 
         return returns
 
-    except Exception as e:
+    except Exception:
         return pd.Series(dtype=float)
 
 
@@ -449,7 +448,7 @@ def prepare_portfolio_data(
 
         return price_data, returns_data
 
-    except Exception as e:
+    except Exception:
         return pd.DataFrame(), pd.DataFrame()
 
 
@@ -502,7 +501,7 @@ def clean_financial_data(
 
         return df_clean
 
-    except Exception as e:
+    except Exception:
         return df
 
 
@@ -629,7 +628,7 @@ def merge_financial_dataframes(
 
         return merged_df if merged_df is not None else pd.DataFrame()
 
-    except Exception as e:
+    except Exception:
         return pd.DataFrame()
 
 
@@ -654,7 +653,7 @@ def calculate_financial_ratios(
         # Basic ratio calculations can be added here
         # For example: ROA, ROE, Debt-to-Equity, etc.
         pass
-    except Exception as e:
+    except Exception:
         pass
 
     return ratios
@@ -691,5 +690,5 @@ def aggregate_portfolio_metrics(returns_data: pd.DataFrame) -> Dict[str, float]:
 
         return metrics
 
-    except Exception as e:
+    except Exception:
         return {}

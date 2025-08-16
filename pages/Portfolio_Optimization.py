@@ -1,5 +1,4 @@
 import streamlit as st
-from vnstock import Quote
 import pandas as pd
 import matplotlib.pyplot as plt
 from pypfopt import (
@@ -10,17 +9,12 @@ from pypfopt import (
     HRPOpt,
 )
 from pypfopt.discrete_allocation import get_latest_prices
-from pypfopt.exceptions import OptimizationError
-from pypfopt.expected_returns import mean_historical_return
-from pypfopt.risk_models import sample_cov
 from pypfopt import plotting
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime
 from bokeh.plotting import figure
 from bokeh.transform import cumsum
-from bokeh.palettes import Spectral
 from src.services.vnstock_api import fetch_portfolio_stock_data
-from bokeh.models import ColumnDataSource
 from math import pi
 import riskfolio as rp
 from src.components.ui_components import inject_custom_success_styling

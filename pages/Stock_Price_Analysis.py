@@ -1,14 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-from vnstock import Vnstock
-from bokeh.plotting import figure
-from bokeh.models import ColumnDataSource, HoverTool
-from bokeh.transform import factor_cmap
-from bokeh.palettes import Spectral6
-import altair as alt
 import os
 import quantstats as qs
 from datetime import datetime
@@ -364,7 +356,7 @@ def calculate_custom_metrics(
                     if include_descriptions
                     else "",
                 }
-        except Exception as e:
+        except Exception:
             # Skip metrics that fail to calculate
             continue
 

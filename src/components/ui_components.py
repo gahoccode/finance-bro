@@ -8,9 +8,6 @@ All components preserve existing session state variables and patterns.
 import streamlit as st
 import pandas as pd
 from typing import Dict, List, Optional, Any, Tuple
-from datetime import datetime, timedelta
-import plotly.express as px
-import plotly.graph_objects as go
 
 
 def render_performance_metrics_columns(metrics_data: List[Dict[str, Any]]) -> None:

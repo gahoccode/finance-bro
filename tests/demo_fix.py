@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import tempfile
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 
 def demo_fixed_logic():

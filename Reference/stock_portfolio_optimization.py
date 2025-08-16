@@ -95,8 +95,7 @@ log_returns = False
 returns = returns_from_prices(prices_df, log_returns=log_returns)
 
 
-from pypfopt import EfficientFrontier, risk_models, expected_returns, DiscreteAllocation
-from pypfopt.exceptions import OptimizationError
+from pypfopt import EfficientFrontier
 from pypfopt.expected_returns import mean_historical_return
 from pypfopt.risk_models import (
     sample_cov,

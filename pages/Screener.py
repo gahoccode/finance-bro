@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-from vnstock import Screener, Listing
+from vnstock import Listing
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -926,7 +926,6 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
     def create_matplotlib_charts_for_download(data):
         """Create matplotlib charts for PNG download"""
         import matplotlib.pyplot as plt
-        import matplotlib.patches as mpatches
         import numpy as np
         from datetime import datetime
         import io

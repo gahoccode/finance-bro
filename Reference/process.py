@@ -1,5 +1,4 @@
 from vnstock import Vnstock
-import pandas as pd
 from vnstock.core.utils.transform import flatten_hierarchical_index
 
 stock = Vnstock().stock(symbol="ACB", source="VCI")

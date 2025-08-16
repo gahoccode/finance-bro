@@ -1,5 +1,4 @@
 import os
-import glob
 from src.services.chart_service import detect_latest_chart
 import streamlit as st
 import pandas as pd
@@ -156,7 +155,7 @@ def transpose_financial_dataframe(df, name, period):
         # For other dataframes, return as-is
         return df
 
-    except Exception as e:
+    except Exception:
         # If transposition fails, return original dataframe
         return df
 

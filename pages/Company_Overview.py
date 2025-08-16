@@ -17,7 +17,6 @@ from src.services.vnstock_api import (
 # Set page configuration
 st.set_page_config(page_title="Company Profile Analysis", layout="wide")
 
-import os
 
 # CSS loading removed
 

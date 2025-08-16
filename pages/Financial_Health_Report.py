@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 from src.components.ui_components import inject_custom_success_styling
 from src.services.crewai_service import run_financial_health_analysis
 

@@ -5,7 +5,7 @@ Provides validation functions for user inputs and data integrity checks.
 
 import pandas as pd
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import List, Dict, Any
 
 
 def validate_stock_symbol(symbol: str, available_symbols: List[str]) -> Dict[str, Any]:

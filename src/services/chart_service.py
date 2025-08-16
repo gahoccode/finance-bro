@@ -7,15 +7,13 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import mplfinance as mpf
-import numpy as np
 import altair as alt
 import os
 import glob
-from datetime import datetime
 from bokeh.plotting import figure
 from bokeh.layouts import column
 from bokeh.models import HoverTool
-from typing import Dict, Optional, Any
+from typing import Dict, Optional
 
 # Technical Analysis Chart Functions
 
