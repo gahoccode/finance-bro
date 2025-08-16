@@ -1,6 +1,22 @@
 # Finance Bro - AI Stock Analysis
 
-🚀 **Natural language interface for Vietnamese stock market analysis** Interact with your financial statements in natural language. Get answers to your questions about any financial statement of listed stocks in Vietnam with a friendly finance bro. He's an introvert so please make your questions short and to the point. 
+🚀 **Experimental front-end vibe coding project for Vietnamese stock market analysis** 
+
+This project is an **experiment in front-end vibe coding** - exploring how intuitive, design-first development approaches can be used to assist analysts' backend work and transform it into a well-rounded full-stack data analysis platform with compelling visuals.
+
+**What is Front-End Vibe Coding?**
+- Design-first development approach prioritizing user experience and visual appeal
+- Rapid prototyping with immediate visual feedback
+- Intuitive interface design that makes complex data analysis accessible
+- Focus on creating engaging, interactive data visualizations
+
+**Project Goals:**
+- Bridge the gap between backend financial analysis and frontend user experience
+- Demonstrate how front-end vibe coding can enhance traditional data analysis workflows
+- Create a comprehensive financial analysis platform that's both powerful and visually appealing
+- Show how modern web technologies can make complex financial data more accessible
+
+**Natural Language Interface:** Interact with your financial statements in natural language. Get answers to your questions about any financial statement of listed stocks in Vietnam with a friendly finance bro. He's an introvert so please make your questions short and to the point. 
 
 ## Features
 
