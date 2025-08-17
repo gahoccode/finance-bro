@@ -216,6 +216,11 @@ from src.components.stock_selector import render_stock_selector
 - **Try-except blocks**: Don't attempt to use try-except blocks when implementing new features on first try, add try-except blocks after the feature is implemented and has passed all tests, if bugs occur, add try-except blocks to fix the bug
 - **Documentation requirement**: Document changes for every fix or feature before committing
 - **Complex problem solving**: Use sequential thinking for multi-step problems
+- **Ruff for code quality**: Always use ruff for formatting and linting in this project
+  - Run `ruff format .` to format code according to project standards
+  - Run `ruff check --fix .` to automatically fix linting errors where possible
+  - Attempt to fix all errors returned by ruff before committing code
+  - Ruff replaces both flake8 (linting) and black (formatting) for this project
 
 **NO Conditional Imports**: 
   - Never use try/except blocks for imports of required packages
