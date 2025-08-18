@@ -22,10 +22,10 @@ def create_dupont_analysis(IncomeStatement, BalanceSheet, CashFlow):
     try:
         # Step 1: Combine necessary data from all three statements
         # Start with Income Statement data for revenue and net income
-        income_data = IncomeStatement[['ticker', 'yearReport', 'Revenue (Bn. VND)', 'Attribute to parent company (Bn. VND)']].copy()
+        income_data = IncomeStatement[['ticker', 'yearReport', 'Revenue (Bn. VND)', 'Net Profit For the Year']].copy()
         
         # Rename for clarity
-        income_data = income_data.rename(columns={'Attribute to parent company (Bn. VND)': 'Net Income (Bn. VND)'})
+        income_data = income_data.rename(columns={'Net Profit For the Year': 'Net Income (Bn. VND)'})
         
         # Step 2: Add Balance Sheet data for assets and equity
         balance_data = BalanceSheet[['ticker', 'yearReport', 'TOTAL ASSETS (Bn. VND)', "OWNER'S EQUITY(Bn.VND)"]].copy()
@@ -107,7 +107,7 @@ def create_dupont_analysis(IncomeStatement, BalanceSheet, CashFlow):
                 "ROE (Direct)",
             ]
         ]
-
+        
         # Convert ratios to percentages for better readability
         dupont_analysis["Net Profit Margin"] = (
             dupont_analysis["Net Profit Margin"] * 100
