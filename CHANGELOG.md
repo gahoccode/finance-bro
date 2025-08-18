@@ -5,6 +5,24 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.24] - 2025-08-18
+
+### Enhanced
+- [2025-08-18] **DuPont Analysis Financial Formatting**: Applied consistent financial display formatting to DuPont analysis tab
+  - **Financial Display Options**: Added user-controlled display format selection (billions, millions, original VND) using `render_financial_display_options()` function from `src/components/ui_components.py`
+  - **Metrics Formatting**: Applied `format_financial_display()` function from `src/services/data_service.py` to all financial metrics (Net Income, Revenue, Total Assets, Equity) with proper comma separators and unit displays
+  - **Table Formatting**: Used `convert_dataframe_for_display()` function from `src/services/data_service.py` to format DuPont analysis table columns with consistent number formatting while preserving original data
+  - **Shared UI Components**: Implemented shared `render_financial_display_options()` component to eliminate code duplication between DuPont and Capital Employed tabs
+  - **Professional Presentation**: Consistent formatting across metrics and tables matching Finance Bro application standards
+
+### Technical Implementation  
+- [2025-08-18] **DuPont Analysis Page Updates**: Enhanced `pages/dupont_analysis.py` with modular formatting system
+  - **Reusable Components**: Leveraged existing `render_financial_display_options()` component from `src/components/ui_components.py`
+  - **Display Formatting**: Applied `format_financial_display()` and `convert_dataframe_for_display()` functions from `src/services/data_service.py`
+  - **Session State Integration**: Proper session state management for display format preferences with unique keys for `render_financial_display_options()`
+  - **Column Configuration**: Updated Streamlit column configuration to handle formatted string columns as TextColumn type for `convert_dataframe_for_display()` output
+  - **Code Deduplication**: Moved `render_financial_display_options()` component outside tab structure to be shared between DuPont and Capital Employed tabs
+
 ## [0.2.23] - 2025-08-18
 
 ### Added

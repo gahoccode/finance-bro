@@ -107,10 +107,19 @@ if "dataframes" not in st.session_state:
     )
     st.stop()
 
+# Add financial display options component (shared for both tabs)
+display_unit = render_financial_display_options(
+    placement="sidebar",
+    unique_key="dupont_display",
+    title="💰 Display Format",
+    help_text="Choose how financial values are displayed in metrics and tables"
+)
+
 # Create tabs for different analyses
 tab1, tab2 = st.tabs(["📊 DuPont Analysis", "💰 Capital Employed"])
 
 with tab1:
+
     # Information about DuPont Analysis
     with st.expander("ℹ️ About DuPont Analysis", expanded=False):
         st.markdown("""
@@ -170,7 +179,9 @@ with tab1:
                     dupont_analysis["yearReport"] == latest_year
                 ].iloc[0]
 
+                # Add additional metrics showing the financial values with display formatting
                 col1, col2, col3, col4 = st.columns(4)
+                col5, col6, col7, col8 = st.columns(4)
 
                 with col1:
                     st.metric(
@@ -200,24 +211,84 @@ with tab1:
                         help="Net Profit Margin × Asset Turnover × Financial Leverage",
                     )
 
+                # Second row with financial values in formatted display units
+                with col5:
+                    st.metric(
+                        "Net Income",
+                        format_financial_display(
+                            latest_data["Net Income (Bn. VND)"],
+                            display_unit,
+                            0
+                        ),
+                        help="Net profit after all expenses",
+                    )
+
+                with col6:
+                    st.metric(
+                        "Revenue", 
+                        format_financial_display(
+                            latest_data["Revenue (Bn. VND)"],
+                            display_unit,
+                            0
+                        ),
+                        help="Total sales revenue",
+                    )
+
+                with col7:
+                    st.metric(
+                        "Avg Total Assets",
+                        format_financial_display(
+                            latest_data["Average Total Assets (Bn. VND)"],
+                            display_unit,
+                            0
+                        ),
+                        help="Average total assets over the period",
+                    )
+
+                with col8:
+                    st.metric(
+                        "Avg Equity",
+                        format_financial_display(
+                            latest_data["Average Equity (Bn. VND)"],
+                            display_unit,
+                            0
+                        ),
+                        help="Average shareholders' equity",
+                    )
+
             # Display the complete dataframe with formatting
             st.markdown("### 📊 Complete DuPont Analysis Table")
 
-            # Configure column display
+            # Create display copy with formatted financial columns
+            financial_columns = [
+                "Net Income (Bn. VND)",
+                "Revenue (Bn. VND)", 
+                "Average Total Assets (Bn. VND)",
+                "Average Equity (Bn. VND)"
+            ]
+            
+            dupont_analysis_display = convert_dataframe_for_display(
+                dupont_analysis,
+                financial_columns,
+                display_unit,
+                decimal_places=1
+            )
+
+            # Configure column display (financial columns now contain formatted strings)
             column_config = {
                 "ticker": st.column_config.TextColumn("Ticker", width="small"),
                 "yearReport": st.column_config.NumberColumn("Year", width="small"),
-                "Net Income (Bn. VND)": st.column_config.NumberColumn(
-                    "Net Income (Bn. VND)", format="%.1f"
+                "Net Income (Bn. VND)": st.column_config.TextColumn(
+                    "Net Income (Bn. VND)"
                 ),
-                "Revenue (Bn. VND)": st.column_config.NumberColumn(
-                    "Revenue (Bn. VND)", format="%.1f"
+                "Revenue (Bn. VND)": st.column_config.TextColumn(
+                    "Revenue (Bn. VND)"
                 ),
-                "Average Total Assets (Bn. VND)": st.column_config.NumberColumn(
-                    "Avg. Total Assets (Bn. VND)", format="%.1f"
+                "Average Total Assets (Bn. VND)": st.column_config.TextColumn(
+                    "Avg. Total Assets (Bn. VND)"
                 ),
-                "Average Equity (Bn. VND)": st.column_config.NumberColumn(
-                    "Avg. Equity (Bn. VND)", format="%.1f"
+                "Average Equity (Bn. VND)": st.column_config.TextColumn(
+                    "Avg. Equity (Bn. VND)"
                 ),
                 "Net Profit Margin": st.column_config.NumberColumn(
                     "Net Profit Margin (%)", format="%.2f"
@@ -237,7 +308,7 @@ with tab1:
             }
 
             # Sort dataframe by year in descending order (most recent first)
-            dupont_analysis_sorted = dupont_analysis.sort_values(
+            dupont_analysis_sorted = dupont_analysis_display.sort_values(
                 "yearReport", ascending=False
             )
 
@@ -434,14 +505,6 @@ with tab2:
     \text{Capital Employed} = \text{Long-term Borrowings} + \text{Short-term Borrowings} + \text{Owner's Equity}
     }
     """)
-
-    # Add financial display options component
-    display_unit = render_financial_display_options(
-        placement="sidebar",
-        unique_key="capital_employed_display",
-        title="💰 Display Format",
-        help_text="Choose how capital employed values are displayed in metrics and tables"
-    )
 
     # Information about Capital Employed Analysis
     with st.expander("ℹ️ About Capital Employed Analysis", expanded=False):
