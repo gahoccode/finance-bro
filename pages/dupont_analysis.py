@@ -1,10 +1,11 @@
 import streamlit as st
 import altair as alt
-from src.components.ui_components import inject_custom_success_styling
+from src.components.ui_components import inject_custom_success_styling, render_financial_display_options
 from src.services.financial_analysis_service import (
     create_dupont_analysis,
     calculate_capital_employed,
 )
+from src.services.data_service import format_financial_display, convert_dataframe_for_display
 
 # Page configuration
 st.set_page_config(
@@ -434,6 +435,14 @@ with tab2:
     }
     """)
 
+    # Add financial display options component
+    display_unit = render_financial_display_options(
+        placement="sidebar",
+        unique_key="capital_employed_display",
+        title="💰 Display Format",
+        help_text="Choose how capital employed values are displayed in metrics and tables"
+    )
+
     # Information about Capital Employed Analysis
     with st.expander("ℹ️ About Capital Employed Analysis", expanded=False):
         st.markdown("""
@@ -477,12 +486,20 @@ with tab2:
                 # Store in session state
                 st.session_state.capital_employed = capital_employed_results
 
-                # Create display copy with comma-formatted strings for table
-                capital_employed_display = capital_employed_results.copy()
-                capital_employed_display['Long-term borrowings (Bn. VND)'] = capital_employed_display['Long-term borrowings (Bn. VND)'].apply(lambda x: f"{x:,.1f}")
-                capital_employed_display['Short-term borrowings (Bn. VND)'] = capital_employed_display['Short-term borrowings (Bn. VND)'].apply(lambda x: f"{x:,.1f}")
-                capital_employed_display["OWNER'S EQUITY(Bn.VND)"] = capital_employed_display["OWNER'S EQUITY(Bn.VND)"].apply(lambda x: f"{x:,.1f}")
-                capital_employed_display['Capital Employed (Bn. VND)'] = capital_employed_display['Capital Employed (Bn. VND)'].apply(lambda x: f"{x:,.1f}")
+                # Create display copy with formatted strings for table
+                financial_columns = [
+                    'Long-term borrowings (Bn. VND)',
+                    'Short-term borrowings (Bn. VND)', 
+                    "OWNER'S EQUITY(Bn.VND)",
+                    'Capital Employed (Bn. VND)'
+                ]
+                
+                capital_employed_display = convert_dataframe_for_display(
+                    capital_employed_results,
+                    financial_columns,
+                    display_unit,
+                    decimal_places=1
+                )
 
                 st.success("✅ Capital Employed analysis completed successfully!")
 
@@ -500,14 +517,22 @@ with tab2:
                     with col1:
                         st.metric(
                             "Long-term Borrowings",
-                            f"{latest_data['Long-term borrowings (Bn. VND)'] / 1_000_000_000:,.0f}B VND",
+                            format_financial_display(
+                                latest_data['Long-term borrowings (Bn. VND)'],
+                                display_unit,
+                                0
+                            ),
                             help="Long-term debt obligations",
                         )
 
                     with col2:
                         st.metric(
                             "Short-term Borrowings",
-                            f"{latest_data['Short-term borrowings (Bn. VND)'] / 1_000_000_000:,.0f}B VND",
+                            format_financial_display(
+                                latest_data['Short-term borrowings (Bn. VND)'],
+                                display_unit,
+                                0
+                            ),
                             help="Short-term debt obligations",
                         )
 
@@ -515,14 +540,22 @@ with tab2:
                         owner_equity_col = "OWNER'S EQUITY(Bn.VND)"
                         st.metric(
                             "Owner's Equity",
-                            f"{latest_data[owner_equity_col] / 1_000_000_000:,.0f}B VND",
+                            format_financial_display(
+                                latest_data[owner_equity_col],
+                                display_unit,
+                                0
+                            ),
                             help="Shareholders' equity",
                         )
 
                     with col4:
                         st.metric(
                             "Total Capital Employed",
-                            f"{latest_data['Capital Employed (Bn. VND)'] / 1_000_000_000:,.0f}B VND",
+                            format_financial_display(
+                                latest_data['Capital Employed (Bn. VND)'],
+                                display_unit,
+                                0
+                            ),
                             help="Total capital invested in the business",
                         )
 

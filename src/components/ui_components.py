@@ -8,6 +8,7 @@ All components preserve existing session state variables and patterns.
 import streamlit as st
 import pandas as pd
 from typing import Dict, List, Optional, Any, Tuple
+from src.core.config import FINANCIAL_DISPLAY_OPTIONS, DEFAULT_FINANCIAL_DISPLAY
 
 
 def render_performance_metrics_columns(metrics_data: List[Dict[str, Any]]) -> None:
@@ -324,6 +325,97 @@ def render_allocation_summary_metrics(
 
     with col3:
         st.metric("Stocks to Buy", total_stocks)
+
+
+def render_financial_display_options(
+    placement: str = "sidebar",
+    unique_key: str = "financial_display",
+    title: str = "💰 Financial Display Options",
+    help_text: str = None
+) -> str:
+    """
+    Render reusable financial display options selector.
+    
+    Provides a consistent interface for users to choose how financial values
+    are displayed across different pages. Manages session state persistence
+    and returns the selected display unit for use in formatting functions.
+    
+    Args:
+        placement: Where to render ('sidebar', 'main', 'columns')
+        unique_key: Unique key for session state (allows multiple instances)
+        title: Title for the selector widget
+        help_text: Optional help text for the selector
+        
+    Returns:
+        Selected display unit key ('billions', 'millions', 'original')
+        
+    Example:
+        # In page header or sidebar
+        display_unit = render_financial_display_options(
+            placement="sidebar",
+            unique_key="dupont_display", 
+            title="📊 Display Format"
+        )
+        
+        # Use with helper functions
+        formatted_value = format_financial_display(value, display_unit)
+        display_df = convert_dataframe_for_display(df, columns, display_unit)
+    """
+    # Initialize session state key with default
+    session_key = f"{unique_key}_{DEFAULT_FINANCIAL_DISPLAY['session_key']}"
+    
+    if session_key not in st.session_state:
+        st.session_state[session_key] = DEFAULT_FINANCIAL_DISPLAY["unit"]
+    
+    # Create options list from configuration
+    options = []
+    option_keys = []
+    
+    for config_key, config_value in FINANCIAL_DISPLAY_OPTIONS.items():
+        options.append(config_value["label"])
+        option_keys.append(config_value["key"])
+    
+    # Default help text if not provided
+    if help_text is None:
+        help_text = "Choose how financial values are displayed across metrics and tables"
+    
+    # Render based on placement
+    if placement == "sidebar":
+        with st.sidebar:
+            st.markdown(f"### {title}")
+            selected_option = st.selectbox(
+                "Format:",
+                options=options,
+                index=option_keys.index(st.session_state[session_key]),
+                help=help_text,
+                key=f"{unique_key}_selectbox"
+            )
+    
+    elif placement == "columns":
+        # For use within column layouts - more compact
+        selected_option = st.selectbox(
+            title,
+            options=options,
+            index=option_keys.index(st.session_state[session_key]),
+            help=help_text,
+            key=f"{unique_key}_selectbox"
+        )
+    
+    else:  # main
+        st.markdown(f"#### {title}")
+        selected_option = st.selectbox(
+            "Display Format:",
+            options=options,
+            index=option_keys.index(st.session_state[session_key]),
+            help=help_text,
+            key=f"{unique_key}_selectbox"
+        )
+    
+    # Update session state and return key
+    selected_key = option_keys[options.index(selected_option)]
+    st.session_state[session_key] = selected_key
+    
+    return selected_key
 
 
 def inject_custom_success_styling():

@@ -74,3 +74,32 @@ REQUIRED_OHLCV_COLUMNS = ["Open", "High", "Low", "Close", "Volume"]
 
 # Theme colors (matching existing Streamlit theme)
 THEME_COLORS = {"primary": "#56524D", "secondary": "#2B2523", "tertiary": "#76706C"}
+
+# Financial display formatting options
+FINANCIAL_DISPLAY_OPTIONS = {
+    "BILLIONS": {
+        "key": "billions",
+        "label": "Billions (B VND)", 
+        "divisor": 1_000_000_000,
+        "suffix": "B VND"
+    },
+    "MILLIONS": {
+        "key": "millions", 
+        "label": "Millions (M VND)",
+        "divisor": 1_000_000,
+        "suffix": "M VND"
+    },
+    "ORIGINAL": {
+        "key": "original",
+        "label": "Original Scale (VND)",
+        "divisor": 1,
+        "suffix": "VND"
+    }
+}
+
+# Default financial display settings
+DEFAULT_FINANCIAL_DISPLAY = {
+    "unit": "billions",
+    "decimal_places": 0,
+    "session_key": "financial_display_unit"
+}

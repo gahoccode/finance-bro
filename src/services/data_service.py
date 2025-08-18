@@ -692,3 +692,114 @@ def aggregate_portfolio_metrics(returns_data: pd.DataFrame) -> Dict[str, float]:
 
     except Exception:
         return {}
+
+
+def format_financial_display(
+    value: float, display_unit: str = "billions", decimal_places: int = 0
+) -> str:
+    """
+    Format financial values for display with proper scaling and comma separators.
+    
+    Used for metrics display in financial analysis pages to provide consistent
+    formatting across the application.
+
+    Args:
+        value: The numeric value to format
+        display_unit: The target unit ('billions', 'millions', 'original')
+        decimal_places: Number of decimal places to show
+
+    Returns:
+        Formatted string with unit suffix and comma separators
+        
+    Examples:
+        format_financial_display(1500000000, 'billions', 0) -> '2B VND'
+        format_financial_display(1500000000, 'millions', 1) -> '1,500.0M VND'
+    """
+    if pd.isna(value) or value is None:
+        return "N/A"
+
+    try:
+        numeric_value = float(value)
+        
+        if display_unit == "billions":
+            converted_value = numeric_value / 1_000_000_000
+            format_str = f"{{:,.{decimal_places}f}}B VND"
+            return format_str.format(converted_value)
+        elif display_unit == "millions":
+            converted_value = numeric_value / 1_000_000
+            format_str = f"{{:,.{decimal_places}f}}M VND"
+            return format_str.format(converted_value)
+        else:  # original
+            format_str = f"{{:,.{decimal_places}f}} VND"
+            return format_str.format(numeric_value)
+            
+    except (ValueError, TypeError):
+        return "N/A"
+
+
+def convert_dataframe_for_display(
+    df: pd.DataFrame, 
+    columns_to_format: List[str], 
+    display_unit: str = "original", 
+    decimal_places: int = 1
+) -> pd.DataFrame:
+    """
+    Convert dataframe columns to formatted strings for display while preserving original data.
+    
+    Creates a display copy with comma-formatted strings for table presentation
+    without modifying the original data structure.
+
+    Args:
+        df: Original dataframe to format
+        columns_to_format: List of column names to apply formatting to
+        display_unit: Target unit for display ('billions', 'millions', 'original')
+        decimal_places: Number of decimal places for display
+
+    Returns:
+        Copy of dataframe with specified columns formatted as strings
+        
+    Examples:
+        # Format capital employed columns for display
+        display_df = convert_dataframe_for_display(
+            capital_employed_df, 
+            ['Long-term borrowings (Bn. VND)', 'Capital Employed (Bn. VND)'],
+            display_unit='original',
+            decimal_places=1
+        )
+    """
+    if df is None or df.empty:
+        return df
+        
+    try:
+        # Create display copy
+        display_df = df.copy()
+        
+        for column in columns_to_format:
+            if column in display_df.columns:
+                # Apply formatting function to each value in the column
+                def format_value(x):
+                    try:
+                        if pd.isna(x) or x is None:
+                            return "N/A"
+                        # Handle string values that might not be convertible to float
+                        if isinstance(x, str) and x in ["N/A", "n/a", "NA", ""]:
+                            return "N/A"
+                        
+                        numeric_value = float(x)
+                        
+                        if display_unit == "billions":
+                            return f"{numeric_value / 1_000_000_000:,.{decimal_places}f}"
+                        elif display_unit == "millions":
+                            return f"{numeric_value / 1_000_000:,.{decimal_places}f}"
+                        else:  # original
+                            return f"{numeric_value:,.{decimal_places}f}"
+                    except (ValueError, TypeError):
+                        return "N/A"
+                
+                display_df[column] = display_df[column].apply(format_value)
+        
+        return display_df
+        
+    except Exception:
+        # Return original dataframe if formatting fails
+        return df
