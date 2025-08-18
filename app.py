@@ -138,7 +138,7 @@ def main_page():
 
         # Quick navigation to analysis pages
         st.markdown("### 🚀 Quick Navigation")
-        
+
         # Financial Analysis Section
         st.markdown("**💰 Financial Analysis**")
         col1, col2 = st.columns(2)
@@ -149,7 +149,7 @@ def main_page():
             if st.button("📊 DuPont Analysis", use_container_width=True):
                 st.switch_page("pages/dupont_analysis.py")
 
-        # Market Analysis Section  
+        # Market Analysis Section
         st.markdown("**📈 Market Analysis**")
         col1, col2 = st.columns(2)
         with col1:
