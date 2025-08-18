@@ -5,6 +5,20 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.23] - 2025-08-18
+
+### Added
+- [2025-08-18] **DuPont Analysis Session State Management**: Enhanced DuPont analysis functionality with persistent data storage
+  - **Session State Integration**: DuPont analysis dataframe now stored in `st.session_state.dupont_analysis` for persistence across page interactions
+  - **Data Consistency**: Ensures calculated DuPont metrics remain available throughout user session for cross-page analysis
+  - **Navigation Continuity**: Maintains analysis results when users navigate between different analysis pages
+
+### Enhanced
+- [2025-08-18] **DuPont Analysis Page**: Improved data flow and user experience
+  - **Persistent Results**: Analysis results now persist in session state for better data accessibility
+  - **Consistent Data Management**: Follows application patterns for dataframe storage and retrieval
+  - **Cross-Page Integration**: Enables potential future integration with other analysis tools
+
 ## [0.2.22] - 2025-08-15
 
 ### Added
