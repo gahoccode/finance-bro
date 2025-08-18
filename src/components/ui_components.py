@@ -363,22 +363,22 @@ def render_financial_display_options(
     """
     # Initialize session state key with default
     session_key = f"{unique_key}_{DEFAULT_FINANCIAL_DISPLAY['session_key']}"
-    
+
     if session_key not in st.session_state:
         st.session_state[session_key] = DEFAULT_FINANCIAL_DISPLAY["unit"]
-    
+
     # Create options list from configuration
     options = []
     option_keys = []
-    
+
     for config_key, config_value in FINANCIAL_DISPLAY_OPTIONS.items():
         options.append(config_value["label"])
         option_keys.append(config_value["key"])
-    
+
     # Default help text if not provided
     if help_text is None:
         help_text = "Choose how financial values are displayed across metrics and tables"
-    
+
     # Render based on placement
     if placement == "sidebar":
         with st.sidebar:
@@ -390,7 +390,7 @@ def render_financial_display_options(
                 help=help_text,
                 key=f"{unique_key}_selectbox"
             )
-    
+
     elif placement == "columns":
         # For use within column layouts - more compact
         selected_option = st.selectbox(
@@ -400,7 +400,7 @@ def render_financial_display_options(
             help=help_text,
             key=f"{unique_key}_selectbox"
         )
-    
+
     else:  # main
         st.markdown(f"#### {title}")
         selected_option = st.selectbox(
@@ -410,11 +410,11 @@ def render_financial_display_options(
             help=help_text,
             key=f"{unique_key}_selectbox"
         )
-    
+
     # Update session state and return key
     selected_key = option_keys[options.index(selected_option)]
     st.session_state[session_key] = selected_key
-    
+
     return selected_key
 
 

@@ -246,6 +246,24 @@ from src.components.stock_selector import render_stock_selector
     ```
   - Users expect immediate download when clicking download buttons
 
+**Chart Styling Guidelines**:
+  - **Clean Line Charts**: Never include `point=True` parameter in Altair line charts
+  - Use clean line visualizations without data point markers for professional appearance
+  - Consistent with earth-tone styling theme (`#76706C`, `#56524D`, `#2B2523`)
+  - Example pattern:
+    ```python
+    # Correct - clean line without points
+    chart = alt.Chart(data).mark_line(
+        color='#76706C',
+        strokeWidth=2
+    )
+    
+    # Incorrect - avoid point markers
+    chart = alt.Chart(data).mark_line(
+        point=True  # DO NOT USE
+    )
+    ```
+
 ### Version Management
 - Uses semantic versioning (MAJOR.MINOR.PATCH) starting from 0.1.0 (pyproject.toml)
 - Patch increment only on actual changes (features/fixes/improvements)

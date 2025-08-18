@@ -720,7 +720,7 @@ def format_financial_display(
 
     try:
         numeric_value = float(value)
-        
+
         if display_unit == "billions":
             converted_value = numeric_value / 1_000_000_000
             format_str = f"{{:,.{decimal_places}f}}B VND"
@@ -732,15 +732,15 @@ def format_financial_display(
         else:  # original
             format_str = f"{{:,.{decimal_places}f}} VND"
             return format_str.format(numeric_value)
-            
+
     except (ValueError, TypeError):
         return "N/A"
 
 
 def convert_dataframe_for_display(
-    df: pd.DataFrame, 
-    columns_to_format: List[str], 
-    display_unit: str = "original", 
+    df: pd.DataFrame,
+    columns_to_format: List[str],
+    display_unit: str = "original",
     decimal_places: int = 1
 ) -> pd.DataFrame:
     """
@@ -769,11 +769,11 @@ def convert_dataframe_for_display(
     """
     if df is None or df.empty:
         return df
-        
+
     try:
         # Create display copy
         display_df = df.copy()
-        
+
         for column in columns_to_format:
             if column in display_df.columns:
                 # Apply formatting function to each value in the column
@@ -784,9 +784,9 @@ def convert_dataframe_for_display(
                         # Handle string values that might not be convertible to float
                         if isinstance(x, str) and x in ["N/A", "n/a", "NA", ""]:
                             return "N/A"
-                        
+
                         numeric_value = float(x)
-                        
+
                         if display_unit == "billions":
                             return f"{numeric_value / 1_000_000_000:,.{decimal_places}f}"
                         elif display_unit == "millions":
@@ -795,11 +795,11 @@ def convert_dataframe_for_display(
                             return f"{numeric_value:,.{decimal_places}f}"
                     except (ValueError, TypeError):
                         return "N/A"
-                
+
                 display_df[column] = display_df[column].apply(format_value)
-        
+
         return display_df
-        
+
     except Exception:
         # Return original dataframe if formatting fails
         return df

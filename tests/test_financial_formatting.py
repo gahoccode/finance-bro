@@ -7,14 +7,11 @@ Tests the flexible financial formatting system including:
 - Reusable UI components in src/components/ui_components.py
 """
 
-import pytest
 import pandas as pd
-import streamlit as st
-from unittest.mock import patch, MagicMock
+import pytest
 
-# Import modules under test
-from src.services.data_service import format_financial_display, convert_dataframe_for_display
 from src.core.config import FINANCIAL_DISPLAY_OPTIONS, DEFAULT_FINANCIAL_DISPLAY
+from src.services.data_service import format_financial_display, convert_dataframe_for_display
 
 
 class TestFormatFinancialDisplay:
@@ -36,7 +33,7 @@ class TestFormatFinancialDisplay:
         assert result == "1,500M VND"
 
     def test_format_millions_with_decimals(self):
-        """Test millions formatting with decimal places.""" 
+        """Test millions formatting with decimal places."""
         result = format_financial_display(1500000000, "millions", 1)
         assert result == "1,500.0M VND"
 
@@ -110,7 +107,7 @@ class TestConvertDataframeForDisplay:
         result = convert_dataframe_for_display(
             self.test_df, columns_to_format, "billions", 1
         )
-        
+
         expected_values = ["1.5", "2.5", "0.8"]
         assert result['Long-term borrowings (Bn. VND)'].tolist() == expected_values
 
@@ -123,7 +120,7 @@ class TestConvertDataframeForDisplay:
         result = convert_dataframe_for_display(
             self.test_df, columns_to_format, "millions", 0
         )
-        
+
         assert result['Long-term borrowings (Bn. VND)'].iloc[0] == "1,500"
         assert result['Short-term borrowings (Bn. VND)'].iloc[0] == "500"
 
@@ -133,7 +130,7 @@ class TestConvertDataframeForDisplay:
         result = convert_dataframe_for_display(
             self.test_df, columns_to_format, "original", 1
         )
-        
+
         expected_values = ["2,000,000,000.0", "3,250,000,000.0", "1,000,000,000.0"]
         assert result['Capital Employed (Bn. VND)'].tolist() == expected_values
 
@@ -141,14 +138,14 @@ class TestConvertDataframeForDisplay:
         """Test that original dataframe is not modified."""
         original_values = self.test_df['Long-term borrowings (Bn. VND)'].copy()
         columns_to_format = ['Long-term borrowings (Bn. VND)']
-        
+
         convert_dataframe_for_display(
             self.test_df, columns_to_format, "billions", 1
         )
-        
+
         # Original dataframe should be unchanged
         pd.testing.assert_series_equal(
-            self.test_df['Long-term borrowings (Bn. VND)'], 
+            self.test_df['Long-term borrowings (Bn. VND)'],
             original_values
         )
 
@@ -158,7 +155,7 @@ class TestConvertDataframeForDisplay:
         result = convert_dataframe_for_display(
             self.test_df, columns_to_format, "billions", 1
         )
-        
+
         # Should process existing column, ignore non-existent one
         assert result['Long-term borrowings (Bn. VND)'].iloc[0] == "1.5"
 
@@ -177,12 +174,12 @@ class TestConvertDataframeForDisplay:
         """Test handling dataframes with NaN values."""
         df_with_nan = self.test_df.copy()
         df_with_nan.iloc[0, df_with_nan.columns.get_loc('Long-term borrowings (Bn. VND)')] = pd.NA
-        
+
         columns_to_format = ['Long-term borrowings (Bn. VND)']
         result = convert_dataframe_for_display(
             df_with_nan, columns_to_format, "billions", 1
         )
-        
+
         assert result['Long-term borrowings (Bn. VND)'].iloc[0] == "N/A"
         assert result['Long-term borrowings (Bn. VND)'].iloc[1] == "2.5"
 
@@ -196,11 +193,11 @@ class TestConvertDataframeForDisplay:
         result = convert_dataframe_for_display(
             self.test_df, financial_columns, "billions", 2
         )
-        
+
         # Check that all financial columns are formatted as strings
         for column in financial_columns:
             assert all(isinstance(x, str) for x in result[column])
-            
+
         # Non-financial columns should remain unchanged
         assert result['Symbol'].iloc[0] == 'REE'
         assert result['Year'].iloc[0] == 2024
@@ -209,12 +206,12 @@ class TestConvertDataframeForDisplay:
         """Test conversion with zero values."""
         df_with_zeros = self.test_df.copy()
         df_with_zeros.iloc[0, df_with_zeros.columns.get_loc('Long-term borrowings (Bn. VND)')] = 0
-        
+
         columns_to_format = ['Long-term borrowings (Bn. VND)']
         result = convert_dataframe_for_display(
             df_with_zeros, columns_to_format, "billions", 1
         )
-        
+
         assert result['Long-term borrowings (Bn. VND)'].iloc[0] == "0.0"
 
 
@@ -224,7 +221,7 @@ class TestFinancialDisplayConfiguration:
     def test_financial_display_options_structure(self):
         """Test that FINANCIAL_DISPLAY_OPTIONS has correct structure."""
         required_keys = ["BILLIONS", "MILLIONS", "ORIGINAL"]
-        
+
         # Check all required top-level keys exist
         for key in required_keys:
             assert key in FINANCIAL_DISPLAY_OPTIONS
@@ -238,7 +235,7 @@ class TestFinancialDisplayConfiguration:
     def test_billions_configuration(self):
         """Test billions configuration values."""
         billions_config = FINANCIAL_DISPLAY_OPTIONS["BILLIONS"]
-        
+
         assert billions_config["key"] == "billions"
         assert billions_config["divisor"] == 1_000_000_000
         assert "B VND" in billions_config["suffix"]
@@ -246,7 +243,7 @@ class TestFinancialDisplayConfiguration:
     def test_millions_configuration(self):
         """Test millions configuration values."""
         millions_config = FINANCIAL_DISPLAY_OPTIONS["MILLIONS"]
-        
+
         assert millions_config["key"] == "millions"
         assert millions_config["divisor"] == 1_000_000
         assert "M VND" in millions_config["suffix"]
@@ -254,7 +251,7 @@ class TestFinancialDisplayConfiguration:
     def test_original_configuration(self):
         """Test original scale configuration values."""
         original_config = FINANCIAL_DISPLAY_OPTIONS["ORIGINAL"]
-        
+
         assert original_config["key"] == "original"
         assert original_config["divisor"] == 1
         assert "VND" in original_config["suffix"]
@@ -262,14 +259,14 @@ class TestFinancialDisplayConfiguration:
     def test_default_financial_display_structure(self):
         """Test DEFAULT_FINANCIAL_DISPLAY has correct structure."""
         required_keys = ["unit", "decimal_places", "session_key"]
-        
+
         for key in required_keys:
             assert key in DEFAULT_FINANCIAL_DISPLAY
 
     def test_default_configuration_consistency(self):
         """Test that default configuration values are consistent with options."""
         default_unit = DEFAULT_FINANCIAL_DISPLAY["unit"]
-        
+
         # Default unit should exist in one of the option keys
         valid_units = [opt["key"] for opt in FINANCIAL_DISPLAY_OPTIONS.values()]
         assert default_unit in valid_units
@@ -291,8 +288,8 @@ class TestFinancialFormattingIntegration:
         """Test complete workflow using billions format."""
         # Test individual value formatting
         revenue_formatted = format_financial_display(
-            self.sample_data.iloc[0]['Revenue (Bn. VND)'], 
-            "billions", 
+            self.sample_data.iloc[0]['Revenue (Bn. VND)'],
+            "billions",
             1
         )
         assert revenue_formatted == "50.0B VND"
@@ -302,21 +299,21 @@ class TestFinancialFormattingIntegration:
         display_df = convert_dataframe_for_display(
             self.sample_data, financial_columns, "billions", 0
         )
-        
+
         assert display_df['Revenue (Bn. VND)'].iloc[0] == "50"
         assert display_df['Assets (Bn. VND)'].iloc[0] == "100"
-        
+
         # Non-financial columns preserved
         assert display_df['Company'].iloc[0] == 'REE Corp'
 
     def test_full_workflow_millions(self):
-        """Test complete workflow using millions format.""" 
+        """Test complete workflow using millions format."""
         # Test dataframe conversion to millions
         financial_columns = ['Revenue (Bn. VND)', 'Assets (Bn. VND)']
         display_df = convert_dataframe_for_display(
             self.sample_data, financial_columns, "millions", 0
         )
-        
+
         assert display_df['Revenue (Bn. VND)'].iloc[0] == "50,000"
         assert display_df['Assets (Bn. VND)'].iloc[0] == "100,000"
 
@@ -324,15 +321,15 @@ class TestFinancialFormattingIntegration:
         """Test handling mixed formatting requirements."""
         # Some metrics in billions, some in original scale
         revenue_billions = format_financial_display(
-            self.sample_data.iloc[0]['Revenue (Bn. VND)'], 
+            self.sample_data.iloc[0]['Revenue (Bn. VND)'],
             "billions", 2
         )
-        
+
         revenue_original = format_financial_display(
-            self.sample_data.iloc[0]['Revenue (Bn. VND)'], 
+            self.sample_data.iloc[0]['Revenue (Bn. VND)'],
             "original", 0
         )
-        
+
         assert revenue_billions == "50.00B VND"
         assert revenue_original == "50,000,000,000 VND"
 
@@ -341,16 +338,16 @@ class TestFinancialFormattingIntegration:
         # Use configuration constants to format
         for config_key, config_value in FINANCIAL_DISPLAY_OPTIONS.items():
             unit_key = config_value["key"]
-            
+
             result = format_financial_display(
                 1000000000,  # 1 billion VND
                 unit_key,
                 1
             )
-            
+
             if unit_key == "billions":
                 assert result == "1.0B VND"
-            elif unit_key == "millions": 
+            elif unit_key == "millions":
                 assert result == "1,000.0M VND"
             elif unit_key == "original":
                 assert result == "1,000,000,000.0 VND"
@@ -393,11 +390,11 @@ class TestEdgeCasesAndErrorHandling:
             'Invalid': ['N/A', None],  # Invalid values
             'Year': [2024, 2024]
         })
-        
+
         result = convert_dataframe_for_display(
             mixed_df, ['Revenue', 'Revenue_Str'], "billions", 1
         )
-        
+
         assert result['Revenue'].iloc[0] == "1.5"
         assert result['Revenue_Str'].iloc[0] == "1.5"
 
@@ -405,7 +402,7 @@ class TestEdgeCasesAndErrorHandling:
         """Test conversion with empty columns list."""
         df = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
         result = convert_dataframe_for_display(df, [], "billions", 1)
-        
+
         # Should return unchanged dataframe
         pd.testing.assert_frame_equal(result, df)
 
@@ -415,11 +412,11 @@ class TestEdgeCasesAndErrorHandling:
             'Valid': [1000000000, 2000000000],
             'Invalid': ['N/A', None]
         })
-        
+
         result = convert_dataframe_for_display(
             invalid_df, ['Invalid'], "billions", 1
         )
-        
+
         assert all(x == "N/A" for x in result['Invalid'])
 
 

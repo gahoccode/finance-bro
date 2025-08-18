@@ -79,12 +79,12 @@ THEME_COLORS = {"primary": "#56524D", "secondary": "#2B2523", "tertiary": "#7670
 FINANCIAL_DISPLAY_OPTIONS = {
     "BILLIONS": {
         "key": "billions",
-        "label": "Billions (B VND)", 
+        "label": "Billions (B VND)",
         "divisor": 1_000_000_000,
         "suffix": "B VND"
     },
     "MILLIONS": {
-        "key": "millions", 
+        "key": "millions",
         "label": "Millions (M VND)",
         "divisor": 1_000_000,
         "suffix": "M VND"

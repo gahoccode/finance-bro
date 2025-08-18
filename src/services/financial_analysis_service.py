@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import streamlit as st
 
 
@@ -340,4 +341,100 @@ def calculate_capital_employed(BalanceSheet):
 
     except Exception as e:
         st.error(f"Error in Capital Employed calculation: {str(e)}")
+        return None
+
+
+def calculate_degree_of_financial_leverage(IncomeStatement):
+    """
+    Calculate Degree of Financial Leverage using percentage changes in Net Income and EBIT.
+    
+    DFL = % Change in Net Income / % Change in EBIT
+    
+    Parameters:
+    -----------
+    IncomeStatement : pandas DataFrame
+        Income Statement data with columns including 'Operating Profit/Loss' and 'Net Profit For the Year'
+    
+    Returns:
+    --------
+    pandas DataFrame
+        DataFrame with DFL calculations
+    """
+    try:
+        # Create a copy to avoid modifying the original dataframe
+        financial_leverage_data = IncomeStatement.copy()
+
+        # Define column variations for Vietnamese financial data
+        ebit_cols = [
+            'Operating Profit/Loss',
+            'Operating profit/loss',
+            'EBIT (Bn. VND)',
+            'Operating income (Bn. VND)',
+            'Operating profit (Bn. VND)'
+        ]
+
+        net_income_cols = [
+            'Net Profit For the Year',
+            'Net profit for the year',
+            'Attribute to parent company (Bn. VND)',
+            'Net Income (Bn. VND)',
+            'Net profit (Bn. VND)',
+            'Profit after tax (Bn. VND)'
+        ]
+
+        # Find matching columns
+        ebit_col = None
+        for col in ebit_cols:
+            if col in financial_leverage_data.columns:
+                ebit_col = col
+                break
+
+        net_income_col = None
+        for col in net_income_cols:
+            if col in financial_leverage_data.columns:
+                net_income_col = col
+                break
+
+        # Validate required columns exist
+        if not ebit_col:
+            raise ValueError("EBIT/Operating Profit column not found")
+        if not net_income_col:
+            raise ValueError("Net Income column not found")
+
+        # Rename for clarity
+        financial_leverage_data = financial_leverage_data.rename(columns={
+            ebit_col: 'EBIT (Bn. VND)',
+            net_income_col: 'Net Income (Bn. VND)'
+        })
+
+        # Sort by ticker and year
+        financial_leverage_data = financial_leverage_data.sort_values(['ticker', 'yearReport'])
+
+        # Calculate year-over-year percentage changes for each ticker
+        financial_leverage_data['EBIT % Change'] = financial_leverage_data.groupby('ticker')['EBIT (Bn. VND)'].pct_change() * 100
+        financial_leverage_data['Net Income % Change'] = financial_leverage_data.groupby('ticker')['Net Income (Bn. VND)'].pct_change() * 100
+
+        # Calculate DFL
+        financial_leverage_data['DFL'] = financial_leverage_data['Net Income % Change'] / financial_leverage_data['EBIT % Change']
+
+        # Handle infinite or NaN values (when EBIT % Change is near zero)
+        financial_leverage_data['DFL'] = financial_leverage_data['DFL'].replace([np.inf, -np.inf], np.nan)
+
+        # Select relevant columns
+        dfl_results = financial_leverage_data[['ticker', 'yearReport',
+                                             'EBIT (Bn. VND)', 'Net Income (Bn. VND)',
+                                             'EBIT % Change', 'Net Income % Change',
+                                             'DFL']]
+
+        # Round values for better display
+        dfl_results = dfl_results.round({
+            'EBIT % Change': 2,
+            'Net Income % Change': 2,
+            'DFL': 2
+        })
+
+        return dfl_results
+
+    except Exception as e:
+        st.error(f"Error in Degree of Financial Leverage calculation: {str(e)}")
         return None

@@ -1,9 +1,11 @@
 import streamlit as st
+import pandas as pd
 import altair as alt
 from src.components.ui_components import inject_custom_success_styling, render_financial_display_options
 from src.services.financial_analysis_service import (
     create_dupont_analysis,
     calculate_capital_employed,
+    calculate_degree_of_financial_leverage,
 )
 from src.services.data_service import format_financial_display, convert_dataframe_for_display
 
@@ -116,7 +118,7 @@ display_unit = render_financial_display_options(
 )
 
 # Create tabs for different analyses
-tab1, tab2 = st.tabs(["📊 DuPont Analysis", "💰 Capital Employed"])
+tab1, tab2, tab3 = st.tabs(["📊 DuPont Analysis", "💰 Capital Employed", "📈 Degree of Financial Leverage"])
 
 with tab1:
 
@@ -225,7 +227,7 @@ with tab1:
 
                 with col6:
                     st.metric(
-                        "Revenue", 
+                        "Revenue",
                         format_financial_display(
                             latest_data["Revenue (Bn. VND)"],
                             display_unit,
@@ -262,11 +264,11 @@ with tab1:
             # Create display copy with formatted financial columns
             financial_columns = [
                 "Net Income (Bn. VND)",
-                "Revenue (Bn. VND)", 
+                "Revenue (Bn. VND)",
                 "Average Total Assets (Bn. VND)",
                 "Average Equity (Bn. VND)"
             ]
-            
+
             dupont_analysis_display = convert_dataframe_for_display(
                 dupont_analysis,
                 financial_columns,
@@ -552,11 +554,11 @@ with tab2:
                 # Create display copy with formatted strings for table
                 financial_columns = [
                     'Long-term borrowings (Bn. VND)',
-                    'Short-term borrowings (Bn. VND)', 
+                    'Short-term borrowings (Bn. VND)',
                     "OWNER'S EQUITY(Bn.VND)",
                     'Capital Employed (Bn. VND)'
                 ]
-                
+
                 capital_employed_display = convert_dataframe_for_display(
                     capital_employed_results,
                     financial_columns,
@@ -659,7 +661,7 @@ with tab2:
 
                     # Capital Employed trend line
                     capital_line = (
-                        base.mark_line(color="#76706C", strokeWidth=4, point=True)
+                        base.mark_line(color="#76706C", strokeWidth=4)
                         .encode(
                             x=alt.X(
                                 "yearReport:O",
@@ -813,6 +815,325 @@ with tab2:
 
     except Exception as e:
         st.error(f"❌ Error performing Capital Employed analysis: {str(e)}")
+        st.info("Please ensure financial data is properly loaded and try again.")
+
+with tab3:
+    # Degree of Financial Leverage Analysis
+    st.markdown("### 🧮 Degree of Financial Leverage Formula")
+
+    # Display the DFL formula
+    st.latex(r"""
+    \boxed{
+    \text{DFL} = \frac{\% \text{ Change in Net Income}}{\% \text{ Change in EBIT}}
+    }
+    """)
+
+    # Information about DFL Analysis
+    with st.expander("ℹ️ About Degree of Financial Leverage Analysis", expanded=False):
+        st.markdown("""
+        **Degree of Financial Leverage (DFL)** measures how sensitive a company's net income is to changes in its operating income (EBIT).
+        
+        **Formula: DFL = % Change in Net Income / % Change in EBIT**
+        
+        **Key Insights:**
+        - **Financial Risk Measurement**: Higher DFL indicates greater financial risk due to fixed financial costs (interest)
+        - **Leverage Impact**: Shows how financial leverage amplifies the effect of operating income changes on net income
+        - **Year-over-Year Analysis**: Compares percentage changes between consecutive years
+        - **Risk Assessment**: Helps evaluate the company's financial structure and interest burden
+        
+        **Interpretation:**
+        - **DFL > 1**: Financial leverage amplifies earnings changes (both positive and negative)
+        - **DFL = 1**: No financial leverage effect (no interest expense)
+        - **DFL < 1**: Financial leverage dampens earnings changes (unusual, may indicate extraordinary items)
+        - **High DFL**: Greater financial risk but potential for higher returns to equity holders
+        - **Low DFL**: Lower financial risk, more stable earnings
+        """)
+
+    # Perform DFL Analysis
+    try:
+        dataframes = st.session_state.dataframes
+
+        # Check if IncomeStatement data exists
+        if "IncomeStatement" not in dataframes:
+            st.error("❌ Income Statement data not available")
+            st.info(
+                "Please ensure all financial data is loaded in the AI Chat Analysis page."
+            )
+        else:
+            # Calculate DFL
+            with st.spinner("🔄 Calculating Degree of Financial Leverage..."):
+                dfl_results = calculate_degree_of_financial_leverage(
+                    dataframes["IncomeStatement"]
+                )
+
+            if dfl_results is not None and not dfl_results.empty:
+                # Store in session state
+                st.session_state.dfl_analysis = dfl_results
+
+                st.success("✅ Degree of Financial Leverage analysis completed successfully!")
+
+                # Display metrics summary
+                st.subheader("📈 DFL Analysis Summary")
+
+                # Filter out rows with NaN DFL values for summary
+                valid_dfl_data = dfl_results.dropna(subset=['DFL'])
+
+                if len(valid_dfl_data) > 0:
+                    latest_year = valid_dfl_data["yearReport"].max()
+                    latest_data = valid_dfl_data[
+                        valid_dfl_data["yearReport"] == latest_year
+                    ].iloc[0]
+
+                    col1, col2, col3, col4 = st.columns(4)
+
+                    with col1:
+                        st.metric(
+                            "EBIT",
+                            format_financial_display(
+                                latest_data['EBIT (Bn. VND)'],
+                                display_unit,
+                                0
+                            ),
+                            help="Earnings Before Interest and Taxes",
+                        )
+
+                    with col2:
+                        st.metric(
+                            "Net Income",
+                            format_financial_display(
+                                latest_data['Net Income (Bn. VND)'],
+                                display_unit,
+                                0
+                            ),
+                            help="Net profit after all expenses including taxes and interest",
+                        )
+
+                    with col3:
+                        ebit_change = latest_data['EBIT % Change']
+                        st.metric(
+                            "EBIT % Change",
+                            f"{ebit_change:.2f}%" if not pd.isna(ebit_change) else "N/A",
+                            help="Year-over-year percentage change in EBIT",
+                        )
+
+                    with col4:
+                        net_income_change = latest_data['Net Income % Change']
+                        st.metric(
+                            "Net Income % Change",
+                            f"{net_income_change:.2f}%" if not pd.isna(net_income_change) else "N/A",
+                            help="Year-over-year percentage change in Net Income",
+                        )
+
+                    # Second row with DFL metric
+                    col5, col6, col7, col8 = st.columns(4)
+
+                    with col5:
+                        dfl_value = latest_data['DFL']
+                        dfl_display = f"{dfl_value:.2f}" if not pd.isna(dfl_value) else "N/A"
+
+                        # Add color coding for DFL assessment
+                        if not pd.isna(dfl_value):
+                            if dfl_value > 2:
+                                dfl_status = "🔴 High Financial Risk"
+                            elif dfl_value > 1.5:
+                                dfl_status = "🟠 Moderate Financial Risk"
+                            elif dfl_value > 1:
+                                dfl_status = "🟡 Low Financial Risk"
+                            else:
+                                dfl_status = "🟢 Minimal Financial Risk"
+                        else:
+                            dfl_status = "N/A"
+
+                        st.metric(
+                            "Degree of Financial Leverage",
+                            dfl_display,
+                            help="DFL = % Change in Net Income / % Change in EBIT",
+                        )
+                        st.caption(dfl_status)
+
+                # Display complete table with formatting
+                st.markdown("### 📊 Degree of Financial Leverage Analysis Table")
+
+                # Create display copy with formatted financial columns
+                financial_columns = [
+                    'EBIT (Bn. VND)',
+                    'Net Income (Bn. VND)'
+                ]
+
+                dfl_results_display = convert_dataframe_for_display(
+                    dfl_results,
+                    financial_columns,
+                    display_unit,
+                    decimal_places=1
+                )
+
+                # Configure column display
+                column_config = {
+                    "ticker": st.column_config.TextColumn("Ticker", width="small"),
+                    "yearReport": st.column_config.NumberColumn("Year", width="small"),
+                    'EBIT (Bn. VND)': st.column_config.TextColumn("EBIT (Bn. VND)"),
+                    'Net Income (Bn. VND)': st.column_config.TextColumn("Net Income (Bn. VND)"),
+                    'EBIT % Change': st.column_config.NumberColumn("EBIT % Change", format="%.2f"),
+                    'Net Income % Change': st.column_config.NumberColumn("Net Income % Change", format="%.2f"),
+                    'DFL': st.column_config.NumberColumn("DFL", format="%.2f"),
+                }
+
+                # Sort by year in descending order (use display copy)
+                dfl_results_sorted = dfl_results_display.sort_values(
+                    "yearReport", ascending=False
+                )
+
+                st.dataframe(
+                    dfl_results_sorted,
+                    use_container_width=True,
+                    column_config=column_config,
+                    hide_index=True,
+                )
+
+                # Trend visualization
+                if len(valid_dfl_data) > 1:
+                    st.markdown("### 📈 DFL Trend Analysis")
+
+                    # Create trend charts
+                    chart_data = valid_dfl_data.copy()
+
+                    # DFL trend line
+                    base = alt.Chart(chart_data)
+
+                    dfl_line = (
+                        base.mark_line(color="#76706C", strokeWidth=4)
+                        .encode(
+                            x=alt.X(
+                                "yearReport:O",
+                                title="Year",
+                                axis=alt.Axis(labelAngle=0),
+                            ),
+                            y=alt.Y(
+                                "DFL:Q",
+                                title="Degree of Financial Leverage",
+                                scale=alt.Scale(zero=False),
+                            ),
+                            tooltip=["yearReport:O", "DFL:Q"],
+                        )
+                        .properties(
+                            title="Degree of Financial Leverage Over Time",
+                            width=600,
+                            height=300,
+                        )
+                    )
+
+                    st.altair_chart(dfl_line, use_container_width=True)
+
+                    # Percentage changes comparison chart
+                    st.markdown("### 📊 EBIT vs Net Income Changes Comparison")
+
+                    # Prepare data for comparison chart
+                    comparison_data = chart_data.melt(
+                        id_vars=["yearReport"],
+                        value_vars=["EBIT % Change", "Net Income % Change"],
+                        var_name="Metric",
+                        value_name="Percentage Change"
+                    )
+
+                    comparison_chart = (
+                        alt.Chart(comparison_data)
+                        .mark_bar()
+                        .encode(
+                            x=alt.X("yearReport:O", title="Year"),
+                            y=alt.Y("Percentage Change:Q", title="Percentage Change (%)"),
+                            color=alt.Color(
+                                "Metric:N",
+                                scale=alt.Scale(
+                                    range=["#56524D", "#76706C"]
+                                ),
+                                title="Financial Metrics",
+                            ),
+                            tooltip=["yearReport:O", "Metric:N", "Percentage Change:Q"],
+                        )
+                        .properties(
+                            title="EBIT vs Net Income Percentage Changes",
+                            width=600,
+                            height=300,
+                        )
+                    )
+
+                    st.altair_chart(comparison_chart, use_container_width=True)
+
+                # Download button
+                csv_data = dfl_results.to_csv(index=False)
+                st.download_button(
+                    label="📥 Download DFL Analysis as CSV",
+                    data=csv_data,
+                    file_name=f"dfl_analysis_{stock_symbol}.csv",
+                    mime="text/csv",
+                    use_container_width=True,
+                )
+
+                # Analysis insights
+                st.markdown("### 🔍 DFL Analysis Insights")
+
+                if len(valid_dfl_data) > 1:
+                    # Year-over-year analysis
+                    years_sorted = valid_dfl_data.sort_values("yearReport")
+                    latest = years_sorted.iloc[-1]
+                    previous = years_sorted.iloc[-2]
+
+                    dfl_change = latest['DFL'] - previous['DFL'] if not pd.isna(latest['DFL']) and not pd.isna(previous['DFL']) else None
+                    ebit_volatility = valid_dfl_data['EBIT % Change'].std()
+                    net_income_volatility = valid_dfl_data['Net Income % Change'].std()
+
+                    st.markdown(f"""
+                    **Year-over-Year Analysis ({previous["yearReport"]:.0f} to {latest["yearReport"]:.0f}):**
+                    
+                    - **DFL Change**: {f"{dfl_change:+.2f}" if dfl_change is not None else "N/A"} {"📈" if dfl_change and dfl_change > 0 else "📉" if dfl_change and dfl_change < 0 else "➡️" if dfl_change == 0 else ""}
+                    - **EBIT Volatility**: {ebit_volatility:.2f}% (Standard Deviation)
+                    - **Net Income Volatility**: {net_income_volatility:.2f}% (Standard Deviation)
+                    """)
+
+                    # Risk assessment
+                    avg_dfl = valid_dfl_data['DFL'].mean()
+                    if avg_dfl > 2:
+                        risk_assessment = "🔴 High Financial Risk - Company has significant financial leverage"
+                        risk_recommendation = "Consider reducing debt levels to lower financial risk"
+                    elif avg_dfl > 1.5:
+                        risk_assessment = "🟠 Moderate Financial Risk - Balanced financial leverage"
+                        risk_recommendation = "Monitor interest coverage and debt levels carefully"
+                    elif avg_dfl > 1:
+                        risk_assessment = "🟡 Low Financial Risk - Conservative financial leverage"
+                        risk_recommendation = "Opportunity to use more leverage for growth if needed"
+                    else:
+                        risk_assessment = "🟢 Minimal Financial Risk - Very low financial leverage"
+                        risk_recommendation = "Company has room to take on debt for expansion"
+
+                    st.markdown("### 📊 Financial Risk Assessment")
+                    st.markdown(f"""
+                    - **Average DFL**: {avg_dfl:.2f}
+                    - **Risk Level**: {risk_assessment}
+                    - **Recommendation**: {risk_recommendation}
+                    """)
+
+                    # Leverage interpretation
+                    st.markdown("### 💡 DFL Interpretation Guide")
+                    st.markdown("""
+                    **Understanding Your DFL Values:**
+                    - **DFL > 2.0**: High financial leverage - earnings are very sensitive to EBIT changes
+                    - **DFL 1.5-2.0**: Moderate leverage - reasonable balance between risk and return
+                    - **DFL 1.0-1.5**: Low leverage - conservative financial structure
+                    - **DFL < 1.0**: Minimal leverage - very stable but potentially missing growth opportunities
+                    
+                    **Key Takeaways:**
+                    - Higher DFL means more financial risk but potentially higher returns for shareholders
+                    - Lower DFL indicates more stable earnings and lower financial risk
+                    - DFL varies with business cycles - monitor trends over time
+                    """)
+
+            else:
+                st.error(
+                    "❌ Could not calculate Degree of Financial Leverage. Please check the income statement data."
+                )
+
+    except Exception as e:
+        st.error(f"❌ Error performing DFL analysis: {str(e)}")
         st.info("Please ensure financial data is properly loaded and try again.")
 
 # Footer
