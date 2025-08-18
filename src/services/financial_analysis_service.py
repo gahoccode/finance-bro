@@ -20,94 +20,15 @@ def create_dupont_analysis(IncomeStatement, BalanceSheet, CashFlow):
         DataFrame with DuPont analysis results
     """
     try:
-        # Step 1: Identify correct column names for Vietnamese financial data
-        # Common variations in Vietnamese financial statements
-        revenue_cols = [
-            "Revenue (Bn. VND)",
-            "Net sales (Bn. VND)",
-            "Revenue",
-            "Net sales",
-        ]
-        net_income_cols = [
-            "Attribute to parent company (Bn. VND)",
-            "Net Income (Bn. VND)",
-            "Net profit (Bn. VND)",
-            "Profit after tax (Bn. VND)",
-        ]
-        assets_cols = [
-            "TOTAL ASSETS (Bn. VND)",
-            "Total assets (Bn. VND)",
-            "TOTAL ASSETS",
-            "Total assets",
-        ]
-        equity_cols = [
-            "OWNER'S EQUITY(Bn.VND)",
-            "Owner's equity (Bn. VND)",
-            "OWNER'S EQUITY",
-            "Owner's equity",
-            "Shareholders' equity (Bn. VND)",
-        ]
-
-        # Find matching columns
-        revenue_col = None
-        for col in revenue_cols:
-            if col in IncomeStatement.columns:
-                revenue_col = col
-                break
-
-        net_income_col = None
-        for col in net_income_cols:
-            if col in IncomeStatement.columns:
-                net_income_col = col
-                break
-
-        assets_col = None
-        for col in assets_cols:
-            if col in BalanceSheet.columns:
-                assets_col = col
-                break
-
-        equity_col = None
-        for col in equity_cols:
-            if col in BalanceSheet.columns:
-                equity_col = col
-                break
-
-        # Validate required columns exist
-        if not all([revenue_col, net_income_col, assets_col, equity_col]):
-            missing_cols = []
-            if not revenue_col:
-                missing_cols.append("Revenue")
-            if not net_income_col:
-                missing_cols.append("Net Income")
-            if not assets_col:
-                missing_cols.append("Total Assets")
-            if not equity_col:
-                missing_cols.append("Owner's Equity")
-
-            raise ValueError(f"Missing required columns: {', '.join(missing_cols)}")
-
-        # Step 2: Combine necessary data from financial statements
-        income_data = IncomeStatement[
-            ["ticker", "yearReport", revenue_col, net_income_col]
-        ].copy()
-        income_data = income_data.rename(
-            columns={
-                revenue_col: "Revenue (Bn. VND)",
-                net_income_col: "Net Income (Bn. VND)",
-            }
-        )
-
-        # Add Balance Sheet data for assets and equity
-        balance_data = BalanceSheet[
-            ["ticker", "yearReport", assets_col, equity_col]
-        ].copy()
-        balance_data = balance_data.rename(
-            columns={
-                assets_col: "TOTAL ASSETS (Bn. VND)",
-                equity_col: "OWNER'S EQUITY(Bn.VND)",
-            }
-        )
+        # Step 1: Combine necessary data from all three statements
+        # Start with Income Statement data for revenue and net income
+        income_data = IncomeStatement[['ticker', 'yearReport', 'Revenue (Bn. VND)', 'Attribute to parent company (Bn. VND)']].copy()
+        
+        # Rename for clarity
+        income_data = income_data.rename(columns={'Attribute to parent company (Bn. VND)': 'Net Income (Bn. VND)'})
+        
+        # Step 2: Add Balance Sheet data for assets and equity
+        balance_data = BalanceSheet[['ticker', 'yearReport', 'TOTAL ASSETS (Bn. VND)', "OWNER'S EQUITY(Bn.VND)"]].copy()
 
         # Merge the dataframes
         dupont_df = pd.merge(

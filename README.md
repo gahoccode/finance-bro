@@ -347,6 +347,37 @@ Finance Bro uses Streamlit's `st.session_state` for comprehensive data sharing a
 **Portfolio Strategy Selection**
 - `portfolio_strategy_choice` - Master control for portfolio strategy selection across all tabs (new in v0.2.16)
 
+#### Technical Analysis Page
+**Analysis Configuration**
+- `ta_interval` - Selected time interval for technical analysis (1D, 1W, 1M)
+
+#### DuPont Analysis Page
+**Financial Analysis Data**
+- `dupont_analysis` - Stored DuPont analysis results for persistence across page interactions
+- `capital_employed` - Capital employed calculation results
+- `dfl_analysis` - Degree of Financial Leverage analysis results
+
+#### Financial Health Report Page  
+**Report Management**
+- `health_report` - Generated financial health report content from CrewAI system
+- `generate_report` - Boolean flag to trigger report generation
+
+#### Chart & Visualization Services
+**Chart State Management**
+- `fibonacci_summary` - Fibonacci retracement analysis results keyed by date
+- `stock_price_data` - Historical stock price data cached from vnstock API
+
+#### UI Components (Dynamic Keys)
+**Financial Display Options**
+- `{unique_key}_financial_display_unit` - Display unit selection for financial formatting (billions/millions/original)
+  - Examples: `dupont_display_financial_display_unit`, `portfolio_display_financial_display_unit`
+
+**Date Picker Components (Dynamic Keys)**
+- `{key_prefix}_start_date` - Start date for date range pickers
+- `{key_prefix}_end_date` - End date for date range pickers  
+- `{key_prefix}_date_range_changed` - Boolean flag for date range change detection
+  - Examples: `analysis_start_date`, `portfolio_start_date`, `screener_start_date`
+
 #### Screener Page
 **Screening Data**
 - `screener_data` - Filtered stock results from screening criteria
