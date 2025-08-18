@@ -178,6 +178,53 @@ if "symbols_df" in st.session_state and st.session_state.symbols_df is not None:
 
 st.subheader(f"DuPont Analysis for {company_name}")
 
+# Beautiful DuPont Formula Display
+st.markdown("---")
+st.markdown("### 🧮 The DuPont Formula")
+
+# Main formula in LaTeX
+st.latex(r'''
+\boxed{
+\begin{aligned}
+\text{ROE} &= \text{Net Profit Margin} \times \text{Asset Turnover} \times \text{Financial Leverage} \\[0.5em]
+&= \frac{\text{Net Income}}{\text{Revenue}} \times \frac{\text{Revenue}}{\text{Average Total Assets}} \times \frac{\text{Average Total Assets}}{\text{Average Equity}} \\[0.5em]
+&= \frac{\text{Net Income}}{\text{Average Equity}}
+\end{aligned}
+}
+''')
+
+# Component explanations in a beautiful layout
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown("""
+    <div style="background-color: #76706C; padding: 15px; border-radius: 10px; text-align: center; margin: 10px 0;">
+        <h4 style="color: white; margin: 0;">💰 Profitability</h4>
+        <p style="color: white; margin: 5px 0; font-size: 14px;">Net Profit Margin</p>
+        <p style="color: white; margin: 0; font-size: 12px;">How much profit per dollar of sales</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown("""
+    <div style="background-color: #56524D; padding: 15px; border-radius: 10px; text-align: center; margin: 10px 0;">
+        <h4 style="color: white; margin: 0;">⚡ Efficiency</h4>
+        <p style="color: white; margin: 5px 0; font-size: 14px;">Asset Turnover</p>
+        <p style="color: white; margin: 0; font-size: 12px;">How effectively assets generate sales</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col3:
+    st.markdown("""
+    <div style="background-color: #2B2523; padding: 15px; border-radius: 10px; text-align: center; margin: 10px 0;">
+        <h4 style="color: white; margin: 0;">📈 Leverage</h4>
+        <p style="color: white; margin: 5px 0; font-size: 14px;">Financial Leverage</p>
+        <p style="color: white; margin: 0; font-size: 12px;">How much debt finances assets</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("---")
+
 # Check if financial data is available
 if "dataframes" not in st.session_state:
     st.warning("⚠️ No financial data loaded. Please go to the AI Chat Analysis page and click 'Analyze Stock' first.")
@@ -223,6 +270,9 @@ try:
         )
     
     if dupont_analysis is not None and not dupont_analysis.empty:
+        # Store the dataframe in session state
+        st.session_state.dupont_analysis = dupont_analysis
+        
         st.success("✅ DuPont Analysis completed successfully!")
         
         # Display the DuPont analysis dataframe
