@@ -138,43 +138,49 @@ def main_page():
 
         # Quick navigation to analysis pages
         st.markdown("### 🚀 Quick Navigation")
-        col1, col2, col3, col4 = st.columns(4)
-
+        
+        # Financial Analysis Section
+        st.markdown("**💰 Financial Analysis**")
+        col1, col2 = st.columns(2)
         with col1:
-            if st.button("📊 Stock Analysis", use_container_width=True):
+            if st.button("🤖 AI Chat Analysis", use_container_width=True):
                 st.switch_page("pages/bro.py")
-
         with col2:
+            if st.button("📊 DuPont Analysis", use_container_width=True):
+                st.switch_page("pages/dupont_analysis.py")
+
+        # Market Analysis Section  
+        st.markdown("**📈 Market Analysis**")
+        col1, col2 = st.columns(2)
+        with col1:
             if st.button("📈 Price Analysis", use_container_width=True):
                 st.switch_page("pages/Stock_Price_Analysis.py")
-
-        with col3:
-            if st.button("🏢 Company Overview", use_container_width=True):
-                st.switch_page("pages/Company_Overview.py")
-
-        with col4:
-            if st.button("💼 Portfolio Optimization", use_container_width=True):
-                st.switch_page("pages/Portfolio_Optimization.py")
-
-        # Second row of navigation buttons
-        st.markdown("")  # Add some spacing
-        col1, col2, col3, col4 = st.columns(4)
-
-        with col1:
-            if st.button("🔍 Stock Screener", use_container_width=True):
-                st.switch_page("pages/Screener.py")
-
         with col2:
             if st.button("📊 Technical Analysis", use_container_width=True):
                 st.switch_page("pages/Technical_Analysis.py")
 
+        # Company & Portfolio Section
+        st.markdown("**🏢 Company & Portfolio**")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("🏢 Company Overview", use_container_width=True):
+                st.switch_page("pages/Company_Overview.py")
+        with col2:
+            if st.button("💼 Portfolio Optimization", use_container_width=True):
+                st.switch_page("pages/Portfolio_Optimization.py")
         with col3:
-            if st.button("🏦 Fund Analysis", use_container_width=True):
-                st.switch_page("pages/Fund_Analysis.py")
-
-        with col4:
             if st.button("🏥 Financial Health", use_container_width=True):
                 st.switch_page("pages/Financial_Health_Report.py")
+
+        # Tools Section
+        st.markdown("**🔧 Tools**")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🔍 Stock Screener", use_container_width=True):
+                st.switch_page("pages/Screener.py")
+        with col2:
+            if st.button("🏦 Fund Analysis", use_container_width=True):
+                st.switch_page("pages/Fund_Analysis.py")
 
     # Instructions and app information
     st.markdown("---")
@@ -218,21 +224,28 @@ pages = {
     "Home": [
         st.Page(main_page, title="📈 Finance Bro", icon="🏠"),
     ],
-    "Analysis": [
-        st.Page("pages/bro.py", title="Stock Analysis", icon="📊"),
+    "Financial Analysis": [
+        st.Page("pages/bro.py", title="AI Chat Analysis", icon="🤖"),
+        st.Page("pages/dupont_analysis.py", title="DuPont Analysis", icon="📊"),
+    ],
+    "Market Analysis": [
         st.Page("pages/Stock_Price_Analysis.py", title="Price Analysis", icon="📈"),
         st.Page("pages/Technical_Analysis.py", title="Technical Analysis", icon="📊"),
+    ],
+    "Company & Portfolio": [
         st.Page("pages/Company_Overview.py", title="Company Overview", icon="🏢"),
         st.Page(
             "pages/Portfolio_Optimization.py", title="Portfolio Optimization", icon="💼"
         ),
-        st.Page("pages/Screener.py", title="Stock Screener", icon="🔍"),
-        st.Page("pages/Fund_Analysis.py", title="Fund Analysis", icon="🏦"),
         st.Page(
             "pages/Financial_Health_Report.py",
             title="Financial Health Report",
             icon="🏥",
         ),
+    ],
+    "Tools": [
+        st.Page("pages/Screener.py", title="Stock Screener", icon="🔍"),
+        st.Page("pages/Fund_Analysis.py", title="Fund Analysis", icon="🏦"),
     ],
 }
 

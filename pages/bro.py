@@ -181,7 +181,7 @@ else:
     st.stop()
 
 # Title
-st.markdown("# Finance Bro")
+st.markdown("# 🤖 AI Chat Analysis")
 st.markdown("Ask your finance bro about your company's financial statements")
 
 # Authentication is handled in main app, so we assume user is already logged in
