@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import altair as alt
 from src.components.ui_components import inject_custom_success_styling
 
 # Page configuration
@@ -291,6 +292,85 @@ try:
             hide_index=True
         )
         
+        # Altair chart for DuPont components trend
+        if len(dupont_analysis) > 1:
+            st.markdown("### 📈 DuPont Components Trend")
+            
+            # Prepare data for Altair chart
+            chart_data = dupont_analysis.copy()
+            
+            # Create the multi-line chart
+            base = alt.Chart(chart_data).add_selection(
+                alt.selection_interval(bind='scales')
+            )
+            
+            # Net Profit Margin line
+            margin_line = base.mark_line(
+                color='#76706C',
+                strokeWidth=3
+            ).encode(
+                x=alt.X('yearReport:O', title='Year', axis=alt.Axis(labelAngle=0)),
+                y=alt.Y('Net Profit Margin:Q', title='Net Profit Margin (%)', scale=alt.Scale(zero=False)),
+                tooltip=['yearReport:O', 'Net Profit Margin:Q']
+            )
+            
+            # Asset Turnover line
+            turnover_line = base.mark_line(
+                color='#76706C',
+                strokeWidth=3
+            ).encode(
+                x=alt.X('yearReport:O', title='Year'),
+                y=alt.Y('Asset Turnover:Q', 
+                       title='Asset Turnover (x)', 
+                       scale=alt.Scale(zero=False)),
+                tooltip=['yearReport:O', 'Asset Turnover:Q']
+            ).resolve_scale(y='independent')
+            
+            # Financial Leverage line
+            leverage_line = base.mark_line(
+                color='#76706C',
+                strokeWidth=3
+            ).encode(
+                x=alt.X('yearReport:O', title='Year'),
+                y=alt.Y('Financial Leverage:Q', 
+                       title='Financial Leverage (x)', 
+                       scale=alt.Scale(zero=False)),
+                tooltip=['yearReport:O', 'Financial Leverage:Q']
+            ).resolve_scale(y='independent')
+            
+            # Combine charts using layering with separate y-axes
+            combined_chart = alt.vconcat(
+                margin_line.properties(
+                    title="Net Profit Margin (%)",
+                    width=600,
+                    height=150
+                ),
+                turnover_line.properties(
+                    title="Asset Turnover (x)",
+                    width=600, 
+                    height=150
+                ),
+                leverage_line.properties(
+                    title="Financial Leverage (x)",
+                    width=600,
+                    height=150
+                )
+            ).resolve_scale(
+                x='shared'
+            )
+            
+            st.altair_chart(combined_chart, use_container_width=True)
+            
+            # Legend explanation
+            st.markdown("""
+            **Chart Information:**
+            - **Net Profit Margin (%)** - Top panel
+            - **Asset Turnover (x)** - Middle panel
+            - **Financial Leverage (x)** - Bottom panel
+            
+            *Each component is displayed in its own panel for better visualization of trends.*
+            """)
+
         # Download button for CSV export
         csv_data = dupont_analysis.to_csv(index=False)
         st.download_button(
