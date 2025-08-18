@@ -163,6 +163,7 @@ def calculate_capital_employed(BalanceSheet):
                 'Short-term borrowings (Bn. VND)',
                 "OWNER'S EQUITY(Bn.VND)"]:
         if col not in balance_sheet_copy.columns:
+            st.warning(f"Column '{col}' not found in balance sheet data")
             balance_sheet_copy[col] = 0
         else:
             balance_sheet_copy[col] = balance_sheet_copy[col].fillna(0)
