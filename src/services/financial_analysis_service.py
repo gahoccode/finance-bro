@@ -22,13 +22,19 @@ def create_dupont_analysis(IncomeStatement, BalanceSheet, CashFlow):
     try:
         # Step 1: Combine necessary data from all three statements
         # Start with Income Statement data for revenue and net income
-        income_data = IncomeStatement[['ticker', 'yearReport', 'Revenue (Bn. VND)', 'Net Profit For the Year']].copy()
-        
+        income_data = IncomeStatement[
+            ["ticker", "yearReport", "Revenue (Bn. VND)", "Net Profit For the Year"]
+        ].copy()
+
         # Rename for clarity
-        income_data = income_data.rename(columns={'Net Profit For the Year': 'Net Income (Bn. VND)'})
-        
+        income_data = income_data.rename(
+            columns={"Net Profit For the Year": "Net Income (Bn. VND)"}
+        )
+
         # Step 2: Add Balance Sheet data for assets and equity
-        balance_data = BalanceSheet[['ticker', 'yearReport', 'TOTAL ASSETS (Bn. VND)', "OWNER'S EQUITY(Bn.VND)"]].copy()
+        balance_data = BalanceSheet[
+            ["ticker", "yearReport", "TOTAL ASSETS (Bn. VND)", "OWNER'S EQUITY(Bn.VND)"]
+        ].copy()
 
         # Merge the dataframes
         dupont_df = pd.merge(
@@ -107,7 +113,7 @@ def create_dupont_analysis(IncomeStatement, BalanceSheet, CashFlow):
                 "ROE (Direct)",
             ]
         ]
-        
+
         # Convert ratios to percentages for better readability
         dupont_analysis["Net Profit Margin"] = (
             dupont_analysis["Net Profit Margin"] * 100
@@ -152,16 +158,16 @@ def calculate_capital_employed(BalanceSheet):
     balance_sheet_copy = BalanceSheet.copy()
 
     # 1️⃣ normalise header text (strip & replace Unicode dashes with ASCII "-")
-    balance_sheet_copy.columns = (
-        balance_sheet_copy.columns
-            .str.strip()
-            .str.replace(r'[\u2010-\u2015]', '-', regex=True)
+    balance_sheet_copy.columns = balance_sheet_copy.columns.str.strip().str.replace(
+        r"[\u2010-\u2015]", "-", regex=True
     )
 
     # 2️⃣ be sure the three columns exist and have no NaN
-    for col in ['Long-term borrowings (Bn. VND)',
-                'Short-term borrowings (Bn. VND)',
-                "OWNER'S EQUITY(Bn.VND)"]:
+    for col in [
+        "Long-term borrowings (Bn. VND)",
+        "Short-term borrowings (Bn. VND)",
+        "OWNER'S EQUITY(Bn.VND)",
+    ]:
         if col not in balance_sheet_copy.columns:
             st.warning(f"Column '{col}' not found in balance sheet data")
             balance_sheet_copy[col] = 0
@@ -169,30 +175,35 @@ def calculate_capital_employed(BalanceSheet):
             balance_sheet_copy[col] = balance_sheet_copy[col].fillna(0)
 
     # 3️⃣ compute Capital Employed
-    balance_sheet_copy['Capital Employed (Bn. VND)'] = (
-        balance_sheet_copy['Long-term borrowings (Bn. VND)'] +
-        balance_sheet_copy['Short-term borrowings (Bn. VND)'] +
-        balance_sheet_copy["OWNER'S EQUITY(Bn.VND)"]
+    balance_sheet_copy["Capital Employed (Bn. VND)"] = (
+        balance_sheet_copy["Long-term borrowings (Bn. VND)"]
+        + balance_sheet_copy["Short-term borrowings (Bn. VND)"]
+        + balance_sheet_copy["OWNER'S EQUITY(Bn.VND)"]
     )
 
-    return balance_sheet_copy[['ticker', 'yearReport',
-                               'Long-term borrowings (Bn. VND)',
-                               'Short-term borrowings (Bn. VND)',
-                               "OWNER'S EQUITY(Bn.VND)",
-                               'Capital Employed (Bn. VND)']]
+    return balance_sheet_copy[
+        [
+            "ticker",
+            "yearReport",
+            "Long-term borrowings (Bn. VND)",
+            "Short-term borrowings (Bn. VND)",
+            "OWNER'S EQUITY(Bn.VND)",
+            "Capital Employed (Bn. VND)",
+        ]
+    ]
 
 
 def calculate_degree_of_financial_leverage(IncomeStatement):
     """
     Calculate Degree of Financial Leverage using percentage changes in Net Income and EBIT.
-    
+
     DFL = % Change in Net Income / % Change in EBIT
-    
+
     Parameters:
     -----------
     IncomeStatement : pandas DataFrame
         Income Statement data with columns including 'Operating Profit/Loss' and 'Attribute to parent company (Bn. VND)'
-    
+
     Returns:
     --------
     pandas DataFrame
@@ -200,30 +211,51 @@ def calculate_degree_of_financial_leverage(IncomeStatement):
     """
     # Create a copy to avoid modifying the original dataframe
     financial_leverage_data = IncomeStatement.copy()
-    
+
     # Rename for clarity
-    financial_leverage_data = financial_leverage_data.rename(columns={
-        'Operating Profit/Loss': 'EBIT (Bn. VND)',
-        'Net Profit For the Year': 'Net Income (Bn. VND)'
-    })
-    
+    financial_leverage_data = financial_leverage_data.rename(
+        columns={
+            "Operating Profit/Loss": "EBIT (Bn. VND)",
+            "Net Profit For the Year": "Net Income (Bn. VND)",
+        }
+    )
+
     # Sort by ticker and year
-    financial_leverage_data = financial_leverage_data.sort_values(['ticker', 'yearReport'])
-    
+    financial_leverage_data = financial_leverage_data.sort_values(
+        ["ticker", "yearReport"]
+    )
+
     # Calculate year-over-year percentage changes for each ticker
-    financial_leverage_data['EBIT % Change'] = financial_leverage_data.groupby('ticker')['EBIT (Bn. VND)'].pct_change() * 100
-    financial_leverage_data['Net Income % Change'] = financial_leverage_data.groupby('ticker')['Net Income (Bn. VND)'].pct_change() * 100
-    
+    financial_leverage_data["EBIT % Change"] = (
+        financial_leverage_data.groupby("ticker")["EBIT (Bn. VND)"].pct_change() * 100
+    )
+    financial_leverage_data["Net Income % Change"] = (
+        financial_leverage_data.groupby("ticker")["Net Income (Bn. VND)"].pct_change()
+        * 100
+    )
+
     # Calculate DFL
-    financial_leverage_data['DFL'] = financial_leverage_data['Net Income % Change'] / financial_leverage_data['EBIT % Change']
-    
+    financial_leverage_data["DFL"] = (
+        financial_leverage_data["Net Income % Change"]
+        / financial_leverage_data["EBIT % Change"]
+    )
+
     # Handle infinite or NaN values (when EBIT % Change is near zero)
-    financial_leverage_data['DFL'] = financial_leverage_data['DFL'].replace([np.inf, -np.inf], np.nan)
-    
+    financial_leverage_data["DFL"] = financial_leverage_data["DFL"].replace(
+        [np.inf, -np.inf], np.nan
+    )
+
     # Select relevant columns
-    dfl_results = financial_leverage_data[['ticker', 'yearReport', 
-                                         'EBIT (Bn. VND)', 'Net Income (Bn. VND)', 
-                                         'EBIT % Change', 'Net Income % Change', 
-                                         'DFL']]
-    
+    dfl_results = financial_leverage_data[
+        [
+            "ticker",
+            "yearReport",
+            "EBIT (Bn. VND)",
+            "Net Income (Bn. VND)",
+            "EBIT % Change",
+            "Net Income % Change",
+            "DFL",
+        ]
+    ]
+
     return dfl_results

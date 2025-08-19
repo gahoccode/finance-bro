@@ -331,32 +331,32 @@ def render_financial_display_options(
     placement: str = "sidebar",
     unique_key: str = "financial_display",
     title: str = "💰 Financial Display Options",
-    help_text: str = None
+    help_text: str = None,
 ) -> str:
     """
     Render reusable financial display options selector.
-    
+
     Provides a consistent interface for users to choose how financial values
     are displayed across different pages. Manages session state persistence
     and returns the selected display unit for use in formatting functions.
-    
+
     Args:
         placement: Where to render ('sidebar', 'main', 'columns')
         unique_key: Unique key for session state (allows multiple instances)
         title: Title for the selector widget
         help_text: Optional help text for the selector
-        
+
     Returns:
         Selected display unit key ('billions', 'millions', 'original')
-        
+
     Example:
         # In page header or sidebar
         display_unit = render_financial_display_options(
             placement="sidebar",
-            unique_key="dupont_display", 
+            unique_key="dupont_display",
             title="📊 Display Format"
         )
-        
+
         # Use with helper functions
         formatted_value = format_financial_display(value, display_unit)
         display_df = convert_dataframe_for_display(df, columns, display_unit)
@@ -377,7 +377,9 @@ def render_financial_display_options(
 
     # Default help text if not provided
     if help_text is None:
-        help_text = "Choose how financial values are displayed across metrics and tables"
+        help_text = (
+            "Choose how financial values are displayed across metrics and tables"
+        )
 
     # Render based on placement
     if placement == "sidebar":
@@ -388,7 +390,7 @@ def render_financial_display_options(
                 options=options,
                 index=option_keys.index(st.session_state[session_key]),
                 help=help_text,
-                key=f"{unique_key}_selectbox"
+                key=f"{unique_key}_selectbox",
             )
 
     elif placement == "columns":
@@ -398,7 +400,7 @@ def render_financial_display_options(
             options=options,
             index=option_keys.index(st.session_state[session_key]),
             help=help_text,
-            key=f"{unique_key}_selectbox"
+            key=f"{unique_key}_selectbox",
         )
 
     else:  # main
@@ -408,7 +410,7 @@ def render_financial_display_options(
             options=options,
             index=option_keys.index(st.session_state[session_key]),
             help=help_text,
-            key=f"{unique_key}_selectbox"
+            key=f"{unique_key}_selectbox",
         )
 
     # Update session state and return key

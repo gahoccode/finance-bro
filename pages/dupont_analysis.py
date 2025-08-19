@@ -1,13 +1,19 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-from src.components.ui_components import inject_custom_success_styling, render_financial_display_options
+from src.components.ui_components import (
+    inject_custom_success_styling,
+    render_financial_display_options,
+)
 from src.services.financial_analysis_service import (
     create_dupont_analysis,
     calculate_capital_employed,
     calculate_degree_of_financial_leverage,
 )
-from src.services.data_service import format_financial_display, convert_dataframe_for_display
+from src.services.data_service import (
+    format_financial_display,
+    convert_dataframe_for_display,
+)
 
 # Page configuration
 st.set_page_config(
@@ -114,14 +120,15 @@ display_unit = render_financial_display_options(
     placement="sidebar",
     unique_key="dupont_display",
     title="💰 Display Format",
-    help_text="Choose how financial values are displayed in metrics and tables"
+    help_text="Choose how financial values are displayed in metrics and tables",
 )
 
 # Create tabs for different analyses
-tab1, tab2, tab3 = st.tabs(["📊 DuPont Analysis", "💰 Capital Employed", "📈 Degree of Financial Leverage"])
+tab1, tab2, tab3 = st.tabs(
+    ["📊 DuPont Analysis", "💰 Capital Employed", "📈 Degree of Financial Leverage"]
+)
 
 with tab1:
-
     # Information about DuPont Analysis
     with st.expander("ℹ️ About DuPont Analysis", expanded=False):
         st.markdown("""
@@ -218,9 +225,7 @@ with tab1:
                     st.metric(
                         "Net Income",
                         format_financial_display(
-                            latest_data["Net Income (Bn. VND)"],
-                            display_unit,
-                            0
+                            latest_data["Net Income (Bn. VND)"], display_unit, 0
                         ),
                         help="Net profit after all expenses",
                     )
@@ -229,9 +234,7 @@ with tab1:
                     st.metric(
                         "Revenue",
                         format_financial_display(
-                            latest_data["Revenue (Bn. VND)"],
-                            display_unit,
-                            0
+                            latest_data["Revenue (Bn. VND)"], display_unit, 0
                         ),
                         help="Total sales revenue",
                     )
@@ -242,7 +245,7 @@ with tab1:
                         format_financial_display(
                             latest_data["Average Total Assets (Bn. VND)"],
                             display_unit,
-                            0
+                            0,
                         ),
                         help="Average total assets over the period",
                     )
@@ -251,9 +254,7 @@ with tab1:
                     st.metric(
                         "Avg Equity",
                         format_financial_display(
-                            latest_data["Average Equity (Bn. VND)"],
-                            display_unit,
-                            0
+                            latest_data["Average Equity (Bn. VND)"], display_unit, 0
                         ),
                         help="Average shareholders' equity",
                     )
@@ -266,14 +267,11 @@ with tab1:
                 "Net Income (Bn. VND)",
                 "Revenue (Bn. VND)",
                 "Average Total Assets (Bn. VND)",
-                "Average Equity (Bn. VND)"
+                "Average Equity (Bn. VND)",
             ]
 
             dupont_analysis_display = convert_dataframe_for_display(
-                dupont_analysis,
-                financial_columns,
-                display_unit,
-                decimal_places=1
+                dupont_analysis, financial_columns, display_unit, decimal_places=1
             )
 
             # Configure column display (financial columns now contain formatted strings)
@@ -283,9 +281,7 @@ with tab1:
                 "Net Income (Bn. VND)": st.column_config.TextColumn(
                     "Net Income (Bn. VND)"
                 ),
-                "Revenue (Bn. VND)": st.column_config.TextColumn(
-                    "Revenue (Bn. VND)"
-                ),
+                "Revenue (Bn. VND)": st.column_config.TextColumn("Revenue (Bn. VND)"),
                 "Average Total Assets (Bn. VND)": st.column_config.TextColumn(
                     "Avg. Total Assets (Bn. VND)"
                 ),
@@ -553,17 +549,17 @@ with tab2:
 
                 # Create display copy with formatted strings for table
                 financial_columns = [
-                    'Long-term borrowings (Bn. VND)',
-                    'Short-term borrowings (Bn. VND)',
+                    "Long-term borrowings (Bn. VND)",
+                    "Short-term borrowings (Bn. VND)",
                     "OWNER'S EQUITY(Bn.VND)",
-                    'Capital Employed (Bn. VND)'
+                    "Capital Employed (Bn. VND)",
                 ]
 
                 capital_employed_display = convert_dataframe_for_display(
                     capital_employed_results,
                     financial_columns,
                     display_unit,
-                    decimal_places=1
+                    decimal_places=1,
                 )
 
                 st.success("✅ Capital Employed analysis completed successfully!")
@@ -583,9 +579,9 @@ with tab2:
                         st.metric(
                             "Long-term Borrowings",
                             format_financial_display(
-                                latest_data['Long-term borrowings (Bn. VND)'],
+                                latest_data["Long-term borrowings (Bn. VND)"],
                                 display_unit,
-                                0
+                                0,
                             ),
                             help="Long-term debt obligations",
                         )
@@ -594,9 +590,9 @@ with tab2:
                         st.metric(
                             "Short-term Borrowings",
                             format_financial_display(
-                                latest_data['Short-term borrowings (Bn. VND)'],
+                                latest_data["Short-term borrowings (Bn. VND)"],
                                 display_unit,
-                                0
+                                0,
                             ),
                             help="Short-term debt obligations",
                         )
@@ -606,9 +602,7 @@ with tab2:
                         st.metric(
                             "Owner's Equity",
                             format_financial_display(
-                                latest_data[owner_equity_col],
-                                display_unit,
-                                0
+                                latest_data[owner_equity_col], display_unit, 0
                             ),
                             help="Shareholders' equity",
                         )
@@ -617,9 +611,9 @@ with tab2:
                         st.metric(
                             "Total Capital Employed",
                             format_financial_display(
-                                latest_data['Capital Employed (Bn. VND)'],
+                                latest_data["Capital Employed (Bn. VND)"],
                                 display_unit,
-                                0
+                                0,
                             ),
                             help="Total capital invested in the business",
                         )
@@ -631,10 +625,18 @@ with tab2:
                 column_config = {
                     "ticker": st.column_config.TextColumn("Ticker", width="small"),
                     "yearReport": st.column_config.NumberColumn("Year", width="small"),
-                    "Long-term borrowings (Bn. VND)": st.column_config.TextColumn("Long-term Borrowings (Bn. VND)"),
-                    "Short-term borrowings (Bn. VND)": st.column_config.TextColumn("Short-term Borrowings (Bn. VND)"),
-                    "OWNER'S EQUITY(Bn.VND)": st.column_config.TextColumn("Owner's Equity (Bn. VND)"),
-                    "Capital Employed (Bn. VND)": st.column_config.TextColumn("Capital Employed (Bn. VND)"),
+                    "Long-term borrowings (Bn. VND)": st.column_config.TextColumn(
+                        "Long-term Borrowings (Bn. VND)"
+                    ),
+                    "Short-term borrowings (Bn. VND)": st.column_config.TextColumn(
+                        "Short-term Borrowings (Bn. VND)"
+                    ),
+                    "OWNER'S EQUITY(Bn.VND)": st.column_config.TextColumn(
+                        "Owner's Equity (Bn. VND)"
+                    ),
+                    "Capital Employed (Bn. VND)": st.column_config.TextColumn(
+                        "Capital Employed (Bn. VND)"
+                    ),
                 }
 
                 # Sort by year in descending order (use display copy)
@@ -870,13 +872,15 @@ with tab3:
                 # Store in session state
                 st.session_state.dfl_analysis = dfl_results
 
-                st.success("✅ Degree of Financial Leverage analysis completed successfully!")
+                st.success(
+                    "✅ Degree of Financial Leverage analysis completed successfully!"
+                )
 
                 # Display metrics summary
                 st.subheader("📈 DFL Analysis Summary")
 
                 # Filter out rows with NaN DFL values for summary
-                valid_dfl_data = dfl_results.dropna(subset=['DFL'])
+                valid_dfl_data = dfl_results.dropna(subset=["DFL"])
 
                 if len(valid_dfl_data) > 0:
                     latest_year = valid_dfl_data["yearReport"].max()
@@ -890,9 +894,7 @@ with tab3:
                         st.metric(
                             "EBIT",
                             format_financial_display(
-                                latest_data['EBIT (Bn. VND)'],
-                                display_unit,
-                                0
+                                latest_data["EBIT (Bn. VND)"], display_unit, 0
                             ),
                             help="Earnings Before Interest and Taxes",
                         )
@@ -901,26 +903,28 @@ with tab3:
                         st.metric(
                             "Net Income",
                             format_financial_display(
-                                latest_data['Net Income (Bn. VND)'],
-                                display_unit,
-                                0
+                                latest_data["Net Income (Bn. VND)"], display_unit, 0
                             ),
                             help="Net profit after all expenses including taxes and interest",
                         )
 
                     with col3:
-                        ebit_change = latest_data['EBIT % Change']
+                        ebit_change = latest_data["EBIT % Change"]
                         st.metric(
                             "EBIT % Change",
-                            f"{ebit_change:.2f}%" if not pd.isna(ebit_change) else "N/A",
+                            f"{ebit_change:.2f}%"
+                            if not pd.isna(ebit_change)
+                            else "N/A",
                             help="Year-over-year percentage change in EBIT",
                         )
 
                     with col4:
-                        net_income_change = latest_data['Net Income % Change']
+                        net_income_change = latest_data["Net Income % Change"]
                         st.metric(
                             "Net Income % Change",
-                            f"{net_income_change:.2f}%" if not pd.isna(net_income_change) else "N/A",
+                            f"{net_income_change:.2f}%"
+                            if not pd.isna(net_income_change)
+                            else "N/A",
                             help="Year-over-year percentage change in Net Income",
                         )
 
@@ -928,8 +932,10 @@ with tab3:
                     col5, col6, col7, col8 = st.columns(4)
 
                     with col5:
-                        dfl_value = latest_data['DFL']
-                        dfl_display = f"{dfl_value:.2f}" if not pd.isna(dfl_value) else "N/A"
+                        dfl_value = latest_data["DFL"]
+                        dfl_display = (
+                            f"{dfl_value:.2f}" if not pd.isna(dfl_value) else "N/A"
+                        )
 
                         # Add color coding for DFL assessment
                         if not pd.isna(dfl_value):
@@ -955,27 +961,27 @@ with tab3:
                 st.markdown("### 📊 Degree of Financial Leverage Analysis Table")
 
                 # Create display copy with formatted financial columns
-                financial_columns = [
-                    'EBIT (Bn. VND)',
-                    'Net Income (Bn. VND)'
-                ]
+                financial_columns = ["EBIT (Bn. VND)", "Net Income (Bn. VND)"]
 
                 dfl_results_display = convert_dataframe_for_display(
-                    dfl_results,
-                    financial_columns,
-                    display_unit,
-                    decimal_places=1
+                    dfl_results, financial_columns, display_unit, decimal_places=1
                 )
 
                 # Configure column display
                 column_config = {
                     "ticker": st.column_config.TextColumn("Ticker", width="small"),
                     "yearReport": st.column_config.NumberColumn("Year", width="small"),
-                    'EBIT (Bn. VND)': st.column_config.TextColumn("EBIT (Bn. VND)"),
-                    'Net Income (Bn. VND)': st.column_config.TextColumn("Net Income (Bn. VND)"),
-                    'EBIT % Change': st.column_config.NumberColumn("EBIT % Change", format="%.2f"),
-                    'Net Income % Change': st.column_config.NumberColumn("Net Income % Change", format="%.2f"),
-                    'DFL': st.column_config.NumberColumn("DFL", format="%.2f"),
+                    "EBIT (Bn. VND)": st.column_config.TextColumn("EBIT (Bn. VND)"),
+                    "Net Income (Bn. VND)": st.column_config.TextColumn(
+                        "Net Income (Bn. VND)"
+                    ),
+                    "EBIT % Change": st.column_config.NumberColumn(
+                        "EBIT % Change", format="%.2f"
+                    ),
+                    "Net Income % Change": st.column_config.NumberColumn(
+                        "Net Income % Change", format="%.2f"
+                    ),
+                    "DFL": st.column_config.NumberColumn("DFL", format="%.2f"),
                 }
 
                 # Sort by year in descending order (use display copy)
@@ -1032,7 +1038,7 @@ with tab3:
                         id_vars=["yearReport"],
                         value_vars=["EBIT % Change", "Net Income % Change"],
                         var_name="Metric",
-                        value_name="Percentage Change"
+                        value_name="Percentage Change",
                     )
 
                     comparison_chart = (
@@ -1040,12 +1046,12 @@ with tab3:
                         .mark_bar()
                         .encode(
                             x=alt.X("yearReport:O", title="Year"),
-                            y=alt.Y("Percentage Change:Q", title="Percentage Change (%)"),
+                            y=alt.Y(
+                                "Percentage Change:Q", title="Percentage Change (%)"
+                            ),
                             color=alt.Color(
                                 "Metric:N",
-                                scale=alt.Scale(
-                                    range=["#56524D", "#76706C"]
-                                ),
+                                scale=alt.Scale(range=["#56524D", "#76706C"]),
                                 title="Financial Metrics",
                             ),
                             tooltip=["yearReport:O", "Metric:N", "Percentage Change:Q"],
@@ -1078,9 +1084,13 @@ with tab3:
                     latest = years_sorted.iloc[-1]
                     previous = years_sorted.iloc[-2]
 
-                    dfl_change = latest['DFL'] - previous['DFL'] if not pd.isna(latest['DFL']) and not pd.isna(previous['DFL']) else None
-                    ebit_volatility = valid_dfl_data['EBIT % Change'].std()
-                    net_income_volatility = valid_dfl_data['Net Income % Change'].std()
+                    dfl_change = (
+                        latest["DFL"] - previous["DFL"]
+                        if not pd.isna(latest["DFL"]) and not pd.isna(previous["DFL"])
+                        else None
+                    )
+                    ebit_volatility = valid_dfl_data["EBIT % Change"].std()
+                    net_income_volatility = valid_dfl_data["Net Income % Change"].std()
 
                     st.markdown(f"""
                     **Year-over-Year Analysis ({previous["yearReport"]:.0f} to {latest["yearReport"]:.0f}):**
@@ -1091,19 +1101,33 @@ with tab3:
                     """)
 
                     # Risk assessment
-                    avg_dfl = valid_dfl_data['DFL'].mean()
+                    avg_dfl = valid_dfl_data["DFL"].mean()
                     if avg_dfl > 2:
                         risk_assessment = "🔴 High Financial Risk - Company has significant financial leverage"
-                        risk_recommendation = "Consider reducing debt levels to lower financial risk"
+                        risk_recommendation = (
+                            "Consider reducing debt levels to lower financial risk"
+                        )
                     elif avg_dfl > 1.5:
-                        risk_assessment = "🟠 Moderate Financial Risk - Balanced financial leverage"
-                        risk_recommendation = "Monitor interest coverage and debt levels carefully"
+                        risk_assessment = (
+                            "🟠 Moderate Financial Risk - Balanced financial leverage"
+                        )
+                        risk_recommendation = (
+                            "Monitor interest coverage and debt levels carefully"
+                        )
                     elif avg_dfl > 1:
-                        risk_assessment = "🟡 Low Financial Risk - Conservative financial leverage"
-                        risk_recommendation = "Opportunity to use more leverage for growth if needed"
+                        risk_assessment = (
+                            "🟡 Low Financial Risk - Conservative financial leverage"
+                        )
+                        risk_recommendation = (
+                            "Opportunity to use more leverage for growth if needed"
+                        )
                     else:
-                        risk_assessment = "🟢 Minimal Financial Risk - Very low financial leverage"
-                        risk_recommendation = "Company has room to take on debt for expansion"
+                        risk_assessment = (
+                            "🟢 Minimal Financial Risk - Very low financial leverage"
+                        )
+                        risk_recommendation = (
+                            "Company has room to take on debt for expansion"
+                        )
 
                     st.markdown("### 📊 Financial Risk Assessment")
                     st.markdown(f"""

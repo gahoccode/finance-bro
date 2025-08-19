@@ -699,7 +699,7 @@ def format_financial_display(
 ) -> str:
     """
     Format financial values for display with proper scaling and comma separators.
-    
+
     Used for metrics display in financial analysis pages to provide consistent
     formatting across the application.
 
@@ -710,7 +710,7 @@ def format_financial_display(
 
     Returns:
         Formatted string with unit suffix and comma separators
-        
+
     Examples:
         format_financial_display(1500000000, 'billions', 0) -> '2B VND'
         format_financial_display(1500000000, 'millions', 1) -> '1,500.0M VND'
@@ -741,11 +741,11 @@ def convert_dataframe_for_display(
     df: pd.DataFrame,
     columns_to_format: List[str],
     display_unit: str = "original",
-    decimal_places: int = 1
+    decimal_places: int = 1,
 ) -> pd.DataFrame:
     """
     Convert dataframe columns to formatted strings for display while preserving original data.
-    
+
     Creates a display copy with comma-formatted strings for table presentation
     without modifying the original data structure.
 
@@ -757,11 +757,11 @@ def convert_dataframe_for_display(
 
     Returns:
         Copy of dataframe with specified columns formatted as strings
-        
+
     Examples:
         # Format capital employed columns for display
         display_df = convert_dataframe_for_display(
-            capital_employed_df, 
+            capital_employed_df,
             ['Long-term borrowings (Bn. VND)', 'Capital Employed (Bn. VND)'],
             display_unit='original',
             decimal_places=1
@@ -788,7 +788,9 @@ def convert_dataframe_for_display(
                         numeric_value = float(x)
 
                         if display_unit == "billions":
-                            return f"{numeric_value / 1_000_000_000:,.{decimal_places}f}"
+                            return (
+                                f"{numeric_value / 1_000_000_000:,.{decimal_places}f}"
+                            )
                         elif display_unit == "millions":
                             return f"{numeric_value / 1_000_000:,.{decimal_places}f}"
                         else:  # original

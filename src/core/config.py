@@ -81,25 +81,25 @@ FINANCIAL_DISPLAY_OPTIONS = {
         "key": "billions",
         "label": "Billions (B VND)",
         "divisor": 1_000_000_000,
-        "suffix": "B VND"
+        "suffix": "B VND",
     },
     "MILLIONS": {
         "key": "millions",
         "label": "Millions (M VND)",
         "divisor": 1_000_000,
-        "suffix": "M VND"
+        "suffix": "M VND",
     },
     "ORIGINAL": {
         "key": "original",
         "label": "Original Scale (VND)",
         "divisor": 1,
-        "suffix": "VND"
-    }
+        "suffix": "VND",
+    },
 }
 
 # Default financial display settings
 DEFAULT_FINANCIAL_DISPLAY = {
     "unit": "billions",
     "decimal_places": 0,
-    "session_key": "financial_display_unit"
+    "session_key": "financial_display_unit",
 }
