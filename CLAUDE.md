@@ -36,11 +36,10 @@ pip install -r requirements.txt
 # Run tests (pytest available in dev dependencies)
 uv run pytest
 
-# Code formatting
-uv run black .
-
-# Linting
-uv run flake8
+# Code formatting and linting (using ruff - replaces black and flake8)
+uv run ruff format .    # Format code
+uv run ruff check .     # Check for linting issues
+uv run ruff check . --fix  # Auto-fix linting issues
 
 # Type checking
 uv run mypy .

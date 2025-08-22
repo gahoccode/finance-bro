@@ -458,6 +458,102 @@ We implemented **Graceful Degradation** with user-friendly error handling:
 
 ---
 
+## ADR-011: DuPont Analysis Financial Formatting System
+
+**Status**: Accepted  
+**Date**: 2025-08-18  
+**Deciders**: Development Team  
+
+### Context
+
+Finance Bro needed consistent financial data formatting across all analysis pages:
+- DuPont Analysis tab required professional financial metrics display
+- Users needed flexible display options (billions, millions, original VND)
+- Code duplication existed between different financial analysis components
+- Inconsistent formatting affected user experience
+
+Options considered:
+1. **Page-Specific Formatting**: Individual formatting logic per page
+2. **Centralized Helper Functions**: Shared formatting utilities
+3. **Component-Based System**: Reusable UI components with formatting
+4. **Configuration-Driven Approach**: Constants-based formatting system
+
+### Decision
+
+We implemented a **Comprehensive Financial Formatting System** with:
+- **Centralized Helper Functions**: `format_financial_display()` and `convert_dataframe_for_display()` in `src/services/data_service.py`
+- **Reusable UI Components**: `render_financial_display_options()` in `src/components/ui_components.py`
+- **Configuration Constants**: `FINANCIAL_DISPLAY_OPTIONS` and `DEFAULT_FINANCIAL_DISPLAY` in `src/core/config.py`
+- **Consistent Session State**: Unique session keys for display preferences across components
+
+### Consequences
+
+**Positive**:
+- Eliminated code duplication across financial analysis pages
+- Consistent professional formatting throughout application
+- User-controlled display preferences with persistence
+- Easy maintenance through centralized formatting logic
+- Comprehensive test coverage for financial formatting functions
+
+**Negative**:
+- Additional abstraction layer increases initial complexity
+- Requires coordination between configuration, services, and components
+- Breaking changes to formatting affect multiple pages simultaneously
+
+---
+
+## ADR-012: Comprehensive Testing Strategy Implementation
+
+**Status**: Accepted  
+**Date**: 2025-08-22  
+**Deciders**: Development Team  
+
+### Context
+
+Finance Bro required robust testing infrastructure for:
+- Financial calculation accuracy and reliability
+- Complex data transformation and formatting logic
+- Integration testing for multi-component workflows
+- Regression testing for critical financial analysis features
+
+Testing needs included:
+- Unit tests for individual functions and calculations
+- Integration tests for data flow between services
+- Edge case handling for financial data validation
+- Test fixtures for consistent test data across modules
+
+Options considered:
+1. **Minimal Testing**: Basic tests for critical functions only
+2. **Focused Unit Testing**: Comprehensive unit tests with limited integration
+3. **Comprehensive Test Suite**: Full unit, integration, and edge case coverage
+4. **Test-Driven Development**: Write tests before implementation
+
+### Decision
+
+We implemented a **Comprehensive Testing Strategy** with:
+- **Extensive Unit Test Coverage**: Individual function testing for all financial calculations
+- **Test Fixtures and Data**: Realistic sample data in `conftest.py` for consistent testing
+- **Edge Case Testing**: Comprehensive handling of invalid inputs, NaN values, and edge cases
+- **Integration Testing**: Cross-component workflow validation
+- **Financial Accuracy Testing**: Specific tests for financial formatting, DuPont analysis, and portfolio optimization
+
+### Consequences
+
+**Positive**:
+- High confidence in financial calculation accuracy
+- Early detection of regressions during development
+- Comprehensive documentation through test cases
+- Reliable behavior for edge cases and error conditions
+- Foundation for continuous integration and quality assurance
+
+**Negative**:
+- Increased development time for comprehensive test writing
+- Test maintenance overhead as codebase evolves
+- Additional complexity in test data management
+- Potential over-testing of simple utility functions
+
+---
+
 ## Decision Status Summary
 
 | ADR | Title | Status | Impact |
@@ -472,6 +568,8 @@ We implemented **Graceful Degradation** with user-friendly error handling:
 | ADR-008 | Vietnamese Market Specialization | ✅ Accepted | High |
 | ADR-009 | Mixed Chart Generation Strategy | ✅ Accepted | Low |
 | ADR-010 | Graceful Error Handling | ✅ Accepted | Medium |
+| ADR-011 | DuPont Analysis Financial Formatting | ✅ Accepted | Medium |
+| ADR-012 | Comprehensive Testing Strategy | ✅ Accepted | Medium |
 
 ## Decision Review Process
 
