@@ -104,6 +104,16 @@ try:
     income_statement = dataframes.get("IncomeStatement", pd.DataFrame())
     cash_flow = dataframes.get("CashFlow", pd.DataFrame())
     ratios = dataframes.get("Ratios", pd.DataFrame())
+    
+    # Sort all financial statements by yearReport in ascending order for proper temporal alignment
+    if not balance_sheet.empty and 'yearReport' in balance_sheet.columns:
+        balance_sheet = balance_sheet.sort_values('yearReport', ascending=True)
+    if not income_statement.empty and 'yearReport' in income_statement.columns:
+        income_statement = income_statement.sort_values('yearReport', ascending=True)
+    if not cash_flow.empty and 'yearReport' in cash_flow.columns:
+        cash_flow = cash_flow.sort_values('yearReport', ascending=True)
+    if not ratios.empty and 'yearReport' in ratios.columns:
+        ratios = ratios.sort_values('yearReport', ascending=True)
 
     # Check if stock price data exists in session state from Stock Price Analysis page
     if "stock_price_data" in st.session_state:
@@ -225,14 +235,12 @@ try:
         )
 
         if not balance_sheet.empty and not ratios.empty and "beta" in locals():
-            # Get latest financial data
-            latest_balance_sheet = (
-                balance_sheet.iloc[-1] if len(balance_sheet) > 0 else None
-            )
+            # Get latest financial data (data is already sorted by yearReport ascending)
+            latest_balance_sheet = balance_sheet.iloc[-1] if len(balance_sheet) > 0 else None
             latest_ratios = ratios.iloc[-1] if len(ratios) > 0 else None
 
             if latest_balance_sheet is not None and latest_ratios is not None:
-                # Ensure we're comparing data from the same year
+                # Ensure we're comparing data from the same year (data already sorted)
                 balance_sheet_year = latest_balance_sheet.get("yearReport")
                 ratios_year = latest_ratios.get("yearReport")
 
@@ -512,25 +520,26 @@ try:
             with col4:
                 st.metric("🎯 Analysis Date", datetime.now().strftime("%Y-%m-%d"))
 
-            # Create detailed results table
+            # Create detailed results table - show only current year (market cap only available for current period)
             if len(balance_sheet) > 0:
                 results_data = []
 
-                for idx, row in balance_sheet.iterrows():
-                    results_data.append(
-                        {
-                            "Year": row.get("yearReport", "N/A"),
-                            "Symbol": symbol,
-                            "Market Cap (B VND)": f"{market_value_of_equity:,.0f}",
-                            "Total Debt (B VND)": f"{total_debt:,.0f}",
-                            "Debt Weight": f"{market_weight_of_debt:.1%}",
-                            "Equity Weight": f"{market_weight_of_equity:.1%}",
-                            "Beta": f"{beta:.4f}",
-                            "Cost of Equity": f"{cost_of_equity:.2%}",
-                            "After-tax Cost of Debt": f"{after_tax_cost_of_debt:.2%}",
-                            "WACC": f"{wacc:.2%}",
-                        }
-                    )
+                # Get latest year (data is already sorted by yearReport ascending)
+                latest_year = balance_sheet.iloc[-1].get("yearReport", "N/A")
+                results_data.append(
+                    {
+                        "Year": latest_year,
+                        "Symbol": symbol,
+                        "Market Cap": format_financial_display(market_value_of_equity, display_unit, 0),
+                        "Total Debt": format_financial_display(total_debt, display_unit, 0),
+                        "Debt Weight": f"{market_weight_of_debt:.1%}",
+                        "Equity Weight": f"{market_weight_of_equity:.1%}",
+                        "Beta": f"{beta:.4f}",
+                        "Cost of Equity": f"{cost_of_equity:.2%}",
+                        "After-tax Cost of Debt": f"{after_tax_cost_of_debt:.2%}",
+                        "WACC": f"{wacc:.2%}",
+                    }
+                )
 
                 results_df = pd.DataFrame(results_data)
                 st.dataframe(results_df, use_container_width=True)

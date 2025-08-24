@@ -133,6 +133,38 @@ Key session variables:
 - Use `yearReport` column to filter and align datasets before performing calculations like WACC
 - Example: Ensure debt data (Balance Sheet) and market cap data (Ratios) are from the same year for accurate capital structure analysis
 
+### Temporal Financial Data Alignment Pattern
+
+**CRITICAL REQUIREMENT**: All financial statements must be sorted by `yearReport` in ascending order immediately after loading to ensure proper temporal alignment across Balance Sheet, Income Statement, Cash Flow, and Ratios.
+
+**Required Implementation Pattern**:
+```python
+# Sort all financial statements by yearReport in ascending order for proper temporal alignment
+if not balance_sheet.empty and 'yearReport' in balance_sheet.columns:
+    balance_sheet = balance_sheet.sort_values('yearReport', ascending=True)
+if not income_statement.empty and 'yearReport' in income_statement.columns:
+    income_statement = income_statement.sort_values('yearReport', ascending=True)
+if not cash_flow.empty and 'yearReport' in cash_flow.columns:
+    cash_flow = cash_flow.sort_values('yearReport', ascending=True)
+if not ratios.empty and 'yearReport' in ratios.columns:
+    ratios = ratios.sort_values('yearReport', ascending=True)
+```
+
+**Benefits**:
+- Guaranteed chronological alignment across all financial statements
+- Reliable `iloc[-1]` for latest year data, `iloc[0]` for earliest year data
+- Eliminates temporal misalignment issues in WACC and valuation calculations
+- Sort once, use consistently throughout analysis
+- Performance optimization: prevents multiple sorting operations
+
+**Usage Guidelines**:
+- Apply immediately after loading financial statements from session state
+- Required for any page performing temporal financial analysis
+- Enables consistent indexing patterns across the application
+- Prevents data alignment bugs between different financial statement years
+
+**Reference Implementation**: See Valuation.py lines 108-116 for correct pattern usage.
+
 ### Authentication Setup
 Requires Google OAuth configuration in `.streamlit/secrets.toml`:
 ```toml
