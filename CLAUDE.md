@@ -126,6 +126,13 @@ Key session variables:
 - Symbol data loaded once per session
 - Visit "Stock Analysis" page first for optimal loading
 
+### Financial Data Alignment
+- Financial statements have `yearReport` column for temporal alignment
+- When working with multiple financial datasets (Balance Sheet, Income Statement, Cash Flow, Ratios), always align on the `yearReport` column to ensure data consistency
+- Avoid mixing financial data from different years as this leads to meaningless analysis
+- Use `yearReport` column to filter and align datasets before performing calculations like WACC
+- Example: Ensure debt data (Balance Sheet) and market cap data (Ratios) are from the same year for accurate capital structure analysis
+
 ### Authentication Setup
 Requires Google OAuth configuration in `.streamlit/secrets.toml`:
 ```toml
