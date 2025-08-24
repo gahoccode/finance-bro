@@ -473,7 +473,6 @@ try:
                             
                         except Exception as e:
                             st.error(f"❌ Error creating share count comparison: {str(e)}")
-                            st.write("Available overview columns:", list(overview.columns) if 'overview' in locals() else "No overview data")
 
                     else:
                         st.error(
@@ -482,16 +481,6 @@ try:
 
                 except Exception as e:
                     st.error(f"❌ Error in WACC calculation: {str(e)}")
-                    st.write(
-                        "Available balance sheet columns:",
-                        list(balance_sheet.columns)
-                        if not balance_sheet.empty
-                        else "No data",
-                    )
-                    st.write(
-                        "Available ratios columns:",
-                        list(ratios.columns) if not ratios.empty else "No data",
-                    )
         else:
             st.error("❌ Unable to load financial data or beta calculation failed.")
 
