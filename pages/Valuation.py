@@ -5,8 +5,9 @@ import altair as alt
 from datetime import datetime, timedelta
 
 # Import project components and services
-from src.components.ui_components import inject_custom_success_styling
+from src.components.ui_components import inject_custom_success_styling, render_financial_display_options
 from src.services.vnstock_api import fetch_stock_price_data
+from src.services.data_service import format_financial_display
 from src.utils.session_utils import get_analysis_dates
 from vnstock import Quote
 
@@ -192,6 +193,14 @@ try:
     with tab2:
         st.header("💰 WACC Analysis")
         
+        # Add financial display options
+        display_unit = render_financial_display_options(
+            placement="main",
+            unique_key="wacc_display",
+            title="💰 Financial Display Options",
+            help_text="Choose how financial values are displayed in Market Values section"
+        )
+        
         if not balance_sheet.empty and not ratios.empty and 'beta' in locals():
             # Get latest financial data
             latest_balance_sheet = balance_sheet.iloc[-1] if len(balance_sheet) > 0 else None
@@ -251,16 +260,16 @@ try:
                             st.metric("📈 Cost of Equity", f"{cost_of_equity:.2%}")
                             st.metric("💳 After-tax Cost of Debt", f"{after_tax_cost_of_debt:.2%}")
                         
-                        # Market values
+                        # Market values with user-selected formatting
                         st.subheader("📊 Market Values")
                         col3, col4, col5 = st.columns(3)
                         
                         with col3:
-                            st.metric("🏛️ Market Cap", f"{market_value_of_equity:,.0f}B VND")
+                            st.metric("🏛️ Market Cap", format_financial_display(market_value_of_equity, display_unit, 0))
                         with col4:
-                            st.metric("💳 Total Debt", f"{total_debt:,.0f}B VND")
+                            st.metric("💳 Total Debt", format_financial_display(total_debt, display_unit, 0))
                         with col5:
-                            st.metric("📊 Total Capital", f"{total_market_capital:,.0f}B VND")
+                            st.metric("📊 Total Capital", format_financial_display(total_market_capital, display_unit, 0))
                         
                         # WACC breakdown table
                         st.subheader("🔢 WACC Calculation Breakdown")
