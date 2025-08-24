@@ -66,6 +66,7 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
   - **services/data_service.py** - Data transformation utilities
   - **services/fibonacci_service.py** - Fibonacci retracement analysis with SciPy swing detection
   - **services/crewai_service.py** - CrewAI financial health analysis orchestration with multi-agent system
+  - **services/financial_analysis_service.py** - Advanced financial analysis functions (DuPont analysis, capital employed, financial leverage)
   - **financial_health_crew/** - CrewAI multi-agent financial health analysis system:
     - **crew.py** - Multi-agent crew configuration with 3 specialized agents (data analyst, risk specialist, report writer)
     - **config/agents.yaml** - Agent roles and expertise definitions for Vietnamese market analysis
@@ -289,6 +290,7 @@ uv run pytest tests/test_portfolio_optimization.py::test_function_name
 
 # Available test files
 # - tests/test_portfolio_optimization.py - Portfolio optimization tests
+# - tests/test_financial_formatting.py - Financial data formatting tests  
 # - tests/conftest.py - Test configuration and fixtures
 ```
 

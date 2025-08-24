@@ -141,13 +141,16 @@ def main_page():
 
         # Financial Analysis Section
         st.markdown("**💰 Financial Analysis**")
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         with col1:
             if st.button("🤖 AI Chat Analysis", use_container_width=True):
                 st.switch_page("pages/bro.py")
         with col2:
             if st.button("📊 DuPont Analysis", use_container_width=True):
                 st.switch_page("pages/dupont_analysis.py")
+        with col3:
+            if st.button("💰 Valuation Analysis", use_container_width=True):
+                st.switch_page("pages/Valuation.py")
 
         # Market Analysis Section
         st.markdown("**📈 Market Analysis**")
@@ -197,6 +200,8 @@ def main_page():
         
         **Available Analysis Tools:**
         - **📊 Stock Analysis (Main Bro)** - AI-powered chat interface for comprehensive financial analysis
+        - **📊 DuPont Analysis** - Return on Equity breakdown using DuPont framework analysis
+        - **💰 Valuation Analysis** - WACC (Weighted Average Cost of Capital) and Beta analysis for stock valuation
         - **📈 Price Analysis** - Interactive price charts and technical analysis
         - **📊 Technical Analysis** - Candlestick charts for stocks with heating up technical signals
         - **🏢 Company Overview** - Company profile, ownership structure, and management team
@@ -227,6 +232,7 @@ pages = {
     "Financial Analysis": [
         st.Page("pages/bro.py", title="AI Chat Analysis", icon="🤖"),
         st.Page("pages/dupont_analysis.py", title="DuPont Analysis", icon="📊"),
+        st.Page("pages/Valuation.py", title="Valuation Analysis", icon="💰"),
     ],
     "Market Analysis": [
         st.Page("pages/Stock_Price_Analysis.py", title="Price Analysis", icon="📈"),
