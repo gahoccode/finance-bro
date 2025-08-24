@@ -337,6 +337,23 @@ Comprehensive architecture documentation is available in `docs/architecture/` fo
 - **Security Architecture** - Authentication, authorization, and security patterns
 - **Quality Attributes** - Performance, scalability, and reliability characteristics
 
+### VnStock Data Scale Conventions
+**IMPORTANT**: VnStock API returns price data in thousands of VND, not individual VND.
+
+**Price Data Scaling:**
+- Stock prices from vnstock are in thousands of VND (e.g., 64.5 = 64,500 VND)
+- **Always multiply by 1,000 to get original scale for calculations**
+- Example: `actual_price = api_price * 1000`
+
+**Financial Data Scaling:**
+- Financial statement data (Balance Sheet, Income Statement, etc.) are in original scale (raw VND)
+- Market cap calculations: `shares × (price_from_api × 1000)`
+
+**Display Formatting:**
+- Use `format_financial_display()` function for all display formatting
+- Perform calculations with original scale values (raw VND)
+- Apply formatting only for display purposes, never for calculations
+
 ### Data Sources and APIs
 - **vnstock** v3.2.5 - Vietnamese stock data (VCI/TCBS sources)  
   - Stock price data, company information, technical indicators

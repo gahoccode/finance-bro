@@ -243,12 +243,14 @@ try:
 
                 try:
                     # Step 1: Get book values from Balance Sheet
+                    # Note: All dataframe values are in original scale (raw VND values)
                     short_term_debt = latest_balance_sheet.get(
                         "Short-term borrowings (Bn. VND)", 0
                     )
                     long_term_debt = latest_balance_sheet.get(
                         "Long-term borrowings (Bn. VND)", 0
                     )
+                    # Values are already in raw VND scale
                     total_debt = short_term_debt + long_term_debt
 
                     # Step 2: Calculate market cap using Vnstock company overview and current price
@@ -270,12 +272,12 @@ try:
                             else 0
                         )
 
-                        # Calculate market cap: outstanding shares * current price
-                        # Note: outstanding_share is already in millions, current_price is in VND
-                        # Convert to billions for consistency with other financial data
-                        market_value_of_equity = (
-                            outstanding_shares * current_price
-                        ) / 1000  # Convert to billions
+                        # Convert price to original scale: vnstock returns prices in thousands of VND
+                        actual_current_price = current_price * 1000
+
+                        # Calculate market cap: outstanding shares * actual price (in VND)
+                        # Note: issue_share is actual share count, current_price needs to be converted from thousands
+                        market_value_of_equity = outstanding_shares * actual_current_price
 
                         if market_value_of_equity <= 0:
                             st.error(
@@ -287,23 +289,7 @@ try:
                         st.error(
                             f"❌ Error calculating market cap from company overview: {str(e)}"
                         )
-                        # Fallback: try to get from ratios if available
-                        try:
-                            market_value_of_equity = latest_ratios[
-                                ("Chỉ tiêu định giá", "Market Capital (Bn. VND)")
-                            ]
-                            st.warning("⚠️ Using market cap from ratios as fallback")
-                        except KeyError:
-                            st.error(
-                                "❌ Market Capital data not found in ratios either. Please check if financial data is complete."
-                            )
-                            st.write(
-                                "Available ratios columns:",
-                                list(latest_ratios.columns)
-                                if latest_ratios is not None
-                                else "No data",
-                            )
-                            st.stop()
+                        st.stop()
 
                     market_value_of_debt = total_debt
 
@@ -403,9 +389,9 @@ try:
                         breakdown_data = {
                             "Component": ["Debt", "Equity", "Total"],
                             "Market Value (B VND)": [
-                                f"{market_value_of_debt:,.0f}",
-                                f"{market_value_of_equity:,.0f}",
-                                f"{total_market_capital:,.0f}",
+                                format_financial_display(market_value_of_debt, "billions", 0),
+                                format_financial_display(market_value_of_equity, "billions", 0),
+                                format_financial_display(total_market_capital, "billions", 0),
                             ],
                             "Weight": [
                                 f"{market_weight_of_debt:.1%}",
@@ -426,6 +412,66 @@ try:
 
                         breakdown_df = pd.DataFrame(breakdown_data)
                         st.dataframe(breakdown_df, use_container_width=True)
+
+                        # Share count comparison section
+                        st.subheader("📊 Share Count Comparison")
+                        
+                        try:
+                            # Collect both share count values from overview data
+                            issue_share_value = overview["issue_share"].iloc[0] if "issue_share" in overview.columns and len(overview) > 0 else "N/A"
+                            financial_ratio_share_value = overview["financial_ratio_issue_share"].iloc[0] if "financial_ratio_issue_share" in overview.columns and len(overview) > 0 else "N/A"
+                            
+                            # Calculate market caps for both methods using actual price (in VND)
+                            if isinstance(issue_share_value, (int, float, np.integer, np.floating)) and issue_share_value > 0 and actual_current_price > 0:
+                                market_cap_issue_share = issue_share_value * actual_current_price
+                            else:
+                                market_cap_issue_share = "N/A"
+                                
+                            if isinstance(financial_ratio_share_value, (int, float, np.integer, np.floating)) and financial_ratio_share_value > 0 and actual_current_price > 0:
+                                market_cap_financial_ratio = financial_ratio_share_value * actual_current_price
+                            else:
+                                market_cap_financial_ratio = "N/A"
+                            
+                            # Calculate percentage difference if both values are valid
+                            if (isinstance(issue_share_value, (int, float, np.integer, np.floating)) and 
+                                isinstance(financial_ratio_share_value, (int, float, np.integer, np.floating)) and 
+                                issue_share_value > 0 and financial_ratio_share_value > 0):
+                                percentage_diff = ((issue_share_value - financial_ratio_share_value) / financial_ratio_share_value) * 100
+                                percentage_diff_str = f"{percentage_diff:+.2f}%"
+                            else:
+                                percentage_diff_str = "N/A"
+                            
+                            # Create comparison DataFrame
+                            comparison_data = {
+                                "Metric": [
+                                    "issue_share (used)",
+                                    "financial_ratio_issue_share", 
+                                    "Difference (%)"
+                                ],
+                                "Share Count (millions)": [
+                                    f"{issue_share_value:,.0f}" if isinstance(issue_share_value, (int, float, np.integer, np.floating)) else issue_share_value,
+                                    f"{financial_ratio_share_value:,.0f}" if isinstance(financial_ratio_share_value, (int, float, np.integer, np.floating)) else financial_ratio_share_value,
+                                    percentage_diff_str
+                                ],
+                                "Market Cap (B VND)": [
+                                    format_financial_display(market_cap_issue_share, "billions", 2) if isinstance(market_cap_issue_share, (int, float)) else market_cap_issue_share,
+                                    format_financial_display(market_cap_financial_ratio, "billions", 2) if isinstance(market_cap_financial_ratio, (int, float)) else market_cap_financial_ratio,
+                                    "-"
+                                ]
+                            }
+                            
+                            comparison_df = pd.DataFrame(comparison_data)
+                            st.dataframe(comparison_df, use_container_width=True)
+                            
+                            # Add explanation
+                            st.info(
+                                "**Note**: The `issue_share` column represents the current outstanding shares and is used for market cap calculation. "
+                                "The `financial_ratio_issue_share` may represent shares used in financial ratio calculations and could differ from current outstanding shares."
+                            )
+                            
+                        except Exception as e:
+                            st.error(f"❌ Error creating share count comparison: {str(e)}")
+                            st.write("Available overview columns:", list(overview.columns) if 'overview' in locals() else "No overview data")
 
                     else:
                         st.error(
