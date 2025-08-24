@@ -471,12 +471,6 @@ try:
                             comparison_df = pd.DataFrame(comparison_data)
                             st.dataframe(comparison_df, use_container_width=True)
                             
-                            # Add explanation
-                            st.info(
-                                "**Note**: The `issue_share` column represents the current outstanding shares and is used for market cap calculation. "
-                                "The `financial_ratio_issue_share` may represent shares used in financial ratio calculations and could differ from current outstanding shares."
-                            )
-                            
                         except Exception as e:
                             st.error(f"❌ Error creating share count comparison: {str(e)}")
                             st.write("Available overview columns:", list(overview.columns) if 'overview' in locals() else "No overview data")
