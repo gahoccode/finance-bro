@@ -388,10 +388,10 @@ try:
                         st.subheader("🔢 WACC Calculation Breakdown")
                         breakdown_data = {
                             "Component": ["Debt", "Equity", "Total"],
-                            "Market Value (B VND)": [
-                                format_financial_display(market_value_of_debt, "billions", 0),
-                                format_financial_display(market_value_of_equity, "billions", 0),
-                                format_financial_display(total_market_capital, "billions", 0),
+                            f"Market Value ({display_unit.capitalize()})": [
+                                format_financial_display(market_value_of_debt, display_unit, 0),
+                                format_financial_display(market_value_of_equity, display_unit, 0),
+                                format_financial_display(total_market_capital, display_unit, 0),
                             ],
                             "Weight": [
                                 f"{market_weight_of_debt:.1%}",
@@ -448,14 +448,14 @@ try:
                                     "financial_ratio_issue_share", 
                                     "Difference (%)"
                                 ],
-                                "Share Count (millions)": [
+                                "Share Count": [
                                     f"{issue_share_value:,.0f}" if isinstance(issue_share_value, (int, float, np.integer, np.floating)) else issue_share_value,
                                     f"{financial_ratio_share_value:,.0f}" if isinstance(financial_ratio_share_value, (int, float, np.integer, np.floating)) else financial_ratio_share_value,
                                     percentage_diff_str
                                 ],
-                                "Market Cap (B VND)": [
-                                    format_financial_display(market_cap_issue_share, "billions", 2) if isinstance(market_cap_issue_share, (int, float)) else market_cap_issue_share,
-                                    format_financial_display(market_cap_financial_ratio, "billions", 2) if isinstance(market_cap_financial_ratio, (int, float)) else market_cap_financial_ratio,
+                                f"Market Cap ({display_unit.capitalize()})": [
+                                    format_financial_display(market_cap_issue_share, display_unit, 2) if isinstance(market_cap_issue_share, (int, float)) else market_cap_issue_share,
+                                    format_financial_display(market_cap_financial_ratio, display_unit, 2) if isinstance(market_cap_financial_ratio, (int, float)) else market_cap_financial_ratio,
                                     "-"
                                 ]
                             }
