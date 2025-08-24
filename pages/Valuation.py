@@ -127,18 +127,15 @@ try:
         
         if not stock_price.empty and not vnindex_data.empty:
             # 1. Prepare & align prices on common dates
-            # Reset index to get 'time' as a regular column since fetch_stock_price_data sets it as index
-            stock_data_with_time = stock_price.reset_index()[["time", "close"]]
-            aligned = (
-                stock_data_with_time
-                .rename(columns={"close": "stock_close"})
-                .merge(
-                    vnindex_data[["time", "close"]].rename(columns={"close": "index_close"}),
-                    on="time",
-                    how="inner",
-                )
-                .sort_values("time")
-            )
+            # Convert vnindex_data to have datetime index like stock_price
+            vnindex_data["time"] = pd.to_datetime(vnindex_data["time"])
+            vnindex_data = vnindex_data.set_index("time")
+            
+            # Align both dataframes on their datetime index
+            aligned = pd.concat([
+                stock_price[["close"]].rename(columns={"close": "stock_close"}),
+                vnindex_data[["close"]].rename(columns={"close": "index_close"})
+            ], axis=1, join="inner").dropna()
             
             if len(aligned) > 30:  # Ensure sufficient data points
                 # 2. Compute daily percentage returns
