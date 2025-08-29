@@ -2,13 +2,9 @@ import numpy as np
 import pandas as pd
 from vnstock import Quote
 
-quote = Quote(symbol='VNINDEX', source='VCI')
+quote = Quote(symbol="VNINDEX", source="VCI")
 # Get historical data
-vnindex_data = quote.history(
-    start=start_date,
-    end=end_date,
-    interval=interval
-)
+vnindex_data = quote.history(start=start_date, end=end_date, interval=interval)
 
 # 1. Prepare & align prices on common dates
 aligned = (
@@ -35,14 +31,16 @@ beta = cov_matrix[0, 1] / cov_matrix[1, 1]
 
 print(f"Stock beta (covariance method): {beta:.4f}")
 # Step 1: Get book values from Balance Sheet
-short_term_debt = BalanceSheet['Short-term borrowings (Bn. VND)']
-long_term_debt = BalanceSheet['Long-term borrowings (Bn. VND)']
+short_term_debt = BalanceSheet["Short-term borrowings (Bn. VND)"]
+long_term_debt = BalanceSheet["Long-term borrowings (Bn. VND)"]
 total_debt = short_term_debt + long_term_debt
 book_equity = BalanceSheet["OWNER'S EQUITY(Bn.VND)"]
 
 # Step 2: Get market values
 # Market capitalization for equity
-market_value_of_equity = Ratio[('Chỉ tiêu định giá', 'Market Capital (Bn. VND)')]  # Market capitalization
+market_value_of_equity = Ratio[
+    ("Chỉ tiêu định giá", "Market Capital (Bn. VND)")
+]  # Market capitalization
 
 # Use book value of debt as a proxy for market value of debt
 # (In practice, we'd prefer bond prices or yield-based valuation if available)
@@ -57,7 +55,7 @@ market_weight_of_equity = market_value_of_equity.div(total_market_capital).filln
 # Option 1: If you have specific bond yield data (example values)
 # In reality, this would vary by company or be derived from external data sources
 base_interest_rate = 0.04  # e.g., Vietnamese government bond rate
-credit_spread = 0.03       # Credit spread based on company rating
+credit_spread = 0.03  # Credit spread based on company rating
 company_bond_yield = base_interest_rate + credit_spread  # = 0.05 (5%)
 
 # Option 2: Use credit rating to determine yield (if available)
@@ -79,7 +77,7 @@ risk_free_rate = 0.03  # Vietnamese government bond yield
 # estimated_beta = external_beta_data  # This would be company-specific
 
 # Option 2: Estimate beta using financial leverage
-financial_leverage = Ratio[('Chỉ tiêu thanh khoản', 'Financial Leverage')]
+financial_leverage = Ratio[("Chỉ tiêu thanh khoản", "Financial Leverage")]
 leverage_mean = financial_leverage.mean()
 estimated_beta = beta
 
@@ -116,20 +114,24 @@ market_risk_premium = 0.05  # Estimated risk premium for Vietnamese market
 cost_of_equity = risk_free_rate + (estimated_beta * market_risk_premium)
 
 # Step 5: Calculate market-based WACC
-wacc_market_based = (market_weight_of_debt * after_tax_market_cost_of_debt) + (market_weight_of_equity * cost_of_equity)
+wacc_market_based = (market_weight_of_debt * after_tax_market_cost_of_debt) + (
+    market_weight_of_equity * cost_of_equity
+)
 
 # Create a DataFrame with the results
-result_df = pd.DataFrame({
-    'ticker': BalanceSheet['ticker'],
-    'yearReport': BalanceSheet['yearReport'],
-    'market_cap': market_value_of_equity,
-    'market_debt': market_value_of_debt,
-    'market_weight_of_debt': market_weight_of_debt,
-    'market_weight_of_equity': market_weight_of_equity,
-    'market_cost_of_debt': after_tax_market_cost_of_debt,
-    'beta': estimated_beta,
-    'cost_of_equity': cost_of_equity,
-    'wacc_market_based': wacc_market_based
-})
+result_df = pd.DataFrame(
+    {
+        "ticker": BalanceSheet["ticker"],
+        "yearReport": BalanceSheet["yearReport"],
+        "market_cap": market_value_of_equity,
+        "market_debt": market_value_of_debt,
+        "market_weight_of_debt": market_weight_of_debt,
+        "market_weight_of_equity": market_weight_of_equity,
+        "market_cost_of_debt": after_tax_market_cost_of_debt,
+        "beta": estimated_beta,
+        "cost_of_equity": cost_of_equity,
+        "wacc_market_based": wacc_market_based,
+    }
+)
 
-result_df[["yearReport", "wacc_market_based"]].round(3) #round to 3 decimal places
+result_df[["yearReport", "wacc_market_based"]].round(3)  # round to 3 decimal places
