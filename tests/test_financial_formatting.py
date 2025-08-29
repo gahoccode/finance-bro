@@ -357,6 +357,74 @@ class TestFinancialFormattingIntegration:
                 assert result == "1,000,000,000.0 VND"
 
 
+class TestVnStockPriceScaling:
+    """Test cases for VnStock price scaling scenarios."""
+
+    def test_vnstock_price_scaling_basic(self):
+        """Test VnStock price scaling from thousands to original scale."""
+        # VnStock returns price in thousands of VND (e.g., 64.5 = 64,500 VND)
+        vnstock_price = 64.5  # Price from VnStock API in thousands
+        actual_price = vnstock_price * 1000  # Convert to original scale
+
+        # Test formatting the actual price
+        result = format_financial_display(actual_price, "original", 0)
+        assert result == "64,500 VND"
+
+        result_millions = format_financial_display(actual_price, "millions", 3)
+        assert result_millions == "0.065M VND"
+
+    def test_market_cap_calculation_with_vnstock_scaling(self):
+        """Test market cap calculation using VnStock price scaling."""
+        # Example: REE stock with realistic values
+        vnstock_price = 64.5  # Price from VnStock API (in thousands)
+        outstanding_shares = 541658139  # Shares from company overview
+
+        # Calculate market cap with proper scaling
+        actual_price = vnstock_price * 1000  # Convert price to original scale
+        market_cap = outstanding_shares * actual_price
+
+        # Test formatting market cap
+        result_billions = format_financial_display(market_cap, "billions", 1)
+        expected_market_cap_billions = (541658139 * 64500) / 1000000000  # ~34,936.9B
+        assert result_billions == f"{expected_market_cap_billions:,.1f}B VND"
+
+        result_original = format_financial_display(market_cap, "original", 0)
+        expected_formatted = f"{market_cap:,.0f} VND"
+        assert result_original == expected_formatted
+
+    def test_price_scaling_edge_cases(self):
+        """Test edge cases in VnStock price scaling."""
+        # Very small price
+        small_vnstock_price = 0.1  # 100 VND actual price
+        actual_small_price = small_vnstock_price * 1000
+        result = format_financial_display(actual_small_price, "original", 0)
+        assert result == "100 VND"
+
+        # Large price
+        large_vnstock_price = 500.0  # 500,000 VND actual price
+        actual_large_price = large_vnstock_price * 1000
+        result = format_financial_display(actual_large_price, "millions", 1)
+        assert result == "0.5M VND"
+
+    def test_financial_data_vs_price_data_scaling(self):
+        """Test that financial data and price data use consistent scaling."""
+        # Financial data from statements (already in original scale)
+        debt_value = 1500000000  # 1.5B VND from balance sheet
+
+        # Price data (needs scaling)
+        vnstock_price = 50.0  # 50,000 VND actual price
+        actual_price = vnstock_price * 1000
+        shares = 100000000  # 100M shares
+        market_cap = shares * actual_price  # 5,000,000,000,000 VND (5T VND)
+
+        # Both should format consistently
+        debt_formatted = format_financial_display(debt_value, "billions", 1)
+        market_cap_formatted = format_financial_display(market_cap, "billions", 1)
+
+        assert debt_formatted == "1.5B VND"
+        assert market_cap_formatted == "5,000.0B VND"  # 5T VND = 5,000B VND
+
+
 class TestEdgeCasesAndErrorHandling:
     """Test edge cases and error handling scenarios."""
 

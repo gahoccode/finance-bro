@@ -1,8 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import altair as alt
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # Import project components and services
 from src.components.ui_components import (
@@ -104,16 +103,16 @@ try:
     income_statement = dataframes.get("IncomeStatement", pd.DataFrame())
     cash_flow = dataframes.get("CashFlow", pd.DataFrame())
     ratios = dataframes.get("Ratios", pd.DataFrame())
-    
+
     # Sort all financial statements by yearReport in ascending order for proper temporal alignment
-    if not balance_sheet.empty and 'yearReport' in balance_sheet.columns:
-        balance_sheet = balance_sheet.sort_values('yearReport', ascending=True)
-    if not income_statement.empty and 'yearReport' in income_statement.columns:
-        income_statement = income_statement.sort_values('yearReport', ascending=True)
-    if not cash_flow.empty and 'yearReport' in cash_flow.columns:
-        cash_flow = cash_flow.sort_values('yearReport', ascending=True)
-    if not ratios.empty and 'yearReport' in ratios.columns:
-        ratios = ratios.sort_values('yearReport', ascending=True)
+    if not balance_sheet.empty and "yearReport" in balance_sheet.columns:
+        balance_sheet = balance_sheet.sort_values("yearReport", ascending=True)
+    if not income_statement.empty and "yearReport" in income_statement.columns:
+        income_statement = income_statement.sort_values("yearReport", ascending=True)
+    if not cash_flow.empty and "yearReport" in cash_flow.columns:
+        cash_flow = cash_flow.sort_values("yearReport", ascending=True)
+    if not ratios.empty and "yearReport" in ratios.columns:
+        ratios = ratios.sort_values("yearReport", ascending=True)
 
     # Check if stock price data exists in session state from Stock Price Analysis page
     if "stock_price_data" in st.session_state:
@@ -236,7 +235,9 @@ try:
 
         if not balance_sheet.empty and not ratios.empty and "beta" in locals():
             # Get latest financial data (data is already sorted by yearReport ascending)
-            latest_balance_sheet = balance_sheet.iloc[-1] if len(balance_sheet) > 0 else None
+            latest_balance_sheet = (
+                balance_sheet.iloc[-1] if len(balance_sheet) > 0 else None
+            )
             latest_ratios = ratios.iloc[-1] if len(ratios) > 0 else None
 
             if latest_balance_sheet is not None and latest_ratios is not None:
@@ -264,14 +265,20 @@ try:
                     # Step 2: Calculate market cap using Vnstock company overview and current price
                     try:
                         # Get company overview data for outstanding shares using newer Vnstock approach
-                        stock = Vnstock().stock(symbol=symbol, source='VCI')
+                        stock = Vnstock().stock(symbol=symbol, source="VCI")
                         overview = stock.company.overview()
-                        
+
                         # Use issue_share as the correct column name for outstanding shares
                         if "issue_share" in overview.columns:
-                            outstanding_shares = overview["issue_share"].iloc[0] if len(overview) > 0 else 0
+                            outstanding_shares = (
+                                overview["issue_share"].iloc[0]
+                                if len(overview) > 0
+                                else 0
+                            )
                         else:
-                            raise KeyError(f"'issue_share' column not found in overview data. Available columns: {list(overview.columns)}")
+                            raise KeyError(
+                                f"'issue_share' column not found in overview data. Available columns: {list(overview.columns)}"
+                            )
 
                         # Get current stock price from the latest price data
                         current_price = (
@@ -285,7 +292,9 @@ try:
 
                         # Calculate market cap: outstanding shares * actual price (in VND)
                         # Note: issue_share is actual share count, current_price needs to be converted from thousands
-                        market_value_of_equity = outstanding_shares * actual_current_price
+                        market_value_of_equity = (
+                            outstanding_shares * actual_current_price
+                        )
 
                         if market_value_of_equity <= 0:
                             st.error(
@@ -397,9 +406,15 @@ try:
                         breakdown_data = {
                             "Component": ["Debt", "Equity", "Total"],
                             f"Market Value ({display_unit.capitalize()})": [
-                                format_financial_display(market_value_of_debt, display_unit, 0),
-                                format_financial_display(market_value_of_equity, display_unit, 0),
-                                format_financial_display(total_market_capital, display_unit, 0),
+                                format_financial_display(
+                                    market_value_of_debt, display_unit, 0
+                                ),
+                                format_financial_display(
+                                    market_value_of_equity, display_unit, 0
+                                ),
+                                format_financial_display(
+                                    total_market_capital, display_unit, 0
+                                ),
                             ],
                             "Weight": [
                                 f"{market_weight_of_debt:.1%}",
@@ -419,60 +434,122 @@ try:
                         }
 
                         breakdown_df = pd.DataFrame(breakdown_data)
-                        st.dataframe(breakdown_df, use_container_width=True)
+                        st.dataframe(breakdown_df, use_container_width=True, hide_index=True)
 
                         # Share count comparison section
                         st.subheader("📊 Share Count Comparison")
-                        
+
                         try:
                             # Collect both share count values from overview data
-                            issue_share_value = overview["issue_share"].iloc[0] if "issue_share" in overview.columns and len(overview) > 0 else "N/A"
-                            financial_ratio_share_value = overview["financial_ratio_issue_share"].iloc[0] if "financial_ratio_issue_share" in overview.columns and len(overview) > 0 else "N/A"
-                            
+                            issue_share_value = (
+                                overview["issue_share"].iloc[0]
+                                if "issue_share" in overview.columns
+                                and len(overview) > 0
+                                else "N/A"
+                            )
+                            financial_ratio_share_value = (
+                                overview["financial_ratio_issue_share"].iloc[0]
+                                if "financial_ratio_issue_share" in overview.columns
+                                and len(overview) > 0
+                                else "N/A"
+                            )
+
                             # Calculate market caps for both methods using actual price (in VND)
-                            if isinstance(issue_share_value, (int, float, np.integer, np.floating)) and issue_share_value > 0 and actual_current_price > 0:
-                                market_cap_issue_share = issue_share_value * actual_current_price
+                            if (
+                                isinstance(
+                                    issue_share_value,
+                                    (int, float, np.integer, np.floating),
+                                )
+                                and issue_share_value > 0
+                                and actual_current_price > 0
+                            ):
+                                market_cap_issue_share = (
+                                    issue_share_value * actual_current_price
+                                )
                             else:
                                 market_cap_issue_share = "N/A"
-                                
-                            if isinstance(financial_ratio_share_value, (int, float, np.integer, np.floating)) and financial_ratio_share_value > 0 and actual_current_price > 0:
-                                market_cap_financial_ratio = financial_ratio_share_value * actual_current_price
+
+                            if (
+                                isinstance(
+                                    financial_ratio_share_value,
+                                    (int, float, np.integer, np.floating),
+                                )
+                                and financial_ratio_share_value > 0
+                                and actual_current_price > 0
+                            ):
+                                market_cap_financial_ratio = (
+                                    financial_ratio_share_value * actual_current_price
+                                )
                             else:
                                 market_cap_financial_ratio = "N/A"
-                            
+
                             # Calculate percentage difference if both values are valid
-                            if (isinstance(issue_share_value, (int, float, np.integer, np.floating)) and 
-                                isinstance(financial_ratio_share_value, (int, float, np.integer, np.floating)) and 
-                                issue_share_value > 0 and financial_ratio_share_value > 0):
-                                percentage_diff = ((issue_share_value - financial_ratio_share_value) / financial_ratio_share_value) * 100
+                            if (
+                                isinstance(
+                                    issue_share_value,
+                                    (int, float, np.integer, np.floating),
+                                )
+                                and isinstance(
+                                    financial_ratio_share_value,
+                                    (int, float, np.integer, np.floating),
+                                )
+                                and issue_share_value > 0
+                                and financial_ratio_share_value > 0
+                            ):
+                                percentage_diff = (
+                                    (issue_share_value - financial_ratio_share_value)
+                                    / financial_ratio_share_value
+                                ) * 100
                                 percentage_diff_str = f"{percentage_diff:+.2f}%"
                             else:
                                 percentage_diff_str = "N/A"
-                            
+
                             # Create comparison DataFrame
                             comparison_data = {
                                 "Metric": [
                                     "issue_share (used)",
-                                    "financial_ratio_issue_share", 
-                                    "Difference (%)"
+                                    "financial_ratio_issue_share",
+                                    "Difference (%)",
                                 ],
                                 "Share Count": [
-                                    f"{issue_share_value:,.0f}" if isinstance(issue_share_value, (int, float, np.integer, np.floating)) else issue_share_value,
-                                    f"{financial_ratio_share_value:,.0f}" if isinstance(financial_ratio_share_value, (int, float, np.integer, np.floating)) else financial_ratio_share_value,
-                                    percentage_diff_str
+                                    f"{issue_share_value:,.0f}"
+                                    if isinstance(
+                                        issue_share_value,
+                                        (int, float, np.integer, np.floating),
+                                    )
+                                    else issue_share_value,
+                                    f"{financial_ratio_share_value:,.0f}"
+                                    if isinstance(
+                                        financial_ratio_share_value,
+                                        (int, float, np.integer, np.floating),
+                                    )
+                                    else financial_ratio_share_value,
+                                    percentage_diff_str,
                                 ],
                                 f"Market Cap ({display_unit.capitalize()})": [
-                                    format_financial_display(market_cap_issue_share, display_unit, 2) if isinstance(market_cap_issue_share, (int, float)) else market_cap_issue_share,
-                                    format_financial_display(market_cap_financial_ratio, display_unit, 2) if isinstance(market_cap_financial_ratio, (int, float)) else market_cap_financial_ratio,
-                                    "-"
-                                ]
+                                    format_financial_display(
+                                        market_cap_issue_share, display_unit, 2
+                                    )
+                                    if isinstance(market_cap_issue_share, (int, float))
+                                    else market_cap_issue_share,
+                                    format_financial_display(
+                                        market_cap_financial_ratio, display_unit, 2
+                                    )
+                                    if isinstance(
+                                        market_cap_financial_ratio, (int, float)
+                                    )
+                                    else market_cap_financial_ratio,
+                                    "-",
+                                ],
                             }
-                            
+
                             comparison_df = pd.DataFrame(comparison_data)
-                            st.dataframe(comparison_df, use_container_width=True)
-                            
+                            st.dataframe(comparison_df, use_container_width=True, hide_index=True)
+
                         except Exception as e:
-                            st.error(f"❌ Error creating share count comparison: {str(e)}")
+                            st.error(
+                                f"❌ Error creating share count comparison: {str(e)}"
+                            )
 
                     else:
                         st.error(
@@ -513,8 +590,12 @@ try:
                     {
                         "Year": latest_year,
                         "Symbol": symbol,
-                        "Market Cap": format_financial_display(market_value_of_equity, display_unit, 0),
-                        "Total Debt": format_financial_display(total_debt, display_unit, 0),
+                        "Market Cap": format_financial_display(
+                            market_value_of_equity, display_unit, 0
+                        ),
+                        "Total Debt": format_financial_display(
+                            total_debt, display_unit, 0
+                        ),
                         "Debt Weight": f"{market_weight_of_debt:.1%}",
                         "Equity Weight": f"{market_weight_of_equity:.1%}",
                         "Beta": f"{beta:.4f}",
@@ -525,7 +606,7 @@ try:
                 )
 
                 results_df = pd.DataFrame(results_data)
-                st.dataframe(results_df, use_container_width=True)
+                st.dataframe(results_df, use_container_width=True, hide_index=True)
 
                 # Download button
                 csv_data = results_df.to_csv(index=False)
