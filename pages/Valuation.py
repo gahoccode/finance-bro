@@ -434,7 +434,9 @@ try:
                         }
 
                         breakdown_df = pd.DataFrame(breakdown_data)
-                        st.dataframe(breakdown_df, use_container_width=True, hide_index=True)
+                        st.dataframe(
+                            breakdown_df, use_container_width=True, hide_index=True
+                        )
 
                         # Share count comparison section
                         st.subheader("📊 Share Count Comparison")
@@ -544,7 +546,9 @@ try:
                             }
 
                             comparison_df = pd.DataFrame(comparison_data)
-                            st.dataframe(comparison_df, use_container_width=True, hide_index=True)
+                            st.dataframe(
+                                comparison_df, use_container_width=True, hide_index=True
+                            )
 
                         except Exception as e:
                             st.error(
@@ -562,62 +566,608 @@ try:
             st.error("❌ Unable to load financial data or beta calculation failed.")
 
     with tab3:
-        st.header("🎯 Valuation Summary")
+        st.header("🎯 DCF Intrinsic Value")
 
-        if "wacc" in locals() and not balance_sheet.empty:
-            # Create results summary
-            st.subheader("📋 Valuation Analysis Results")
+        if "wacc" in locals() and not cash_flow.empty and not balance_sheet.empty:
+            # Calculate historical free cash flow using Vietnamese column names
+            try:
+                # Get historical cash flow data (already sorted by yearReport ascending)
+                historical_fcf = []
+                historical_years = []
 
-            # Summary metrics
-            col1, col2, col3, col4 = st.columns(4)
+                # Use exact Vietnamese column names
+                ocf_column = "Net cash inflows/outflows from operating activities"
+                capex_column = "Purchase of fixed assets"
 
-            with col1:
-                st.metric("📊 Stock Symbol", symbol)
-            with col2:
-                st.metric("💰 WACC", f"{wacc:.2%}")
-            with col3:
-                st.metric("📈 Beta", f"{beta:.4f}")
-            with col4:
-                st.metric("🎯 Analysis Date", datetime.now().strftime("%Y-%m-%d"))
+                for _, row in cash_flow.iterrows():
+                    year = row.get("yearReport")
+                    operating_cash_flow = row.get(ocf_column, 0)
+                    capex = row.get(capex_column, 0)
 
-            # Create detailed results table - show only current year (market cap only available for current period)
-            if len(balance_sheet) > 0:
-                results_data = []
+                    # Calculate free cash flow: Operating Cash Flow - Capital Expenditures
+                    # Note: capex is typically negative, so we subtract it
+                    free_cash_flow = operating_cash_flow - abs(capex)
 
-                # Get latest year (data is already sorted by yearReport ascending)
-                latest_year = balance_sheet.iloc[-1].get("yearReport", "N/A")
-                results_data.append(
+                    if year and not pd.isna(free_cash_flow) and free_cash_flow != 0:
+                        historical_fcf.append(free_cash_flow)
+                        historical_years.append(year)
+
+                if len(historical_fcf) < 2:
+                    st.error(
+                        "❌ Insufficient cash flow data for DCF analysis. Need at least 2 years of data."
+                    )
+                    st.stop()
+
+                # Time Series Analysis for FCF Forecasting
+
+                # Create time series DataFrame
+                fcf_ts = pd.DataFrame(
+                    {"year": historical_years, "fcf": historical_fcf}
+                ).sort_values("year")
+
+                # Calculate various growth metrics for time series analysis
+                growth_rates = []
+                for i in range(1, len(historical_fcf)):
+                    if historical_fcf[i - 1] != 0:
+                        growth_rate = (historical_fcf[i] - historical_fcf[i - 1]) / abs(
+                            historical_fcf[i - 1]
+                        )
+                        growth_rates.append(growth_rate)
+
+                # Time series trend analysis
+                if len(fcf_ts) >= 3:
+                    # Linear trend analysis using numpy polyfit
+                    years_numeric = np.array(fcf_ts["year"])
+                    fcf_values = np.array(fcf_ts["fcf"])
+
+                    # Fit linear trend
+                    trend_coeffs = np.polyfit(years_numeric, fcf_values, 1)
+                    trend_slope = trend_coeffs[0]
+                    trend_intercept = trend_coeffs[1]
+
+                    # Calculate R-squared for trend fit
+                    fcf_trend = trend_slope * years_numeric + trend_intercept
+                    ss_res = np.sum((fcf_values - fcf_trend) ** 2)
+                    ss_tot = np.sum((fcf_values - np.mean(fcf_values)) ** 2)
+                    trend_r_squared = 1 - (ss_res / ss_tot) if ss_tot > 0 else 0
+
+                    # Calculate trend-based growth rate
+                    if len(fcf_values) > 1:
+                        avg_fcf = np.mean(fcf_values)
+                        trend_growth_rate = (
+                            (trend_slope / avg_fcf) if avg_fcf != 0 else 0
+                        )
+                    else:
+                        trend_growth_rate = 0
+                else:
+                    trend_growth_rate = 0
+                    trend_r_squared = 0
+
+                # Volatility analysis
+                if len(growth_rates) > 1:
+                    growth_volatility = np.std(growth_rates)
+                    growth_cv = (
+                        growth_volatility / abs(np.mean(growth_rates))
+                        if np.mean(growth_rates) != 0
+                        else float("inf")
+                    )
+                else:
+                    growth_volatility = 0
+                    growth_cv = 0
+
+                # Multiple forecasting methods
+                forecasting_methods = {}
+
+                # 1. Simple historical average
+                avg_historical_growth = np.mean(growth_rates) if growth_rates else 0.10
+                forecasting_methods["Historical Average"] = avg_historical_growth
+
+                # 2. Median (more robust to outliers)
+                median_historical_growth = (
+                    np.median(growth_rates) if growth_rates else 0.10
+                )
+                forecasting_methods["Historical Median"] = median_historical_growth
+
+                # 3. Trend-based forecast
+                forecasting_methods["Linear Trend"] = trend_growth_rate
+
+                # 4. Weighted recent years (give more weight to recent performance)
+                if len(growth_rates) >= 2:
+                    weights = np.linspace(
+                        0.5, 1.0, len(growth_rates)
+                    )  # More weight to recent years
+                    weighted_growth = np.average(growth_rates, weights=weights)
+                    forecasting_methods["Weighted Recent"] = weighted_growth
+                else:
+                    forecasting_methods["Weighted Recent"] = avg_historical_growth
+
+                # 5. Conservative estimate (lower quartile for risk adjustment)
+                if len(growth_rates) >= 4:
+                    conservative_growth = np.percentile(growth_rates, 25)
+                    forecasting_methods["Conservative (25th percentile)"] = (
+                        conservative_growth
+                    )
+                else:
+                    forecasting_methods["Conservative (25th percentile)"] = (
+                        min(growth_rates) if growth_rates else 0.05
+                    )
+
+                # Select best forecasting method based on data quality and trend strength
+                if trend_r_squared > 0.7 and len(fcf_ts) >= 4:
+                    # Strong trend - use trend-based forecast
+                    recommended_growth = trend_growth_rate
+                    recommended_method = "Linear Trend"
+                elif growth_cv < 0.5:  # Low volatility
+                    # Stable growth - use weighted recent
+                    recommended_growth = forecasting_methods["Weighted Recent"]
+                    recommended_method = "Weighted Recent"
+                else:
+                    # High volatility - use conservative median
+                    recommended_growth = median_historical_growth
+                    recommended_method = "Historical Median"
+
+                latest_fcf = (
+                    historical_fcf[-1] if historical_fcf else 1000000000
+                )  # Fallback
+
+                # Enhanced Time Series Analysis Display
+                st.subheader("📈 Time Series Analysis Results")
+
+                # Display forecasting method analysis
+                col1, col2, col3 = st.columns(3)
+
+                with col1:
+                    st.metric("📊 Recommended Method", recommended_method)
+                    st.metric("🎯 Recommended Growth", f"{recommended_growth:.1%}")
+
+                with col2:
+                    if "trend_r_squared" in locals():
+                        st.metric("📈 Trend R²", f"{trend_r_squared:.3f}")
+                    if "growth_volatility" in locals():
+                        st.metric("📊 Growth Volatility", f"{growth_volatility:.1%}")
+
+                with col3:
+                    st.metric("📋 Data Points", len(historical_fcf))
+                    st.metric(
+                        "📅 Years Analyzed",
+                        f"{min(historical_years)}-{max(historical_years)}",
+                    )
+
+                # Display all forecasting methods comparison
+                st.subheader("🔄 Forecasting Methods Comparison")
+                methods_df = pd.DataFrame(
+                    [
+                        {
+                            "Method": method,
+                            "Growth Rate": f"{rate:.1%}",
+                            "Selected": "✅" if method == recommended_method else "",
+                        }
+                        for method, rate in forecasting_methods.items()
+                    ]
+                )
+                st.dataframe(methods_df, use_container_width=True, hide_index=True)
+
+                # Multi-year FCF projections using different base years
+                st.subheader("📊 Multi-Year Base Analysis")
+
+                # Create projections from different historical starting points
+                multi_year_projections = []
+
+                # Use each historical year as a potential base for projection
+                for i, (base_year, base_fcf) in enumerate(
+                    zip(historical_years, historical_fcf)
+                ):
+                    # Calculate growth from this base year to latest year
+                    if (
+                        base_year != historical_years[-1]
+                    ):  # Skip if it's the latest year
+                        years_ahead = historical_years[-1] - base_year
+                        if years_ahead > 0 and base_fcf != 0:
+                            # Handle negative FCF values properly to avoid complex numbers
+                            fcf_ratio = latest_fcf / base_fcf
+
+                            if fcf_ratio > 0:
+                                # Normal CAGR calculation for positive ratio
+                                implied_cagr = (fcf_ratio ** (1 / years_ahead)) - 1
+                            elif latest_fcf > 0 and base_fcf < 0:
+                                # From negative to positive FCF - use absolute growth rate
+                                implied_cagr = abs(fcf_ratio) ** (1 / years_ahead) - 1
+                            elif latest_fcf < 0 and base_fcf > 0:
+                                # From positive to negative FCF - negative growth
+                                implied_cagr = (
+                                    -(abs(fcf_ratio) ** (1 / years_ahead)) + 1
+                                )
+                            else:
+                                # Both negative - calculate as if positive and make negative
+                                implied_cagr = -(
+                                    (abs(fcf_ratio) ** (1 / years_ahead)) - 1
+                                )
+
+                            # Only include if CAGR is reasonable (between -50% and +200%)
+                            if -0.5 <= implied_cagr <= 2.0:
+                                multi_year_projections.append(
+                                    {
+                                        "Base Year": base_year,
+                                        "Base FCF": base_fcf,
+                                        "Years to Latest": years_ahead,
+                                        "Implied CAGR": implied_cagr,
+                                        "Weight": 1.0
+                                        / (
+                                            len(historical_years) - i
+                                        ),  # More weight to recent years
+                                    }
+                                )
+
+                if multi_year_projections:
+                    # Calculate weighted average CAGR from multiple base years
+                    total_weight = sum(
+                        proj["Weight"] for proj in multi_year_projections
+                    )
+                    weighted_cagr = (
+                        sum(
+                            proj["Implied CAGR"] * proj["Weight"]
+                            for proj in multi_year_projections
+                        )
+                        / total_weight
+                    )
+
+                    # Display multi-year analysis
+                    proj_df = pd.DataFrame(multi_year_projections)
+                    proj_df["Base FCF"] = proj_df["Base FCF"].apply(
+                        lambda x: format_financial_display(x, display_unit, 0)
+                    )
+                    proj_df["Implied CAGR"] = proj_df["Implied CAGR"].apply(
+                        lambda x: f"{x:.1%}"
+                    )
+                    proj_df["Weight"] = proj_df["Weight"].apply(lambda x: f"{x:.2f}")
+
+                    st.dataframe(proj_df, use_container_width=True, hide_index=True)
+                    st.info(f"📊 **Multi-Year Weighted CAGR**: {weighted_cagr:.1%}")
+
+                # DCF Parameters with sidebar controls
+                with st.sidebar:
+                    st.header("🎯 DCF Parameters")
+                    st.subheader("Growth Assumptions")
+
+                    # Enhanced historical context with time series insights
+                    if growth_rates:
+                        st.info(
+                            f"📊 **Time Series Analysis**:\n"
+                            f"• Recommended: {recommended_growth:.1%} ({recommended_method})\n"
+                            f"• Historical Avg: {avg_historical_growth:.1%}\n"
+                            f"• Historical Median: {median_historical_growth:.1%}\n"
+                            f"• Volatility: {growth_volatility:.1%}\n"
+                            f"• Range: {min(growth_rates):.1%} to {max(growth_rates):.1%}"
+                        )
+
+                        if "weighted_cagr" in locals():
+                            st.info(f"📈 **Multi-Year CAGR**: {weighted_cagr:.1%}")
+
+                    # Stage 1: High Growth Period
+                    stage1_years = st.slider(
+                        "Stage 1 Duration (years)",
+                        min_value=3,
+                        max_value=10,
+                        value=5,
+                        help="High growth period duration",
+                    )
+
+                    # Use recommended growth as intelligent default
+                    default_stage1 = (
+                        recommended_growth * 100 if recommended_growth > 0.05 else 10.0
+                    )
+                    stage1_growth = st.number_input(
+                        "Stage 1 Growth Rate (%)",
+                        min_value=-50.0,
+                        max_value=100.0,
+                        value=default_stage1,
+                        step=1.0,
+                        help=f"Default based on time series analysis: {recommended_method} = {recommended_growth:.1%}",
+                    )
+
+                    # Stage 2: Terminal Growth
+                    terminal_growth = st.number_input(
+                        "Terminal Growth Rate (%)",
+                        min_value=0.0,
+                        max_value=10.0,
+                        value=3.0,
+                        step=0.5,
+                        help="Long-term sustainable growth rate (typically 2-4% for developed markets)",
+                    )
+
+                    # Advanced option: Use multi-year weighted FCF as base
+                    if "weighted_cagr" in locals():
+                        use_weighted_base = st.checkbox(
+                            "Use Multi-Year Weighted Analysis",
+                            value=True,
+                            help="Use weighted analysis from all historical years instead of just latest year",
+                        )
+
+                # Convert percentages to decimals
+                stage1_growth_rate = stage1_growth / 100
+                terminal_growth_rate = terminal_growth / 100
+
+                # Determine base FCF for projections
+                if (
+                    "use_weighted_base" in locals()
+                    and use_weighted_base
+                    and "weighted_cagr" in locals()
+                ):
+                    # Use multi-year weighted analysis
+                    base_fcf_for_projection = latest_fcf
+                    effective_growth_rate = (
+                        weighted_cagr  # Use weighted CAGR from multi-year analysis
+                    )
+                    projection_method = (
+                        f"Multi-Year Weighted CAGR ({weighted_cagr:.1%})"
+                    )
+                else:
+                    # Use traditional single-year base
+                    base_fcf_for_projection = latest_fcf
+                    effective_growth_rate = stage1_growth_rate
+                    projection_method = f"Single-Year Base ({stage1_growth_rate:.1%})"
+
+                # DCF Calculations
+                st.subheader("📊 DCF Model Results")
+                st.info(f"**Projection Method**: {projection_method}")
+
+                # Stage 1: High Growth Period Cash Flows
+                stage1_fcf = []
+                stage1_pv = []
+
+                for year in range(1, stage1_years + 1):
+                    if (
+                        "use_weighted_base" in locals()
+                        and use_weighted_base
+                        and "weighted_cagr" in locals()
+                    ):
+                        # Use weighted CAGR for first few years, then transition to user-selected growth
+                        transition_years = min(
+                            3, stage1_years
+                        )  # Transition over first 3 years
+
+                        if year <= transition_years:
+                            # Blend weighted CAGR with user growth rate over transition period
+                            weight_historical = (
+                                transition_years - year + 1
+                            ) / transition_years
+                            blended_growth = (weight_historical * weighted_cagr) + (
+                                (1 - weight_historical) * stage1_growth_rate
+                            )
+                        else:
+                            # Use user-selected growth rate after transition
+                            blended_growth = stage1_growth_rate
+
+                        projected_fcf = base_fcf_for_projection * (
+                            (1 + blended_growth) ** year
+                        )
+                    else:
+                        # Traditional approach: use user-selected growth rate
+                        projected_fcf = base_fcf_for_projection * (
+                            (1 + stage1_growth_rate) ** year
+                        )
+
+                    stage1_fcf.append(projected_fcf)
+
+                    # Calculate present value
+                    pv = projected_fcf / ((1 + wacc) ** year)
+                    stage1_pv.append(pv)
+
+                # Stage 2: Terminal Value
+                terminal_fcf = stage1_fcf[-1] * (1 + terminal_growth_rate)
+                terminal_value = terminal_fcf / (wacc - terminal_growth_rate)
+                terminal_pv = terminal_value / ((1 + wacc) ** stage1_years)
+
+                # Enterprise Value
+                enterprise_value = sum(stage1_pv) + terminal_pv
+
+                # Equity Value = Enterprise Value - Net Debt
+                net_debt = total_debt  # Assuming no cash for simplicity
+                equity_value = enterprise_value - net_debt
+
+                # Intrinsic Value per Share (in original VND scale)
+                intrinsic_value_per_share = (
+                    equity_value / outstanding_shares if outstanding_shares > 0 else 0
+                )
+
+                # Current price comparison (convert current price to original VND scale)
+                current_price_original_scale = (
+                    current_price * 1000
+                )  # Convert from thousands to original VND
+                upside_downside = (
+                    (intrinsic_value_per_share - current_price_original_scale)
+                    / current_price_original_scale
+                    if current_price_original_scale > 0
+                    else 0
+                )
+
+                # Display key results
+                col1, col2, col3, col4 = st.columns(4)
+
+                with col1:
+                    st.metric(
+                        "🎯 Intrinsic Value",
+                        f"{intrinsic_value_per_share:,.0f} VND",
+                        help="DCF-based intrinsic value per share",
+                    )
+
+                with col2:
+                    st.metric(
+                        "💰 Current Price", f"{current_price_original_scale:,.0f} VND"
+                    )
+
+                with col3:
+                    st.metric(
+                        "📈 Upside/Downside",
+                        f"{upside_downside:+.1%}",
+                        delta=f"{upside_downside:+.1%}",
+                    )
+
+                with col4:
+                    recommendation = (
+                        "🟢 BUY"
+                        if upside_downside > 0.20
+                        else "🟡 HOLD"
+                        if upside_downside > -0.10
+                        else "🔴 SELL"
+                    )
+                    st.metric("📋 Recommendation", recommendation)
+
+                # Detailed DCF breakdown
+                st.subheader("🔢 DCF Calculation Breakdown")
+
+                # Create detailed table
+                dcf_data = []
+
+                # Base year (Year 0)
+                dcf_data.append(
                     {
-                        "Year": latest_year,
-                        "Symbol": symbol,
-                        "Market Cap": format_financial_display(
-                            market_value_of_equity, display_unit, 0
-                        ),
-                        "Total Debt": format_financial_display(
-                            total_debt, display_unit, 0
-                        ),
-                        "Debt Weight": f"{market_weight_of_debt:.1%}",
-                        "Equity Weight": f"{market_weight_of_equity:.1%}",
-                        "Beta": f"{beta:.4f}",
-                        "Cost of Equity": f"{cost_of_equity:.2%}",
-                        "After-tax Cost of Debt": f"{after_tax_cost_of_debt:.2%}",
-                        "WACC": f"{wacc:.2%}",
+                        "Year": 0,
+                        "FCF": format_financial_display(latest_fcf, display_unit, 0),
+                        "Growth Rate": "-",
+                        "Discount Factor": "1.000",
+                        "Present Value": "-",
+                        "Type": "Base Year",
                     }
                 )
 
-                results_df = pd.DataFrame(results_data)
-                st.dataframe(results_df, use_container_width=True, hide_index=True)
+                # Stage 1 projections
+                for i, (fcf, pv) in enumerate(zip(stage1_fcf, stage1_pv), 1):
+                    discount_factor = 1 / ((1 + wacc) ** i)
+                    dcf_data.append(
+                        {
+                            "Year": i,
+                            "FCF": format_financial_display(fcf, display_unit, 0),
+                            "Growth Rate": f"{stage1_growth_rate:.1%}",
+                            "Discount Factor": f"{discount_factor:.3f}",
+                            "Present Value": format_financial_display(
+                                pv, display_unit, 0
+                            ),
+                            "Type": "High Growth",
+                        }
+                    )
 
-                # Download button
-                csv_data = results_df.to_csv(index=False)
+                # Terminal year
+                terminal_discount_factor = 1 / ((1 + wacc) ** stage1_years)
+                dcf_data.append(
+                    {
+                        "Year": f"Terminal",
+                        "FCF": format_financial_display(
+                            terminal_value, display_unit, 0
+                        ),
+                        "Growth Rate": f"{terminal_growth_rate:.1%}",
+                        "Discount Factor": f"{terminal_discount_factor:.3f}",
+                        "Present Value": format_financial_display(
+                            terminal_pv, display_unit, 0
+                        ),
+                        "Type": "Terminal Value",
+                    }
+                )
+
+                dcf_df = pd.DataFrame(dcf_data)
+                st.dataframe(dcf_df, use_container_width=True, hide_index=True)
+
+                # Summary calculation table
+                st.subheader("💎 Valuation Summary")
+                summary_data = {
+                    "Component": [
+                        "PV of Stage 1 Cash Flows",
+                        "Present Value of Terminal Value",
+                        "Enterprise Value",
+                        "Less: Net Debt",
+                        "Equity Value",
+                        "Outstanding Shares",
+                        "Intrinsic Value per Share",
+                    ],
+                    "Value": [
+                        format_financial_display(sum(stage1_pv), display_unit, 0),
+                        format_financial_display(terminal_pv, display_unit, 0),
+                        format_financial_display(enterprise_value, display_unit, 0),
+                        format_financial_display(net_debt, display_unit, 0),
+                        format_financial_display(equity_value, display_unit, 0),
+                        f"{outstanding_shares:,.0f} shares",
+                        f"{intrinsic_value_per_share:,.0f} VND",
+                    ],
+                }
+
+                summary_df = pd.DataFrame(summary_data)
+                st.dataframe(summary_df, use_container_width=True, hide_index=True)
+
+                # Historical FCF context
+                st.subheader("📊 Historical Free Cash Flow Context")
+                historical_data = []
+                for year, fcf in zip(historical_years, historical_fcf):
+                    historical_data.append(
+                        {
+                            "Year": year,
+                            "Operating Cash Flow": "N/A",  # Could add if needed
+                            "Capital Expenditures": "N/A",  # Could add if needed
+                            "Free Cash Flow": format_financial_display(
+                                fcf, display_unit, 0
+                            ),
+                            "YoY Growth": "N/A",
+                        }
+                    )
+
+                # Add growth rates
+                for i, growth_rate in enumerate(growth_rates, 1):
+                    if i < len(historical_data):
+                        historical_data[i]["YoY Growth"] = f"{growth_rate:+.1%}"
+
+                historical_df = pd.DataFrame(historical_data)
+                st.dataframe(historical_df, use_container_width=True, hide_index=True)
+
+                # Download DCF results
+                dcf_results = {
+                    "Symbol": symbol,
+                    "Analysis Date": datetime.now().strftime("%Y-%m-%d"),
+                    "Current Price (VND)": current_price_original_scale,
+                    "Intrinsic Value (VND)": intrinsic_value_per_share,
+                    "Upside/Downside": f"{upside_downside:+.1%}",
+                    "Enterprise Value": enterprise_value,
+                    "Equity Value": equity_value,
+                    "WACC": f"{wacc:.2%}",
+                    "Stage 1 Growth": f"{stage1_growth_rate:.1%}",
+                    "Terminal Growth": f"{terminal_growth_rate:.1%}",
+                    "Stage 1 Years": stage1_years,
+                }
+
+                dcf_csv = pd.DataFrame([dcf_results]).to_csv(index=False)
                 st.download_button(
-                    label="📊 Download Valuation Results (CSV)",
-                    data=csv_data,
-                    file_name=f"valuation_analysis_{symbol}_{datetime.now().strftime('%Y%m%d')}.csv",
+                    label="📊 Download DCF Analysis (CSV)",
+                    data=dcf_csv,
+                    file_name=f"dcf_analysis_{symbol}_{datetime.now().strftime('%Y%m%d')}.csv",
                     mime="text/csv",
                 )
+
+            except Exception as e:
+                st.error(f"❌ Error in DCF calculation: {str(e)}")
+                st.info(
+                    "Ensure cash flow data is available with the required Vietnamese column names."
+                )
+
         else:
-            st.info("Complete the WACC calculation to view summary results.")
+            st.info(
+                "💡 Complete the WACC calculation and ensure cash flow data is loaded to perform DCF analysis."
+            )
+
+            # Show required data status
+            st.subheader("📋 Data Requirements Check")
+            requirements = [
+                ("WACC Calculation", "wacc" in locals()),
+                ("Cash Flow Data", not cash_flow.empty),
+                ("Balance Sheet Data", not balance_sheet.empty),
+                ("Stock Price Data", not stock_price.empty),
+            ]
+
+            for requirement, status in requirements:
+                status_icon = "✅" if status else "❌"
+                st.write(f"{status_icon} {requirement}")
+
+            if not all(status for _, status in requirements):
+                st.info(
+                    "💡 Visit previous tabs and Stock Price Analysis page to load required data."
+                )
 
 except Exception as e:
     st.error(f"❌ Error loading data: {str(e)}")
