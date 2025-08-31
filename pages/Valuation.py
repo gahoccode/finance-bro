@@ -1085,7 +1085,7 @@ try:
                         "Enterprise Value",
                         "Total Debt",
                         "Cash & Cash Equivalents",
-                        "Short-term Investments", 
+                        "Short-term Investments",
                         "Net Debt (Total Debt - Cash - ST Investments)",
                         "Equity Value",
                         "Outstanding Shares",

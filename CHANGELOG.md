@@ -5,6 +5,23 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.25] - 2025-08-31
+
+### Enhanced
+- [2025-08-31] **DCF Net Debt Calculation Accuracy**: Improved net debt calculation in Valuation page for more accurate DCF analysis
+  - **Proper Net Debt Formula**: Replaced oversimplified `net_debt = total_debt` with accurate calculation: `Total Debt - Cash & Cash Equivalents - Short-term Investments`
+  - **Exact Column Names**: Used precise Balance Sheet column names from Reference/fin_col.md: "Cash and cash equivalents (Bn. VND)" and "Short-term investments (Bn. VND)"
+  - **Enhanced Transparency**: Added detailed breakdown in valuation summary table showing Total Debt, Cash, Short-term Investments, and calculated Net Debt
+  - **Improved DCF Accuracy**: More precise equity valuation calculation by properly accounting for company's liquid assets that offset debt obligations
+  - **Financial Best Practices**: Follows standard DCF methodology where Enterprise Value minus Net Debt equals Equity Value
+
+### Technical Implementation
+- [2025-08-31] **Valuation.py Net Debt Logic**: Enhanced DCF calculation methodology in `pages/Valuation.py`
+  - **Balance Sheet Integration**: Proper extraction of cash and short-term investment values from latest balance sheet data
+  - **Summary Table Enhancement**: Expanded valuation summary to show debt calculation components for user transparency
+  - **Error Prevention**: Eliminated potential undervaluation bias from not accounting for company's liquid asset positions
+  - **Column Name Accuracy**: Direct mapping to exact vnstock API column names for reliable data extraction
+
 ## [0.2.24] - 2025-08-18
 
 ### Enhanced
