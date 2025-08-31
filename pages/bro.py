@@ -349,6 +349,16 @@ if analyze_button or (period_changed and "stock_symbol" in st.session_state):
             IncomeStatement_AI = IncomeStatement.copy()
             Ratio_AI = Ratio.copy()
 
+            # Sort all financial statements by yearReport in ascending order for proper temporal alignment
+            if not CashFlow_AI.empty and 'yearReport' in CashFlow_AI.columns:
+                CashFlow_AI = CashFlow_AI.sort_values('yearReport', ascending=True)
+            if not BalanceSheet_AI.empty and 'yearReport' in BalanceSheet_AI.columns:
+                BalanceSheet_AI = BalanceSheet_AI.sort_values('yearReport', ascending=True)
+            if not IncomeStatement_AI.empty and 'yearReport' in IncomeStatement_AI.columns:
+                IncomeStatement_AI = IncomeStatement_AI.sort_values('yearReport', ascending=True)
+            if not Ratio_AI.empty and 'yearReport' in Ratio_AI.columns:
+                Ratio_AI = Ratio_AI.sort_values('yearReport', ascending=True)
+
             if period == "quarter":
                 # Rename columns in AI copies for better query compatibility
                 if (

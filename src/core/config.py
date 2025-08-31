@@ -48,7 +48,7 @@ SAMPLE_QUESTIONS = [
     "What is the company's debt-to-equity ratio?",
     "What's 2024 revenue growth?",
     "What's the ROE in 2024?",
-    "Plot a line chart of cashflows over the years?",
+    "Plot a line chart of OCF and Sales over the years?",
     "What is the company's profitability trend?",
     "Analyze the balance sheet health indicators",
 ]
