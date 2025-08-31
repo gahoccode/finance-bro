@@ -10,6 +10,7 @@ import warnings
 from pandasai import Agent
 from pandasai.llm import OpenAI
 from src.components.ui_components import inject_custom_success_styling
+from src.core.config import SAMPLE_QUESTIONS
 
 warnings.filterwarnings("ignore")
 
@@ -262,20 +263,10 @@ with st.sidebar:
     st.markdown("---")
     st.subheader("Sample Questions")
 
-    sample_questions = [
-        "What is the return on invested capital (ROIC) trend?",
-        "Analyze the dividend yield trend",
-        "What is the company's debt-to-equity ratio?",
-        "What's 2024 revenue growth?",
-        "What's the ROE in 2024?",
-        "How has cash flow evolved over time?",
-        "What is the company's profitability trend?",
-        "Analyze the balance sheet health indicators",
-    ]
 
     selected_question = st.selectbox(
         "Select a question to analyze:",
-        options=["Choose a question..."] + sample_questions,
+        options=["Choose a question..."] + SAMPLE_QUESTIONS,
         index=0,
         key="sample_question_selector",
     )

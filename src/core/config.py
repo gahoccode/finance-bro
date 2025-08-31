@@ -43,12 +43,12 @@ SCREENER_PRESETS = {
 
 # Sample questions for AI analysis
 SAMPLE_QUESTIONS = [
-    "What is the return on invested capital (ROIC) trend?",
+    "Calculate EPS growth in 2024 and compare to the Net Profit Margin percentage in 2024? Convert the Net Profit Margin from decimal to percentage. Answer by concluding whether EPS growth is tracking ahead or behind profitability",
     "Analyze the dividend yield trend",
     "What is the company's debt-to-equity ratio?",
     "What's 2024 revenue growth?",
     "What's the ROE in 2024?",
-    "How has cash flow evolved over time?",
+    "Plot a line chart of cashflows over the years?",
     "What is the company's profitability trend?",
     "Analyze the balance sheet health indicators",
 ]
