@@ -103,3 +103,6 @@ DEFAULT_FINANCIAL_DISPLAY = {
     "decimal_places": 0,
     "session_key": "financial_display_unit",
 }
+
+# Tax rate constants
+DEFAULT_STATUTORY_TAX_RATE = 20.0  # Vietnamese corporate tax rate (%)

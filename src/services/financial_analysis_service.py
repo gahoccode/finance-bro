@@ -259,3 +259,92 @@ def calculate_degree_of_financial_leverage(IncomeStatement):
     ]
 
     return dfl_results
+
+
+@st.cache_data
+def calculate_effective_tax_rate(income_statement, cash_flow):
+    """
+    Calculate the effective tax rate using Income Statement and Cash Flow data.
+
+    Effective Tax Rate = Tax Expense / Profit Before Tax
+
+    Parameters:
+    -----------
+    income_statement : pandas DataFrame
+        Income Statement data with columns: ticker, yearReport, etc.
+    cash_flow : pandas DataFrame
+        Cash Flow Statement data with columns: ticker, yearReport, 'Net Profit/Loss before tax', 'Business Income Tax paid'
+
+    Returns:
+    --------
+    pandas DataFrame
+        DataFrame with effective tax rate calculations
+    """
+    # Handle empty dataframes
+    if income_statement.empty or cash_flow.empty:
+        return pd.DataFrame(columns=[
+            "ticker", "yearReport", "Profit Before Tax (Bn. VND)", 
+            "Tax Paid (Bn. VND)", "Effective Tax Rate"
+        ])
+    
+    # Check for required columns
+    required_income_cols = ["ticker", "yearReport", "Profit before tax"]
+    required_cash_cols = ["ticker", "yearReport", "Business Income Tax paid", "Net Profit/Loss before tax"]
+    
+    if not all(col in income_statement.columns for col in required_income_cols):
+        return pd.DataFrame(columns=[
+            "ticker", "yearReport", "Profit Before Tax (Bn. VND)", 
+            "Tax Paid (Bn. VND)", "Effective Tax Rate"
+        ])
+        
+    if not all(col in cash_flow.columns for col in required_cash_cols):
+        return pd.DataFrame(columns=[
+            "ticker", "yearReport", "Profit Before Tax (Bn. VND)", 
+            "Tax Paid (Bn. VND)", "Effective Tax Rate"
+        ])
+
+    # Merge the necessary data from both financial statements
+    tax_data_df = pd.merge(
+        income_statement[["ticker", "yearReport", "Profit before tax"]],
+        cash_flow[
+            [
+                "ticker",
+                "yearReport",
+                "Business Income Tax paid",
+                "Net Profit/Loss before tax",
+            ]
+        ],
+        on=["ticker", "yearReport"],
+        how="inner",
+    )
+
+    # Use Profit before tax from Income Statement if available, otherwise use from Cash Flow
+    tax_data_df["Profit Before Tax (Bn. VND)"] = tax_data_df[
+        "Profit before tax"
+    ].fillna(tax_data_df["Net Profit/Loss before tax"])
+
+    # Calculate effective tax rate with absolute value of tax paid (since it appears as negative in cash flow)
+    tax_data_df["Tax Paid (Bn. VND)"] = tax_data_df["Business Income Tax paid"].abs()
+
+    # Calculate effective tax rate
+    tax_data_df["Effective Tax Rate"] = (
+        tax_data_df["Tax Paid (Bn. VND)"] / tax_data_df["Profit Before Tax (Bn. VND)"]
+    )
+
+    # Handle edge cases (negative profits, zero profits, etc.)
+    tax_data_df["Effective Tax Rate"] = tax_data_df["Effective Tax Rate"].clip(
+        0, 1
+    )  # Cap between 0 and 1
+
+    # Select relevant columns
+    tax_data_df = tax_data_df[
+        [
+            "ticker",
+            "yearReport",
+            "Profit Before Tax (Bn. VND)",
+            "Tax Paid (Bn. VND)",
+            "Effective Tax Rate",
+        ]
+    ]
+
+    return tax_data_df

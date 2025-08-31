@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import altair as alt
 from datetime import datetime
 
 # Import project components and services
@@ -10,6 +11,8 @@ from src.components.ui_components import (
 )
 from src.services.vnstock_api import fetch_stock_price_data
 from src.services.data_service import format_financial_display
+from src.services.financial_analysis_service import calculate_effective_tax_rate
+from src.core.config import DEFAULT_STATUTORY_TAX_RATE
 from src.utils.session_utils import get_analysis_dates
 from vnstock import Quote, Vnstock
 
@@ -37,58 +40,6 @@ if "stock_symbol" not in st.session_state or st.session_state.stock_symbol is No
 symbol = st.session_state.stock_symbol
 st.success(f"✅ Analyzing valuation for **{symbol}**")
 
-# Sidebar for WACC parameters
-with st.sidebar:
-    st.header("⚙️ WACC Parameters")
-
-    st.subheader("Market Parameters")
-    risk_free_rate = st.number_input(
-        "Risk-free Rate (%)",
-        min_value=0.0,
-        max_value=15.0,
-        value=3.0,
-        step=0.1,
-        help="Vietnamese government bond yield",
-    )
-
-    market_risk_premium = st.number_input(
-        "Market Risk Premium (%)",
-        min_value=0.0,
-        max_value=15.0,
-        value=5.0,
-        step=0.1,
-        help="Expected return above risk-free rate",
-    )
-
-    st.subheader("Debt Parameters")
-    market_cost_of_debt = st.number_input(
-        "Cost of Debt (%)",
-        min_value=0.0,
-        max_value=20.0,
-        value=7.0,
-        step=0.1,
-        help="Company's borrowing cost",
-    )
-
-    tax_rate = st.number_input(
-        "Tax Rate (%)",
-        min_value=0.0,
-        max_value=50.0,
-        value=20.0,
-        step=1.0,
-        help="Vietnamese corporate tax rate",
-    )
-
-# Convert percentage inputs to decimals
-risk_free_rate_decimal = risk_free_rate / 100
-market_risk_premium_decimal = market_risk_premium / 100
-market_cost_of_debt_decimal = market_cost_of_debt / 100
-tax_rate_decimal = tax_rate / 100
-
-# Get global analysis dates
-start_date, end_date = get_analysis_dates()
-interval = "1D"
-
 try:
     # Check if financial data is available in session state
     if "dataframes" not in st.session_state:
@@ -113,6 +64,81 @@ try:
         cash_flow = cash_flow.sort_values("yearReport", ascending=True)
     if not ratios.empty and "yearReport" in ratios.columns:
         ratios = ratios.sort_values("yearReport", ascending=True)
+
+    # Calculate effective tax rate from financial data
+    effective_tax_rate_data = None
+    calculated_tax_rate = DEFAULT_STATUTORY_TAX_RATE
+
+    if not income_statement.empty and not cash_flow.empty:
+        try:
+            effective_tax_rate_data = calculate_effective_tax_rate(
+                income_statement, cash_flow
+            )
+            if not effective_tax_rate_data.empty:
+                # Use the most recent year's effective tax rate
+                latest_effective_rate = effective_tax_rate_data.iloc[-1][
+                    "Effective Tax Rate"
+                ]
+                calculated_tax_rate = (
+                    latest_effective_rate * 100
+                )  # Convert to percentage
+        except Exception as e:
+            st.warning(
+                f"⚠️ Could not calculate effective tax rate: {str(e)}. Using statutory rate."
+            )
+            calculated_tax_rate = DEFAULT_STATUTORY_TAX_RATE
+
+    # Sidebar for WACC parameters
+    with st.sidebar:
+        st.header("⚙️ WACC Parameters")
+
+        st.subheader("Market Parameters")
+        risk_free_rate = st.number_input(
+            "Risk-free Rate (%)",
+            min_value=0.0,
+            max_value=15.0,
+            value=3.0,
+            step=0.1,
+            help="Vietnamese government bond yield",
+        )
+
+        market_risk_premium = st.number_input(
+            "Market Risk Premium (%)",
+            min_value=0.0,
+            max_value=15.0,
+            value=5.0,
+            step=0.1,
+            help="Expected return above risk-free rate",
+        )
+
+        st.subheader("Debt Parameters")
+        market_cost_of_debt = st.number_input(
+            "Cost of Debt (%)",
+            min_value=0.0,
+            max_value=20.0,
+            value=7.0,
+            step=0.1,
+            help="Company's borrowing cost",
+        )
+
+        tax_rate = st.number_input(
+            "Tax Rate (%)",
+            min_value=0.0,
+            max_value=50.0,
+            value=calculated_tax_rate,
+            step=1.0,
+            help="Effective tax rate calculated from financial data (override if needed)",
+        )
+
+    # Convert percentage inputs to decimals
+    risk_free_rate_decimal = risk_free_rate / 100
+    market_risk_premium_decimal = market_risk_premium / 100
+    market_cost_of_debt_decimal = market_cost_of_debt / 100
+    tax_rate_decimal = tax_rate / 100
+
+    # Get global analysis dates
+    start_date, end_date = get_analysis_dates()
+    interval = "1D"
 
     # Check if stock price data exists in session state from Stock Price Analysis page
     if "stock_price_data" in st.session_state:
@@ -233,6 +259,59 @@ try:
             help_text="Choose how financial values are displayed in Market Values section",
         )
 
+        # Tax Rate Used in WACC
+        is_using_effective_rate = (
+            effective_tax_rate_data is not None
+            and not effective_tax_rate_data.empty
+            and abs(tax_rate - calculated_tax_rate) < 0.1
+        )
+
+        tax_rate_type = (
+            "Effective Tax Rate" if is_using_effective_rate else "Statutory Tax Rate"
+        )
+        help_text = (
+            "Calculated from financial statements"
+            if is_using_effective_rate
+            else "Manual override or fallback statutory rate"
+        )
+
+        st.metric(
+            f"🔢 {tax_rate_type} Used in WACC", f"{tax_rate:.1f}%", help=help_text
+        )
+
+        # Historical effective tax rates table
+        if effective_tax_rate_data is not None and not effective_tax_rate_data.empty:
+            st.subheader("📋 Historical Effective Tax Rates")
+            historical_tax_display = effective_tax_rate_data.copy()
+
+            # Apply financial formatting to monetary columns
+            historical_tax_display["Profit Before Tax (Bn. VND)"] = (
+                historical_tax_display["Profit Before Tax (Bn. VND)"].apply(
+                    lambda x: format_financial_display(x, display_unit, 0)
+                )
+            )
+
+            historical_tax_display["Tax Paid (Bn. VND)"] = historical_tax_display[
+                "Tax Paid (Bn. VND)"
+            ].apply(lambda x: format_financial_display(x, display_unit, 0))
+
+            # Convert effective tax rate to percentage
+            historical_tax_display["Effective Tax Rate"] = (
+                historical_tax_display["Effective Tax Rate"] * 100
+            ).round(1)
+
+            # Update column names to reflect formatting
+            historical_tax_display = historical_tax_display.rename(
+                columns={
+                    "Profit Before Tax (Bn. VND)": f"Profit Before Tax ({display_unit.capitalize()})",
+                    "Tax Paid (Bn. VND)": f"Tax Paid ({display_unit.capitalize()})",
+                    "Effective Tax Rate": "Effective Tax Rate (%)",
+                }
+            )
+            st.dataframe(
+                historical_tax_display, use_container_width=True, hide_index=True
+            )
+
         if not balance_sheet.empty and not ratios.empty and "beta" in locals():
             # Get latest financial data (data is already sorted by yearReport ascending)
             latest_balance_sheet = (
@@ -342,7 +421,7 @@ try:
                         with col1:
                             st.subheader("📊 Capital Structure")
 
-                            # Create simple pie chart data
+                            # Create pie chart data
                             capital_data = pd.DataFrame(
                                 {
                                     "Component": ["Debt", "Equity"],
@@ -357,24 +436,51 @@ try:
                                 }
                             )
 
-                            # Display as metrics instead of chart for now
-                            st.metric("💳 Debt Weight", f"{market_weight_of_debt:.1%}")
-                            st.metric(
-                                "🏛️ Equity Weight", f"{market_weight_of_equity:.1%}"
+                            # Create pie chart using Altair
+                            pie_chart = (
+                                alt.Chart(capital_data)
+                                .mark_arc(
+                                    innerRadius=40,
+                                    outerRadius=100,
+                                    stroke="white",
+                                    strokeWidth=2,
+                                )
+                                .encode(
+                                    theta=alt.Theta("Weight:Q"),
+                                    color=alt.Color(
+                                        "Component:N",
+                                        scale=alt.Scale(range=["#76706C", "#56524D"]),
+                                        legend=alt.Legend(title="Capital Components"),
+                                    ),
+                                    tooltip=[
+                                        alt.Tooltip("Component:N", title="Component"),
+                                        alt.Tooltip(
+                                            "Weight:Q", title="Weight", format=".1%"
+                                        ),
+                                        alt.Tooltip(
+                                            "Value:Q", title="Value", format=",.0f"
+                                        ),
+                                    ],
+                                )
+                                .properties(
+                                    width=220, height=220, title="Capital Structure"
+                                )
                             )
+
+                            st.altair_chart(pie_chart, use_container_width=True)
 
                         with col2:
                             st.subheader("💎 Key Metrics")
 
                             st.metric(
                                 "💰 WACC",
-                                f"{wacc:.2%}",
+                                f"{wacc:.1%}",
                                 help="Weighted Average Cost of Capital",
                             )
-                            st.metric("📈 Cost of Equity", f"{cost_of_equity:.2%}")
+                            st.metric("📈 Cost of Equity", f"{cost_of_equity:.1%}")
                             st.metric(
                                 "💳 After-tax Cost of Debt",
-                                f"{after_tax_cost_of_debt:.2%}",
+                                f"{after_tax_cost_of_debt:.1%}",
                             )
 
                         # Market values with user-selected formatting
@@ -969,7 +1075,7 @@ try:
                 short_term_investments = latest_balance_sheet.get(
                     "Short-term investments (Bn. VND)", 0
                 )
-                
+
                 # Net debt = Total debt - (Cash + Short-term investments)
                 net_debt = total_debt - (cash_and_equivalents + short_term_investments)
                 equity_value = enterprise_value - net_debt
@@ -1097,7 +1203,9 @@ try:
                         format_financial_display(enterprise_value, display_unit, 0),
                         format_financial_display(total_debt, display_unit, 0),
                         format_financial_display(cash_and_equivalents, display_unit, 0),
-                        format_financial_display(short_term_investments, display_unit, 0),
+                        format_financial_display(
+                            short_term_investments, display_unit, 0
+                        ),
                         format_financial_display(net_debt, display_unit, 0),
                         format_financial_display(equity_value, display_unit, 0),
                         f"{outstanding_shares:,.0f} shares",

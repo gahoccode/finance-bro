@@ -95,6 +95,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.21] - 2025-08-14
 
+### Changed
+- [2025-08-31] **Replace hard-coded statutory tax rate with calculated effective tax rate in Valuation page for more accurate WACC calculations**
+
 ### Added
 - [2025-08-14] **Fibonacci Retracement Analysis**: Comprehensive Fibonacci retracement feature with SciPy-based swing detection
   - **Professional Swing Detection**: Uses `scipy.signal.argrelextrema` for accurate swing high/low identification
