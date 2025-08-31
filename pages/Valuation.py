@@ -1031,7 +1031,7 @@ try:
                 # Base year (Year 0)
                 dcf_data.append(
                     {
-                        "Year": 0,
+                        "Year": "0",
                         "FCF": format_financial_display(latest_fcf, display_unit, 0),
                         "Growth Rate": "-",
                         "Discount Factor": "1.000",
@@ -1045,7 +1045,7 @@ try:
                     discount_factor = 1 / ((1 + wacc) ** i)
                     dcf_data.append(
                         {
-                            "Year": i,
+                            "Year": str(i),
                             "FCF": format_financial_display(fcf, display_unit, 0),
                             "Growth Rate": f"{stage1_growth_rate:.1%}",
                             "Discount Factor": f"{discount_factor:.3f}",
@@ -1060,7 +1060,7 @@ try:
                 terminal_discount_factor = 1 / ((1 + wacc) ** stage1_years)
                 dcf_data.append(
                     {
-                        "Year": f"Terminal",
+                        "Year": "Terminal",
                         "FCF": format_financial_display(
                             terminal_value, display_unit, 0
                         ),
