@@ -962,7 +962,16 @@ try:
                 enterprise_value = sum(stage1_pv) + terminal_pv
 
                 # Equity Value = Enterprise Value - Net Debt
-                net_debt = total_debt  # Assuming no cash for simplicity
+                # Calculate net debt properly: Total Debt - Cash and Cash Equivalents
+                cash_and_equivalents = latest_balance_sheet.get(
+                    "Cash and cash equivalents (Bn. VND)", 0
+                )
+                short_term_investments = latest_balance_sheet.get(
+                    "Short-term investments (Bn. VND)", 0
+                )
+                
+                # Net debt = Total debt - (Cash + Short-term investments)
+                net_debt = total_debt - (cash_and_equivalents + short_term_investments)
                 equity_value = enterprise_value - net_debt
 
                 # Intrinsic Value per Share (in original VND scale)
@@ -1074,7 +1083,10 @@ try:
                         "PV of Stage 1 Cash Flows",
                         "Present Value of Terminal Value",
                         "Enterprise Value",
-                        "Less: Net Debt",
+                        "Total Debt",
+                        "Cash & Cash Equivalents",
+                        "Short-term Investments", 
+                        "Net Debt (Total Debt - Cash - ST Investments)",
                         "Equity Value",
                         "Outstanding Shares",
                         "Intrinsic Value per Share",
@@ -1083,6 +1095,9 @@ try:
                         format_financial_display(sum(stage1_pv), display_unit, 0),
                         format_financial_display(terminal_pv, display_unit, 0),
                         format_financial_display(enterprise_value, display_unit, 0),
+                        format_financial_display(total_debt, display_unit, 0),
+                        format_financial_display(cash_and_equivalents, display_unit, 0),
+                        format_financial_display(short_term_investments, display_unit, 0),
                         format_financial_display(net_debt, display_unit, 0),
                         format_financial_display(equity_value, display_unit, 0),
                         f"{outstanding_shares:,.0f} shares",
