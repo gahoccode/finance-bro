@@ -5,6 +5,25 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.26] - 2025-09-01
+
+### Added
+- [2025-09-01] **Company News Tab**: Added comprehensive news and reports tab to Company Overview page
+  - **News Integration**: Integrated vnstock Company.reports() API to fetch latest company news and reports
+  - **Interactive Links**: Added clickable links that redirect users to full news articles
+  - **Chronological Display**: Reports automatically sorted by date (most recent first) with proper datetime formatting
+  - **Rich Content Display**: Shows article title (description), publication date, summary (name), and direct article links
+  - **Performance Optimized**: Implemented 5-minute caching for news data using @st.cache_data decorator
+  - **User Experience**: Added summary metrics showing total number of available reports
+
+### Technical Implementation
+- [2025-09-01] **News Tab Infrastructure**: Added news functionality to Company Overview analysis system
+  - **Service Layer**: Created `get_company_reports()` function in `src/services/vnstock_api.py` following existing patterns
+  - **Data Processing**: Proper datetime conversion and sorting for chronological news display
+  - **UI Enhancement**: Extended tab structure from 5 to 6 tabs with News positioned before Full Details
+  - **Error Handling**: Comprehensive error handling for missing data and API failures
+  - **Code Standards**: Follows Finance Bro coding conventions with ruff formatting and modular architecture
+
 ## [0.2.25] - 2025-08-31
 
 ### Enhanced

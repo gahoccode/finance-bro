@@ -91,6 +91,29 @@ def get_foreign_trading_data(symbol):
         return pd.DataFrame()
 
 
+@st.cache_data(ttl=300)  # Cache for 5 minutes
+def get_company_reports(symbol):
+    """Get company reports/news data with caching
+
+    Uses vnstock.explorer.vci.Company.reports() to fetch company news and reports.
+    Returns DataFrame with columns: date, description, link, name
+    """
+    try:
+        company = Company(symbol=symbol)
+        reports_df = company.reports()
+
+        if not reports_df.empty and "date" in reports_df.columns:
+            # Convert date column to datetime for proper sorting
+            reports_df["date"] = pd.to_datetime(reports_df["date"])
+            # Sort by date descending (most recent first)
+            reports_df = reports_df.sort_values("date", ascending=False)
+
+        return reports_df
+    except Exception as e:
+        st.error(f"Error fetching company reports: {str(e)}")
+        return pd.DataFrame()
+
+
 # ================================
 # STOCK PRICE DATA FUNCTIONS
 # ================================

@@ -12,6 +12,7 @@ from src.services.vnstock_api import (
     get_subsidiaries_data,
     get_insider_deals_data,
     get_foreign_trading_data,
+    get_company_reports,
 )
 
 # Set page configuration
@@ -123,12 +124,13 @@ if stock_symbol:
             st.info("No ownership data available for this symbol.")
 
         # Create tabs for additional information
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(
+        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
             [
                 "Management Team",
                 "Subsidiaries",
                 "Insider Deals",
                 "Foreign Transaction",
+                "News",
                 "Full Details",
             ]
         )
@@ -498,6 +500,49 @@ if stock_symbol:
                 st.error(f"Error loading foreign trading data: {str(e)}")
 
         with tab5:
+            st.header("Company News & Reports")
+            try:
+                # Get cached company reports data
+                company_reports = get_company_reports(stock_symbol)
+
+                if not company_reports.empty:
+                    # Display summary metrics
+                    col1, col2 = st.columns([2, 1])
+                    with col1:
+                        st.subheader("Latest Company News")
+                    with col2:
+                        st.metric("Total Reports", len(company_reports))
+
+                    # Display each report
+                    for idx, report in company_reports.iterrows():
+                        # Create container for each news item
+                        with st.container():
+                            # Title (description) in bold
+                            st.markdown(f"**{report['description']}**")
+
+                            # Date formatting
+                            if pd.notna(report["date"]):
+                                formatted_date = report["date"].strftime("%B %d, %Y")
+                                st.markdown(f"*{formatted_date}*")
+
+                            # Article summary (name)
+                            if pd.notna(report["name"]) and report["name"].strip():
+                                st.markdown(f"{report['name']}")
+
+                            # Clickable link
+                            if pd.notna(report["link"]) and report["link"].strip():
+                                st.markdown(f"[🔗 Read Full Article]({report['link']})")
+
+                            # Add separator
+                            st.markdown("---")
+
+                else:
+                    st.info("No news or reports available for this symbol.")
+
+            except Exception as e:
+                st.error(f"Error loading company reports: {str(e)}")
+
+        with tab6:
             st.header("Detailed Information")
             if not ownership_percentage.empty:
                 st.subheader("Complete Ownership Data")
