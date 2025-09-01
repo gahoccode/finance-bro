@@ -15,6 +15,7 @@ from src.services.financial_analysis_service import calculate_effective_tax_rate
 from src.core.config import DEFAULT_STATUTORY_TAX_RATE
 from src.utils.session_utils import get_analysis_dates
 from vnstock import Quote, Vnstock
+from vnstock.explorer.vci import Company
 
 # Page configuration
 st.set_page_config(page_title="📊 Stock Valuation Analysis", layout="wide")
@@ -341,49 +342,93 @@ try:
                     # Values are already in raw VND scale
                     total_debt = short_term_debt + long_term_debt
 
-                    # Step 2: Calculate market cap using Vnstock company overview and current price
-                    try:
-                        # Get company overview data for outstanding shares using newer Vnstock approach
-                        stock = Vnstock().stock(symbol=symbol, source="VCI")
-                        overview = stock.company.overview()
+                    # Step 2: Calculate market cap using VnStock Company class (primary) with manual fallback
+                    market_value_of_equity = 0
+                    outstanding_shares = 0
+                    actual_current_price = 0
 
-                        # Use issue_share as the correct column name for outstanding shares
-                        if "issue_share" in overview.columns:
-                            outstanding_shares = (
-                                overview["issue_share"].iloc[0]
-                                if len(overview) > 0
+                    try:
+                        # PRIMARY METHOD: Use VnStock Company class for enterprise value
+                        company = Company(symbol)
+                        ev_data = company.ratio_summary()
+                        market_value_of_equity = (
+                            ev_data["ev"].iloc[0] if not ev_data.empty else 0
+                        )
+
+                        if market_value_of_equity > 0:
+                            st.success("✅ Using VnStock Company Class (Enterprise Value)")
+
+                            # Get shares data for DCF calculation
+                            try:
+                                # Try to get outstanding shares from the same Company instance
+                                stock = Vnstock().stock(symbol=symbol, source="VCI")
+                                overview = stock.company.overview()
+                                if "issue_share" in overview.columns:
+                                    outstanding_shares = (
+                                        overview["issue_share"].iloc[0]
+                                        if len(overview) > 0
+                                        else 0
+                                    )
+                            except Exception:
+                                outstanding_shares = 0
+                        else:
+                            raise ValueError("VnStock Company class returned zero or invalid enterprise value")
+
+                    except Exception as primary_error:
+                        st.warning(f"⚠️ Primary method failed: {str(primary_error)}")
+                        st.info("🔄 Falling back to manual calculation...")
+
+                        try:
+                            # FALLBACK METHOD: Manual calculation using shares * price
+                            stock = Vnstock().stock(symbol=symbol, source="VCI")
+                            overview = stock.company.overview()
+
+                            # Get outstanding shares
+                            if "issue_share" in overview.columns:
+                                outstanding_shares = (
+                                    overview["issue_share"].iloc[0]
+                                    if len(overview) > 0
+                                    else 0
+                                )
+                            else:
+                                raise KeyError(
+                                    f"'issue_share' column not found in overview data. Available columns: {list(overview.columns)}"
+                                )
+
+                            # Get current stock price
+                            current_price = (
+                                stock_price["close"].iloc[-1]
+                                if not stock_price.empty
                                 else 0
                             )
-                        else:
-                            raise KeyError(
-                                f"'issue_share' column not found in overview data. Available columns: {list(overview.columns)}"
+
+                            # Convert price to original scale
+                            actual_current_price = current_price * 1000
+
+                            # Calculate market cap manually
+                            market_value_of_equity = (
+                                outstanding_shares * actual_current_price
                             )
 
-                        # Get current stock price from the latest price data
-                        current_price = (
-                            stock_price["close"].iloc[-1]
-                            if not stock_price.empty
-                            else 0
-                        )
+                            if market_value_of_equity > 0:
+                                st.success("✅ Fallback successful: Manual Calculation (Shares × Price)")
+                            else:
+                                raise ValueError(
+                                    "Manual calculation resulted in zero market cap"
+                                )
 
-                        # Convert price to original scale: vnstock returns prices in thousands of VND
-                        actual_current_price = current_price * 1000
-
-                        # Calculate market cap: outstanding shares * actual price (in VND)
-                        # Note: issue_share is actual share count, current_price needs to be converted from thousands
-                        market_value_of_equity = (
-                            outstanding_shares * actual_current_price
-                        )
-
-                        if market_value_of_equity <= 0:
+                        except Exception as fallback_error:
+                            st.error(f"❌ Both calculation methods failed:")
                             st.error(
-                                "❌ Unable to calculate market cap. Invalid outstanding shares or current price."
+                                f"   • Primary (VnStock Company): {str(primary_error)}"
                             )
+                            st.error(f"   • Fallback (Manual): {str(fallback_error)}")
                             st.stop()
 
-                    except Exception as e:
+                    # Validate final result
+                    if market_value_of_equity <= 0:
                         st.error(
-                            f"❌ Error calculating market cap from company overview: {str(e)}"
+                            "❌ Unable to calculate market cap. All methods failed."
                         )
                         st.stop()
 
