@@ -342,10 +342,18 @@ try:
                     # Values are already in raw VND scale
                     total_debt = short_term_debt + long_term_debt
 
+                    # Extract current price from stock price data (needed for DCF calculation)
+                    current_price = 0
+                    actual_current_price = 0
+                    if not stock_price.empty:
+                        current_price = stock_price["close"].iloc[-1]
+                        actual_current_price = (
+                            current_price * 1000
+                        )  # Convert to original scale
+
                     # Step 2: Calculate market cap using VnStock Company class (primary) with manual fallback
                     market_value_of_equity = 0
                     outstanding_shares = 0
-                    actual_current_price = 0
 
                     try:
                         # PRIMARY METHOD: Use VnStock Company class for enterprise value
@@ -356,7 +364,9 @@ try:
                         )
 
                         if market_value_of_equity > 0:
-                            st.success("✅ Using VnStock Company Class (Enterprise Value)")
+                            st.success(
+                                "✅ Using VnStock Company Class (Enterprise Value)"
+                            )
 
                             # Get shares data for DCF calculation
                             try:
@@ -372,7 +382,9 @@ try:
                             except Exception:
                                 outstanding_shares = 0
                         else:
-                            raise ValueError("VnStock Company class returned zero or invalid enterprise value")
+                            raise ValueError(
+                                "VnStock Company class returned zero or invalid enterprise value"
+                            )
 
                     except Exception as primary_error:
                         st.warning(f"⚠️ Primary method failed: {str(primary_error)}")
@@ -395,23 +407,15 @@ try:
                                     f"'issue_share' column not found in overview data. Available columns: {list(overview.columns)}"
                                 )
 
-                            # Get current stock price
-                            current_price = (
-                                stock_price["close"].iloc[-1]
-                                if not stock_price.empty
-                                else 0
-                            )
-
-                            # Convert price to original scale
-                            actual_current_price = current_price * 1000
-
-                            # Calculate market cap manually
+                            # Calculate market cap manually using already extracted price data
                             market_value_of_equity = (
                                 outstanding_shares * actual_current_price
                             )
 
                             if market_value_of_equity > 0:
-                                st.success("✅ Fallback successful: Manual Calculation (Shares × Price)")
+                                st.success(
+                                    "✅ Fallback successful: Manual Calculation (Shares × Price)"
+                                )
                             else:
                                 raise ValueError(
                                     "Manual calculation resulted in zero market cap"
@@ -719,7 +723,13 @@ try:
     with tab3:
         st.header("🎯 DCF Intrinsic Value")
 
-        if "wacc" in locals() and not cash_flow.empty and not balance_sheet.empty:
+        if (
+            "wacc" in locals()
+            and not cash_flow.empty
+            and not balance_sheet.empty
+            and "current_price" in locals()
+            and current_price > 0
+        ):
             # Calculate historical free cash flow using Vietnamese column names
             try:
                 # Get historical cash flow data (already sorted by yearReport ascending)
@@ -1326,6 +1336,10 @@ try:
                 ("Cash Flow Data", not cash_flow.empty),
                 ("Balance Sheet Data", not balance_sheet.empty),
                 ("Stock Price Data", not stock_price.empty),
+                (
+                    "Current Price Available",
+                    "current_price" in locals() and current_price > 0,
+                ),
             ]
 
             for requirement, status in requirements:
@@ -1334,7 +1348,7 @@ try:
 
             if not all(status for _, status in requirements):
                 st.info(
-                    "💡 Visit previous tabs and Stock Price Analysis page to load required data."
+                    "💡 Visit previous tabs and Stock Price Analysis page to load required data. Ensure WACC calculation completes successfully."
                 )
 
 except Exception as e:

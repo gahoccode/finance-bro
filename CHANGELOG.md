@@ -5,6 +5,25 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.27] - 2025-09-15
+
+### Fixed
+- [2025-09-15] **DCF Calculation Variable Scope Error**: Fixed NameError for 'current_price' in valuation analysis
+  - **Variable Initialization**: Added proper initialization of `current_price` and `actual_current_price` variables at the beginning of WACC calculation section (lines 345-350)
+  - **Cross-Tab Variable Dependency**: Resolved variable scope issue where `current_price` was only defined in fallback method execution path but used in DCF calculation (Tab 3) regardless of which method succeeded
+  - **Early Price Extraction**: Moved price data extraction before method selection logic to ensure availability in both execution paths (primary VnStock Company class and fallback manual calculation)
+  - **Proper Scaling**: Ensured correct VnStock API data scaling by converting thousands of VND to original scale (multiplying by 1000)
+  - **Enhanced Validation**: Added `current_price > 0` validation to DCF calculation condition (line 718) to prevent calculations with invalid price data
+  - **User Experience**: Updated data requirements display to include "Current Price Available" status for better user feedback
+
+### Technical Implementation
+- [2025-09-15] **Valuation.py Variable Scope Fix**: Enhanced DCF calculation reliability in `pages/Valuation.py`
+  - **Code Quality**: Applied ruff formatting and passed all code quality checks
+  - **Comprehensive Testing**: Created test suite in `tests/test_current_price_fix.py` to verify fix works in both execution paths
+  - **Error Prevention**: Eliminated potential NameError when primary market cap calculation method succeeds
+  - **Execution Path Consistency**: Ensured both primary and fallback methods provide required variables for downstream DCF calculations
+  - **Maintainability**: Removed duplicate code and centralized price extraction logic
+
 ## [0.2.26] - 2025-09-01
 
 ### Added
