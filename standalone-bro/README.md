@@ -6,14 +6,15 @@ A streamlined, standalone version of the Finance Bro AI chat interface for Vietn
 
 - 🤖 AI-powered financial analysis using PandasAI
 - 📊 Real-time Vietnamese stock data via Vnstock API
-- 📈 Chart generation and data visualization
+- 📈 Chart generation with Altair visualizations
 - 🎯 Stock symbol selection and configuration
 - 🔑 Direct OpenAI API key integration
 - 🎨 Professional finance theme styling
+- 📋 Pre-loaded sample questions for common analysis
 
 ## Requirements
 
-- Python 3.10.11
+- Python 3.10.11 or higher
 - OpenAI API key
 
 ## Installation
@@ -22,6 +23,10 @@ A streamlined, standalone version of the Finance Bro AI chat interface for Vietn
 2. Install dependencies:
    ```bash
    pip install -r requirements.txt
+   ```
+   Or use UV for faster installation:
+   ```bash
+   uv sync
    ```
 
 ## Usage
@@ -46,27 +51,32 @@ A streamlined, standalone version of the Finance Bro AI chat interface for Vietn
 - **Direct API key input** - Enter OpenAI API key in the sidebar
 - **Simplified stock selection** - Choose from available Vietnamese stock symbols
 - **Essential features only** - Focused on AI chat analysis without extra pages
+- **Python 3.10.11+ compatibility** - Uses stable pandas 1.5.3 and pandasai 2.3.0
 
 ## Configuration
 
 - **Data Sources**: VCI (default) or TCBS for stock data
 - **Period**: Annual or quarterly financial data
 - **Chart Export**: Charts saved to `exports/charts/` directory
+- **Theme**: Professional finance theme with earth-tone styling
 
 ## Sample Questions
 
 The app includes pre-loaded sample questions for common financial analysis:
-- ROIC analysis
-- Dividend schedule analysis
-- Debt-to-equity ratios
-- Profitability trends
-- And more...
+- EPS growth vs Net Profit Margin analysis
+- Dividend yield trend analysis
+- Debt-to-equity ratio calculation
+- Revenue growth analysis
+- ROE calculation and trends
+- Operating Cash Flow vs Sales analysis
+- Profitability trend analysis
+- Balance sheet health indicators
 
 ## File Structure
 
 ```
 standalone-bro/
-├── standalone_bro.py      # Main application
+├── standalone_bro.py      # Main application with inlined dependencies
 ├── requirements.txt       # Dependencies
 ├── .streamlit/
 │   └── config.toml       # Theme configuration
@@ -77,14 +87,29 @@ standalone-bro/
 ## Dependencies
 
 - `streamlit==1.47.0` - Web framework
-- `pandas==1.5.3` - Data processing
-- `pandasai==2.3.0` - AI analysis
+- `pandas==1.5.3` - Data processing (stable version)
+- `numpy>=1.26.4,<2.0.0` - Numerical computing
+- `pandasai==2.3.0` - AI analysis (stable version)
 - `vnstock==3.2.5` - Vietnamese stock data
 - `openai>=1.61.0` - LLM integration
-- `altair>=5.5.0` - Visualizations
+- `altair>=5.5.0` - Statistical visualizations
+- `vl-convert-python>=1.6.0` - Chart export
+- `python-dotenv==1.0.1` - Environment variables
+
+## Technology Stack
+
+The standalone app uses a focused technology stack optimized for AI-powered financial analysis:
+
+- **AI Engine**: PandasAI 2.3.0 with OpenAI GPT models
+- **Data Processing**: Pandas 1.5.3 with NumPy backend
+- **Financial Data**: VnStock 3.2.5 for Vietnamese market data
+- **Visualization**: Altair for interactive statistical charts
+- **Framework**: Streamlit 1.47.0 for web interface
 
 ## Notes
 
 - Requires internet connection for Vnstock API and OpenAI services
 - All financial data is fetched in real-time, no local database
 - Charts are temporarily saved and displayed in the chat interface
+- Uses pandas 1.5.3 for compatibility with pandasai 2.3.0
+- Supports both VCI and TCBS data sources for comprehensive market coverage

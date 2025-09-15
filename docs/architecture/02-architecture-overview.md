@@ -216,25 +216,26 @@ sequenceDiagram
 ## Technology Stack
 
 ### Frontend
-- **Streamlit 1.47.0**: Web framework and UI components
+- **Streamlit 1.49.0+**: Web framework and UI components
+- **Plotly 5.17.0+**: Professional financial charting with interactive candlestick charts
 - **Altair**: Interactive statistical visualizations
 - **Custom CSS**: Earth-toned theme configuration
 
 ### Backend Services
 - **PandasAI 2.3.0**: Natural language data analysis
 - **CrewAI**: Multi-agent AI collaboration framework
-- **Pandas 1.5.3**: Data manipulation and analysis
+- **Pandas 2.2.0+**: Data manipulation and analysis
 - **SciPy**: Scientific computing for technical analysis
 
 ### External Integrations
-- **VnStock 3.2.5**: Vietnamese stock market data
+- **VnStock 3.2.6+**: Vietnamese stock market data
 - **OpenAI API**: Large language models (GPT-4o-mini)
 - **Google OAuth**: User authentication
 
 ### Development & Deployment
-- **Python 3.10.11**: Runtime environment
+- **Python 3.12+**: Runtime environment with enhanced performance
 - **UV**: Dependency management
-- **Docker**: Containerization
+- **Docker**: Containerization with Python 3.12 base image
 - **GitHub Actions**: CI/CD pipeline
 
 ## Quality Attributes
@@ -277,6 +278,8 @@ sequenceDiagram
 - Improved error handling and user feedback
 - Smart data loading with progressive feedback (v0.2.22+)
 - Enhanced valuation flow with pre-loading system (v0.2.22+)
+- **Professional financial charting**: Plotly-based candlestick charts with interactive features (v0.2.29+)
+- **Modern Python runtime**: Python 3.12 support with enhanced performance and NumPy 2.0 compatibility (v0.2.29+)
 
 ### Long-term Vision
 - Microservices extraction for high-load components

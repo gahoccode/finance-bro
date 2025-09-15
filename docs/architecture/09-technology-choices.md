@@ -8,16 +8,17 @@ Finance Bro's technology stack is carefully chosen to optimize for rapid develop
 
 | Category | Technology | Version | Rationale | Alternatives Considered |
 |----------|------------|---------|-----------|------------------------|
-| **Runtime** | Python | 3.10.11 | AI/ML ecosystem compatibility | 3.11+, Node.js, Go |
-| **Web Framework** | Streamlit | 1.47.0 | Rapid data app development | Flask, Django, Dash |
+| **Runtime** | Python | 3.12+ | Enhanced performance & NumPy 2.0 compatibility | 3.10.11, 3.11+, Node.js, Go |
+| **Web Framework** | Streamlit | 1.49.0+ | Rapid data app development | Flask, Django, Dash |
 | **Package Manager** | UV | Latest | Fast, deterministic dependencies | pip, poetry, pipenv |
-| **Data Processing** | Pandas | 1.5.3 | Financial data manipulation | Polars, Dask, Spark |
+| **Data Processing** | Pandas | 2.2.0+ | Enhanced performance & NumPy 2.0 compatibility | Polars, Dask, Spark |
 | **AI Framework** | PandasAI | 2.3.0 | Natural language data analysis | LangChain, Custom LLM |
 | **Multi-Agent AI** | CrewAI | 0.35.8+ | Collaborative AI workflows | AutoGen, Custom agents |
 | **LLM Provider** | OpenAI | GPT-4o-mini | Cost-effective, reliable AI | Claude, Gemini, Local LLMs |
-| **Market Data** | VnStock | 3.2.5 | Vietnamese stock market data | Bloomberg API, Alpha Vantage |
+| **Market Data** | VnStock | 3.2.6+ | Vietnamese stock market data | Bloomberg API, Alpha Vantage |
 | **Authentication** | Google OAuth | 2.0 | Secure, user-friendly auth | Custom auth, Auth0, Firebase |
 | **Visualization** | Mixed Stack | Various | Optimal tool per use case | Single charting library |
+| **Financial Charts** | Plotly | 5.17.0+ | Professional candlestick charts & interactivity | Bokeh, Matplotlib |
 | **Containerization** | Docker | Latest | Consistent deployment | Native deployment, VM |
 | **CI/CD** | GitHub Actions | Latest | Integrated with repository | GitLab CI, Jenkins, CircleCI |
 
@@ -25,18 +26,30 @@ Finance Bro's technology stack is carefully chosen to optimize for rapid develop
 
 ### 1. Python Ecosystem
 
-#### Python 3.10.11 (Exact Version)
+#### Python 3.12+ (Enhanced Performance)
 
 **Why Chosen**:
 - **AI/ML Ecosystem**: Best support for data science and machine learning libraries
-- **Library Compatibility**: Stable compatibility with PandasAI 2.3.0 and financial libraries
-- **Community**: Largest community for financial analysis and data processing
-- **Rapid Development**: Excellent for prototyping and iterative development
+- **Enhanced Performance**: Significant speed improvements over Python 3.10.11
+- **NumPy 2.0 Compatibility**: Native support for NumPy 2.0+ with enhanced array operations
+- **Modern Features**: Improved error handling, typing, and async support
+- **Future-Proof**: Longer support lifecycle and better security updates
 
-**Version Constraint Rationale**:
-- PandasAI 2.3.0 has specific compatibility requirements
-- QuantStats 0.0.59 requires pandas 1.5.3 compatibility
-- Newer Python versions may break dependency compatibility
+**Version Migration Benefits**:
+```python
+# Performance Improvements in Python 3.12
+- 15-20% faster general execution
+- Better memory management for large datasets
+- Improved garbage collection for data processing
+- Enhanced exception handling and debugging
+- Native support for modern data science libraries
+
+# NumPy 2.0 Compatibility
+- Significant performance improvements for array operations
+- Better string dtype support for financial data
+- Enhanced random number generation for simulations
+- Improved memory usage for large DataFrames
+```
 
 **Alternatives Considered**:
 ```python
@@ -76,7 +89,7 @@ uv      # uv.lock (excellent, fast)
 
 ### 2. Web Framework
 
-#### Streamlit 1.47.0
+#### Streamlit 1.49.0+
 
 **Why Chosen**:
 - **Data-Native**: Built specifically for data applications
@@ -223,24 +236,32 @@ Claude-3:    Similar quality, API integration challenges
 
 ### 5. Visualization Stack
 
-#### Mixed Charting Strategy
+#### Enhanced Charting Strategy with Plotly Integration
 
-**Why Mixed Approach**:
-- **Optimal Tool Selection**: Each library excels at specific chart types
-- **Feature Coverage**: Combined capabilities exceed any single library
-- **Flexibility**: Can choose best tool for each visualization need
+**Why Enhanced Approach**:
+- **Professional Financial Charts**: Plotly provides native candlestick charts for optimal OHLCV visualization
+- **Enhanced Interactivity**: Native zoom, pan, and hover features designed for financial data
+- **Consistent Theming**: Maintains Finance Bro visual identity with improved chart quality
+- **Performance Optimization**: Direct rendering without intermediate file generation
 
 **Library Specialization**:
 ```python
+# Plotly 5.17.0+ - Primary Financial Charting (NEW in v0.2.29)
+- Native candlestick charts with go.Candlestick()
+- Professional financial charting capabilities
+- Interactive range selectors (7d, 30d, 3m, 6m, 1y, All)
+- Synchronized subplots for price and volume
+- Finance Bro theming with consistent colors
+- Enhanced performance with direct rendering
+
 # Altair - Interactive Statistical Charts
 - Grammar of graphics approach
 - Excellent Streamlit integration
 - Interactive data exploration
 - Clean, consistent styling
 
-# mplfinance - Financial Charts
-- Specialized candlestick charts
-- Technical indicator overlays  
+# mplfinance - Technical Analysis Charts
+- Specialized technical indicator overlays
 - Professional financial visualization
 - Export-friendly static charts
 
@@ -249,12 +270,18 @@ Claude-3:    Similar quality, API integration challenges
 - Export capability for user downloads
 - Full customization when needed
 - Integration with analysis narrative
+```
 
-# Plotly (selective use) - Complex Interactive Charts
-- 3D visualizations when needed
-- Advanced interactive features
-- Dashboard-style layouts
-- Real-time data updates
+**Plotly Migration Benefits**:
+```python
+# Why Replace Bokeh with Plotly?
+- Native candlestick support vs. manual OHLC construction
+- Professional financial charting features
+- Better performance with direct rendering
+- Enhanced user experience with zoom/pan capabilities
+- Consistent color theming with Finance Bro design
+- Range selector buttons for quick time period navigation
+- Synchronized price and volume subplots
 ```
 
 ### 6. Infrastructure and Deployment
@@ -270,14 +297,14 @@ Claude-3:    Similar quality, API integration challenges
 **Container Strategy**:
 ```dockerfile
 # Multi-stage build for optimization
-FROM python:3.10.11-slim as base
+FROM python:3.12-slim as base
 # Install system dependencies
 RUN apt-get update && apt-get install -y build-essential
 
 FROM base as builder  
 # Install Python dependencies
 RUN pip install uv
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml ./
 RUN uv sync --frozen --no-dev
 
 FROM base as production
@@ -353,10 +380,11 @@ Total typical usage        150-300 MB            Acceptable for target deploymen
 - **Monitoring**: Add performance monitoring tools
 
 ### Medium-term (12 months)
-- **Python**: Evaluate migration to 3.11+ when dependency compatibility allows
-- **PandasAI**: Assess migration to 3.x when stable
+- **Python**: Continue with 3.12+ and evaluate 3.13+ when available
+- **PandasAI**: Assess migration to 3.x when stable and compatible
 - **Scaling**: Implement Redis for session management if needed
 - **Security**: Enhanced security monitoring and tools
+- **Visualization**: Evaluate additional Plotly features for advanced financial dashboards
 
 ### Long-term (18+ months)
 - **Architecture**: Consider microservices extraction for high-load components

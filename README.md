@@ -11,14 +11,14 @@
 - 🎯 **Intelligent Stock Screener** - Multi-criteria filtering with 6 advanced filters (Beta, Alpha, Financial Health, etc.)
 - 💼 **Portfolio Optimization** - Modern Portfolio Theory, Hierarchical Risk Parity, and risk analysis with riskfolio-lib
 - 🏢 **Comprehensive Company Analysis** - Ownership structure, management team, subsidiaries, and foreign transaction analysis
-- 📊 **Professional Visualizations** - Interactive charts with Altair, Bokeh, and custom styling
+- 📊 **Professional Visualizations** - Interactive charts with Plotly, Altair, and custom styling
 - 🔐 **Secure Authentication** - Google OAuth integration with API key management
 
 ## Quick Start
 
 ### Prerequisites
 
-- Python >= 3.10.11
+- Python >= 3.12
 - OpenAI API key
 - Google Cloud Console account (for OAuth setup)
 
@@ -246,7 +246,7 @@ streamlit run app.py
 
 ### Why Version Compatibility Matters
 
-- **pandasai v2.3.0** requires **pandas v1.5.3** (not v2.x)
+- **pandasai v2.3.0** requires **pandas v2.2.0+** (compatible with NumPy 2.0)
 - **pandasai v3.x** (beta) has breaking changes and schema issues
 - Mismatched versions cause:
   - `TypeError: sequence item 0: expected str instance, tuple found`
@@ -257,21 +257,23 @@ streamlit run app.py
 
 ✅ **WORKING COMBINATION:**
 - `pandasai==2.3.0` (stable)
-- `pandas==1.5.3` (exact version required for compatibility)
-- `quantstats==0.0.59` (last version compatible with pandas 1.5.3)
+- `pandas>=2.2.0,<3.0.0` (compatible with pandasai 2.x and NumPy 2.0)
+- `numpy>=2.0.0,<3.0.0` (enhanced performance with NumPy 2.0)
+- `quantstats>=0.0.77` (compatible with pandas 2.2.0+ and NumPy 2.0)
 - Built-in OpenAI LLM (no separate extension needed)
 
 ❌ **AVOID:**
 - `pandasai>=3.0.0` (beta, unstable)
-- `pandas>=2.0.0` (incompatible with pandasai 2.3.0)
-- `quantstats>=0.0.60` (requires pandas 2.0+ frequency aliases)
+- `pandas<2.2.0` (incompatible with NumPy 2.0 and current dependencies)
+- `numpy<2.0.0` (missing performance improvements and compatibility)
+- `quantstats<0.0.77` (incompatible with pandas 2.2.0+)
 - `pandasai-openai` extension (not needed in v2.3.0)
 
 ### Critical QuantStats Compatibility
 **NEVER upgrade quantstats independently.** The app uses:
-- **QuantStats v0.0.59** - Last version compatible with pandas 1.5.3 legacy frequency aliases (`M`, `Q`, `A`)
-- **Issue with newer versions**: QuantStats 0.0.60+ uses pandas 2.0+ frequency aliases (`ME`, `QE`, `YE`) causing "Invalid frequency" errors
-- **Solution**: Version pinned in requirements.txt to maintain compatibility
+- **QuantStats v0.0.77+** - Compatible with pandas 2.2.0+ and NumPy 2.0 frequency aliases (`ME`, `QE`, `YE`)
+- **Python 3.12+ Benefits**: Enhanced performance, better error handling, and NumPy 2.0 compatibility
+- **Solution**: Versions pinned in pyproject.toml and requirements.txt to maintain compatibility
 
 ### If You Need to Upgrade
 
@@ -282,15 +284,16 @@ streamlit run app.py
 
 ## Technology Stack
 
-- **Frontend:** Streamlit v1.47.0 with Google OAuth authentication
+- **Frontend:** Streamlit v1.49.0+ with Google OAuth authentication
 - **AI Engine:** PandasAI v2.3.0 (stable) with OpenAI GPT integration
-- **Stock Data:** Vnstock v3.2.5 (VCI/TCBS sources for Vietnamese market)
-- **Data Processing:** Pandas v1.5.3 (compatible with pandasai 2.3.0)
-- **Financial Analysis:** QuantStats v0.0.59 (75+ performance metrics and tearsheets)
+- **Stock Data:** Vnstock v3.2.6+ (VCI/TCBS sources for Vietnamese market)
+- **Data Processing:** Pandas v2.2.0+ with NumPy v2.0.0+ (enhanced performance)
+- **Financial Analysis:** QuantStats v0.0.77+ (75+ performance metrics and tearsheets)
 - **Portfolio Optimization:** PyPortfolioOpt (Modern Portfolio Theory, Efficient Frontier)
-- **Risk Analysis:** riskfolio-lib v5.0.1+ (Hierarchical Risk Parity, advanced risk metrics)
+- **Risk Analysis:** riskfolio-lib v7.0.1+ (Hierarchical Risk Parity, advanced risk metrics)
 - **Technical Analysis:** pandas-ta for 150+ technical indicators with robust error handling
-- **Visualizations:** Altair v5.5.0+, Bokeh v2.4.3, mplfinance for interactive charts
+- **Visualizations:** Plotly v5.17.0+ (professional financial charts), Altair v5.5.0+, mplfinance for interactive charts
+- **Multi-Agent AI:** CrewAI v0.35.8+ for collaborative financial analysis
 - **Authentication:** Authlib v1.3.2+ for Google OAuth integration
 
 ## Future Refactor: PandasAI 3.x Migration
@@ -461,9 +464,18 @@ finance-bro/
 │   │   └── config.py         # Centralized app configuration
 │   ├── services/
 │   │   ├── vnstock_api.py    # VnStock API functions (30+ functions)
-│   │   ├── chart_service.py  # Chart generation utilities
+│   │   ├── chart_service.py  # Chart generation utilities (10+ functions)
 │   │   ├── data_service.py   # Data transformation utilities
-│   │   └── fibonacci_service.py # Fibonacci retracement analysis
+│   │   ├── fibonacci_service.py # Fibonacci retracement analysis
+│   │   ├── crewai_service.py # CrewAI financial health analysis
+│   │   ├── financial_analysis_service.py # Advanced financial analysis
+│   │   ├── session_state_service.py # Smart session state management
+│   │   └── financial_data_service.py # Centralized financial data loading
+│   ├── financial_health_crew/ # CrewAI multi-agent system
+│   │   ├── crew.py          # Multi-agent coordination
+│   │   ├── main.py          # Entry point for analysis
+│   │   ├── config/           # Agent and task definitions
+│   │   └── tools/           # Custom analysis tools
 │   ├── components/
 │   │   ├── stock_selector.py # Stock selection UI component
 │   │   ├── date_picker.py    # Date range picker component
@@ -489,7 +501,7 @@ finance-bro/
 │   ├── commands/            # Custom commands
 │   └── settings.local.json  # Local Claude settings
 ├── requirements.txt         # Python dependencies
-├── pyproject.toml          # Project configuration (Python 3.10.11)
+├── pyproject.toml          # Project configuration (Python 3.12+)
 ├── Dockerfile              # Docker configuration
 ├── docker-compose.yml      # Docker Compose configuration
 ├── .env.example            # Environment variables template
@@ -706,25 +718,34 @@ docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/gahoccode/finance-bro
 
 ### Core Dependencies
 - `pandasai==2.3.0` - AI-powered data analysis
-- `pandas==1.5.3` - Data manipulation (exact version for compatibility)
-- `vnstock==3.2.5` - Vietnamese stock data (VCI/TCBS sources)
+- `pandas>=2.2.0,<3.0.0` - Data manipulation with NumPy 2.0 compatibility
+- `numpy>=2.0.0,<3.0.0` - Enhanced numerical computing with NumPy 2.0
+- `vnstock>=3.2.6` - Vietnamese stock data (VCI/TCBS sources)
 - `openai>=1.61.0` - OpenAI API client
-- `streamlit==1.47.0` - Web application framework with OAuth support
+- `streamlit>=1.49.0` - Web application framework with OAuth support
 - `python-dotenv==1.0.1` - Environment variable management
 
 ### Financial Analysis
-- `quantstats==0.0.59` - Performance analytics and tearsheets (75+ metrics)
+- `quantstats>=0.0.77` - Performance analytics and tearsheets (75+ metrics)
 - `pyportfolioopt>=1.5.6` - Modern Portfolio Theory optimization
-- `riskfolio-lib>=5.0.1` - Advanced risk analysis and HRP
+- `riskfolio-lib>=7.0.1` - Advanced risk analysis and HRP
 - `mplfinance>=0.12.10b0` - Financial data visualization
 
 ### Visualization & UI
+- `plotly>=5.17.0` - Professional financial charting with interactive candlestick charts
 - `altair>=5.5.0` - Interactive statistical visualizations  
-- `bokeh==2.4.3` - Interactive web plots
+- `vl-convert-python>=1.6.0` - Chart conversion and export
 - `Authlib>=1.3.2` - Google OAuth authentication
 
+### Multi-Agent AI
+- `crewai>=0.35.8` - Collaborative AI system for financial health analysis
+
+### Technical Analysis
+- `pandas-ta==0.4.71b0` - 150+ technical indicators
+- `scipy>=1.11.0` - Scientific computing for technical analysis
+
 ### System Dependencies (Docker)
-- `osqp==0.6.2.post8` - Quadratic programming solver (specific version for stability)
+- `osqp>=0.6.3` - Quadratic programming solver (specific version for stability)
 
 ## Contributing
 

@@ -47,12 +47,12 @@ uv run mypy .
 
 ## Architecture Overview
 
-This is a Streamlit-based AI financial analysis application for Vietnamese stock market data.
+This is a Streamlit-based financial analysis application for Vietnamese stock market data with standalone AI capabilities.
 
 ### Core Structure
 - **app.py** - Main entry point with authentication and API key setup
 - **pages/** - Multi-page Streamlit app structure:
-  - **bro.py** - Main AI chat interface with PandasAI integration
+  - **bro.py** - Financial analysis interface (PandasAI now standalone)
   - **Company_Overview.py** - Company profile and ownership analysis
   - **Stock_Price_Analysis.py** - Price charts and technical analysis
   - **Technical_Analysis.py** - Advanced technical indicators with pandas-ta integration
@@ -84,35 +84,49 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
 - **docs/architecture/** - Comprehensive architecture documentation with C4 Model diagrams
 
 ### Key Technologies
-- **Streamlit** - Web framework (v1.47.0)
-- **PandasAI** - AI data analysis (v2.3.0 - stable, compatible with pandas 1.5.3)
+- **Streamlit** - Web framework (v1.49.0+)
 - **CrewAI** - Multi-agent AI system (v0.35.8+) for financial health analysis
-- **vnstock** - Vietnamese stock market data (v3.2.5)
+- **vnstock** - Vietnamese stock market data (v3.2.6+)
 - **OpenAI API** - LLM for natural language queries and agent communication
 - **Google OAuth** - User authentication
 - **SciPy** - Scientific computing for Fibonacci swing point detection
+- **Plotly** - Professional financial charting with interactive candlestick charts (v5.17.0+)
 - **Altair** - Interactive statistical visualizations with Finance Bro theming
+
+**Standalone AI Component:**
+- **PandasAI** - AI data analysis (v2.3.0 - stable, compatible with pandas 2.2.0+) now available as separate standalone application
 
 ### Data Flow
 1. Authentication via Google OAuth (required)
 2. Stock symbol selection (shared across pages via session state)
 3. Data loading from vnstock API with caching
-4. AI analysis through PandasAI agent or CrewAI multi-agent system
+4. AI analysis through CrewAI multi-agent system
 5. Chart generation and export
+
+**Standalone AI Flow:**
+- PandasAI operates as separate application for natural language financial analysis
+- Data can be exported from main app for standalone AI analysis
+- Standalone AI provides focused chat interface for financial queries
 
 ### Critical Dependencies
 **NEVER upgrade pandas, pandasai, or quantstats independently.** The app requires:
-- **Python** - Exact version `3.10.11` (specified in pyproject.toml)
-- `pandasai==2.3.0` (stable)
-- `pandas==1.5.3` (compatible with pandasai 2.x)
-- `quantstats==0.0.59` (last version compatible with pandas 1.5.3)
+- **Python** - Version `3.12+` (specified in pyproject.toml) with NumPy 2.0 compatibility
+- `pandas==2.2.0+` (compatible with NumPy 2.0)
+- `quantstats==0.0.62` (compatible with pandas 2.2.0+ and NumPy 2.0)
 - `crewai>=0.35.8` (multi-agent AI system for financial health analysis)
 - Uses `uv` for dependency management (recommended over pip)
 
+**Standalone PandasAI Component:**
+- `pandasai==2.3.0` (stable) - Available as separate standalone application
+- Compatible with pandas 2.2.0+ and NumPy 2.0
+- Natural language financial analysis capabilities
+- Can be run independently from main application
+
 **Version Compatibility Notes:**
 - PandasAI 3.x has breaking changes and requires different pandas versions
-- QuantStats 0.0.60+ uses pandas 2.0+ frequency aliases (`ME`, `QE`, `YE`) incompatible with pandas 1.5.3
-- QuantStats 0.0.59 uses legacy frequency aliases (`M`, `Q`, `A`) compatible with pandas 1.5.3
+- QuantStats 0.0.62+ supports pandas 2.0+ frequency aliases (`ME`, `QE`, `YE`) compatible with pandas 2.2.0+
+- Python 3.12+ provides enhanced performance and NumPy 2.0 compatibility for improved array operations
+- **Standalone PandasAI**: Uses pandasai==2.3.0 for stability, separate from main app dependencies
 
 ### Session State Management
 Key session variables:
@@ -120,7 +134,7 @@ Key session variables:
 - `stock_data` - Cached financial data
 - `selected_symbol` - Currently selected stock symbol
 - `symbols_data` - All available symbols (cached)
-- `agent` - PandasAI agent instance
+- `agent` - CrewAI agent instance (note: PandasAI agent removed, now standalone)
 
 ### Performance Considerations
 - Stock data is cached in `cache/` directory
@@ -214,18 +228,20 @@ st.success("✅ Success message with custom styling")
 - Optional Docker environment variables in `.env`
 
 ### Chart Generation
-Charts are generated via PandasAI and saved to `exports/charts/temp_chart.png`. The app detects the latest chart file for display.
+Charts are generated via Plotly, Altair, and mplfinance with export capabilities. Standalone PandasAI application handles AI-generated charts separately.
 
 ### Error Handling
 - API key validation on startup
 - Graceful handling of vnstock API errors
-- PandasAI error recovery with fallback responses
+- CrewAI error recovery with fallback responses
+- Standalone PandasAI error handling managed separately
 
 ### Development Workflow
 - Use **uv** for dependency management over pip (faster and more reliable)
-- **Critical**: Never upgrade pandas/pandasai without checking compatibility
-- Python exact version `3.10.11` required (no newer versions supported)
+- **Critical**: Never upgrade pandas without checking compatibility
+- Python version `3.12+` required (enhanced performance with NumPy 2.0 compatibility)
 - Run `uv sync` after pulling changes to ensure dependency consistency
+- **PandasAI**: Now standalone application, develop and test separately
 
 ### Modular Architecture (Version 0.2.20+)
 The codebase follows a modular architecture pattern with centralized services:
