@@ -8,11 +8,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import mplfinance as mpf
 import altair as alt
+import plotly.graph_objects as go
+import plotly.subplots as sp
 import os
 import glob
-from bokeh.plotting import figure
-from bokeh.layouts import column
-from bokeh.models import HoverTool
 from typing import Dict, Optional
 
 # Technical Analysis Chart Functions
@@ -267,117 +266,146 @@ def create_altair_area_chart(chart_data: pd.DataFrame, ticker: str) -> alt.Chart
     return stock_chart
 
 
-def create_bokeh_candlestick_chart(stock_price_bokeh: pd.DataFrame, ticker: str):
-    """Create Bokeh candlestick chart with volume for stock price analysis
 
-    Extracted from Stock_Price_Analysis.py lines 494-606.
+def create_plotly_candlestick_chart(stock_price_data: pd.DataFrame, ticker: str) -> go.Figure:
+    """Create Plotly candlestick chart with volume for optimal OHLCV visualization
+
+    Args:
+        stock_price_data: DataFrame with OHLCV data and date index
+        ticker: Stock ticker symbol for chart title
+
+    Returns:
+        Plotly Figure object with candlestick + volume charts in subplots
     """
-    # Calculate candlestick properties
-    stock_price_bokeh["color"] = [
-        "green" if close >= open_price else "red"
-        for close, open_price in zip(
-            stock_price_bokeh["close"], stock_price_bokeh["open"]
-        )
+    # Prepare data for Plotly
+    chart_data = stock_price_data.reset_index()
+    if 'date' not in chart_data.columns:
+        chart_data = chart_data.rename(columns={chart_data.columns[0]: 'date'})
+    
+    # Get Finance Bro theme colors
+    theme = get_finance_bro_theme()
+    up_color = theme["primary_colors"]["up"]      # #76706C
+    down_color = theme["primary_colors"]["down"]  # #2B2523
+    
+    # Create subplots with secondary y-axis for volume
+    fig = sp.make_subplots(
+        rows=2, cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.05,
+        row_heights=[0.7, 0.3],
+        subplot_titles=[f'{ticker} - Candlestick Chart', 'Volume'],
+        specs=[[{"type": "scatter"}],
+               [{"type": "bar"}]]
+    )
+    
+    # Add candlestick chart
+    candlestick = go.Candlestick(
+        x=chart_data['date'],
+        open=chart_data['open'],
+        high=chart_data['high'],
+        low=chart_data['low'],
+        close=chart_data['close'],
+        increasing_line_color=up_color,
+        decreasing_line_color=down_color,
+        increasing_fillcolor=up_color,
+        decreasing_fillcolor=down_color,
+        line=dict(width=1),
+        name='Price'
+    )
+    
+    fig.add_trace(candlestick, row=1, col=1)
+    
+    # Add volume bars with Finance Bro colors
+    volume_colors = [
+        up_color if chart_data.iloc[i]['close'] >= chart_data.iloc[i]['open'] 
+        else down_color for i in range(len(chart_data))
     ]
-
-    # Calculate min/max values for consistent scaling
-    min_date = stock_price_bokeh.index.min()
-    max_date = stock_price_bokeh.index.max()
-    max_volume = stock_price_bokeh["volume"].max()
-
-    # Price chart - use responsive sizing
-    price = figure(
-        x_axis_type="datetime",
-        title=f"{ticker} - Candlestick Chart",
-        height=400,
-        tools="pan,wheel_zoom,box_zoom,reset,save",
-        toolbar_location="above",
-        x_range=(min_date, max_date),
-        sizing_mode="stretch_width",
+    
+    volume_bar = go.Bar(
+        x=chart_data['date'],
+        y=chart_data['volume'],
+        marker_color=volume_colors,
+        marker_line_color='rgba(0,0,0,0.2)',
+        marker_line_width=0.5,
+        name='Volume',
+        opacity=0.7
     )
-
-    # Add segments for high-low range
-    price.segment(
-        x0="date",
-        y0="high",
-        x1="date",
-        y1="low",
-        source=stock_price_bokeh,
-        color="black",
-        line_width=1,
+    
+    fig.add_trace(volume_bar, row=2, col=1)
+    
+    # Update layout with Finance Bro styling
+    fig.update_layout(
+        title=dict(
+            text=f'{ticker} - Professional Candlestick Chart',
+            x=0.5,
+            font=dict(size=16, family='serif')
+        ),
+        xaxis_rangeslider_visible=False,
+        height=700,
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        font=dict(family='serif', color='#333333'),
+        hovermode='x unified',
+        showlegend=False,
+        margin=dict(l=80, r=40, t=80, b=40),
     )
-
-    # Add rectangles for open-close range
-    price.vbar(
-        x="date",
-        width=12 * 60 * 60 * 1000,  # 12 hours in milliseconds
-        top="open",
-        bottom="close",
-        source=stock_price_bokeh,
-        fill_color="color",
-        line_color="black",
-        line_width=1,
+    
+    # Update x-axes
+    fig.update_xaxes(
+        title_text="Date",
+        showgrid=True,
+        gridwidth=1,
+        gridcolor='rgba(128,128,128,0.2)',
+        row=2, col=1
     )
-
-    # Customize price plot
-    price.yaxis.axis_label = "Price (in thousands)"
-    price.grid.grid_line_alpha = 0.3
-    price.xaxis.visible = False  # Hide x-axis labels on price chart
-
-    # Volume chart - use same responsive sizing
-    volume = figure(
-        x_axis_type="datetime",
-        height=200,
-        tools="pan,wheel_zoom,box_zoom,reset,save",
-        toolbar_location=None,
-        x_range=price.x_range,  # Link x-axis with price chart
-        sizing_mode="stretch_width",
+    fig.update_xaxes(
+        showgrid=True,
+        gridwidth=1,
+        gridcolor='rgba(128,128,128,0.2)',
+        row=1, col=1
     )
-
-    # Add volume bars
-    volume.vbar(
-        x="date",
-        width=12 * 60 * 60 * 1000,
-        top="volume",
-        bottom=0,
-        source=stock_price_bokeh,
-        fill_color="color",
-        line_color="black",
-        line_width=0.5,
-        alpha=0.7,
+    
+    # Update y-axes
+    fig.update_yaxes(
+        title_text="Price (in thousands)",
+        showgrid=True,
+        gridwidth=1,
+        gridcolor='rgba(128,128,128,0.2)',
+        tickformat=',.0f',
+        row=1, col=1
     )
-
-    # Customize volume plot
-    volume.yaxis.axis_label = "Volume"
-    volume.grid.grid_line_alpha = 0.3
-    volume.xaxis.axis_label = "Date"
-
-    # Add hover tools for both charts
-    hover_price = HoverTool(
-        tooltips=[
-            ("Date", "@date{%F}"),
-            ("Open", "@open{0,0}"),
-            ("High", "@high{0,0}"),
-            ("Low", "@low{0,0}"),
-            ("Close", "@close{0,0}"),
-            ("Volume", "@volume{0,0}"),
-        ],
-        formatters={"@date": "datetime"},
-        mode="vline",
+    fig.update_yaxes(
+        title_text="Volume",
+        showgrid=True,
+        gridwidth=1,
+        gridcolor='rgba(128,128,128,0.2)',
+        tickformat=',.0f',
+        row=2, col=1
     )
-    price.add_tools(hover_price)
-
-    hover_volume = HoverTool(
-        tooltips=[("Date", "@date{%F}"), ("Volume", "@volume{0,0}")],
-        formatters={"@date": "datetime"},
-        mode="vline",
+    
+    # Add range selector buttons for better interactivity
+    fig.update_layout(
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=7, label="7d", step="day", stepmode="backward"),
+                    dict(count=30, label="30d", step="day", stepmode="backward"),
+                    dict(count=90, label="3m", step="day", stepmode="backward"),
+                    dict(count=180, label="6m", step="day", stepmode="backward"),
+                    dict(count=365, label="1y", step="day", stepmode="backward"),
+                    dict(step="all", label="All")
+                ]),
+                bgcolor='rgba(118,112,108,0.1)',
+                bordercolor='rgba(118,112,108,0.3)',
+                borderwidth=1,
+                font=dict(color='#333333')
+            ),
+            rangeslider=dict(visible=False),
+            type="date"
+        )
     )
-    volume.add_tools(hover_volume)
-
-    # Combine charts vertically with proper alignment
-    combined_chart = column(price, volume, sizing_mode="stretch_width")
-
-    return combined_chart
+    
+    return fig
 
 
 # Chart Detection Functions (from bro.py)

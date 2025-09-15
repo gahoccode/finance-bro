@@ -1,5 +1,5 @@
-# Use Python 3.10.11 to match pyproject.toml
-FROM python:3.10.11-slim
+# Use Python 3.12 to match pyproject.toml
+FROM python:3.12-slim
 
 # Set working directory in container
 WORKDIR /app
@@ -25,11 +25,11 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
-COPY requirements.txt .
+# Copy pyproject.toml first for better caching
+COPY pyproject.toml .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -e .
 
 # Copy application code
 COPY . .

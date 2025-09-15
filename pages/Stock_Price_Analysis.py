@@ -368,7 +368,7 @@ from src.services.vnstock_api import fetch_stock_price_data
 from src.services.chart_service import (
     create_altair_line_chart,
     create_altair_area_chart,
-    create_bokeh_candlestick_chart,
+    create_plotly_candlestick_chart,
 )
 
 if ticker:
@@ -635,10 +635,10 @@ if ticker:
             stock_price_bokeh["date"] = stock_price_bokeh.index
 
             # Create candlestick chart using chart service
-            combined_chart = create_bokeh_candlestick_chart(stock_price_bokeh, ticker)
+            combined_chart = create_plotly_candlestick_chart(stock_price_bokeh, ticker)
 
-            # Display the combined Bokeh chart
-            st.bokeh_chart(combined_chart, use_container_width=True)
+            # Display the combined Plotly chart
+            st.plotly_chart(combined_chart, use_container_width=True)
 
     except Exception as e:
         st.error(f"Error loading data for {ticker}: {str(e)}")

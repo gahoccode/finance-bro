@@ -12,10 +12,8 @@ from pypfopt.discrete_allocation import get_latest_prices
 from pypfopt import plotting
 import numpy as np
 from datetime import datetime
-from bokeh.plotting import figure
-from bokeh.transform import cumsum
+import altair as alt
 from src.services.vnstock_api import fetch_portfolio_stock_data
-from math import pi
 import riskfolio as rp
 from src.components.ui_components import inject_custom_success_styling
 
@@ -400,7 +398,7 @@ with tab1:
     pie_colors = ["#56524D", "#76706C", "#AAA39F"]
 
     def create_pie_chart(weights_dict, title, colors):
-        """Create a Bokeh pie chart for portfolio weights."""
+        """Create an Altair pie chart for portfolio weights."""
         # Filter out zero weights and prepare data
         data = pd.DataFrame(list(weights_dict.items()), columns=["Symbol", "Weight"])
         data = data[data["Weight"] > 0.01]  # Filter out very small weights
@@ -409,46 +407,37 @@ with tab1:
         if len(data) == 0:
             return None
 
-        # Calculate angles for pie chart
-        data["angle"] = data["Weight"] / data["Weight"].sum() * 2 * pi
+        # Assign colors to symbols
         data["color"] = (
             colors[: len(data)]
             if len(data) <= len(colors)
             else colors + ["#D3D3D3"] * (len(data) - len(colors))
         )
 
-        # Create pie chart with increased height for better visibility
-        p = figure(
-            height=400,
-            width=350,
-            title=title,
-            toolbar_location=None,
-            tools="hover",
-            tooltips="@Symbol: @Weight{0.00%}",
-            x_range=(-0.5, 0.5),
-            y_range=(-0.5, 0.5),
-            sizing_mode="scale_both",
+        # Create Altair pie chart
+        chart = (
+            alt.Chart(data)
+            .mark_arc(innerRadius=50, stroke="white", strokeWidth=2)
+            .encode(
+                theta=alt.Theta("Weight:Q", title="Weight"),
+                color=alt.Color(
+                    "Symbol:N",
+                    scale=alt.Scale(range=data["color"].tolist()),
+                    legend=alt.Legend(title="Symbols")
+                ),
+                tooltip=[
+                    alt.Tooltip("Symbol:N", title="Symbol"),
+                    alt.Tooltip("Weight:Q", title="Weight", format=".2%")
+                ]
+            )
+            .properties(
+                width=350,
+                height=350,
+                title=title
+            )
         )
 
-        p.wedge(
-            x=0,
-            y=0,
-            radius=0.35,
-            start_angle=cumsum("angle", include_zero=True),
-            end_angle=cumsum("angle"),
-            line_color="white",
-            fill_color="color",
-            legend_field="Symbol",
-            source=data,
-        )
-
-        p.axis.axis_label = None
-        p.axis.visible = False
-        p.grid.grid_line_color = None
-        p.title.text_font_size = "12pt"
-        p.legend.label_text_font_size = "10pt"
-
-        return p
+        return chart
 
     # Create three pie charts in columns
     col1, col2, col3 = st.columns(3)
@@ -456,14 +445,14 @@ with tab1:
     with col1:
         pie1 = create_pie_chart(weights_max_sharpe, "Max Sharpe Portfolio", pie_colors)
         if pie1:
-            st.bokeh_chart(pie1, use_container_width=True)
+            st.altair_chart(pie1, use_container_width=True)
         else:
             st.write("No significant weights in Max Sharpe Portfolio")
 
     with col2:
         pie2 = create_pie_chart(weights_min_vol, "Min Volatility Portfolio", pie_colors)
         if pie2:
-            st.bokeh_chart(pie2, use_container_width=True)
+            st.altair_chart(pie2, use_container_width=True)
         else:
             st.write("No significant weights in Min Volatility Portfolio")
 
@@ -472,7 +461,7 @@ with tab1:
             weights_max_utility, "Max Utility Portfolio", pie_colors
         )
         if pie3:
-            st.bokeh_chart(pie3, use_container_width=True)
+            st.altair_chart(pie3, use_container_width=True)
         else:
             st.write("No significant weights in Max Utility Portfolio")
 
