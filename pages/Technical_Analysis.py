@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from src.services.vnstock_api import (
     get_heating_up_stocks,
     get_technical_stock_data,
-    calculate_technical_indicators,
 )
+from src.services.technical_indicators import calculate_technical_indicators
 from src.services.chart_service import (
     create_technical_chart,
     display_fibonacci_summary,
