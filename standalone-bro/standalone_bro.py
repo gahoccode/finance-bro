@@ -234,6 +234,16 @@ st.set_page_config(
 # Apply custom CSS styling for success alerts
 inject_custom_success_styling()
 
+# Initialize session state variables for standalone mode
+if "stock_symbol" not in st.session_state:
+    st.session_state.stock_symbol = None
+if "dataframes" not in st.session_state:
+    st.session_state.dataframes = None
+if "display_dataframes" not in st.session_state:
+    st.session_state.display_dataframes = None
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
 # Standalone stock symbol selection (replaces session state dependency)
 st.header("🤖 AI Chat Analysis")
 st.markdown("Ask your finance bro about your company's financial statements")
@@ -263,6 +273,9 @@ with st.sidebar:
         options=st.session_state.stock_symbols_list,
         index=0
     )
+    
+    # Store selected symbol in session state for data loading logic
+    st.session_state.stock_symbol = stock_symbol
     
     st.metric("Current Symbol", stock_symbol)
     st.sidebar.markdown("---")
@@ -350,8 +363,8 @@ period_changed = False
 if "last_period" in st.session_state and st.session_state.last_period != period:
     period_changed = True
 
-# Main content area
-if analyze_button or (period_changed and "stock_symbol" in st.session_state):
+# Main content area - ensure stock_symbol is available before loading data
+if analyze_button or (period_changed and "stock_symbol" in st.session_state and st.session_state.stock_symbol):
     try:
         with st.spinner(f"Loading data for {stock_symbol}..."):
             # Initialize Vnstock
