@@ -1,55 +1,51 @@
 [project]
-name = "finance-bro"
-version = "0.2.28"
-description = "AI-powered financial analysis tool for Vietnamese stock market"
-requires-python = "==3.10.11"
+name = "standalone-finance-bro"
+version = "1.0.0"
+description = "Standalone AI-powered financial analysis tool for Vietnamese stock market"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
+    "streamlit==1.47.0",
+    "pandas==1.5.3",
     "numpy>=1.26.4,<2.0.0",
     "pandasai==2.3.0",
-    "pandas==1.5.3",
-    "vnstock==3.2.5",
     "openai>=1.61.0",
-    "streamlit==1.47.0",
-    "python-dotenv==1.0.1",
-    "mplfinance>=0.12.10b0",
-    "bokeh==2.4.3",
+    "vnstock==3.2.5",
     "altair>=5.5.0",
-    "pyportfolioopt>=1.5.6",
-    "Authlib>=1.3.2",1
-    "riskfolio-lib>=5.0.1",
-    "quantstats==0.0.59",
-    "pandas-ta>=0.3.14b0",
-    "scipy>=1.11.0,<1.12.0",
     "vl-convert-python>=1.6.0",
-    "crewai>=0.35.8",
+    "python-dotenv==1.0.1",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest==8.3.2",
+    "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
-    "pytest-mock>=3.10.0",
-    "black==24.4.2",
+    "black>=24.0.0",
     "ruff>=0.8.0",
-    "mypy==1.11.1",
 ]
 
-[dependency-groups]
-dev = [
-    "ipykernel>=6.30.0",
-    "jupyterlab>=4.0.0",
-    "notebook>=7.0.0",
-]
+[project.urls]
+Homepage = "https://github.com/gahoccode/finance-bro"
+Repository = "https://github.com/gahoccode/finance-bro"
+Issues = "https://github.com/gahoccode/finance-bro/issues"
+
+[project.scripts]
+standalone-finance-bro = "standalone_bro:main"
 
 [tool.ruff]
-# Set the maximum line length to 88 (same as Black)
+# Set the maximum line length to 88
 line-length = 88
-# Target Python 3.10.11 (exact version from project requirements)
+# Target Python 3.10+
 target-version = "py310"
 # Exclude common directories
 exclude = [
@@ -69,7 +65,6 @@ exclude = [
     ".svn",
     ".tox",
     ".venv",
-    ".vscode",
     "__pycache__",
     "_build",
     "buck-out",
@@ -109,23 +104,23 @@ unfixable = []
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.format]
-# Use double quotes for strings (same as Black)
+# Use double quotes for strings
 quote-style = "double"
-# Indent with spaces (same as Black)
+# Indent with spaces
 indent-style = "space"
-# Respect magic trailing commas (same as Black)
+# Respect magic trailing commas
 skip-magic-trailing-comma = false
-# Automatically detect line ending (same as Black)
+# Automatically detect line ending
 line-ending = "auto"
 # Enable docstring code formatting
 docstring-code-format = true
 
-[tool.ruff.lint.mccabe]
-# Set maximum complexity
-max-complexity = 10
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
-[tool.ruff.lint.isort]
-# Configure import sorting to match project structure
-known-first-party = ["src", "pages", "tests"]
-force-single-line = false
-lines-after-imports = 2
+[tool.setuptools]
+packages = []
+
+[tool.setuptools.package-data]
+"*" = ["*.py", "*.toml", "*.md"]

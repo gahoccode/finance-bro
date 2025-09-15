@@ -1,0 +1,26 @@
+# Standalone Finance Bro - Essential dependencies only
+# Based on analysis of pages/bro.py requirements
+
+# Core framework
+streamlit==1.47.0
+
+# Data processing
+pandas==1.5.3
+numpy>=1.26.4,<2.0.0
+
+# AI functionality
+pandasai==2.3.0
+openai>=1.61.0
+
+# Financial data
+vnstock==3.2.5
+
+# Visualization
+altair>=5.5.0
+vl-convert-python>=1.6.0
+
+# Environment variables
+python-dotenv==1.0.1
+
+# Note: Removed authentication (Authlib) and other non-essential dependencies
+# Standalone app doesn't need portfolio optimization, technical analysis, or authentication
