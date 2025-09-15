@@ -67,6 +67,8 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
   - **services/fibonacci_service.py** - Fibonacci retracement analysis with SciPy swing detection
   - **services/crewai_service.py** - CrewAI financial health analysis orchestration with multi-agent system
   - **services/financial_analysis_service.py** - Advanced financial analysis functions (DuPont analysis, capital employed, financial leverage)
+  - **services/session_state_service.py** - Smart session state management with progressive data loading (v0.2.22+)
+  - **services/financial_data_service.py** - Centralized financial data loading with validation and caching (v0.2.22+)
   - **financial_health_crew/** - CrewAI multi-agent financial health analysis system:
     - **crew.py** - Multi-agent crew configuration with 3 specialized agents (data analyst, risk specialist, report writer)
     - **config/agents.yaml** - Agent roles and expertise definitions for Vietnamese market analysis
@@ -385,6 +387,54 @@ Comprehensive architecture documentation is available in `docs/architecture/` fo
 - Use `format_financial_display()` function for all display formatting
 - Perform calculations with original scale values (raw VND)
 - Apply formatting only for display purposes, never for calculations
+
+### Smart Data Loading Architecture (v0.2.22+)
+
+The application implements a sophisticated smart data loading system that eliminates page dependencies and provides progressive loading with user feedback.
+
+**Core Services:**
+- **`src/services/session_state_service.py`** - Centralized session state management with intelligent dependency resolution
+- **`src/services/financial_data_service.py`** - Comprehensive financial data loading with validation and caching
+
+**Key Features:**
+- **Progressive Loading**: Data loads in stages with real-time progress feedback
+- **Dependency Resolution**: Automatic loading of prerequisite data without page dependencies
+- **Cache Management**: Intelligent cache invalidation and reuse strategies
+- **Error Handling**: Graceful degradation with informative error messages
+- **Standalone Pages**: Each page can work independently without requiring users to visit other pages first
+
+**Usage Patterns:**
+```python
+# For valuation pages - load all required data progressively
+loading_result = ensure_valuation_data_loaded(symbol)
+if not loading_result["success"]:
+    st.error(f"❌ Failed to load valuation data: {loading_result.get('error', 'Unknown error')}")
+
+# For financial analysis pages - load financial statements
+financial_result = ensure_financial_data_loaded(symbol, period="year", source="VCI")
+
+# For any page - smart loading based on requirements
+result = smart_load_for_page(page_name="valuation", symbol=symbol)
+```
+
+**Progressive Loading Best Practices:**
+- Always use the appropriate `ensure_*` function for your page type
+- Provide user feedback through progress bars and status messages
+- Handle loading errors gracefully with fallback options
+- Cache data appropriately to minimize API calls
+- Use `force_reload=True` parameter when fresh data is required
+
+**Session State Management:**
+- Global session state initialization via `init_global_session_state()`
+- Stock symbols caching with `ensure_stock_symbols_loaded()`
+- Financial data validation via `validate_financial_data()`
+- Cache management via `clear_financial_data_cache()`
+
+**Cache Management Strategy:**
+- Financial data cached for 5 minutes (TTL) via `@st.cache_data(ttl=300)`
+- Stock symbols cached for 1 hour (TTL) via `@st.cache_data(ttl=3600)`
+- Smart cache key generation based on parameters (symbol, period, source)
+- Manual cache clearing available via `clear_financial_data_cache()`
 
 ### Data Sources and APIs
 - **vnstock** v3.2.5 - Vietnamese stock data (VCI/TCBS sources)  

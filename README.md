@@ -103,29 +103,38 @@ streamlit run app.py
    - **Search Feature**: Type to search through all available Vietnamese stock symbols
    - **Persistence**: Your selected symbol will be available throughout your session
 
-### Step 2: Stock Analysis Page (Essential First Stop)
-4. **📈 Navigate to Stock Analysis**: From the homepage, click the "📊 Stock Analysis" quick navigation button
-   - **Why This Matters**: The Stock Analysis page loads and caches essential data for optimal performance
-   - **Data Loading**: This page loads all stock symbols and company information for the entire app
-   - **Performance**: Visiting this page first ensures faster loading on all other pages
+### Step 2: Direct Navigation to Any Analysis Page (New Enhanced Flow)
 
-5. **⚙️ Configure Analysis Settings**: In the Stock Analysis page:
-   - Select period (year/quarter)
-   - Choose data source (VCI/TCBS)
-   - Click "Analyze Stock" to load financial data
+**Enhanced Experience (v0.2.22+)**: With smart data loading, you can now navigate directly to any analysis page without dependencies:
 
-6. **💬 AI Interaction**: Once data is loaded:
-   - Use the chat interface to ask financial questions
-   - Try sample questions from the sidebar
-   - Explore AI-generated insights and charts
+4. **🚀 Choose Your Analysis Path**: From the homepage, you can now directly access any analysis tool:
+   - **📊 Stock Analysis**: AI chat interface with natural language financial queries
+   - **💰 Valuation**: Comprehensive valuation analysis with pre-loaded data
+   - **📈 Price Analysis**: Interactive price charts with 75+ QuantStats metrics
+   - **📊 Technical Analysis**: Advanced technical indicators with heating stock discovery
+   - **🏢 Company Overview**: Company profiles with ownership structure analysis
+   - **💼 Portfolio Optimization**: Modern Portfolio Theory and risk analysis
+   - **🎯 Stock Screener**: Multi-criteria stock filtering with advanced metrics
 
-### Step 3: Explore Other Analysis Tools
-7. **🚀 Navigate to Other Pages**: Now you can efficiently use other analysis tools:
-   - **📈 Price Analysis**: Interactive price charts with 75+ QuantStats metrics and professional tearsheets
-   - **📊 Technical Analysis**: Advanced technical indicators with heating stock discovery and robust error handling
-   - **🏢 Company Overview**: Company profile with ownership structure, management team, subsidiaries, and foreign transaction analysis
-   - **💼 Portfolio Optimization**: Modern Portfolio Theory, Hierarchical Risk Parity, and comprehensive risk analysis
-   - **🎯 Stock Screener**: Multi-criteria stock filtering with advanced metrics (Beta, Alpha, Financial Health) and quick presets
+5. **⚡ Smart Data Loading**: Each page now intelligently loads required data with progress feedback:
+   - **Automatic Pre-loading**: Data loads progressively with real-time status updates
+   - **No Page Dependencies**: Each page works independently without requiring visits to other pages
+   - **Intelligent Caching**: Data is cached smartly to optimize performance across sessions
+   - **Error Handling**: Graceful degradation with informative error messages
+
+### Step 3: Traditional Stock Analysis Page (Optional)
+6. **📈 Enhanced Stock Analysis**: The Stock Analysis page remains available for:
+   - **AI Chat Interface**: Natural language queries about financial metrics
+   - **Sample Questions**: Quick access to common analysis questions
+   - **File Upload Support**: Upload your own financial data for analysis
+   - **Comprehensive Data Loading**: Still the best place to load all data for optimal performance
+
+### Step 4: Explore Advanced Analysis Tools
+7. **🎯 Specialized Analysis**: Access sophisticated analysis tools:
+   - **📊 Technical Analysis**: Professional technical indicators with automatic stock discovery
+   - **💼 Portfolio Optimization**: Hierarchical Risk Parity and Modern Portfolio Theory
+   - **🏢 Company Overview**: Ownership structure, management team, and foreign transaction analysis
+   - **🎯 Stock Screener**: Multi-criteria filtering with quick presets and advanced metrics
 
 ### Recommended Setup for Best Experience
 
@@ -139,22 +148,30 @@ streamlit run app.py
 
 **Alternative**: Light mode is also supported if you prefer standard Streamlit styling.
 
-### Why This Flow Matters
+### Why This Enhanced Flow Matters
 
-**🎯 Performance Optimization**: 
-- Stock Analysis page loads and caches symbols data once for the entire session
-- All other pages benefit from this cached data for faster loading
-- Company names display properly across all pages
+**🎯 Smart Data Loading (v0.2.22+)**: 
+- **Progressive Loading**: Data loads in stages with real-time progress feedback
+- **No Page Dependencies**: Each page works independently without requiring users to visit other pages first
+- **Intelligent Caching**: Smart cache invalidation and reuse strategies optimize performance
+- **Graceful Degradation**: Error handling with informative messages when data loading fails
 
-**📊 Data Consistency**: 
-- Your selected stock symbol persists across all pages
-- Financial data is loaded once and shared across analysis tools
-- Seamless navigation between different analysis perspectives
+**📊 Enhanced User Experience**: 
+- **Direct Navigation**: Users can go directly to any analysis page from the homepage
+- **Real-time Feedback**: Progress bars and status messages keep users informed during data loading
+- **Flexible Workflow**: No mandatory path - users choose their preferred analysis approach
+- **Consistent Performance**: Smart caching ensures fast loading regardless of navigation path
 
-**🚀 Best User Experience**:
-- No need to re-enter stock symbols on each page
-- Faster page loads after initial data caching
-- Professional company name display instead of just stock symbols
+**🚀 Technical Benefits**:
+- **Modular Architecture**: Clean separation between data loading and presentation logic
+- **Scalable Design**: Easy to add new analysis pages without dependencies
+- **Maintainable Code**: Centralized data services reduce code duplication
+- **Better Error Recovery**: Individual page failures don't affect other parts of the application
+
+**🔄 Backwards Compatibility**: 
+- **Existing Flow Preserved**: Traditional users can still follow the original Stock Analysis → Other Pages flow
+- **Progressive Enhancement**: New features enhance rather than replace existing functionality
+- **Performance Improvements**: Even users following the traditional flow benefit from smart loading optimizations
 
 ## Example Questions
 

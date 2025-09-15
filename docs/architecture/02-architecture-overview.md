@@ -18,13 +18,19 @@ Finance Bro follows a **Modular Monolith** architecture pattern with **Microserv
 - Components are atomic and composable
 - Clear boundaries between layers
 
-### 3. Dependency Inversion
+### 3. Smart Data Loading
+- **Progressive Loading**: Data loads in stages with user feedback
+- **Dependency Resolution**: Automatic loading of prerequisite data
+- **Cache Management**: Intelligent cache invalidation and reuse
+- **Error Handling**: Graceful degradation with informative error messages
+
+### 4. Dependency Inversion
 - High-level modules don't depend on low-level modules
 - Pages depend on services, not external APIs directly
 - Configuration drives behavior, not hard-coded values
 - Injectable dependencies for testing
 
-### 4. Function-First Design
+### 5. Function-First Design
 - Prioritizes functions over classes for simplicity
 - Stateless operations where possible
 - Pure functions for data transformations
@@ -96,7 +102,9 @@ C4Container
 ├── chart_service.py        # Visualization generation (10+ functions)
 ├── data_service.py         # Data transformation utilities
 ├── fibonacci_service.py    # Technical analysis calculations
-└── crewai_service.py       # Multi-agent AI coordination
+├── crewai_service.py       # Multi-agent AI coordination
+├── session_state_service.py # Smart session state management
+└── financial_data_service.py # Centralized financial data loading
 ```
 
 ### Core Layer
@@ -185,17 +193,22 @@ sequenceDiagram
 - **Scope**: Function-level caching with TTL
 - **Benefits**: Performance optimization, reduced API calls
 
-### 3. Session State Management
+### 3. Smart Data Loading
+- **Pattern**: Progressive data loading with intelligent dependency resolution
+- **Implementation**: `src/services/session_state_service.py` and `src/services/financial_data_service.py`
+- **Benefits**: Eliminates page dependencies, improves user experience with progress feedback, reduces redundant API calls
+
+### 4. Session State Management
 - **Pattern**: Centralized session state in `src/utils/session_utils.py`
 - **Scope**: Cross-page data persistence
 - **Benefits**: Consistent user experience, data sharing
 
-### 4. Component-Based UI
+### 5. Component-Based UI
 - **Pattern**: Reusable UI components in `src/components/`
 - **Benefits**: Consistency, maintainability, testability
 - **Example**: `stock_selector.py` provides consistent symbol selection
 
-### 5. Configuration-Driven Behavior
+### 6. Configuration-Driven Behavior
 - **Pattern**: Centralized configuration in `src/core/config.py`
 - **Benefits**: Easy environment management, consistent defaults
 - **Example**: Cache TTL, default symbols, API endpoints
@@ -262,6 +275,8 @@ sequenceDiagram
 - Enhanced caching strategies for better performance
 - Extended AI capabilities with additional models
 - Improved error handling and user feedback
+- Smart data loading with progressive feedback (v0.2.22+)
+- Enhanced valuation flow with pre-loading system (v0.2.22+)
 
 ### Long-term Vision
 - Microservices extraction for high-load components

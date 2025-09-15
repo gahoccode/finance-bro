@@ -2,7 +2,9 @@
 
 ## Data Architecture Overview
 
-Finance Bro's data architecture is designed around Vietnamese stock market data with efficient caching, transformation, and AI integration. The system handles real-time market data, historical analysis, and AI-generated insights through a multi-layered approach.
+Finance Bro's data architecture is designed around Vietnamese stock market data with efficient caching, transformation, and AI integration. The system handles real-time market data, historical analysis, and AI-generated insights through a multi-layered approach. 
+
+**Enhanced in v0.2.28**: Smart data loading with progressive feedback, intelligent dependency resolution, and centralized financial data services.
 
 ## Data Flow Architecture
 
@@ -19,26 +21,28 @@ flowchart TD
         E[VnStock Service]
         F[AI Service]
         G[Authentication Service]
+        H[Smart Data Loader Service]
+        I[Financial Data Service]
     end
     
     subgraph "Data Processing Layer"
-        H[Data Transformation]
-        I[Financial Calculations]
-        J[Technical Analysis]
-        K[AI Query Processing]
+        J[Data Transformation]
+        K[Financial Calculations]
+        L[Technical Analysis]
+        M[AI Query Processing]
     end
     
     subgraph "Caching Layer"
-        L[Streamlit Function Cache]
-        M[File System Cache]
-        N[Session State Cache]
+        N[Streamlit Function Cache]
+        O[File System Cache]
+        P[Session State Cache]
     end
     
     subgraph "Presentation Layer"
-        O[Charts & Visualizations]
-        P[Data Tables]
-        Q[AI Responses]
-        R[Export Files]
+        Q[Charts & Visualizations]
+        R[Data Tables]
+        S[AI Responses]
+        T[Export Files]
     end
     
     A --> E
@@ -46,21 +50,182 @@ flowchart TD
     C --> F
     D --> G
     
-    E --> H
-    E --> I
-    F --> K
+    E --> J
+    E --> K
+    F --> M
+    H --> N
+    I --> O
     
-    H --> L
-    I --> M
-    K --> N
-    
-    L --> O
+    J --> N
+    K --> O
+    L --> P
     M --> P
+    
     N --> Q
     O --> R
+    P --> S
+    Q --> T
     
-    J --> H
-    J --> I
+    L --> J
+    L --> K
+```
+
+## Smart Data Loading Architecture (v0.2.28+)
+
+### Progressive Loading Pattern
+
+The enhanced data loading architecture introduces progressive data loading with intelligent dependency resolution and user feedback:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant App as Streamlit App
+    participant Loader as Smart Data Loader
+    participant Services as Service Layer
+    participant Cache as Data Cache
+    participant API as External APIs
+
+    User->>App: Select valuation analysis
+    App->>Loader: Request valuation data for symbol
+    Loader->>Services: Check cache and dependencies
+    
+    alt Cache Miss
+        Services->>API: Fetch required data
+        API-->>Services: Return data
+        Services-->>Loader: Provide structured data
+    else Cache Hit
+        Services-->>Loader: Return cached data
+    end
+    
+    Loader->>App: Show progress (0-100%)
+    App->>User: Display loading feedback
+    Loader->>User: Real-time status updates
+    
+    Loader->>App: Data loading complete
+    App->>User: Display analysis ready
+```
+
+### Smart Dependency Resolution
+
+The smart data loader automatically manages dependencies between different data types:
+
+```python
+# Smart data loading logic
+class SmartDataLoader:
+    def ensure_valuation_data_loaded(self, symbol: str) -> dict:
+        """Ensure all data required for valuation analysis is loaded"""
+        
+        # Progressive loading with user feedback
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        
+        try:
+            # Step 1: Load financial data (60% of progress)
+            status_text.text("Loading financial statements...")
+            financial_result = self.load_financial_data(symbol)
+            progress_bar.progress(0.6)
+            
+            # Step 2: Load price data and returns (40% of progress)
+            status_text.text("Loading price data and calculating returns...")
+            price_result = self.load_price_data(symbol)
+            progress_bar.progress(1.0)
+            
+            # Validate and combine results
+            combined_data = self.combine_data_sources(
+                financial_result, price_result
+            )
+            
+            return {
+                "success": True,
+                "components": {
+                    "financial": financial_result,
+                    "price": price_result
+                },
+                "validation": self.validate_data_integrity(combined_data)
+            }
+            
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e),
+                "components": {}
+            }
+```
+
+### Cache Management Strategy
+
+The enhanced architecture implements intelligent cache management:
+
+```python
+# Cache key generation and management
+class CacheManager:
+    def generate_cache_key(self, symbol: str, data_type: str, 
+                          period: str, source: str) -> str:
+        """Generate consistent cache keys for different data types"""
+        return f"{symbol}_{data_type}_{period}_{source}"
+    
+    def invalidate_cache_for_symbol(self, symbol: str):
+        """Clear all cached data for a specific symbol"""
+        cache_keys_to_remove = [
+            key for key in st.session_state.keys()
+            if key.startswith(f"{symbol}_") or symbol in key
+        ]
+        
+        for key in cache_keys_to_remove:
+            if key in st.session_state:
+                del st.session_state[key]
+    
+    def get_data_freshness(self, cache_key: str) -> dict:
+        """Check if cached data is still fresh"""
+        if cache_key in st.session_state:
+            metadata = st.session_state.get(f"{cache_key}_metadata", {})
+            if "loaded_at" in metadata:
+                age = datetime.now() - metadata["loaded_at"]
+                return {
+                    "is_fresh": age.total_seconds() < CACHE_TTL,
+                    "age_seconds": age.total_seconds(),
+                    "loaded_at": metadata["loaded_at"]
+                }
+        return {"is_fresh": False}
+```
+
+### Error Handling and Fallback Strategy
+
+The smart data loader implements comprehensive error handling:
+
+```python
+# Error handling with graceful degradation
+class ErrorHandler:
+    def handle_data_loading_error(self, error: Exception, 
+                                 symbol: str, data_type: str) -> dict:
+        """Handle data loading errors with informative feedback"""
+        
+        error_info = {
+            "success": False,
+            "error": str(error),
+            "symbol": symbol,
+            "data_type": data_type,
+            "timestamp": datetime.now(),
+            "user_message": self.generate_user_message(error),
+            "fallback_available": self.check_fallback_available(symbol, data_type)
+        }
+        
+        # Log error for debugging
+        logger.error(f"Data loading failed for {symbol} ({data_type}): {error}")
+        
+        # Show appropriate user feedback
+        if error_info["fallback_available"]:
+            st.warning(f"⚠️ {error_info['user_message']}. Using cached data.")
+        else:
+            st.error(f"❌ {error_info['user_message']}")
+        
+        return error_info
+    
+    def check_fallback_available(self, symbol: str, data_type: str) -> bool:
+        """Check if fallback data is available"""
+        cache_key = f"{symbol}_{data_type}"
+        return cache_key in st.session_state and \
+               st.session_state[cache_key] is not None
 ```
 
 ## Data Models
@@ -296,22 +461,49 @@ graph TB
     F --> J
 ```
 
-#### Cache Configuration
+#### Cache Configuration (Enhanced v0.2.28+)
 ```python
 # TTL Settings (seconds)
-CACHE_TTL = {
+CACHE_TTL_SETTINGS = {
     "COMPANY_DATA": 3600,        # 1 hour - Company fundamentals
     "STOCK_DATA": 3600,          # 1 hour - Historical price data
     "TECHNICAL_DATA": 300,       # 5 minutes - Technical indicators
     "SCREENER_DATA": 3600,       # 1 hour - Screener results
     "FUND_DATA": 3600,           # 1 hour - Investment fund data
-    "AI_RESPONSES": 1800         # 30 minutes - AI analysis responses
+    "AI_RESPONSES": 1800,        # 30 minutes - AI analysis responses
+    "FINANCIAL_STATEMENTS": 300, # 5 minutes - Financial statements (smart loading)
+    "VALUATION_DATA": 300        # 5 minutes - Complete valuation packages
 }
 
-# Cache Implementation
-@st.cache_data(ttl=CACHE_TTL["STOCK_DATA"], show_spinner="Loading market data...")
-def get_stock_data(symbol: str, start_date: str, end_date: str) -> pd.DataFrame:
-    """Cached stock data retrieval with automatic TTL expiration"""
+# Enhanced cache implementation with smart loading
+@st.cache_data(ttl=CACHE_TTL_SETTINGS["FINANCIAL_STATEMENTS"])
+def load_comprehensive_financial_data(symbol: str, period: str = "year", 
+                                   source: str = "VCI", company_source: str = "TCBS") -> dict:
+    """Comprehensive financial data loading with smart caching"""
+    
+    # Generate cache key based on all parameters
+    cache_key = f"{symbol}_{period}_{source}_{company_source}"
+    
+    # Check if fresh data exists in session state
+    if "financial_data_cache_key" in st.session_state and \
+       st.session_state.financial_data_cache_key == cache_key:
+        return {
+            "dataframes": st.session_state.dataframes,
+            "display_dataframes": st.session_state.display_dataframes,
+            "metadata": st.session_state.financial_data_metadata,
+            "cached": True
+        }
+    
+    # Load fresh data
+    financial_data = _load_financial_data_from_api(symbol, period, source, company_source)
+    
+    # Store in session state for future use
+    st.session_state.dataframes = financial_data["dataframes"]
+    st.session_state.display_dataframes = financial_data["display_dataframes"]
+    st.session_state.financial_data_metadata = financial_data["metadata"]
+    st.session_state.financial_data_cache_key = cache_key
+    
+    return financial_data
 ```
 
 ### File System Storage
