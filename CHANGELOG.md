@@ -5,6 +5,29 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.29] - 2025-09-15
+
+### Enhanced
+- [2025-09-15] **Superior Candlestick Charts**: Migrated from Altair to Plotly for optimal OHLCV visualization in stock price analysis
+  - **Native Candlestick Support**: Replaced manual Altair rule+bar construction with Plotly's native `go.Candlestick()` implementation
+  - **Professional Financial Charting**: Enhanced interactivity with zoom, pan, and hover features specifically designed for financial data
+  - **Interactive Range Selectors**: Added professional range selector buttons (7d, 30d, 3m, 6m, 1y, All) for quick time period navigation
+  - **Synchronized Subplots**: Price and volume charts are perfectly synchronized with shared x-axis for comprehensive OHLCV analysis
+  - **Finance Bro Theming**: Maintained consistent color scheme (#76706C bullish, #2B2523 bearish) across the new Plotly implementation
+
+### Technical Implementation
+- [2025-09-15] **New Chart Service Function**: Added `create_plotly_candlestick_chart()` to centralized chart service
+  - **Plotly Integration**: Added plotly>=5.17.0 dependency for professional financial charting capabilities
+  - **Dual Chart Layout**: Implemented 2-row subplot layout with 70% price chart and 30% volume chart
+  - **Enhanced Styling**: Professional grid styling, hover templates, and Finance Bro color coordination
+  - **Performance Optimized**: Direct chart rendering without intermediate file generation
+
+### User Experience Improvements
+- [2025-09-15] **Enhanced Stock Analysis**: Stock Price Analysis page now features professional-grade candlestick charts
+  - **Superior Visualization**: Cleaner, more professional OHLCV chart presentation
+  - **Better Interactivity**: Native financial chart controls and navigation
+  - **Consistent Theming**: Maintained Finance Bro visual identity with improved chart quality
+
 ## [0.2.28] - 2025-09-15
 
 ### Added
