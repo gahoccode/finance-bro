@@ -144,8 +144,8 @@ def main_page():
         st.markdown("**💰 Financial Analysis**")
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("🤖 AI Chat Analysis", use_container_width=True):
-                st.switch_page("pages/bro.py")
+            if st.button("📊 Stock Analysis", use_container_width=True):
+                st.switch_page("pages/Stock_Price_Analysis.py")
         with col2:
             if st.button("📊 DuPont Analysis", use_container_width=True):
                 st.switch_page("pages/dupont_analysis.py")
@@ -260,7 +260,6 @@ pages = {
         st.Page(main_page, title="📈 Finance Bro", icon="🏠"),
     ],
     "Financial Analysis": [
-        st.Page("pages/bro.py", title="AI Chat Analysis", icon="🤖"),
         st.Page("pages/dupont_analysis.py", title="DuPont Analysis", icon="📊"),
         st.Page("pages/Valuation.py", title="Valuation Analysis", icon="💰"),
     ],

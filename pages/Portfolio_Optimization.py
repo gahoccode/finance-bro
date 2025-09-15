@@ -42,11 +42,11 @@ else:
 # Sidebar for user inputs
 st.sidebar.header("Portfolio Configuration")
 
-# Get stock symbols from session state (cached from bro.py)
+# Get stock symbols from session state (cached from any analysis page)
 if "stock_symbols_list" in st.session_state:
     stock_symbols_list = st.session_state.stock_symbols_list
 else:
-    # If not cached, user should visit bro.py first
+    # If not cached, user should visit any analysis page first
     st.warning(
         "⚠️ Stock symbols not loaded. Please visit the Stock Analysis page first to load symbols."
     )

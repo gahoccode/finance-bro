@@ -1,6 +1,11 @@
 import streamlit as st
 from src.components.ui_components import inject_custom_success_styling
 from src.services.crewai_service import run_financial_health_analysis
+from src.services.session_state_service import (
+    init_global_session_state, 
+    ensure_financial_data_loaded,
+    get_current_company_name
+)
 
 st.set_page_config(
     page_title="Financial Health Report - Finance Bro", page_icon="🏥", layout="wide"
@@ -22,10 +27,19 @@ if "stock_symbol" not in st.session_state:
     st.stop()
 
 current_symbol = st.session_state.stock_symbol
+company_name = get_current_company_name()
 
 with st.container():
     st.markdown("### 📊 Current Analysis Setup")
     col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown(f"**🏢 Company:** {company_name}")
+        st.markdown(f"**📈 Symbol:** {current_symbol}")
+    
+    with col2:
+        st.markdown("**📅 Data Period:** Annual Reports")
+        st.markdown("**🤖 Analysis:** CrewAI Multi-Agent System")
 
     with col1:
         st.info(f"**Selected Stock:** {current_symbol}")
@@ -43,17 +57,34 @@ with st.container():
 if not dataframes_available:
     st.warning("📋 **No financial data found in session state.**")
     st.markdown("""
-    To generate a financial health report, you need financial dataframes in session state.
-    
-    **How to load financial data:**
-    1. Go to **📊 Stock Analysis** page
-    2. Ask the AI to load financial statements (e.g., "Load balance sheet and income statement")
-    3. Return to this page to generate the health report
+    Loading financial data automatically...
     """)
-
-    if st.button("📊 Go to Stock Analysis", type="primary"):
-        st.switch_page("pages/bro.py")
-    st.stop()
+    
+    # Initialize session state and load financial data
+    init_global_session_state()
+    
+    # Load financial data using smart data loading
+    with st.spinner("📊 Loading financial data..."):
+        loading_result = ensure_financial_data_loaded(
+            st.session_state.stock_symbol, 
+            period="year", 
+            source="VCI"
+        )
+        
+        if loading_result["success"]:
+            st.success("✅ Financial data loaded successfully!")
+            st.rerun()
+        else:
+            st.error(f"❌ Failed to load financial data: {loading_result.get('error', 'Unknown error')}")
+            st.markdown("""
+            **To load financial data:**
+            1. Go to **📊 Stock Price Analysis** page
+            2. Select a stock symbol
+            3. Return to this page to generate the health report
+            """)
+            if st.button("📈 Go to Stock Price Analysis", type="primary"):
+                st.switch_page("pages/Stock_Price_Analysis.py")
+            st.stop()
 
 st.markdown("### 🤖 AI Financial Health Analysis")
 

@@ -105,7 +105,7 @@ def render_navigation_buttons() -> None:
 
     with col1:
         if st.button("📊 Stock Analysis", use_container_width=True):
-            st.switch_page("pages/bro.py")
+            st.switch_page("pages/Stock_Price_Analysis.py")
 
     with col2:
         if st.button("📈 Price Analysis", use_container_width=True):

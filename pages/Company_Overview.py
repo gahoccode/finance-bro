@@ -43,7 +43,7 @@ if "symbols_df" in st.session_state and st.session_state.symbols_df is not None:
         # Keep using stock_symbol as fallback if anything fails
         pass
 else:
-    # If symbols not cached, user should visit bro.py first for optimal experience
+    # If symbols not cached, user should visit any analysis page first for optimal experience
     st.info(
         "💡 For best experience with company names, visit the Stock Analysis page first to load stock symbols."
     )

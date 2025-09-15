@@ -111,7 +111,7 @@ st.markdown("---")
 # Check if financial data is available
 if "dataframes" not in st.session_state:
     st.warning(
-        "⚠️ No financial data loaded. Please go to the AI Chat Analysis page and click 'Analyze Stock' first."
+        "⚠️ No financial data loaded. Please go to the Stock Price Analysis page and select a stock first."
     )
     st.stop()
 
@@ -160,7 +160,7 @@ with tab1:
                 f"❌ Missing required financial statements: {', '.join(missing_dfs)}"
             )
             st.info(
-                "Please ensure all financial data is loaded in the AI Chat Analysis page."
+                "Please ensure all financial data is loaded in the Stock Price Analysis page."
             )
             st.stop()
 
@@ -531,7 +531,7 @@ with tab2:
         if "BalanceSheet" not in dataframes:
             st.error("❌ Balance Sheet data not available")
             st.info(
-                "Please ensure all financial data is loaded in the AI Chat Analysis page."
+                "Please ensure all financial data is loaded in the Stock Price Analysis page."
             )
         else:
             # Calculate capital employed
@@ -859,7 +859,7 @@ with tab3:
         if "IncomeStatement" not in dataframes:
             st.error("❌ Income Statement data not available")
             st.info(
-                "Please ensure all financial data is loaded in the AI Chat Analysis page."
+                "Please ensure all financial data is loaded in the Stock Price Analysis page."
             )
         else:
             # Calculate DFL
