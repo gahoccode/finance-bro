@@ -12,6 +12,13 @@ from src.components.ui_components import (
 from src.services.vnstock_api import fetch_stock_price_data
 from src.services.data_service import format_financial_display
 from src.services.financial_analysis_service import calculate_effective_tax_rate
+from src.services.session_state_service import (
+    init_global_session_state,
+    ensure_valuation_data_loaded,
+    get_current_company_name,
+    validate_valuation_prerequisites,
+    smart_load_for_page,
+)
 from src.core.config import DEFAULT_STATUTORY_TAX_RATE
 from src.utils.session_utils import get_analysis_dates
 from vnstock import Quote, Vnstock
@@ -21,11 +28,8 @@ from vnstock.explorer.vci import Company
 st.set_page_config(page_title="📊 Stock Valuation Analysis", layout="wide")
 inject_custom_success_styling()
 
-# Initialize global session state for dates
-if "analysis_start_date" not in st.session_state:
-    st.session_state.analysis_start_date = pd.to_datetime("2024-01-01")
-if "analysis_end_date" not in st.session_state:
-    st.session_state.analysis_end_date = pd.to_datetime("today") - pd.Timedelta(days=1)
+# Initialize global session state
+init_global_session_state()
 
 # Page header
 st.title("📊 Stock Valuation Analysis")
@@ -33,38 +37,34 @@ st.markdown(
     "Comprehensive WACC (Weighted Average Cost of Capital) and Beta analysis for Vietnamese stocks"
 )
 
-# Check if stock is selected from homepage
-if "stock_symbol" not in st.session_state or st.session_state.stock_symbol is None:
+# Smart data loading for valuation analysis - no more page dependencies!
+symbol = st.session_state.get("stock_symbol")
+
+if not symbol:
     st.warning("⚠️ Please select a stock from the homepage first")
     st.stop()
 
-symbol = st.session_state.stock_symbol
-st.success(f"✅ Analyzing valuation for **{symbol}**")
+# Display current selection
+company_name = get_current_company_name()
+st.success(f"✅ Analyzing valuation for **{company_name}** ({symbol})")
+
+# Progressive data loading with user feedback
+loading_result = ensure_valuation_data_loaded(symbol)
+
+if not loading_result["success"]:
+    st.error(f"❌ Failed to load valuation data: {loading_result.get('error', 'Unknown error')}")
+    st.info("Please try refreshing the page or selecting a different stock symbol.")
+    st.stop()
 
 try:
-    # Check if financial data is available in session state
-    if "dataframes" not in st.session_state:
-        st.warning(
-            "⚠️ Financial data not loaded. Please visit the Stock Price Analysis page first to load data."
-        )
-        st.stop()
-
-    # Get financial statements from session state
+    # Get financial statements from session state (now guaranteed to be loaded)
     dataframes = st.session_state.dataframes
     balance_sheet = dataframes.get("BalanceSheet", pd.DataFrame())
     income_statement = dataframes.get("IncomeStatement", pd.DataFrame())
     cash_flow = dataframes.get("CashFlow", pd.DataFrame())
     ratios = dataframes.get("Ratios", pd.DataFrame())
 
-    # Sort all financial statements by yearReport in ascending order for proper temporal alignment
-    if not balance_sheet.empty and "yearReport" in balance_sheet.columns:
-        balance_sheet = balance_sheet.sort_values("yearReport", ascending=True)
-    if not income_statement.empty and "yearReport" in income_statement.columns:
-        income_statement = income_statement.sort_values("yearReport", ascending=True)
-    if not cash_flow.empty and "yearReport" in cash_flow.columns:
-        cash_flow = cash_flow.sort_values("yearReport", ascending=True)
-    if not ratios.empty and "yearReport" in ratios.columns:
-        ratios = ratios.sort_values("yearReport", ascending=True)
+    # Data is already sorted by yearReport in ascending order from the service
 
     # Calculate effective tax rate from financial data
     effective_tax_rate_data = None
@@ -141,16 +141,13 @@ try:
     start_date, end_date = get_analysis_dates()
     interval = "1D"
 
-    # Check if stock price data exists in session state from Stock Price Analysis page
-    if "stock_price_data" in st.session_state:
+    # Get stock price data (loaded automatically by ensure_valuation_data_loaded)
+    if "stock_price_data" in st.session_state and not st.session_state.stock_price_data.empty:
         stock_price = st.session_state.stock_price_data
-        st.success("✅ Using stock price data from Stock Price Analysis page")
+        st.success("✅ Using cached stock price data")
     else:
-        st.warning(
-            "⚠️ Stock price data not found. Please visit Stock Price Analysis page first to load data."
-        )
-        st.info("Loading fresh stock price data for beta calculation...")
         # Fallback: Load stock price data if not in session state
+        st.info("Loading fresh stock price data for beta calculation...")
         with st.spinner("Loading price data for beta calculation..."):
             stock_price = fetch_stock_price_data(symbol, start_date, end_date)
 

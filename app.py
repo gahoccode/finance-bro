@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from vnstock import Listing
 from src.components.ui_components import inject_custom_success_styling
+from src.services.session_state_service import ensure_valuation_data_loaded
 
 # Load environment variables from .env file
 load_dotenv()
@@ -151,6 +152,33 @@ def main_page():
         with col3:
             if st.button("💰 Valuation Analysis", use_container_width=True):
                 st.switch_page("pages/Valuation.py")
+        
+        # Enhanced Valuation Flow Section
+        st.markdown("**🚀 Enhanced Valuation Flow (Recommended)**")
+        st.markdown("Pre-load valuation data for the smoothest analysis experience")
+        
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            if st.button("⚡ Load & Analyze Valuation", use_container_width=True, type="primary"):
+                # Pre-load valuation data before navigation
+                with st.spinner(f"🔄 Pre-loading valuation data for {st.session_state.stock_symbol}..."):
+                    loading_result = ensure_valuation_data_loaded(st.session_state.stock_symbol)
+                    
+                    if loading_result["success"]:
+                        st.success("✅ Valuation data loaded successfully! Navigating...")
+                        st.switch_page("pages/Valuation.py")
+                    else:
+                        st.error(f"❌ Failed to pre-load data: {loading_result.get('error', 'Unknown error')}")
+        
+        with col2:
+            # Data status indicator
+            valuation_data_status = "✅ Ready" if (
+                "dataframes" in st.session_state and 
+                "price_data" in st.session_state and
+                st.session_state.get("stock_symbol") in str(st.session_state.get("dataframes", {}))
+            ) else "⏳ Not Loaded"
+            
+            st.metric("Data Status", valuation_data_status)
 
         # Market Analysis Section
         st.markdown("**📈 Market Analysis**")
@@ -195,7 +223,9 @@ def main_page():
         
         **Getting Started:**
         1. **Select a Stock Symbol** - Use the searchable dropdown above to find and select a Vietnamese stock symbol
-        2. **Navigate to Analysis Pages** - Use the navigation menu or quick buttons to explore different analysis tools
+        2. **Choose Your Analysis Flow**:
+           - **Enhanced Flow (Recommended)** - Use "⚡ Load & Analyze Valuation" for the smoothest experience
+           - **Standard Flow** - Navigate to individual analysis pages using quick buttons or menu
         3. **Stock Symbol Persistence** - Your selected symbol will be available across all pages
         
         **Available Analysis Tools:**
