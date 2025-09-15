@@ -16,8 +16,6 @@ from src.services.session_state_service import (
     init_global_session_state,
     ensure_valuation_data_loaded,
     get_current_company_name,
-    validate_valuation_prerequisites,
-    smart_load_for_page,
 )
 from src.core.config import DEFAULT_STATUTORY_TAX_RATE
 from src.utils.session_utils import get_analysis_dates
@@ -732,28 +730,66 @@ try:
                 # Get historical cash flow data (already sorted by yearReport ascending)
                 historical_fcf = []
                 historical_years = []
+                historical_ocf = []  # Store OCF components for display
+                historical_capex = []  # Store Capex components for display
 
                 # Use exact Vietnamese column names
                 ocf_column = "Net cash inflows/outflows from operating activities"
                 capex_column = "Purchase of fixed assets"
 
+                # Validate required columns exist
+                if ocf_column not in cash_flow.columns:
+                    st.error(f"❌ Required column '{ocf_column}' not found in cash flow data")
+                    st.error(f"Available columns: {list(cash_flow.columns)}")
+                    st.stop()
+
+                if capex_column not in cash_flow.columns:
+                    st.error(f"❌ Required column '{capex_column}' not found in cash flow data")
+                    st.error(f"Available columns: {list(cash_flow.columns)}")
+                    st.stop()
+
                 for _, row in cash_flow.iterrows():
                     year = row.get("yearReport")
                     operating_cash_flow = row.get(ocf_column, 0)
-                    capex = row.get(capex_column, 0)
+                    capex_value = row.get(capex_column, 0)
 
                     # Calculate free cash flow: Operating Cash Flow - Capital Expenditures
                     # Note: capex is typically negative, so we subtract it
-                    free_cash_flow = operating_cash_flow - abs(capex)
+                    free_cash_flow = operating_cash_flow - abs(capex_value)
 
                     if year and not pd.isna(free_cash_flow) and free_cash_flow != 0:
                         historical_fcf.append(free_cash_flow)
                         historical_years.append(year)
+                        historical_ocf.append(operating_cash_flow)
+                        historical_capex.append(capex_value)
 
+                # Debug information - check data quality
                 if len(historical_fcf) < 2:
                     st.error(
                         "❌ Insufficient cash flow data for DCF analysis. Need at least 2 years of data."
                     )
+                    if len(historical_fcf) == 0:
+                        st.error("🔍 Debug: No valid FCF data found. This could be due to:")
+                        st.error("- All cash flow values are NaN or zero")
+                        st.error("- Missing yearReport data")
+                        st.error("- Data filtering conditions (line 762)")
+                    elif len(historical_fcf) == 1:
+                        st.error("🔍 Debug: Only 1 year of valid FCF data found.")
+                        st.error(f"Available year: {historical_years[0] if historical_years else 'Unknown'}")
+
+                    # Show sample data for debugging
+                    st.subheader("🔍 Cash Flow Data Debug")
+                    debug_data = []
+                    for _, row in cash_flow.head(3).iterrows():
+                        debug_data.append({
+                            "Year": row.get("yearReport", "N/A"),
+                            "OCF": row.get(ocf_column, "N/A"),
+                            "Capex": row.get(capex_column, "N/A"),
+                            "FCF Raw": row.get(ocf_column, 0) - abs(row.get(capex_column, 0))
+                        })
+                    debug_df = pd.DataFrame(debug_data)
+                    st.dataframe(debug_df, use_container_width=True, hide_index=True)
+
                     st.stop()
 
                 # Time Series Analysis for FCF Forecasting
@@ -1271,12 +1307,16 @@ try:
                 # Historical FCF context
                 st.subheader("📊 Historical Free Cash Flow Context")
                 historical_data = []
-                for year, fcf in zip(historical_years, historical_fcf):
+                for i, (year, fcf, ocf, capex) in enumerate(zip(historical_years, historical_fcf, historical_ocf, historical_capex)):
                     historical_data.append(
                         {
                             "Year": year,
-                            "Operating Cash Flow": "N/A",  # Could add if needed
-                            "Capital Expenditures": "N/A",  # Could add if needed
+                            "Operating Cash Flow": format_financial_display(
+                                ocf, display_unit, 0
+                            ),
+                            "Capital Expenditures": format_financial_display(
+                                capex, display_unit, 0
+                            ),
                             "Free Cash Flow": format_financial_display(
                                 fcf, display_unit, 0
                             ),
