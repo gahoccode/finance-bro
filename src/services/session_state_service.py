@@ -5,17 +5,19 @@ Centralized session state initialization and smart dependency resolution.
 Provides intelligent data loading with progress feedback and cache management.
 """
 
-import streamlit as st
-import pandas as pd
-from typing import Optional, Dict, Any
 import warnings
+from typing import Any, Dict
+
+import pandas as pd
+import streamlit as st
 
 from .financial_data_service import (
-    load_comprehensive_financial_data,
-    get_stock_symbols_with_names,
     get_company_name_from_symbol,
+    get_stock_symbols_with_names,
+    load_comprehensive_financial_data,
     validate_financial_data,
 )
+
 
 warnings.filterwarnings("ignore")
 
@@ -166,8 +168,8 @@ def ensure_financial_data_loaded(
 
 def ensure_valuation_data_loaded(
     symbol: str,
-    start_date: Optional[pd.Timestamp] = None,
-    end_date: Optional[pd.Timestamp] = None,
+    start_date: pd.Timestamp | None = None,
+    end_date: pd.Timestamp | None = None,
     force_reload: bool = False,
 ) -> Dict[str, Any]:
     """

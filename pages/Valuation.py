@@ -1,26 +1,28 @@
-import streamlit as st
+from datetime import datetime
+
+import altair as alt
 import numpy as np
 import pandas as pd
-import altair as alt
-from datetime import datetime
+import streamlit as st
+from vnstock import Quote, Vnstock
+from vnstock.explorer.vci import Company
 
 # Import project components and services
 from src.components.ui_components import (
     inject_custom_success_styling,
     render_financial_display_options,
 )
-from src.services.vnstock_api import fetch_stock_price_data
+from src.core.config import DEFAULT_STATUTORY_TAX_RATE
 from src.services.data_service import format_financial_display
 from src.services.financial_analysis_service import calculate_effective_tax_rate
 from src.services.session_state_service import (
-    init_global_session_state,
     ensure_valuation_data_loaded,
     get_current_company_name,
+    init_global_session_state,
 )
-from src.core.config import DEFAULT_STATUTORY_TAX_RATE
+from src.services.vnstock_api import fetch_stock_price_data
 from src.utils.session_utils import get_analysis_dates
-from vnstock import Quote, Vnstock
-from vnstock.explorer.vci import Company
+
 
 # Page configuration
 st.set_page_config(page_title="📊 Stock Valuation Analysis", layout="wide")
@@ -164,9 +166,11 @@ try:
         )
 
     # Create tabs for different analyses
-    tab1, tab2, tab3 = st.tabs(
-        ["📊 Beta Analysis", "💰 WACC Calculation", "🎯 Valuation Results"]
-    )
+    tab1, tab2, tab3 = st.tabs([
+        "📊 Beta Analysis",
+        "💰 WACC Calculation",
+        "🎯 Valuation Results",
+    ])
 
     with tab1:
         st.header("📊 Beta Calculation & Market Correlation")
@@ -420,7 +424,7 @@ try:
                                 )
 
                         except Exception as fallback_error:
-                            st.error(f"❌ Both calculation methods failed:")
+                            st.error("❌ Both calculation methods failed:")
                             st.error(
                                 f"   • Primary (VnStock Company): {str(primary_error)}"
                             )
@@ -469,19 +473,17 @@ try:
                             st.subheader("📊 Capital Structure")
 
                             # Create pie chart data
-                            capital_data = pd.DataFrame(
-                                {
-                                    "Component": ["Debt", "Equity"],
-                                    "Weight": [
-                                        market_weight_of_debt,
-                                        market_weight_of_equity,
-                                    ],
-                                    "Value": [
-                                        market_value_of_debt,
-                                        market_value_of_equity,
-                                    ],
-                                }
-                            )
+                            capital_data = pd.DataFrame({
+                                "Component": ["Debt", "Equity"],
+                                "Weight": [
+                                    market_weight_of_debt,
+                                    market_weight_of_equity,
+                                ],
+                                "Value": [
+                                    market_value_of_debt,
+                                    market_value_of_equity,
+                                ],
+                            })
 
                             # Create pie chart using Altair
                             pie_chart = (
@@ -790,15 +792,13 @@ try:
                     st.subheader("🔍 Cash Flow Data Debug")
                     debug_data = []
                     for _, row in cash_flow.head(3).iterrows():
-                        debug_data.append(
-                            {
-                                "Year": row.get("yearReport", "N/A"),
-                                "OCF": row.get(ocf_column, "N/A"),
-                                "Capex": row.get(capex_column, "N/A"),
-                                "FCF Raw": row.get(ocf_column, 0)
-                                - abs(row.get(capex_column, 0)),
-                            }
-                        )
+                        debug_data.append({
+                            "Year": row.get("yearReport", "N/A"),
+                            "OCF": row.get(ocf_column, "N/A"),
+                            "Capex": row.get(capex_column, "N/A"),
+                            "FCF Raw": row.get(ocf_column, 0)
+                            - abs(row.get(capex_column, 0)),
+                        })
                     debug_df = pd.DataFrame(debug_data)
                     st.dataframe(debug_df, width="stretch", hide_index=True)
 
@@ -807,9 +807,10 @@ try:
                 # Time Series Analysis for FCF Forecasting
 
                 # Create time series DataFrame
-                fcf_ts = pd.DataFrame(
-                    {"year": historical_years, "fcf": historical_fcf}
-                ).sort_values("year")
+                fcf_ts = pd.DataFrame({
+                    "year": historical_years,
+                    "fcf": historical_fcf,
+                }).sort_values("year")
 
                 # Calculate various growth metrics for time series analysis
                 growth_rates = []
@@ -941,16 +942,14 @@ try:
 
                 # Display all forecasting methods comparison
                 st.subheader("🔄 Forecasting Methods Comparison")
-                methods_df = pd.DataFrame(
-                    [
-                        {
-                            "Method": method,
-                            "Growth Rate": f"{rate:.1%}",
-                            "Selected": "✅" if method == recommended_method else "",
-                        }
-                        for method, rate in forecasting_methods.items()
-                    ]
-                )
+                methods_df = pd.DataFrame([
+                    {
+                        "Method": method,
+                        "Growth Rate": f"{rate:.1%}",
+                        "Selected": "✅" if method == recommended_method else "",
+                    }
+                    for method, rate in forecasting_methods.items()
+                ])
                 st.dataframe(methods_df, width="stretch", hide_index=True)
 
                 # Multi-year FCF projections using different base years
@@ -961,7 +960,7 @@ try:
 
                 # Use each historical year as a potential base for projection
                 for i, (base_year, base_fcf) in enumerate(
-                    zip(historical_years, historical_fcf)
+                    zip(historical_years, historical_fcf, strict=False)
                 ):
                     # Calculate growth from this base year to latest year
                     if (
@@ -991,18 +990,16 @@ try:
 
                             # Only include if CAGR is reasonable (between -50% and +200%)
                             if -0.5 <= implied_cagr <= 2.0:
-                                multi_year_projections.append(
-                                    {
-                                        "Base Year": base_year,
-                                        "Base FCF": base_fcf,
-                                        "Years to Latest": years_ahead,
-                                        "Implied CAGR": implied_cagr,
-                                        "Weight": 1.0
-                                        / (
-                                            len(historical_years) - i
-                                        ),  # More weight to recent years
-                                    }
-                                )
+                                multi_year_projections.append({
+                                    "Base Year": base_year,
+                                    "Base FCF": base_fcf,
+                                    "Years to Latest": years_ahead,
+                                    "Implied CAGR": implied_cagr,
+                                    "Weight": 1.0
+                                    / (
+                                        len(historical_years) - i
+                                    ),  # More weight to recent years
+                                })
 
                 if multi_year_projections:
                     # Calculate weighted average CAGR from multiple base years
@@ -1235,49 +1232,41 @@ try:
                 dcf_data = []
 
                 # Base year (Year 0)
-                dcf_data.append(
-                    {
-                        "Year": "0",
-                        "FCF": format_financial_display(latest_fcf, display_unit, 0),
-                        "Growth Rate": "-",
-                        "Discount Factor": "1.000",
-                        "Present Value": "-",
-                        "Type": "Base Year",
-                    }
-                )
+                dcf_data.append({
+                    "Year": "0",
+                    "FCF": format_financial_display(latest_fcf, display_unit, 0),
+                    "Growth Rate": "-",
+                    "Discount Factor": "1.000",
+                    "Present Value": "-",
+                    "Type": "Base Year",
+                })
 
                 # Stage 1 projections
-                for i, (fcf, pv) in enumerate(zip(stage1_fcf, stage1_pv), 1):
+                for i, (fcf, pv) in enumerate(
+                    zip(stage1_fcf, stage1_pv, strict=False), 1
+                ):
                     discount_factor = 1 / ((1 + wacc) ** i)
-                    dcf_data.append(
-                        {
-                            "Year": str(i),
-                            "FCF": format_financial_display(fcf, display_unit, 0),
-                            "Growth Rate": f"{stage1_growth_rate:.1%}",
-                            "Discount Factor": f"{discount_factor:.3f}",
-                            "Present Value": format_financial_display(
-                                pv, display_unit, 0
-                            ),
-                            "Type": "High Growth",
-                        }
-                    )
+                    dcf_data.append({
+                        "Year": str(i),
+                        "FCF": format_financial_display(fcf, display_unit, 0),
+                        "Growth Rate": f"{stage1_growth_rate:.1%}",
+                        "Discount Factor": f"{discount_factor:.3f}",
+                        "Present Value": format_financial_display(pv, display_unit, 0),
+                        "Type": "High Growth",
+                    })
 
                 # Terminal year
                 terminal_discount_factor = 1 / ((1 + wacc) ** stage1_years)
-                dcf_data.append(
-                    {
-                        "Year": "Terminal",
-                        "FCF": format_financial_display(
-                            terminal_value, display_unit, 0
-                        ),
-                        "Growth Rate": f"{terminal_growth_rate:.1%}",
-                        "Discount Factor": f"{terminal_discount_factor:.3f}",
-                        "Present Value": format_financial_display(
-                            terminal_pv, display_unit, 0
-                        ),
-                        "Type": "Terminal Value",
-                    }
-                )
+                dcf_data.append({
+                    "Year": "Terminal",
+                    "FCF": format_financial_display(terminal_value, display_unit, 0),
+                    "Growth Rate": f"{terminal_growth_rate:.1%}",
+                    "Discount Factor": f"{terminal_discount_factor:.3f}",
+                    "Present Value": format_financial_display(
+                        terminal_pv, display_unit, 0
+                    ),
+                    "Type": "Terminal Value",
+                })
 
                 dcf_df = pd.DataFrame(dcf_data)
                 st.dataframe(dcf_df, width="stretch", hide_index=True)
@@ -1325,23 +1314,22 @@ try:
                         historical_fcf,
                         historical_ocf,
                         historical_capex,
+                        strict=False,
                     )
                 ):
-                    historical_data.append(
-                        {
-                            "Year": year,
-                            "Operating Cash Flow": format_financial_display(
-                                ocf, display_unit, 0
-                            ),
-                            "Capital Expenditures": format_financial_display(
-                                capex, display_unit, 0
-                            ),
-                            "Free Cash Flow": format_financial_display(
-                                fcf, display_unit, 0
-                            ),
-                            "YoY Growth": "N/A",
-                        }
-                    )
+                    historical_data.append({
+                        "Year": year,
+                        "Operating Cash Flow": format_financial_display(
+                            ocf, display_unit, 0
+                        ),
+                        "Capital Expenditures": format_financial_display(
+                            capex, display_unit, 0
+                        ),
+                        "Free Cash Flow": format_financial_display(
+                            fcf, display_unit, 0
+                        ),
+                        "YoY Growth": "N/A",
+                    })
 
                 # Add growth rates
                 for i, growth_rate in enumerate(growth_rates, 1):

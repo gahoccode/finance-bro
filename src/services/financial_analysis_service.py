@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 import streamlit as st
 
 
@@ -122,15 +122,13 @@ def create_dupont_analysis(IncomeStatement, BalanceSheet, CashFlow):
         dupont_analysis["ROE (Direct)"] = dupont_analysis["ROE (Direct)"] * 100
 
         # Round values for better display
-        dupont_analysis = dupont_analysis.round(
-            {
-                "Net Profit Margin": 2,
-                "Asset Turnover": 2,
-                "Financial Leverage": 2,
-                "ROE (DuPont)": 2,
-                "ROE (Direct)": 2,
-            }
-        )
+        dupont_analysis = dupont_analysis.round({
+            "Net Profit Margin": 2,
+            "Asset Turnover": 2,
+            "Financial Leverage": 2,
+            "ROE (DuPont)": 2,
+            "ROE (Direct)": 2,
+        })
 
         return dupont_analysis
 
@@ -221,9 +219,10 @@ def calculate_degree_of_financial_leverage(IncomeStatement):
     )
 
     # Sort by ticker and year
-    financial_leverage_data = financial_leverage_data.sort_values(
-        ["ticker", "yearReport"]
-    )
+    financial_leverage_data = financial_leverage_data.sort_values([
+        "ticker",
+        "yearReport",
+    ])
 
     # Calculate year-over-year percentage changes for each ticker
     financial_leverage_data["EBIT % Change"] = (

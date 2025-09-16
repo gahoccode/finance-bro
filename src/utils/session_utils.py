@@ -7,15 +7,16 @@ CRITICAL: All session state variables remain exactly the same.
 These utilities just provide convenient helpers for common patterns.
 """
 
-import streamlit as st
-import pandas as pd
 from datetime import datetime
-from typing import Optional, List, Tuple, Dict, Any
+from typing import Any, Dict, List, Tuple
 
-from ..core.config import DEFAULT_STOCK_SYMBOLS, DEFAULT_ANALYSIS_START_DATE
+import pandas as pd
+import streamlit as st
+
+from ..core.config import DEFAULT_ANALYSIS_START_DATE, DEFAULT_STOCK_SYMBOLS
 
 
-def get_stock_symbol() -> Optional[str]:
+def get_stock_symbol() -> str | None:
     """
     Helper to get current stock symbol from session state.
     Does NOT replace direct st.session_state.stock_symbol access.
@@ -36,7 +37,7 @@ def get_symbols_list() -> List[str]:
     return st.session_state.get("stock_symbols_list", DEFAULT_STOCK_SYMBOLS)
 
 
-def get_symbols_dataframe() -> Optional[pd.DataFrame]:
+def get_symbols_dataframe() -> pd.DataFrame | None:
     """
     Helper to get symbols DataFrame.
     Does NOT replace direct st.session_state.symbols_df access.
@@ -79,7 +80,7 @@ def has_date_range_changed() -> bool:
     return st.session_state.get("date_range_changed", False)
 
 
-def get_api_key() -> Optional[str]:
+def get_api_key() -> str | None:
     """
     Helper to get API key from session state.
     Does NOT replace direct st.session_state.api_key access.
@@ -106,7 +107,7 @@ def has_dataframes() -> bool:
     return "dataframes" in st.session_state
 
 
-def get_portfolio_returns() -> Optional[pd.DataFrame]:
+def get_portfolio_returns() -> pd.DataFrame | None:
     """
     Helper to get portfolio returns from session state.
     Does NOT replace direct st.session_state.portfolio_returns access.
@@ -119,7 +120,7 @@ def has_portfolio_data() -> bool:
     return "portfolio_returns" in st.session_state
 
 
-def get_portfolio_strategy_choice() -> Optional[str]:
+def get_portfolio_strategy_choice() -> str | None:
     """
     Helper to get portfolio strategy choice.
     Does NOT replace direct st.session_state.portfolio_strategy_choice access.

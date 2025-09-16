@@ -1,21 +1,24 @@
-import streamlit as st
-import pandas as pd
+from datetime import datetime
+
+import altair as alt
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import riskfolio as rp
+import streamlit as st
 from pypfopt import (
-    EfficientFrontier,
-    risk_models,
-    expected_returns,
     DiscreteAllocation,
+    EfficientFrontier,
     HRPOpt,
+    expected_returns,
+    plotting,
+    risk_models,
 )
 from pypfopt.discrete_allocation import get_latest_prices
-from pypfopt import plotting
-import numpy as np
-from datetime import datetime
-import altair as alt
-from src.services.vnstock_api import fetch_portfolio_stock_data
-import riskfolio as rp
+
 from src.components.ui_components import inject_custom_success_styling
+from src.services.vnstock_api import fetch_portfolio_stock_data
+
 
 # Streamlit page configuration
 st.set_page_config(
@@ -26,6 +29,8 @@ st.set_page_config(
 inject_custom_success_styling()
 
 import os
+import pathlib
+
 
 # Get stock symbol from session state (set in main app)
 # If not available, show message to use main app first
@@ -297,15 +302,13 @@ with col3:
     )
 
 # Create tabs for different analysis views
-tab1, tab2, tab3, tab4, tab5 = st.tabs(
-    [
-        "📈 Efficient Frontier & Weights",
-        "🌳 Hierarchical Risk Parity",
-        "💰 Dollars Allocation",
-        "📊 Report",
-        "📋 Risk Analysis",
-    ]
-)
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    "📈 Efficient Frontier & Weights",
+    "🌳 Hierarchical Risk Parity",
+    "💰 Dollars Allocation",
+    "📊 Report",
+    "📋 Risk Analysis",
+])
 
 with tab1:
     # Efficient Frontier Plot
@@ -463,26 +466,24 @@ with tab1:
 
     # Detailed performance table
     st.subheader("Detailed Performance Analysis")
-    performance_df = pd.DataFrame(
-        {
-            "Portfolio": ["Max Sharpe", "Min Volatility", "Max Utility"],
-            "Expected Return": [
-                f"{ret_tangent:.4f}",
-                f"{ret_min_vol:.4f}",
-                f"{ret_utility:.4f}",
-            ],
-            "Volatility": [
-                f"{std_tangent:.4f}",
-                f"{std_min_vol:.4f}",
-                f"{std_utility:.4f}",
-            ],
-            "Sharpe Ratio": [
-                f"{sharpe:.4f}",
-                f"{sharpe_min_vol:.4f}",
-                f"{sharpe_utility:.4f}",
-            ],
-        }
-    )
+    performance_df = pd.DataFrame({
+        "Portfolio": ["Max Sharpe", "Min Volatility", "Max Utility"],
+        "Expected Return": [
+            f"{ret_tangent:.4f}",
+            f"{ret_min_vol:.4f}",
+            f"{ret_utility:.4f}",
+        ],
+        "Volatility": [
+            f"{std_tangent:.4f}",
+            f"{std_min_vol:.4f}",
+            f"{std_utility:.4f}",
+        ],
+        "Sharpe Ratio": [
+            f"{sharpe:.4f}",
+            f"{sharpe_min_vol:.4f}",
+            f"{sharpe_utility:.4f}",
+        ],
+    })
     st.dataframe(performance_df, hide_index=True)
 
 with tab2:
@@ -661,7 +662,9 @@ with tab4:
     # Generate report button
     if st.button("Generate Report", key="generate_excel_report"):
         # Production-safe absolute path resolution
-        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        project_root = pathlib.Path(
+            pathlib.Path(pathlib.Path(__file__).resolve()).parent
+        ).parent
         reports_dir = os.path.join(project_root, "exports", "reports")
         os.makedirs(reports_dir, exist_ok=True)
 
@@ -693,7 +696,7 @@ with tab4:
         rp.excel_report(returns=returns, w=selected_weights_df, name=filepath_base)
 
         # Success message and download interface
-        st.success(f"✅ Excel report generated successfully!")
+        st.success("✅ Excel report generated successfully!")
 
         # Display report information
         col1, col2 = st.columns(2)
@@ -714,7 +717,7 @@ with tab4:
             )
 
         # Show file details
-        file_size = os.path.getsize(filepath_xlsx) / 1024  # Size in KB
+        file_size = pathlib.Path(filepath_xlsx).stat().st_size / 1024  # Size in KB
         st.caption(f"File: {filename_base}.xlsx ({file_size:.1f} KB)")
 
     else:

@@ -1,19 +1,21 @@
-import streamlit as st
-import pandas as pd
 import altair as alt
+import pandas as pd
+import streamlit as st
+
 from src.components.ui_components import (
     inject_custom_success_styling,
     render_financial_display_options,
 )
+from src.services.data_service import (
+    convert_dataframe_for_display,
+    format_financial_display,
+)
 from src.services.financial_analysis_service import (
-    create_dupont_analysis,
     calculate_capital_employed,
     calculate_degree_of_financial_leverage,
+    create_dupont_analysis,
 )
-from src.services.data_service import (
-    format_financial_display,
-    convert_dataframe_for_display,
-)
+
 
 # Page configuration
 st.set_page_config(
@@ -124,9 +126,11 @@ display_unit = render_financial_display_options(
 )
 
 # Create tabs for different analyses
-tab1, tab2, tab3 = st.tabs(
-    ["📊 DuPont Analysis", "💰 Capital Employed", "📈 Degree of Financial Leverage"]
-)
+tab1, tab2, tab3 = st.tabs([
+    "📊 DuPont Analysis",
+    "💰 Capital Employed",
+    "📈 Degree of Financial Leverage",
+])
 
 with tab1:
     # Information about DuPont Analysis
@@ -702,13 +706,11 @@ with tab2:
                     )
 
                     # Clean component names for display
-                    melted_data["Component"] = melted_data["Component"].replace(
-                        {
-                            "Long-term borrowings (Bn. VND)": "Long-term Debt",
-                            "Short-term borrowings (Bn. VND)": "Short-term Debt",
-                            "OWNER'S EQUITY(Bn.VND)": "Owner's Equity",
-                        }
-                    )
+                    melted_data["Component"] = melted_data["Component"].replace({
+                        "Long-term borrowings (Bn. VND)": "Long-term Debt",
+                        "Short-term borrowings (Bn. VND)": "Short-term Debt",
+                        "OWNER'S EQUITY(Bn.VND)": "Owner's Equity",
+                    })
 
                     # Create stacked bar chart
                     stacked_chart = (

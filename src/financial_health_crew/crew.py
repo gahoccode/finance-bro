@@ -1,5 +1,6 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
+
 from .tools.financial_analysis_tool import FinancialAnalysisTool
 
 

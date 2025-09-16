@@ -50,6 +50,12 @@ dev = [
 line-length = 88
 # Target Python 3.12 (updated from 3.10.11)
 target-version = "py312"
+# Enable preview features for cutting-edge rules
+preview = true
+# Show fixes for better developer experience
+show-fixes = true
+# Cache directory for performance
+cache-dir = ".ruff_cache"
 # Exclude common directories
 exclude = [
     ".bzr",
@@ -81,34 +87,76 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-# Python-specific code review standards
+# Comprehensive rule selection for LLM-generated code quality
 select = [
-    # Pyflakes - Essential Python errors
-    "F401",  # Unused imports
-    "F402",  # Import module from line N shadowed by loop variable
-    "F403",  # 'from module import *' used; unable to detect undefined names
-    "F404",  # Future import(s) name after other statements
-    "F405",  # Name may be undefined, or defined from star imports
-    "F811",  # Redefinition of unused name from line N
-    "F821",  # Undefined name
-    "F822",  # Undefined name in __all__
-    "F823",  # Local variable referenced before assignment
-    "F841",  # Local variable assigned but never used
+    # Pyflakes - Essential Python errors (F-rules)
+    "F",      # All PyFlakes rules (includes F401, F841, F821, F811, F822, F823)
     
     # pycodestyle - Python style issues
-    "E101",  # Indentation contains mixed spaces and tabs
+    "E4",     # Import-related errors
+    "E7",     # Statement-related errors  
+    "E9",     # Runtime syntax errors
+    "E101",   # Indentation contains mixed spaces and tabs
+    
+    # pycodestyle warnings - Common LLM formatting issues
+    "W",      # All pycodestyle warnings (includes W291, W292, W293, W391)
+    
+    # flake8-bugbear - Modern Python best practices
+    "B",      # B0xx series for common bugs and design issues
+    
+    # pyupgrade - Modern Python syntax
+    "UP",     # UPxxx series for Python modernization
+    
+    # flake8-simplify - Code simplification opportunities
+    "SIM",    # SIMxxx series for code simplification
+    
+    # flake8-comprehensions - Better list/dict comprehensions
+    "C4",     # C4xx series for comprehension improvements
+    
+    # flake8-unused-arguments - Unused function arguments
+    "ARG",    # ARGxxx series for unused arguments
+    
+    # flake8-use-pathlib - Modern path handling
+    "PTH",    # PTHxxx series for pathlib usage
+    
+    # flake8-type-checking - Type checking improvements
+    "TCH",    # TCHxxx series for type checking
+    
+    # isort - Import sorting (configured separately)
+    "I",      # Ixxx series for import organization
     
     # NumPy 2.0 compatibility rules
-    "NPY201",  # NumPy 2.0 deprecations and compatibility
-    "W291",  # Trailing whitespace
-    "W292",  # No newline at end of file
-    "W293",  # Blank line contains whitespace
+    "NPY201", # NumPy 2.0 deprecations and compatibility
+]
+# Ignore specific rules that are not relevant
+ignore = [
+    "E501",   # Line too long (handled by formatter)
+    "B008",   # Do not perform function calls in argument defaults
+    "UP007",  # Use X | Y for union types (may conflict with existing code)
 ]
 # Allow fix for all enabled rules
 fixable = ["ALL"]
 unfixable = []
+# Allow unsafe fixes for beneficial modernizations
+extend-unsafe-fixes = ["UP006", "UP007", "UP035"]
 # Allow unused variables when underscore-prefixed
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+# Task tags for TODO/FIXME management
+task-tags = ["TODO", "FIXME", "XXX", "HACK"]
+
+[tool.ruff.lint.per-file-ignores]
+# Allow unused imports in __init__.py files
+"__init__.py" = ["F401"]
+# Allow unused variables in test files
+"tests/**/*.py" = ["F401", "F841", "ARG001", "ARG002"]
+# Allow unused variables in example/demo files
+"examples/**/*.py" = ["F401", "F841"]
+# Allow unused variables in scripts
+"scripts/**/*.py" = ["F841"]
+# Allow unused variables in documentation files
+"docs/**/*.py" = ["F401", "F841"]
+# Allow specific patterns in legacy code (if any)
+"src/legacy/**/*.py" = ["F401", "F841"]
 
 [tool.ruff.format]
 # Use double quotes for strings (same as Black)

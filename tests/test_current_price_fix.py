@@ -3,8 +3,8 @@ Test to verify the current_price fix for DCF calculation.
 This test ensures that current_price is properly initialized in both execution paths.
 """
 
-import pytest
 import pandas as pd
+import pytest
 
 
 def test_current_price_initialization():
@@ -47,15 +47,14 @@ def test_dcf_validation_condition():
     """Test the DCF calculation validation condition."""
     # Simulate the condition from line 718
     wacc = 0.085
-    cash_flow = pd.DataFrame(
-        {
-            "yearReport": [2023, 2022],
-            "Net cash inflows/outflows from operating activities": [100, 90],
-        }
-    )
-    balance_sheet = pd.DataFrame(
-        {"yearReport": [2023, 2022], "Short-term borrowings (Bn. VND)": [100, 90]}
-    )
+    cash_flow = pd.DataFrame({
+        "yearReport": [2023, 2022],
+        "Net cash inflows/outflows from operating activities": [100, 90],
+    })
+    balance_sheet = pd.DataFrame({
+        "yearReport": [2023, 2022],
+        "Short-term borrowings (Bn. VND)": [100, 90],
+    })
     current_price = 64.8
 
     # Test the validation condition
@@ -73,15 +72,14 @@ def test_dcf_validation_condition():
 def test_dcf_validation_fails_without_current_price():
     """Test that DCF validation fails when current_price is not available."""
     wacc = 0.085
-    cash_flow = pd.DataFrame(
-        {
-            "yearReport": [2023, 2022],
-            "Net cash inflows/outflows from operating activities": [100, 90],
-        }
-    )
-    balance_sheet = pd.DataFrame(
-        {"yearReport": [2023, 2022], "Short-term borrowings (Bn. VND)": [100, 90]}
-    )
+    cash_flow = pd.DataFrame({
+        "yearReport": [2023, 2022],
+        "Net cash inflows/outflows from operating activities": [100, 90],
+    })
+    balance_sheet = pd.DataFrame({
+        "yearReport": [2023, 2022],
+        "Short-term borrowings (Bn. VND)": [100, 90],
+    })
     # current_price is not defined (simulating the original bug)
 
     # Test the validation condition without current_price

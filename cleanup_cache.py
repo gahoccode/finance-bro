@@ -13,8 +13,8 @@ Usage:
     python cleanup_cache.py
 """
 
-import os
 import glob
+import os
 import sys
 from pathlib import Path
 
@@ -31,7 +31,7 @@ def cleanup_directory(directory, file_pattern, description):
     Returns:
         int: Number of files deleted
     """
-    if not os.path.exists(directory):
+    if not Path(directory).exists():
         print(f"📁 Directory {directory} does not exist, skipping...")
         return 0
 
@@ -46,7 +46,7 @@ def cleanup_directory(directory, file_pattern, description):
     deleted_count = 0
     for file_path in files_to_delete:
         try:
-            os.remove(file_path)
+            Path(file_path).unlink()
             print(f"🗑️  Deleted: {file_path}")
             deleted_count += 1
         except OSError as e:

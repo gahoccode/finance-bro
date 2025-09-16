@@ -1,22 +1,25 @@
-import streamlit as st
-import pandas as pd
 from datetime import datetime
+
+import pandas as pd
+import streamlit as st
+
+from src.components.ui_components import inject_custom_success_styling
+from src.services.chart_service import (
+    create_fund_asset_pie_chart,
+    create_fund_comparison_bar_chart,
+    create_fund_industry_pie_chart,
+    create_fund_nav_line_chart,
+    generate_fund_charts_2x2_png,
+)
 
 # Import from modular services
 from src.services.vnstock_api import (
-    get_fund_listing,
-    get_fund_nav_report,
     get_fund_asset_allocation,
     get_fund_industry_allocation,
+    get_fund_listing,
+    get_fund_nav_report,
 )
-from src.services.chart_service import (
-    create_fund_nav_line_chart,
-    create_fund_comparison_bar_chart,
-    create_fund_asset_pie_chart,
-    create_fund_industry_pie_chart,
-    generate_fund_charts_2x2_png,
-)
-from src.components.ui_components import inject_custom_success_styling
+
 
 st.set_page_config(page_title="Fund Analysis", layout="wide")
 
@@ -306,16 +309,12 @@ with export_col2:
 with export_col3:
     # Prepare allocation data CSV (only show if data exists)
     if not industry_data.empty or not asset_data.empty:
-        allocation_data = pd.concat(
-            [
-                asset_data.assign(type="Asset")
-                if not asset_data.empty
-                else pd.DataFrame(),
-                industry_data.assign(type="Industry")
-                if not industry_data.empty
-                else pd.DataFrame(),
-            ]
-        )
+        allocation_data = pd.concat([
+            asset_data.assign(type="Asset") if not asset_data.empty else pd.DataFrame(),
+            industry_data.assign(type="Industry")
+            if not industry_data.empty
+            else pd.DataFrame(),
+        ])
         if not allocation_data.empty:
             allocation_csv = allocation_data.to_csv(index=False)
             st.download_button(

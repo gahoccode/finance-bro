@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from vnstock import Quote
 
+
 quote = Quote(symbol="VNINDEX", source="VCI")
 # Get historical data
 vnindex_data = quote.history(start=start_date, end=end_date, interval=interval)
@@ -119,19 +120,17 @@ wacc_market_based = (market_weight_of_debt * after_tax_market_cost_of_debt) + (
 )
 
 # Create a DataFrame with the results
-result_df = pd.DataFrame(
-    {
-        "ticker": BalanceSheet["ticker"],
-        "yearReport": BalanceSheet["yearReport"],
-        "market_cap": market_value_of_equity,
-        "market_debt": market_value_of_debt,
-        "market_weight_of_debt": market_weight_of_debt,
-        "market_weight_of_equity": market_weight_of_equity,
-        "market_cost_of_debt": after_tax_market_cost_of_debt,
-        "beta": estimated_beta,
-        "cost_of_equity": cost_of_equity,
-        "wacc_market_based": wacc_market_based,
-    }
-)
+result_df = pd.DataFrame({
+    "ticker": BalanceSheet["ticker"],
+    "yearReport": BalanceSheet["yearReport"],
+    "market_cap": market_value_of_equity,
+    "market_debt": market_value_of_debt,
+    "market_weight_of_debt": market_weight_of_debt,
+    "market_weight_of_equity": market_weight_of_equity,
+    "market_cost_of_debt": after_tax_market_cost_of_debt,
+    "beta": estimated_beta,
+    "cost_of_equity": cost_of_equity,
+    "wacc_market_based": wacc_market_based,
+})
 
 result_df[["yearReport", "wacc_market_based"]].round(3)  # round to 3 decimal places

@@ -1,6 +1,7 @@
 from vnstock import Vnstock
 from vnstock.core.utils.transform import flatten_hierarchical_index
 
+
 stock = Vnstock().stock(symbol="ACB", source="VCI")
 ratios = stock.finance.ratio(period="year", lang="vi", dropna=True)
 

@@ -5,18 +5,19 @@ Comprehensive tests for all company data fetching functions in src/services/vnst
 to ensure reliability and data consistency for Company_Overview.py page.
 """
 
-import pytest
-import pandas as pd
+from unittest.mock import MagicMock, patch
+
 import numpy as np
-from unittest.mock import patch, MagicMock
+import pandas as pd
+import pytest
 
 from src.services.vnstock_api import (
-    get_ownership_data,
-    get_management_data,
-    get_subsidiaries_data,
-    get_insider_deals_data,
-    get_foreign_trading_data,
     get_company_reports,
+    get_foreign_trading_data,
+    get_insider_deals_data,
+    get_management_data,
+    get_ownership_data,
+    get_subsidiaries_data,
 )
 
 
@@ -192,14 +193,12 @@ class TestVnStockCompanyFunctions:
     def test_get_company_reports_date_processing(self):
         """Test company reports date conversion and sorting logic."""
         # Create mock data with unsorted dates
-        mock_data = pd.DataFrame(
-            {
-                "date": ["2024-01-15", "2024-01-20", "2024-01-10"],
-                "description": ["Report 1", "Report 2", "Report 3"],
-                "link": ["link1", "link2", "link3"],
-                "name": ["News 1", "News 2", "News 3"],
-            }
-        )
+        mock_data = pd.DataFrame({
+            "date": ["2024-01-15", "2024-01-20", "2024-01-10"],
+            "description": ["Report 1", "Report 2", "Report 3"],
+            "link": ["link1", "link2", "link3"],
+            "name": ["News 1", "News 2", "News 3"],
+        })
 
         with patch("src.services.vnstock_api.Company") as mock_company_class:
             # Setup mock

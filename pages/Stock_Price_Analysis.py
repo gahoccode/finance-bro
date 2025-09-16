@@ -1,10 +1,13 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
 import os
-import quantstats as qs
 from datetime import datetime
+
+import numpy as np
+import pandas as pd
+import quantstats as qs
+import streamlit as st
+
 from src.components.ui_components import inject_custom_success_styling
+
 
 st.set_page_config(page_title="Stock Price Analysis", layout="wide")
 
@@ -365,12 +368,15 @@ def calculate_custom_metrics(
 
 
 # Import cached function from modular utilities
-from src.services.vnstock_api import fetch_stock_price_data
+import pathlib
+
 from src.services.chart_service import (
-    create_altair_line_chart,
     create_altair_area_chart,
+    create_altair_line_chart,
     create_plotly_candlestick_chart,
 )
+from src.services.vnstock_api import fetch_stock_price_data
+
 
 if ticker:
     try:
@@ -445,9 +451,9 @@ if ticker:
                         and len(st.session_state.stock_returns) > 0
                     ):
                         # Set up exports directory
-                        project_root = os.path.dirname(
-                            os.path.dirname(os.path.abspath(__file__))
-                        )
+                        project_root = pathlib.Path(
+                            pathlib.Path(pathlib.Path(__file__).resolve()).parent
+                        ).parent
                         tearsheets_dir = os.path.join(
                             project_root, "exports", "tearsheets"
                         )
@@ -467,22 +473,24 @@ if ticker:
                                 qs.reports.html(returns_data, output=filepath)
 
                                 # Check if file was created at expected location, if not check project root
-                                if not os.path.exists(filepath):
+                                if not pathlib.Path(filepath).exists():
                                     # QuantStats 0.0.59 may save to project root with default name
-                                    project_root = os.path.dirname(
-                                        os.path.dirname(os.path.abspath(__file__))
-                                    )
+                                    project_root = pathlib.Path(
+                                        pathlib.Path(
+                                            pathlib.Path(__file__).resolve()
+                                        ).parent
+                                    ).parent
                                     default_file = os.path.join(
                                         project_root, "quantstats-tearsheet.html"
                                     )
-                                    if os.path.exists(default_file):
+                                    if pathlib.Path(default_file).exists():
                                         # Move file to our desired location
                                         import shutil
 
                                         shutil.move(default_file, filepath)
 
                                 # Read the generated HTML file for display
-                                with open(filepath, "r", encoding="utf-8") as f:
+                                with open(filepath, encoding="utf-8") as f:
                                     html_content = f.read()
 
                                 # Success message

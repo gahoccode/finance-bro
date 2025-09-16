@@ -1,7 +1,8 @@
 """Tests for effective tax rate calculation function."""
 
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from src.services.financial_analysis_service import calculate_effective_tax_rate
 
 
@@ -11,27 +12,23 @@ class TestEffectiveTaxRateCalculation:
     def test_calculate_effective_tax_rate_basic(self):
         """Test basic effective tax rate calculation."""
         # Create sample Income Statement data
-        income_statement = pd.DataFrame(
-            {
-                "ticker": ["VIC", "VIC", "VIC"],
-                "yearReport": [2021, 2022, 2023],
-                "Profit before tax": [1000, 1200, 1500],  # Billions VND
-            }
-        )
+        income_statement = pd.DataFrame({
+            "ticker": ["VIC", "VIC", "VIC"],
+            "yearReport": [2021, 2022, 2023],
+            "Profit before tax": [1000, 1200, 1500],  # Billions VND
+        })
 
         # Create sample Cash Flow data
-        cash_flow = pd.DataFrame(
-            {
-                "ticker": ["VIC", "VIC", "VIC"],
-                "yearReport": [2021, 2022, 2023],
-                "Business Income Tax paid": [
-                    -200,
-                    -240,
-                    -300,
-                ],  # Negative values (typical in cash flow)
-                "Net Profit/Loss before tax": [1000, 1200, 1500],  # Fallback values
-            }
-        )
+        cash_flow = pd.DataFrame({
+            "ticker": ["VIC", "VIC", "VIC"],
+            "yearReport": [2021, 2022, 2023],
+            "Business Income Tax paid": [
+                -200,
+                -240,
+                -300,
+            ],  # Negative values (typical in cash flow)
+            "Net Profit/Loss before tax": [1000, 1200, 1500],  # Fallback values
+        })
 
         # Calculate effective tax rate
         result = calculate_effective_tax_rate(income_statement, cash_flow)
@@ -57,29 +54,25 @@ class TestEffectiveTaxRateCalculation:
         expected_rates = [0.20, 0.20, 0.20]
         actual_rates = result["Effective Tax Rate"].tolist()
 
-        for expected, actual in zip(expected_rates, actual_rates):
+        for expected, actual in zip(expected_rates, actual_rates, strict=False):
             assert abs(actual - expected) < 0.001
 
     def test_calculate_effective_tax_rate_with_missing_income_statement_data(self):
         """Test effective tax rate calculation when Income Statement data is missing."""
         # Income Statement with missing "Profit before tax" values
-        income_statement = pd.DataFrame(
-            {
-                "ticker": ["VIC", "VIC"],
-                "yearReport": [2022, 2023],
-                "Profit before tax": [np.nan, 1500],  # Missing data for 2022
-            }
-        )
+        income_statement = pd.DataFrame({
+            "ticker": ["VIC", "VIC"],
+            "yearReport": [2022, 2023],
+            "Profit before tax": [np.nan, 1500],  # Missing data for 2022
+        })
 
         # Cash Flow with complete data
-        cash_flow = pd.DataFrame(
-            {
-                "ticker": ["VIC", "VIC"],
-                "yearReport": [2022, 2023],
-                "Business Income Tax paid": [-240, -300],
-                "Net Profit/Loss before tax": [1200, 1500],  # Fallback values
-            }
-        )
+        cash_flow = pd.DataFrame({
+            "ticker": ["VIC", "VIC"],
+            "yearReport": [2022, 2023],
+            "Business Income Tax paid": [-240, -300],
+            "Net Profit/Loss before tax": [1200, 1500],  # Fallback values
+        })
 
         result = calculate_effective_tax_rate(income_statement, cash_flow)
 
@@ -92,38 +85,34 @@ class TestEffectiveTaxRateCalculation:
         expected_rates = [0.20, 0.20]
         actual_rates = result["Effective Tax Rate"].tolist()
 
-        for expected, actual in zip(expected_rates, actual_rates):
+        for expected, actual in zip(expected_rates, actual_rates, strict=False):
             assert abs(actual - expected) < 0.001
 
     def test_calculate_effective_tax_rate_edge_cases(self):
         """Test effective tax rate calculation with edge cases."""
         # Test with zero and negative profits
-        income_statement = pd.DataFrame(
-            {
-                "ticker": ["VIC", "VIC", "VIC", "VIC"],
-                "yearReport": [2020, 2021, 2022, 2023],
-                "Profit before tax": [
-                    0,
-                    -500,
-                    1000,
-                    2000,
-                ],  # Zero, negative, positive profits
-            }
-        )
+        income_statement = pd.DataFrame({
+            "ticker": ["VIC", "VIC", "VIC", "VIC"],
+            "yearReport": [2020, 2021, 2022, 2023],
+            "Profit before tax": [
+                0,
+                -500,
+                1000,
+                2000,
+            ],  # Zero, negative, positive profits
+        })
 
-        cash_flow = pd.DataFrame(
-            {
-                "ticker": ["VIC", "VIC", "VIC", "VIC"],
-                "yearReport": [2020, 2021, 2022, 2023],
-                "Business Income Tax paid": [
-                    -50,
-                    -100,
-                    -200,
-                    -600,
-                ],  # Various tax payments
-                "Net Profit/Loss before tax": [0, -500, 1000, 2000],
-            }
-        )
+        cash_flow = pd.DataFrame({
+            "ticker": ["VIC", "VIC", "VIC", "VIC"],
+            "yearReport": [2020, 2021, 2022, 2023],
+            "Business Income Tax paid": [
+                -50,
+                -100,
+                -200,
+                -600,
+            ],  # Various tax payments
+            "Net Profit/Loss before tax": [0, -500, 1000, 2000],
+        })
 
         result = calculate_effective_tax_rate(income_statement, cash_flow)
 
@@ -149,22 +138,18 @@ class TestEffectiveTaxRateCalculation:
     def test_calculate_effective_tax_rate_multiple_companies(self):
         """Test effective tax rate calculation with multiple companies."""
         # Multiple tickers
-        income_statement = pd.DataFrame(
-            {
-                "ticker": ["VIC", "VIC", "REE", "REE"],
-                "yearReport": [2022, 2023, 2022, 2023],
-                "Profit before tax": [1000, 1200, 800, 900],
-            }
-        )
+        income_statement = pd.DataFrame({
+            "ticker": ["VIC", "VIC", "REE", "REE"],
+            "yearReport": [2022, 2023, 2022, 2023],
+            "Profit before tax": [1000, 1200, 800, 900],
+        })
 
-        cash_flow = pd.DataFrame(
-            {
-                "ticker": ["VIC", "VIC", "REE", "REE"],
-                "yearReport": [2022, 2023, 2022, 2023],
-                "Business Income Tax paid": [-200, -240, -160, -225],
-                "Net Profit/Loss before tax": [1000, 1200, 800, 900],
-            }
-        )
+        cash_flow = pd.DataFrame({
+            "ticker": ["VIC", "VIC", "REE", "REE"],
+            "yearReport": [2022, 2023, 2022, 2023],
+            "Business Income Tax paid": [-200, -240, -160, -225],
+            "Net Profit/Loss before tax": [1000, 1200, 800, 900],
+        })
 
         result = calculate_effective_tax_rate(income_statement, cash_flow)
 
@@ -197,22 +182,18 @@ class TestEffectiveTaxRateCalculation:
 
     def test_calculate_effective_tax_rate_no_matching_years(self):
         """Test effective tax rate calculation when years don't match between statements."""
-        income_statement = pd.DataFrame(
-            {
-                "ticker": ["VIC"],
-                "yearReport": [2022],
-                "Profit before tax": [1000],
-            }
-        )
+        income_statement = pd.DataFrame({
+            "ticker": ["VIC"],
+            "yearReport": [2022],
+            "Profit before tax": [1000],
+        })
 
-        cash_flow = pd.DataFrame(
-            {
-                "ticker": ["VIC"],
-                "yearReport": [2023],  # Different year
-                "Business Income Tax paid": [-200],
-                "Net Profit/Loss before tax": [1200],
-            }
-        )
+        cash_flow = pd.DataFrame({
+            "ticker": ["VIC"],
+            "yearReport": [2023],  # Different year
+            "Business Income Tax paid": [-200],
+            "Net Profit/Loss before tax": [1200],
+        })
 
         result = calculate_effective_tax_rate(income_statement, cash_flow)
 

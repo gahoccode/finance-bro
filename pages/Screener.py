@@ -1,11 +1,14 @@
-import streamlit as st
-import pandas as pd
-import altair as alt
-from vnstock import Listing
 import warnings
+
+import altair as alt
+import pandas as pd
+import streamlit as st
+from vnstock import Listing
+
 
 warnings.filterwarnings("ignore")
 from src.services.vnstock_api import get_screener_data
+
 
 # Title and header
 st.markdown("# 🔍 Stock Screener")
@@ -523,13 +526,11 @@ if run_screener:
 
                     # Add step to tracking
                     filter_name = column.replace("_", " ").title()
-                    filtering_steps.append(
-                        {
-                            "Step": f"After {filter_name}",
-                            "Count": after_count,
-                            "Filter": f"{filter_name} ({min_val}-{max_val})",
-                        }
-                    )
+                    filtering_steps.append({
+                        "Step": f"After {filter_name}",
+                        "Count": after_count,
+                        "Filter": f"{filter_name} ({min_val}-{max_val})",
+                    })
                 else:
                     st.warning(
                         f"⚠️ Column '{column}' not found in data. Skipping this filter."
@@ -654,16 +655,14 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
     st.subheader("📊 Visualizations")
 
     # Create tabs for different visualizations
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
-        [
-            "ROE Analysis",
-            "Market Cap vs Dividend Yield",
-            "Value vs Quality",
-            "Risk Analysis",
-            "Quality Scores",
-            "Distribution Charts",
-        ]
-    )
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+        "ROE Analysis",
+        "Market Cap vs Dividend Yield",
+        "Value vs Quality",
+        "Risk Analysis",
+        "Quality Scores",
+        "Distribution Charts",
+    ])
 
     with tab1:
         if "roe" in df.columns and "market_cap" in df.columns:
@@ -911,10 +910,11 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
 
     def create_matplotlib_charts_for_download(data):
         """Create matplotlib charts for PNG download"""
+        import io
+        from datetime import datetime
+
         import matplotlib.pyplot as plt
         import numpy as np
-        from datetime import datetime
-        import io
 
         # Set up the figure with subplots
         fig_height = 12

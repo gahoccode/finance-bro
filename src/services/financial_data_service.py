@@ -5,11 +5,13 @@ Centralized financial data loading for all pages, extracted from bro.py.
 Provides cached, validated financial statement data for valuation and analysis.
 """
 
-import streamlit as st
-import pandas as pd
-from vnstock import Vnstock, Listing
-from vnstock.core.utils.transform import flatten_hierarchical_index
 import warnings
+
+import pandas as pd
+import streamlit as st
+from vnstock import Listing, Vnstock
+from vnstock.core.utils.transform import flatten_hierarchical_index
+
 
 warnings.filterwarnings("ignore")
 

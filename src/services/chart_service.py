@@ -3,16 +3,19 @@ Chart generation utilities for Finance Bro application.
 Centralized chart creation functions extracted from various pages.
 """
 
-import streamlit as st
-import pandas as pd
+import glob
+import os
+import pathlib
+from typing import Dict
+
+import altair as alt
 import matplotlib.pyplot as plt
 import mplfinance as mpf
-import altair as alt
+import pandas as pd
 import plotly.graph_objects as go
 import plotly.subplots as sp
-import os
-import glob
-from typing import Dict, Optional
+import streamlit as st
+
 
 # Technical Analysis Chart Functions
 
@@ -22,7 +25,7 @@ def create_technical_chart(
     data: pd.DataFrame,
     indicators: dict,
     config: dict,
-    fibonacci_config: Optional[Dict] = None,
+    fibonacci_config: Dict | None = None,
 ) -> plt.Figure:
     """Create technical analysis chart with indicators using mplfinance with safe validation
 
@@ -40,15 +43,11 @@ def create_technical_chart(
             required_cols = ["BBU_20_2.0", "BBM_20_2.0", "BBL_20_2.0"]
             if all(col in bb.columns for col in required_cols):
                 try:
-                    addplots.extend(
-                        [
-                            mpf.make_addplot(bb["BBU_20_2.0"], color="red", width=0.7),
-                            mpf.make_addplot(bb["BBM_20_2.0"], color="blue", width=0.7),
-                            mpf.make_addplot(
-                                bb["BBL_20_2.0"], color="green", width=0.7
-                            ),
-                        ]
-                    )
+                    addplots.extend([
+                        mpf.make_addplot(bb["BBU_20_2.0"], color="red", width=0.7),
+                        mpf.make_addplot(bb["BBM_20_2.0"], color="blue", width=0.7),
+                        mpf.make_addplot(bb["BBL_20_2.0"], color="green", width=0.7),
+                    ])
                 except Exception as e:
                     skipped_indicators.append(f"Bollinger Bands: {str(e)}")
             else:
@@ -84,19 +83,17 @@ def create_technical_chart(
             required_cols = ["MACD_12_26_9", "MACDs_12_26_9"]
             if all(col in macd.columns for col in required_cols):
                 try:
-                    addplots.extend(
-                        [
-                            mpf.make_addplot(
-                                macd["MACD_12_26_9"],
-                                panel=panels,
-                                color="blue",
-                                ylabel="MACD",
-                            ),
-                            mpf.make_addplot(
-                                macd["MACDs_12_26_9"], panel=panels, color="red"
-                            ),
-                        ]
-                    )
+                    addplots.extend([
+                        mpf.make_addplot(
+                            macd["MACD_12_26_9"],
+                            panel=panels,
+                            color="blue",
+                            ylabel="MACD",
+                        ),
+                        mpf.make_addplot(
+                            macd["MACDs_12_26_9"], panel=panels, color="red"
+                        ),
+                    ])
                     panels += 1
                 except Exception as e:
                     skipped_indicators.append(f"MACD: {str(e)}")
@@ -131,17 +128,13 @@ def create_technical_chart(
             required_cols = ["ADX_14", "DMP_14", "DMN_14"]
             if all(col in adx.columns for col in required_cols):
                 try:
-                    addplots.extend(
-                        [
-                            mpf.make_addplot(
-                                adx["ADX_14"], panel=panels, color="brown", ylabel="ADX"
-                            ),
-                            mpf.make_addplot(
-                                adx["DMP_14"], panel=panels, color="green"
-                            ),
-                            mpf.make_addplot(adx["DMN_14"], panel=panels, color="red"),
-                        ]
-                    )
+                    addplots.extend([
+                        mpf.make_addplot(
+                            adx["ADX_14"], panel=panels, color="brown", ylabel="ADX"
+                        ),
+                        mpf.make_addplot(adx["DMP_14"], panel=panels, color="green"),
+                        mpf.make_addplot(adx["DMN_14"], panel=panels, color="red"),
+                    ])
                     panels += 1
                 except Exception as e:
                     skipped_indicators.append(f"ADX: {str(e)}")
@@ -390,16 +383,14 @@ def create_plotly_candlestick_chart(
     fig.update_layout(
         xaxis=dict(
             rangeselector=dict(
-                buttons=list(
-                    [
-                        dict(count=7, label="7d", step="day", stepmode="backward"),
-                        dict(count=30, label="30d", step="day", stepmode="backward"),
-                        dict(count=90, label="3m", step="day", stepmode="backward"),
-                        dict(count=180, label="6m", step="day", stepmode="backward"),
-                        dict(count=365, label="1y", step="day", stepmode="backward"),
-                        dict(step="all", label="All"),
-                    ]
-                ),
+                buttons=list([
+                    dict(count=7, label="7d", step="day", stepmode="backward"),
+                    dict(count=30, label="30d", step="day", stepmode="backward"),
+                    dict(count=90, label="3m", step="day", stepmode="backward"),
+                    dict(count=180, label="6m", step="day", stepmode="backward"),
+                    dict(count=365, label="1y", step="day", stepmode="backward"),
+                    dict(step="all", label="All"),
+                ]),
                 bgcolor="rgba(118,112,108,0.1)",
                 bordercolor="rgba(118,112,108,0.3)",
                 borderwidth=1,
@@ -423,7 +414,7 @@ def detect_latest_chart():
     """
     try:
         chart_dir = "exports/charts/"
-        if os.path.exists(chart_dir):
+        if pathlib.Path(chart_dir).exists():
             chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
             if chart_files:
                 latest_chart = max(chart_files, key=os.path.getctime)
@@ -500,8 +491,8 @@ def _create_fibonacci_overlays(data: pd.DataFrame, fibonacci_config: Dict) -> li
     """
     try:
         from src.services.fibonacci_service import (
-            get_recent_swing_fibonacci,
             get_fibonacci_colors,
+            get_recent_swing_fibonacci,
         )
 
         # Get Fibonacci analysis
@@ -932,8 +923,9 @@ def generate_fund_charts_2x2_png(
     Returns:
         PNG data as bytes for direct download
     """
-    import altair as alt
     import io
+
+    import altair as alt
 
     # Create 2x2 layout
     # Top row: NAV Performance and Fund Comparison

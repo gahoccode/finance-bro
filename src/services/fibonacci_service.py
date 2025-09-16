@@ -3,11 +3,12 @@ Fibonacci Retracement Service for Finance Bro application.
 Provides swing detection using SciPy and Fibonacci level calculations.
 """
 
-import pandas as pd
+from typing import Dict, Tuple
+
 import numpy as np
-from scipy.signal import argrelextrema
-from typing import Dict, Tuple, Optional
+import pandas as pd
 import streamlit as st
+from scipy.signal import argrelextrema
 
 
 @st.cache_data(ttl=300)  # 5-minute cache for fibonacci calculations
@@ -119,7 +120,7 @@ def get_recent_swing_fibonacci(
     lookback_bars: int = 50,
     swing_order: int = 5,
     include_extensions: bool = False,
-) -> Optional[Dict]:
+) -> Dict | None:
     """
     Calculate Fibonacci levels based on most recent significant swing.
 

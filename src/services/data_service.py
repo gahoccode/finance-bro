@@ -6,9 +6,10 @@ CRITICAL: All session state variables remain exactly the same.
 These utilities work WITH existing data processing patterns.
 """
 
-import pandas as pd
+from typing import Any, Dict, List, Tuple
+
 import numpy as np
-from typing import Dict, Any, Optional, List, Tuple
+import pandas as pd
 
 
 def transpose_financial_dataframe(
@@ -348,13 +349,11 @@ def prepare_technical_chart_data(data: pd.DataFrame, indicators: dict) -> List:
             try:
                 import mplfinance as mpf
 
-                addplots.extend(
-                    [
-                        mpf.make_addplot(bb["BBU_20_2.0"], color="red", width=0.7),
-                        mpf.make_addplot(bb["BBM_20_2.0"], color="blue", width=0.7),
-                        mpf.make_addplot(bb["BBL_20_2.0"], color="green", width=0.7),
-                    ]
-                )
+                addplots.extend([
+                    mpf.make_addplot(bb["BBU_20_2.0"], color="red", width=0.7),
+                    mpf.make_addplot(bb["BBM_20_2.0"], color="blue", width=0.7),
+                    mpf.make_addplot(bb["BBL_20_2.0"], color="green", width=0.7),
+                ])
             except Exception as e:
                 skipped_indicators.append(f"Bollinger Bands: {str(e)}")
         else:
@@ -553,7 +552,7 @@ def format_financial_metrics(value: Any, metric_type: str = "default") -> str:
 
 
 def validate_financial_dataframe(
-    df: pd.DataFrame, required_columns: Optional[List[str]] = None
+    df: pd.DataFrame, required_columns: List[str] | None = None
 ) -> Dict[str, Any]:
     """
     Validate financial dataframe structure and content.

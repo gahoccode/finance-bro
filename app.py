@@ -1,9 +1,12 @@
-import streamlit as st
 import os
+
+import streamlit as st
 from dotenv import load_dotenv
 from vnstock import Listing
+
 from src.components.ui_components import inject_custom_success_styling
 from src.services.session_state_service import ensure_valuation_data_loaded
+
 
 # Load environment variables from .env file
 load_dotenv()

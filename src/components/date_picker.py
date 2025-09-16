@@ -6,14 +6,15 @@ CRITICAL: All session state variables remain exactly the same.
 This component works WITH existing session state patterns.
 """
 
-import streamlit as st
-import pandas as pd
 from datetime import datetime, timedelta
 from typing import Tuple
 
+import pandas as pd
+import streamlit as st
+
+from ..core.config import DEFAULT_ANALYSIS_START_DATE
 from ..utils.session_utils import get_analysis_dates
 from ..utils.validation import validate_date_range
-from ..core.config import DEFAULT_ANALYSIS_START_DATE
 from .ui_components import inject_custom_success_styling
 
 

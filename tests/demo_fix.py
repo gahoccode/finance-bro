@@ -5,11 +5,13 @@ This simulates the fixed logic without needing to run the Streamlit app.
 """
 
 import os
-import pandas as pd
-import numpy as np
-from datetime import datetime
+import pathlib
 import tempfile
+from datetime import datetime
 from unittest.mock import patch
+
+import numpy as np
+import pandas as pd
 
 
 def demo_fixed_logic():
@@ -25,7 +27,7 @@ def demo_fixed_logic():
     np.random.seed(42)
     dates = pd.date_range(start="2024-01-01", periods=100, freq="D")
     returns_data = {}
-    for symbol in sample_weights.keys():
+    for symbol in sample_weights:
         returns_data[symbol] = np.random.normal(0.001, 0.02, 100)
 
     returns_df = pd.DataFrame(returns_data, index=dates)
@@ -97,13 +99,13 @@ def demo_fixed_logic():
             print(f"   ✓ Download filename: {download_filename}")
 
             # Verify file exists and can be read
-            assert os.path.exists(filepath_xlsx)
-            file_size = os.path.getsize(filepath_xlsx) / 1024
+            assert pathlib.Path(filepath_xlsx).exists()
+            file_size = pathlib.Path(filepath_xlsx).stat().st_size / 1024
             print(f"   ✓ File size: {file_size:.1f} KB")
 
             print(f"   ✅ {portfolio_label} Portfolio: SUCCESS")
 
-    print(f"\n🎉 All tests passed! The double extension bug has been fixed.")
+    print("\n🎉 All tests passed! The double extension bug has been fixed.")
     print("\nSUMMARY OF THE FIX:")
     print("• filename_base: No .xlsx extension")
     print("• rp.excel_report(): Called with path without extension")

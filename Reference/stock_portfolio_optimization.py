@@ -1,5 +1,6 @@
-from vnstock import Quote
 import pandas as pd
+from vnstock import Quote
+
 
 # Define the symbols you want to fetch data for
 symbols = ["REE", "FMC", "DHC"]
@@ -91,16 +92,17 @@ risk_free_rate = 0.02
 risk_aversion = 1
 from pypfopt.expected_returns import returns_from_prices
 
+
 log_returns = False
 returns = returns_from_prices(prices_df, log_returns=log_returns)
 
 
 from pypfopt import EfficientFrontier
+from pypfopt.efficient_frontier import EfficientFrontier
 from pypfopt.expected_returns import mean_historical_return
 from pypfopt.risk_models import (
     sample_cov,
 )  # for covariance matrix, get more methods from risk_models
-from pypfopt.efficient_frontier import EfficientFrontier
 
 
 mu = mean_historical_return(
@@ -116,8 +118,9 @@ S = sample_cov(prices_df)
 # Matplotlib Dashboard
 
 import matplotlib.pyplot as plt
-from pypfopt import plotting
 import numpy as np
+from pypfopt import plotting
+
 
 # Create the plot
 fig, ax = plt.subplots(figsize=(10, 7))

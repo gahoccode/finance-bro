@@ -1,8 +1,9 @@
-from crewai.tools import BaseTool
-from typing import Dict, Type, List
-from pydantic import BaseModel, Field
+from typing import Dict, List, Type
+
 import pandas as pd
 import streamlit as st
+from crewai.tools import BaseTool
+from pydantic import BaseModel, Field
 
 
 class FinancialAnalysisToolInput(BaseModel):
@@ -81,7 +82,7 @@ class FinancialAnalysisTool(BaseTool):
         # Sort years for trend analysis
         sorted_years = sorted(list(all_years)) if all_years else []
 
-        analysis += f"DATA COVERAGE SUMMARY:\n"
+        analysis += "DATA COVERAGE SUMMARY:\n"
         analysis += f"- Available years: {', '.join(map(str, sorted_years))}\n"
         analysis += f"- Current/Latest year: {current_year}\n"
         analysis += f"- Historical coverage: {len(sorted_years)} years\n\n"
@@ -124,7 +125,7 @@ class FinancialAnalysisTool(BaseTool):
                 non_zero_data = (
                     df[numeric_cols].replace(0, pd.NA).dropna(how="all", axis=1)
                 )
-                analysis += f"\nDATA QUALITY:\n"
+                analysis += "\nDATA QUALITY:\n"
                 analysis += f"  • Numeric metrics: {len(numeric_cols)}\n"
                 analysis += f"  • Non-zero metrics: {len(non_zero_data.columns)}\n"
                 analysis += f"  • Completeness: {((1 - df.isnull().sum().sum() / (df.shape[0] * df.shape[1])) * 100):.1f}%\n"

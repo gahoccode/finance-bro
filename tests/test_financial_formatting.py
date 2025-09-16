@@ -10,10 +10,10 @@ Tests the flexible financial formatting system including:
 import pandas as pd
 import pytest
 
-from src.core.config import FINANCIAL_DISPLAY_OPTIONS, DEFAULT_FINANCIAL_DISPLAY
+from src.core.config import DEFAULT_FINANCIAL_DISPLAY, FINANCIAL_DISPLAY_OPTIONS
 from src.services.data_service import (
-    format_financial_display,
     convert_dataframe_for_display,
+    format_financial_display,
 )
 
 
@@ -96,15 +96,13 @@ class TestConvertDataframeForDisplay:
 
     def setup_method(self):
         """Set up test dataframe for each test."""
-        self.test_df = pd.DataFrame(
-            {
-                "Symbol": ["REE", "VIC", "VNM"],
-                "Long-term borrowings (Bn. VND)": [1500000000, 2500000000, 800000000],
-                "Short-term borrowings (Bn. VND)": [500000000, 750000000, 200000000],
-                "Capital Employed (Bn. VND)": [2000000000, 3250000000, 1000000000],
-                "Year": [2024, 2024, 2024],
-            }
-        )
+        self.test_df = pd.DataFrame({
+            "Symbol": ["REE", "VIC", "VNM"],
+            "Long-term borrowings (Bn. VND)": [1500000000, 2500000000, 800000000],
+            "Short-term borrowings (Bn. VND)": [500000000, 750000000, 200000000],
+            "Capital Employed (Bn. VND)": [2000000000, 3250000000, 1000000000],
+            "Year": [2024, 2024, 2024],
+        })
 
     def test_convert_single_column_billions(self):
         """Test converting single column to billions display."""
@@ -283,14 +281,12 @@ class TestFinancialFormattingIntegration:
 
     def setup_method(self):
         """Set up integration test data."""
-        self.sample_data = pd.DataFrame(
-            {
-                "Company": ["REE Corp", "VIC Group", "VNM Ltd"],
-                "Revenue (Bn. VND)": [50000000000, 75000000000, 25000000000],
-                "Assets (Bn. VND)": [100000000000, 150000000000, 60000000000],
-                "Year": [2024, 2024, 2024],
-            }
-        )
+        self.sample_data = pd.DataFrame({
+            "Company": ["REE Corp", "VIC Group", "VNM Ltd"],
+            "Revenue (Bn. VND)": [50000000000, 75000000000, 25000000000],
+            "Assets (Bn. VND)": [100000000000, 150000000000, 60000000000],
+            "Year": [2024, 2024, 2024],
+        })
 
     def test_full_workflow_billions(self):
         """Test complete workflow using billions format."""
@@ -455,15 +451,13 @@ class TestEdgeCasesAndErrorHandling:
 
     def test_dataframe_with_mixed_types(self):
         """Test dataframe conversion with mixed column types."""
-        mixed_df = pd.DataFrame(
-            {
-                "Company": ["REE", "VIC"],
-                "Revenue": [1.5e9, 2.5e9],  # Scientific notation
-                "Revenue_Str": ["1500000000", "2500000000"],  # String numbers
-                "Invalid": ["N/A", None],  # Invalid values
-                "Year": [2024, 2024],
-            }
-        )
+        mixed_df = pd.DataFrame({
+            "Company": ["REE", "VIC"],
+            "Revenue": [1.5e9, 2.5e9],  # Scientific notation
+            "Revenue_Str": ["1500000000", "2500000000"],  # String numbers
+            "Invalid": ["N/A", None],  # Invalid values
+            "Year": [2024, 2024],
+        })
 
         result = convert_dataframe_for_display(
             mixed_df, ["Revenue", "Revenue_Str"], "billions", 1
@@ -482,9 +476,10 @@ class TestEdgeCasesAndErrorHandling:
 
     def test_all_invalid_values_column(self):
         """Test handling column with all invalid values."""
-        invalid_df = pd.DataFrame(
-            {"Valid": [1000000000, 2000000000], "Invalid": ["N/A", None]}
-        )
+        invalid_df = pd.DataFrame({
+            "Valid": [1000000000, 2000000000],
+            "Invalid": ["N/A", None],
+        })
 
         result = convert_dataframe_for_display(invalid_df, ["Invalid"], "billions", 1)
 

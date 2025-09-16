@@ -5,8 +5,9 @@ Contains technical analysis functions that depend on pandas-ta.
 Isolated from vnstock_api.py to prevent import failures when pandas-ta is unavailable.
 """
 
-import streamlit as st
 import pandas as pd
+import streamlit as st
+
 
 try:
     import pandas_ta as ta

@@ -5,10 +5,11 @@ Extracted cached data functions from existing pages.
 PRESERVES ALL @st.cache_data decorators and vnstock API instantiation patterns exactly as they exist.
 """
 
-import streamlit as st
-import pandas as pd
 from datetime import datetime, timedelta
-from vnstock import Vnstock, Company, Quote, Screener, Fund
+
+import pandas as pd
+import streamlit as st
+from vnstock import Company, Fund, Quote, Screener, Vnstock
 
 
 # ================================

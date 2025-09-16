@@ -1,20 +1,22 @@
-import streamlit as st
-import pandas as pd
 import matplotlib.pyplot as plt
-from src.services.vnstock_api import (
-    get_heating_up_stocks,
-    get_technical_stock_data,
-)
-from src.services.technical_indicators import (
-    calculate_technical_indicators,
-    display_indicators_status,
-)
+import pandas as pd
+import streamlit as st
+
+from src.components.ui_components import inject_custom_success_styling
 from src.services.chart_service import (
     create_technical_chart,
     display_fibonacci_summary,
     get_fibonacci_level_alerts,
 )
-from src.components.ui_components import inject_custom_success_styling
+from src.services.technical_indicators import (
+    calculate_technical_indicators,
+    display_indicators_status,
+)
+from src.services.vnstock_api import (
+    get_heating_up_stocks,
+    get_technical_stock_data,
+)
+
 
 st.set_page_config(
     page_title="Technical Analysis - Finance Bro", page_icon="📊", layout="wide"

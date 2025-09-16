@@ -12,23 +12,27 @@ Usage:
     python scripts/validate_vnstock_data.py --symbol REE
 """
 
-import sys
-import os
 import argparse
+import pathlib
+import sys
 from datetime import datetime
+
 import pandas as pd
 
+
 # Add project root to Python path
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+project_root = pathlib.Path(
+    pathlib.Path(pathlib.Path(__file__).resolve()).parent
+).parent
 sys.path.insert(0, project_root)
 
 from src.services.vnstock_api import (
-    get_ownership_data,
-    get_management_data,
-    get_subsidiaries_data,
-    get_insider_deals_data,
-    get_foreign_trading_data,
     get_company_reports,
+    get_foreign_trading_data,
+    get_insider_deals_data,
+    get_management_data,
+    get_ownership_data,
+    get_subsidiaries_data,
 )
 
 
@@ -84,13 +88,13 @@ class VnStockDataValidator:
                     if missing_cols:
                         print(f"   ⚠️  Missing expected columns: {missing_cols}")
                     else:
-                        print(f"   ✅ All expected columns present")
+                        print("   ✅ All expected columns present")
 
                 # Show sample data
-                print(f"\n   Sample data (first 3 rows):")
+                print("\n   Sample data (first 3 rows):")
                 print(data.head(3).to_string(index=False))
             else:
-                print(f"   ℹ️  No data returned (empty DataFrame)")
+                print("   ℹ️  No data returned (empty DataFrame)")
 
         except Exception as e:
             # Store error
@@ -107,7 +111,7 @@ class VnStockDataValidator:
 
     def validate_all_functions(self):
         """Validate all company data functions."""
-        print(f"🚀 Starting VnStock Data Validation")
+        print("🚀 Starting VnStock Data Validation")
         print(f"Symbol: {self.symbol}")
         print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
@@ -160,7 +164,7 @@ class VnStockDataValidator:
     def validate_reports_date_sorting(self):
         """Special validation for company reports date sorting."""
         print(f"\n{'=' * 60}")
-        print(f"Special Test: Company Reports Date Sorting")
+        print("Special Test: Company Reports Date Sorting")
         print(f"{'=' * 60}")
 
         try:
@@ -170,7 +174,7 @@ class VnStockDataValidator:
                 dates = reports["date"].tolist()
                 is_sorted_desc = dates == sorted(dates, reverse=True)
 
-                print(f"✅ Date sorting test:")
+                print("✅ Date sorting test:")
                 print(f"   Total reports: {len(reports)}")
                 print(f"   Date column type: {reports['date'].dtype}")
                 print(f"   Sorted descending: {'Yes' if is_sorted_desc else 'No'}")
@@ -181,7 +185,7 @@ class VnStockDataValidator:
 
                 return is_sorted_desc
             else:
-                print(f"   ⚠️  No reports data or missing date column")
+                print("   ⚠️  No reports data or missing date column")
                 return None
 
         except Exception as e:
@@ -191,7 +195,7 @@ class VnStockDataValidator:
     def generate_summary_report(self):
         """Generate summary validation report."""
         print(f"\n{'=' * 60}")
-        print(f"VALIDATION SUMMARY REPORT")
+        print("VALIDATION SUMMARY REPORT")
         print(f"{'=' * 60}")
 
         successful_functions = [
@@ -217,7 +221,7 @@ class VnStockDataValidator:
         print(f"📊 Functions with data: {len(functions_with_data)}")
 
         if successful_functions:
-            print(f"\n✅ Successful functions:")
+            print("\n✅ Successful functions:")
             for func_name in successful_functions:
                 result = self.results[func_name]
                 data_info = (
@@ -229,7 +233,7 @@ class VnStockDataValidator:
                 print(f"   - {func_name} {data_info} - {duration:.2f}s")
 
         if failed_functions:
-            print(f"\n❌ Failed functions:")
+            print("\n❌ Failed functions:")
             for func_name in failed_functions:
                 error = self.results[func_name].get("error", "Unknown error")
                 print(f"   - {func_name}: {error}")
@@ -241,14 +245,14 @@ class VnStockDataValidator:
         print(f"\n⏱️  Total execution time: {total_duration:.2f} seconds")
 
         # Special validations
-        print(f"\n🔍 Special Validations:")
+        print("\n🔍 Special Validations:")
         date_sorting_result = self.validate_reports_date_sorting()
         if date_sorting_result is True:
-            print(f"   ✅ Company reports date sorting: PASSED")
+            print("   ✅ Company reports date sorting: PASSED")
         elif date_sorting_result is False:
-            print(f"   ❌ Company reports date sorting: FAILED")
+            print("   ❌ Company reports date sorting: FAILED")
         else:
-            print(f"   ⚠️  Company reports date sorting: NOT TESTABLE")
+            print("   ⚠️  Company reports date sorting: NOT TESTABLE")
 
         # Overall status
         overall_success = len(failed_functions) == 0

@@ -1,19 +1,22 @@
-import streamlit as st
-import pandas as pd
-import altair as alt
 import warnings
+
+import altair as alt
+import pandas as pd
+import streamlit as st
+
 
 warnings.filterwarnings("ignore")
 
 # Import from modular utilities - preserves ALL caching and session state
 from src.services.vnstock_api import (
-    get_ownership_data,
-    get_management_data,
-    get_subsidiaries_data,
-    get_insider_deals_data,
-    get_foreign_trading_data,
     get_company_reports,
+    get_foreign_trading_data,
+    get_insider_deals_data,
+    get_management_data,
+    get_ownership_data,
+    get_subsidiaries_data,
 )
+
 
 # Set page configuration
 st.set_page_config(page_title="Company Profile Analysis", layout="wide")
@@ -124,16 +127,14 @@ if stock_symbol:
             st.info("No ownership data available for this symbol.")
 
         # Create tabs for additional information
-        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
-            [
-                "Management Team",
-                "Subsidiaries",
-                "Insider Deals",
-                "Foreign Transaction",
-                "News",
-                "Full Details",
-            ]
-        )
+        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+            "Management Team",
+            "Subsidiaries",
+            "Insider Deals",
+            "Foreign Transaction",
+            "News",
+            "Full Details",
+        ])
 
         with tab1:
             st.header("Company Management")
@@ -427,12 +428,10 @@ if stock_symbol:
                         "max_holding_room",
                     ]:
                         if col in foreign_trading.columns:
-                            room_data.append(
-                                {
-                                    "Room Type": col.replace("_", " ").title(),
-                                    "Value": foreign_trading[col].iloc[0],
-                                }
-                            )
+                            room_data.append({
+                                "Room Type": col.replace("_", " ").title(),
+                                "Value": foreign_trading[col].iloc[0],
+                            })
 
                     if room_data:
                         room_df = pd.DataFrame(room_data)

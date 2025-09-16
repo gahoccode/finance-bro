@@ -3,9 +3,10 @@ Input validation utilities for Finance Bro application.
 Provides validation functions for user inputs and data integrity checks.
 """
 
-import pandas as pd
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+import pandas as pd
 
 
 def validate_stock_symbol(symbol: str, available_symbols: List[str]) -> Dict[str, Any]:

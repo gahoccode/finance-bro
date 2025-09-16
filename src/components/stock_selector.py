@@ -6,17 +6,18 @@ CRITICAL: All session state variables remain exactly the same.
 This component works WITH existing session state patterns.
 """
 
-import streamlit as st
-from typing import List, Optional
+from typing import List
 
+import streamlit as st
+
+from ..core.config import DEFAULT_STOCK_SYMBOLS
 from ..utils.session_utils import get_stock_symbol, get_symbols_list
 from ..utils.validation import validate_stock_symbol
-from ..core.config import DEFAULT_STOCK_SYMBOLS
 from .ui_components import inject_custom_success_styling
 
 
 def render_stock_selector(
-    symbols_list: Optional[List[str]] = None,
+    symbols_list: List[str] | None = None,
     key: str = "stock_selector",
     help_text: str = "Search and select one stock symbol to analyze",
 ) -> str:
@@ -182,7 +183,7 @@ def render_symbol_validation(symbol: str, available_symbols: List[str]) -> bool:
 
 
 def render_compact_stock_selector(
-    symbols_list: Optional[List[str]] = None, key: str = "compact_stock_selector"
+    symbols_list: List[str] | None = None, key: str = "compact_stock_selector"
 ) -> str:
     """
     Render compact stock selector for sidebar or limited space.
@@ -247,7 +248,7 @@ def render_multi_symbol_selector(
     max_selections: int = 10,
     min_selections: int = 1,
     key: str = "multi_symbol_selector",
-    default_symbols: Optional[List[str]] = None,
+    default_symbols: List[str] | None = None,
     preserve_session_state: bool = True,
 ) -> List[str]:
     """
@@ -306,7 +307,7 @@ def render_multi_symbol_selector(
 
 
 def render_portfolio_symbol_selector(
-    selected_symbols: Optional[List[str]] = None, key: str = "portfolio_symbols"
+    selected_symbols: List[str] | None = None, key: str = "portfolio_symbols"
 ) -> List[str]:
     """
     Render symbol selector specifically for portfolio optimization.

@@ -4,9 +4,9 @@ Tests beta calculation, WACC computation, and data alignment.
 Follows TDD principles with comprehensive test coverage.
 """
 
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 
 
 # Test fixtures for sample data
@@ -39,40 +39,34 @@ def sample_vnindex_data():
     np.random.seed(123)  # Different seed for market data
     prices = 1200 + np.random.randn(len(dates)).cumsum() * 2.0
 
-    return pd.DataFrame(
-        {
-            "time": dates,
-            "close": prices,
-            "open": prices * 0.995,
-            "high": prices * 1.005,
-            "low": prices * 0.995,
-            "volume": np.random.randint(10000000, 50000000, len(dates)),
-        }
-    )
+    return pd.DataFrame({
+        "time": dates,
+        "close": prices,
+        "open": prices * 0.995,
+        "high": prices * 1.005,
+        "low": prices * 0.995,
+        "volume": np.random.randint(10000000, 50000000, len(dates)),
+    })
 
 
 @pytest.fixture
 def sample_balance_sheet():
     """Sample balance sheet data."""
-    return pd.DataFrame(
-        {
-            "yearReport": [2023, 2022, 2021],
-            "Short-term borrowings (Bn. VND)": [100.0, 90.0, 80.0],
-            "Long-term borrowings (Bn. VND)": [200.0, 180.0, 160.0],
-            "Total assets (Bn. VND)": [1000.0, 950.0, 900.0],
-        }
-    )
+    return pd.DataFrame({
+        "yearReport": [2023, 2022, 2021],
+        "Short-term borrowings (Bn. VND)": [100.0, 90.0, 80.0],
+        "Long-term borrowings (Bn. VND)": [200.0, 180.0, 160.0],
+        "Total assets (Bn. VND)": [1000.0, 950.0, 900.0],
+    })
 
 
 @pytest.fixture
 def sample_ratios():
     """Sample ratios data with market cap."""
-    return pd.DataFrame(
-        {
-            ("Chỉ tiêu định giá", "Market Capital (Bn. VND)"): [500.0, 450.0, 400.0],
-            ("Chỉ tiêu định giá", "P/E"): [15.0, 14.0, 13.0],
-        }
-    )
+    return pd.DataFrame({
+        ("Chỉ tiêu định giá", "Market Capital (Bn. VND)"): [500.0, 450.0, 400.0],
+        ("Chỉ tiêu định giá", "P/E"): [15.0, 14.0, 13.0],
+    })
 
 
 # Test Class 1: Data Alignment Tests
@@ -125,9 +119,10 @@ class TestDataAlignment:
 
         # Index data: Jan 10-25 (partial overlap)
         index_dates = pd.date_range(start="2024-01-10", end="2024-01-25", freq="D")
-        vnindex_data = pd.DataFrame(
-            {"time": index_dates, "close": np.random.randn(len(index_dates)) + 1200}
-        )
+        vnindex_data = pd.DataFrame({
+            "time": index_dates,
+            "close": np.random.randn(len(index_dates)) + 1200,
+        })
 
         # Convert and align
         vnindex_data["time"] = pd.to_datetime(vnindex_data["time"])
@@ -224,9 +219,10 @@ class TestBetaCalculation:
             {"close": np.random.randn(len(small_dates)) + 100}, index=small_dates
         )
 
-        vnindex_data = pd.DataFrame(
-            {"time": small_dates, "close": np.random.randn(len(small_dates)) + 1200}
-        )
+        vnindex_data = pd.DataFrame({
+            "time": small_dates,
+            "close": np.random.randn(len(small_dates)) + 1200,
+        })
 
         vnindex_data["time"] = pd.to_datetime(vnindex_data["time"])
         vnindex_data = vnindex_data.set_index("time")
@@ -377,12 +373,10 @@ class TestErrorHandling:
 
     def test_missing_columns(self):
         """Test handling of missing required columns."""
-        incomplete_balance_sheet = pd.DataFrame(
-            {
-                "yearReport": [2023],
-                # Missing debt columns
-            }
-        )
+        incomplete_balance_sheet = pd.DataFrame({
+            "yearReport": [2023],
+            # Missing debt columns
+        })
 
         latest = incomplete_balance_sheet.iloc[-1]
         short_term_debt = latest.get("Short-term borrowings (Bn. VND)", 0)
@@ -395,9 +389,9 @@ class TestErrorHandling:
     def test_invalid_market_cap_structure(self):
         """Test handling of different market cap data structures."""
         # Sometimes market cap might be a tuple
-        ratios_with_tuple = pd.DataFrame(
-            {("Chỉ tiêu định giá", "Market Capital (Bn. VND)"): [("Label", 500.0)]}
-        )
+        ratios_with_tuple = pd.DataFrame({
+            ("Chỉ tiêu định giá", "Market Capital (Bn. VND)"): [("Label", 500.0)]
+        })
 
         latest = ratios_with_tuple.iloc[-1]
         market_value = latest.get(("Chỉ tiêu định giá", "Market Capital (Bn. VND)"), 0)
@@ -494,20 +488,18 @@ class TestValuationIntegration:
         # Create results data structure (same as in valuation page)
         results_data = []
         for idx, row in sample_balance_sheet.iterrows():
-            results_data.append(
-                {
-                    "Year": row.get("yearReport", "N/A"),
-                    "Symbol": symbol,
-                    "Market Cap (B VND)": f"{market_value_of_equity:,.0f}",
-                    "Total Debt (B VND)": f"{total_debt:,.0f}",
-                    "Debt Weight": f"{market_weight_of_debt:.1%}",
-                    "Equity Weight": f"{market_weight_of_equity:.1%}",
-                    "Beta": f"{beta:.4f}",
-                    "Cost of Equity": f"{cost_of_equity:.2%}",
-                    "After-tax Cost of Debt": f"{after_tax_cost_of_debt:.2%}",
-                    "WACC": f"{wacc:.2%}",
-                }
-            )
+            results_data.append({
+                "Year": row.get("yearReport", "N/A"),
+                "Symbol": symbol,
+                "Market Cap (B VND)": f"{market_value_of_equity:,.0f}",
+                "Total Debt (B VND)": f"{total_debt:,.0f}",
+                "Debt Weight": f"{market_weight_of_debt:.1%}",
+                "Equity Weight": f"{market_weight_of_equity:.1%}",
+                "Beta": f"{beta:.4f}",
+                "Cost of Equity": f"{cost_of_equity:.2%}",
+                "After-tax Cost of Debt": f"{after_tax_cost_of_debt:.2%}",
+                "WACC": f"{wacc:.2%}",
+            })
 
         results_df = pd.DataFrame(results_data)
 

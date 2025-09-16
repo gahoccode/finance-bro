@@ -5,10 +5,13 @@ Provides reusable UI components used across multiple pages.
 All components preserve existing session state variables and patterns.
 """
 
-import streamlit as st
+import pathlib
+from typing import Any, Dict, List, Tuple
+
 import pandas as pd
-from typing import Dict, List, Any, Tuple
-from src.core.config import FINANCIAL_DISPLAY_OPTIONS, DEFAULT_FINANCIAL_DISPLAY
+import streamlit as st
+
+from src.core.config import DEFAULT_FINANCIAL_DISPLAY, FINANCIAL_DISPLAY_OPTIONS
 
 
 def render_performance_metrics_columns(metrics_data: List[Dict[str, Any]]) -> None:
@@ -25,7 +28,7 @@ def render_performance_metrics_columns(metrics_data: List[Dict[str, Any]]) -> No
     else:
         columns = [st.columns(1)[0] for _ in metrics_data]
 
-    for i, (col, metric) in enumerate(zip(columns, metrics_data)):
+    for i, (col, metric) in enumerate(zip(columns, metrics_data, strict=False)):
         with col:
             st.metric(
                 metric.get("label", f"Metric {i + 1}"),
@@ -194,9 +197,8 @@ def render_file_download_interface(
             )
 
         # Show file details
-        import os
 
-        file_size = os.path.getsize(filepath) / 1024  # Size in KB
+        file_size = pathlib.Path(filepath).stat().st_size / 1024  # Size in KB
         st.caption(f"File: {filename} ({file_size:.1f} KB)")
 
     except FileNotFoundError:

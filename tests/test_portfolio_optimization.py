@@ -1,8 +1,10 @@
-import pytest
-import pandas as pd
 import os
-from unittest.mock import patch
+import pathlib
 from datetime import datetime
+from unittest.mock import patch
+
+import pandas as pd
+import pytest
 
 
 class TestPortfolioReportGeneration:
@@ -113,9 +115,9 @@ class TestPortfolioReportGeneration:
             f.write(b"fake excel content")
 
         # Test file size calculation uses correct path
-        file_size = os.path.getsize(filepath_xlsx) / 1024
+        file_size = pathlib.Path(filepath_xlsx).stat().st_size / 1024
 
-        assert os.path.exists(filepath_xlsx)
+        assert pathlib.Path(filepath_xlsx).exists()
         assert filepath_xlsx.endswith(".xlsx")
         assert filepath_xlsx.count(".xlsx") == 1
 

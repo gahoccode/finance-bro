@@ -1,5 +1,6 @@
 from vnstock import Vnstock
 
+
 # Default stock symbol for standalone execution
 stock_symbol = "REE"
 
