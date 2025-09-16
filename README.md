@@ -7,7 +7,7 @@
 - 📊 **Vietnamese Stock Data** - Load financial data using Vnstock (VCI/TCBS sources)
 - 🤖 **AI Chat Interface** - Natural language queries about financial metrics with PandasAI integration
 - 💬 **Interactive Analysis** - Real-time conversation with AI analyst including file upload support
-- 📈 **Advanced Technical Analysis** - Interactive price charts with 75+ QuantStats metrics, professional tearsheets, and comprehensive technical indicators (RSI, MACD, Bollinger Bands, OBV, ADX) with robust error handling
+- 📈 **Advanced Technical Analysis** - Interactive price charts with 75+ QuantStats metrics, professional tearsheets, and comprehensive technical indicators (RSI, MACD, Bollinger Bands, OBV) with robust error handling
 - 🎯 **Intelligent Stock Screener** - Multi-criteria filtering with 6 advanced filters (Beta, Alpha, Financial Health, etc.)
 - 💼 **Portfolio Optimization** - Modern Portfolio Theory, Hierarchical Risk Parity, and risk analysis with riskfolio-lib
 - 🏢 **Comprehensive Company Analysis** - Ownership structure, management team, subsidiaries, and foreign transaction analysis
@@ -197,7 +197,6 @@ streamlit run app.py
 - **MACD (Moving Average Convergence Divergence)**: Trend-following momentum indicator
 - **Bollinger Bands**: Volatility bands for price channel analysis
 - **OBV (On-Balance Volume)**: Volume flow indicator for price movement validation
-- **ADX (Average Directional Index)**: Trend strength measurement
 
 **🎯 Interactive Candlestick Charts**
 - Professional mplfinance integration with custom Finance Bro theme
@@ -208,7 +207,7 @@ streamlit run app.py
 **⚙️ Robust Error Handling**
 - Comprehensive pandas-ta integration with graceful error recovery
 - Individual indicator validation with specific failure explanations
-- Enhanced data validation for optimal ADX calculation (30+ data points required)
+- Enhanced data validation for optimal indicator calculations
 - Transparent warning system explaining exactly why indicators might fail
 - Optimized date ranges (90 days for daily analysis) for reliable calculations
 
@@ -216,7 +215,7 @@ streamlit run app.py
 
 **Production-Ready Error Handling**
 - Fixed `TypeError: 'NoneType' object is not subscriptable` from pandas-ta None returns
-- Resolved `ValueError: zero-size array to reduction operation maximum` in ADX calculations
+- Resolved technical indicator calculation errors with improved data validation
 - Safe chart creation with fallback mechanisms for partial indicator availability
 - Professional user feedback with success/failure indicator reporting
 
@@ -230,7 +229,7 @@ streamlit run app.py
 
 **Data Requirements**
 - Minimum 20 data points required for most indicators
-- ADX requires 30+ data points for reliable calculation
+- Technical indicators require sufficient data points for reliable calculation
 - Daily interval provides 90 days of data for comprehensive analysis
 - Weekly and monthly intervals provide extended historical coverage
 

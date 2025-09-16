@@ -59,8 +59,6 @@ def main():
         show_macd = st.checkbox("MACD", value=True)
         show_obv = st.checkbox("OBV", value=False)
         
-        # Note: ADX has been removed due to implementation complexity
-        st.caption("ℹ️ ADX indicator temporarily unavailable due to manual implementation complexity")
 
         # Indicator parameters
         bb_period = st.slider("BB Period", 10, 50, 20)
@@ -358,9 +356,6 @@ def main():
                                         st.metric("MACD", "N/A")
                                         st.caption("⚠️ MACD calculation failed")
 
-                                with col3:
-                                    st.metric("ADX", "N/A")
-                                    st.caption("ℹ️ ADX temporarily unavailable")
                         else:
                             st.warning("Could not calculate technical indicators")
                     else:
@@ -463,9 +458,6 @@ def main():
                                                 st.metric("MACD", "N/A")
                                                 st.caption("⚠️ MACD calculation failed")
 
-                                        with col3:
-                                            st.metric("ADX", "N/A")
-                                            st.caption("ℹ️ ADX temporarily unavailable")
                                 else:
                                     st.warning(
                                         "Could not calculate technical indicators"
@@ -484,7 +476,6 @@ def main():
     - **MACD**: Moving Average Convergence Divergence (trend-following) with histogram
     - **Bollinger Bands**: Price volatility and potential reversal points
     - **OBV**: On-Balance Volume (volume flow indicator)
-    - **ADX**: Temporarily unavailable due to implementation complexity
     - **Fibonacci Retracements**: Support/resistance levels at 23.6%, 38.2%, 50%, 61.8%, 78.6%
     
     **Fibonacci Features:**

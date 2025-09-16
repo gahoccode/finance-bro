@@ -158,8 +158,7 @@ def create_technical_chart(
         else:
             skipped_indicators.append("OBV: Calculation failed or unavailable")
 
-    # Note: ADX has been removed due to implementation complexity
-    # Manual implementation would be too error-prone and complex to maintain
+    # Chart service supports 4 core technical indicators: RSI, MACD, Bollinger Bands, OBV
 
     # Add Fibonacci retracement levels if provided
     if fibonacci_config and fibonacci_config.get("show_fibonacci", False):

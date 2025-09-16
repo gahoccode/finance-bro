@@ -184,7 +184,6 @@ def calculate_technical_indicators(data: pd.DataFrame) -> tuple[dict, list, bool
     """Calculate technical indicators using manual implementations.
     
     Provides RSI, MACD, Bollinger Bands, and OBV with comprehensive error handling.
-    Note: ADX has been removed due to implementation complexity.
     
     Args:
         data: DataFrame with OHLCV columns
@@ -275,8 +274,7 @@ def calculate_technical_indicators(data: pd.DataFrame) -> tuple[dict, list, bool
     except Exception as e:
         warnings.append(f"MACD calculation failed: {str(e)}")
 
-    # Note: ADX has been removed due to implementation complexity
-    # Users will see a note about this in the Technical Analysis page
+    # Manual implementation provides 4 core technical indicators
 
     # Return indicators data along with warnings and success status
     has_success = len(indicators) > 0

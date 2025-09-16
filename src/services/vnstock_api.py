@@ -232,7 +232,7 @@ def get_technical_stock_data(ticker, interval="1D"):
     try:
         # Calculate days based on interval (optimized for technical indicators)
         if interval == "1D":
-            days = 90  # ~3 months (sufficient for ADX and all indicators)
+            days = 90  # ~3 months (sufficient for all technical indicators)
         elif interval == "1W":
             days = 180  # ~6 months
         elif interval == "1M":

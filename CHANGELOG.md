@@ -5,6 +5,22 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.29] - 2025-09-16
+
+### Removed
+- [2025-09-16] **ADX References Cleanup**: Comprehensive removal of all ADX (Average Directional Index) references following manual implementation removal
+  - **UI Cleanup**: Removed ADX placeholder metrics and "temporarily unavailable" captions from Technical Analysis page
+  - **Documentation Update**: Updated README.md to reflect current 4-indicator implementation (RSI, MACD, Bollinger Bands, OBV)
+  - **Code Cleanup**: Updated internal comments and technical documentation to remove ADX references
+  - **User Experience**: Eliminated confusing ADX placeholders that were showing "N/A" values in indicator displays
+
+### Fixed  
+- [2025-09-16] **Streamlit Caching Error**: Resolved `CacheReplayClosureError` in technical indicators calculation by implementing clean separation of concerns
+  - **Root Cause**: `calculate_technical_indicators()` was calling `st.warning()` and `st.success()` directly inside the cached function
+  - **Solution**: Split into two functions - `calculate_technical_indicators()` for pure calculation logic and `display_indicators_status()` for UI display
+  - **Performance**: Caching now works correctly without UI element conflicts, improving indicator calculation performance
+  - **Architecture**: Follows Streamlit best practices for cached functions (pure data computations only)
+
 ## [0.2.28] - 2025-09-15
 
 ### Added
