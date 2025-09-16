@@ -180,7 +180,7 @@ def manual_macd(close_prices: pd.Series, fast: int = 12, slow: int = 26, signal:
 
 
 @st.cache_data(ttl=300)  # Cache for 5 minutes
-def calculate_technical_indicators(data: pd.DataFrame) -> dict:
+def calculate_technical_indicators(data: pd.DataFrame) -> tuple[dict, list, bool]:
     """Calculate technical indicators using manual implementations.
     
     Provides RSI, MACD, Bollinger Bands, and OBV with comprehensive error handling.
@@ -190,27 +190,30 @@ def calculate_technical_indicators(data: pd.DataFrame) -> dict:
         data: DataFrame with OHLCV columns
         
     Returns:
-        Dictionary of calculated indicators
+        tuple: (indicators_dict, warnings_list, has_success)
+            - indicators_dict: Dictionary of calculated indicators
+            - warnings_list: List of warning messages to display
+            - has_success: Boolean indicating if any indicators were calculated successfully
     """
     indicators = {}
     warnings = []
 
     # Validate data sufficiency
     if len(data) < 20:
-        st.warning(
+        warnings.append(
             f"⚠️ **Insufficient data for technical indicators**: Only {len(data)} data points available. "
             f"Most indicators require minimum 20 points. Try selecting '1W' or '1M' interval for more data."
         )
-        return {}
+        return {}, warnings, False
 
     # Validate required columns
     required_columns = ["Open", "High", "Low", "Close", "Volume"]
     missing_columns = [col for col in required_columns if col not in data.columns]
     if missing_columns:
-        st.warning(
+        warnings.append(
             f"⚠️ **Missing required data columns**: {missing_columns}. Cannot calculate technical indicators."
         )
-        return {}
+        return {}, warnings, False
 
     # Calculate OBV with error handling
     try:
@@ -275,21 +278,40 @@ def calculate_technical_indicators(data: pd.DataFrame) -> dict:
     # Note: ADX has been removed due to implementation complexity
     # Users will see a note about this in the Technical Analysis page
 
+    # Return indicators data along with warnings and success status
+    has_success = len(indicators) > 0
+    return indicators, warnings, has_success
+
+
+def display_indicators_status(warnings: list, has_success: bool, indicator_names: list) -> None:
+    """Display technical indicators status messages to the user.
+    
+    Handles all Streamlit UI display logic that was moved out of the cached 
+    calculate_technical_indicators function to fix caching compatibility.
+    
+    Args:
+        warnings: List of warning messages to display
+        has_success: Whether any indicators were calculated successfully  
+        indicator_names: List of successfully calculated indicator names
+    """
     # Display warnings to user
     if warnings:
-        warning_text = "⚠️ **Technical Indicator Issues:**\n" + "\n".join(
-            f"• {w}" for w in warnings
-        )
-        st.warning(warning_text)
+        # Handle both single warning strings and lists of warnings
+        if len(warnings) == 1 and not warnings[0].startswith("⚠️ **Technical Indicator Issues:**"):
+            # Single validation error (insufficient data or missing columns)
+            st.warning(warnings[0])
+        else:
+            # Multiple indicator calculation warnings
+            warning_text = "⚠️ **Technical Indicator Issues:**\n" + "\n".join(
+                f"• {w}" for w in warnings
+            )
+            st.warning(warning_text)
 
     # Show success summary
-    if indicators:
+    if has_success and indicator_names:
         # Apply custom CSS styling for success alerts
         inject_custom_success_styling()
 
-        success_indicators = list(indicators.keys())
         st.success(
-            f"✅ **Successfully calculated indicators**: {', '.join(success_indicators).upper()}"
+            f"✅ **Successfully calculated indicators**: {', '.join(indicator_names).upper()}"
         )
-
-    return indicators
