@@ -26,6 +26,7 @@ dependencies = [
     "vl-convert-python>=1.6.0",
     "crewai>=0.35.8",
     "plotly>=5.17.0",
+    "osqp>=0.6.3",
 ]
 
 [project.optional-dependencies]
