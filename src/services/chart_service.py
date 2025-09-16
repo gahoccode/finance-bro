@@ -266,8 +266,9 @@ def create_altair_area_chart(chart_data: pd.DataFrame, ticker: str) -> alt.Chart
     return stock_chart
 
 
-
-def create_plotly_candlestick_chart(stock_price_data: pd.DataFrame, ticker: str) -> go.Figure:
+def create_plotly_candlestick_chart(
+    stock_price_data: pd.DataFrame, ticker: str
+) -> go.Figure:
     """Create Plotly candlestick chart with volume for optimal OHLCV visualization
 
     Args:
@@ -279,132 +280,136 @@ def create_plotly_candlestick_chart(stock_price_data: pd.DataFrame, ticker: str)
     """
     # Prepare data for Plotly
     chart_data = stock_price_data.reset_index()
-    if 'date' not in chart_data.columns:
-        chart_data = chart_data.rename(columns={chart_data.columns[0]: 'date'})
-    
+    if "date" not in chart_data.columns:
+        chart_data = chart_data.rename(columns={chart_data.columns[0]: "date"})
+
     # Get Finance Bro theme colors
     theme = get_finance_bro_theme()
-    up_color = theme["primary_colors"]["up"]      # #76706C
+    up_color = theme["primary_colors"]["up"]  # #76706C
     down_color = theme["primary_colors"]["down"]  # #2B2523
-    
+
     # Create subplots with secondary y-axis for volume
     fig = sp.make_subplots(
-        rows=2, cols=1,
+        rows=2,
+        cols=1,
         shared_xaxes=True,
         vertical_spacing=0.05,
         row_heights=[0.7, 0.3],
-        subplot_titles=[f'{ticker} - Candlestick Chart', 'Volume'],
-        specs=[[{"type": "scatter"}],
-               [{"type": "bar"}]]
+        subplot_titles=[f"{ticker} - Candlestick Chart", "Volume"],
+        specs=[[{"type": "scatter"}], [{"type": "bar"}]],
     )
-    
+
     # Add candlestick chart
     candlestick = go.Candlestick(
-        x=chart_data['date'],
-        open=chart_data['open'],
-        high=chart_data['high'],
-        low=chart_data['low'],
-        close=chart_data['close'],
+        x=chart_data["date"],
+        open=chart_data["open"],
+        high=chart_data["high"],
+        low=chart_data["low"],
+        close=chart_data["close"],
         increasing_line_color=up_color,
         decreasing_line_color=down_color,
         increasing_fillcolor=up_color,
         decreasing_fillcolor=down_color,
         line=dict(width=1),
-        name='Price'
+        name="Price",
     )
-    
+
     fig.add_trace(candlestick, row=1, col=1)
-    
+
     # Add volume bars with Finance Bro colors
     volume_colors = [
-        up_color if chart_data.iloc[i]['close'] >= chart_data.iloc[i]['open'] 
-        else down_color for i in range(len(chart_data))
+        up_color
+        if chart_data.iloc[i]["close"] >= chart_data.iloc[i]["open"]
+        else down_color
+        for i in range(len(chart_data))
     ]
-    
+
     volume_bar = go.Bar(
-        x=chart_data['date'],
-        y=chart_data['volume'],
+        x=chart_data["date"],
+        y=chart_data["volume"],
         marker_color=volume_colors,
-        marker_line_color='rgba(0,0,0,0.2)',
+        marker_line_color="rgba(0,0,0,0.2)",
         marker_line_width=0.5,
-        name='Volume',
-        opacity=0.7
+        name="Volume",
+        opacity=0.7,
     )
-    
+
     fig.add_trace(volume_bar, row=2, col=1)
-    
+
     # Update layout with Finance Bro styling
     fig.update_layout(
         title=dict(
-            text=f'{ticker} - Professional Candlestick Chart',
+            text=f"{ticker} - Professional Candlestick Chart",
             x=0.5,
-            font=dict(size=16, family='serif')
+            font=dict(size=16, family="serif"),
         ),
         xaxis_rangeslider_visible=False,
         height=700,
-        plot_bgcolor='white',
-        paper_bgcolor='white',
-        font=dict(family='serif', color='#333333'),
-        hovermode='x unified',
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        font=dict(family="serif", color="#333333"),
+        hovermode="x unified",
         showlegend=False,
         margin=dict(l=80, r=40, t=80, b=40),
     )
-    
+
     # Update x-axes
     fig.update_xaxes(
         title_text="Date",
         showgrid=True,
         gridwidth=1,
-        gridcolor='rgba(128,128,128,0.2)',
-        row=2, col=1
+        gridcolor="rgba(128,128,128,0.2)",
+        row=2,
+        col=1,
     )
     fig.update_xaxes(
-        showgrid=True,
-        gridwidth=1,
-        gridcolor='rgba(128,128,128,0.2)',
-        row=1, col=1
+        showgrid=True, gridwidth=1, gridcolor="rgba(128,128,128,0.2)", row=1, col=1
     )
-    
+
     # Update y-axes
     fig.update_yaxes(
         title_text="Price (in thousands)",
         showgrid=True,
         gridwidth=1,
-        gridcolor='rgba(128,128,128,0.2)',
-        tickformat=',.0f',
-        row=1, col=1
+        gridcolor="rgba(128,128,128,0.2)",
+        tickformat=",.0f",
+        row=1,
+        col=1,
     )
     fig.update_yaxes(
         title_text="Volume",
         showgrid=True,
         gridwidth=1,
-        gridcolor='rgba(128,128,128,0.2)',
-        tickformat=',.0f',
-        row=2, col=1
+        gridcolor="rgba(128,128,128,0.2)",
+        tickformat=",.0f",
+        row=2,
+        col=1,
     )
-    
+
     # Add range selector buttons for better interactivity
     fig.update_layout(
         xaxis=dict(
             rangeselector=dict(
-                buttons=list([
-                    dict(count=7, label="7d", step="day", stepmode="backward"),
-                    dict(count=30, label="30d", step="day", stepmode="backward"),
-                    dict(count=90, label="3m", step="day", stepmode="backward"),
-                    dict(count=180, label="6m", step="day", stepmode="backward"),
-                    dict(count=365, label="1y", step="day", stepmode="backward"),
-                    dict(step="all", label="All")
-                ]),
-                bgcolor='rgba(118,112,108,0.1)',
-                bordercolor='rgba(118,112,108,0.3)',
+                buttons=list(
+                    [
+                        dict(count=7, label="7d", step="day", stepmode="backward"),
+                        dict(count=30, label="30d", step="day", stepmode="backward"),
+                        dict(count=90, label="3m", step="day", stepmode="backward"),
+                        dict(count=180, label="6m", step="day", stepmode="backward"),
+                        dict(count=365, label="1y", step="day", stepmode="backward"),
+                        dict(step="all", label="All"),
+                    ]
+                ),
+                bgcolor="rgba(118,112,108,0.1)",
+                bordercolor="rgba(118,112,108,0.3)",
                 borderwidth=1,
-                font=dict(color='#333333')
+                font=dict(color="#333333"),
             ),
             rangeslider=dict(visible=False),
-            type="date"
+            type="date",
         )
     )
-    
+
     return fig
 
 

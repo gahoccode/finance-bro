@@ -904,7 +904,7 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
                     lambda x: f"{x:.2f}" if pd.notna(x) else "N/A"
                 )
 
-    st.dataframe(display_df, use_container_width=True, hide_index=True)
+    st.dataframe(display_df, width="stretch", hide_index=True)
 
     # Export functionality - Download PNG visualization
     st.subheader("📥 Export Visualization")

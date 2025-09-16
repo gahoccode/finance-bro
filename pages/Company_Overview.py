@@ -118,7 +118,7 @@ if stock_symbol:
 
                 # Display raw data in expander
                 with st.expander("View Raw Data"):
-                    st.dataframe(ownership_percentage, use_container_width=True)
+                    st.dataframe(ownership_percentage, width="stretch")
 
         else:
             st.info("No ownership data available for this symbol.")
@@ -211,7 +211,7 @@ if stock_symbol:
                     else:
                         st.info("No management share ownership data available.")
 
-                    st.dataframe(management_team, use_container_width=True)
+                    st.dataframe(management_team, width="stretch")
 
                 else:
                     st.info("No management information available for this symbol.")
@@ -303,7 +303,7 @@ if stock_symbol:
                     display_subs["ownership_percent"] = (
                         display_subs["ownership_percent"] * 100
                     )
-                    st.dataframe(display_subs, use_container_width=True)
+                    st.dataframe(display_subs, width="stretch")
 
                 else:
                     st.info("No subsidiaries information available for this symbol.")
@@ -391,7 +391,7 @@ if stock_symbol:
 
                     # Display insider deals table
                     st.subheader("Recent Insider Transactions")
-                    st.dataframe(insider_deals, use_container_width=True)
+                    st.dataframe(insider_deals, width="stretch")
 
                 else:
                     st.info("No insider deals information available for this symbol.")
@@ -491,7 +491,7 @@ if stock_symbol:
 
                     # Display complete foreign trading data
                     st.subheader("Complete Foreign Trading Data")
-                    st.dataframe(foreign_trading, use_container_width=True)
+                    st.dataframe(foreign_trading, width="stretch")
 
                 else:
                     st.info("No foreign trading information available for this symbol.")
@@ -546,7 +546,7 @@ if stock_symbol:
             st.header("Detailed Information")
             if not ownership_percentage.empty:
                 st.subheader("Complete Ownership Data")
-                st.dataframe(ownership_percentage, use_container_width=True)
+                st.dataframe(ownership_percentage, width="stretch")
 
     except Exception as e:
         st.error(f"Error processing stock symbol '{stock_symbol}': {str(e)}")

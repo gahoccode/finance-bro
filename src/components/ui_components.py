@@ -7,7 +7,7 @@ All components preserve existing session state variables and patterns.
 
 import streamlit as st
 import pandas as pd
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Any, Tuple
 from src.core.config import FINANCIAL_DISPLAY_OPTIONS, DEFAULT_FINANCIAL_DISPLAY
 
 
@@ -76,7 +76,6 @@ def clear_progress_indicator(progress_bar, status_text) -> None:
     """
     progress_bar.empty()
     status_text.empty()
-
 
 
 def render_weights_comparison_table(weights_data: Dict[str, Dict[str, float]]) -> None:

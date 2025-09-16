@@ -313,7 +313,7 @@ with tab1:
             # Display dataframe with enhanced formatting
             st.dataframe(
                 dupont_analysis_sorted,
-                use_container_width=True,
+                width="stretch",
                 column_config=column_config,
                 hide_index=True,
             )
@@ -403,7 +403,7 @@ with tab1:
                 data=csv_data,
                 file_name=f"dupont_analysis_{stock_symbol}.csv",
                 mime="text/csv",
-                use_container_width=True,
+                width="stretch",
             )
 
             # Interpretation and insights
@@ -646,7 +646,7 @@ with tab2:
 
                 st.dataframe(
                     capital_employed_sorted,
-                    use_container_width=True,
+                    width="stretch",
                     column_config=column_config,
                     hide_index=True,
                 )
@@ -742,7 +742,7 @@ with tab2:
                     data=csv_data,
                     file_name=f"capital_employed_{stock_symbol}.csv",
                     mime="text/csv",
-                    use_container_width=True,
+                    width="stretch",
                 )
 
                 # Analysis insights
@@ -991,7 +991,7 @@ with tab3:
 
                 st.dataframe(
                     dfl_results_sorted,
-                    use_container_width=True,
+                    width="stretch",
                     column_config=column_config,
                     hide_index=True,
                 )
@@ -1072,7 +1072,7 @@ with tab3:
                     data=csv_data,
                     file_name=f"dfl_analysis_{stock_symbol}.csv",
                     mime="text/csv",
-                    use_container_width=True,
+                    width="stretch",
                 )
 
                 # Analysis insights

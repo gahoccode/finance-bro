@@ -2,9 +2,9 @@ import streamlit as st
 from src.components.ui_components import inject_custom_success_styling
 from src.services.crewai_service import run_financial_health_analysis
 from src.services.session_state_service import (
-    init_global_session_state, 
+    init_global_session_state,
     ensure_financial_data_loaded,
-    get_current_company_name
+    get_current_company_name,
 )
 
 st.set_page_config(
@@ -32,11 +32,11 @@ company_name = get_current_company_name()
 with st.container():
     st.markdown("### 📊 Current Analysis Setup")
     col1, col2 = st.columns(2)
-    
+
     with col1:
         st.markdown(f"**🏢 Company:** {company_name}")
         st.markdown(f"**📈 Symbol:** {current_symbol}")
-    
+
     with col2:
         st.markdown("**📅 Data Period:** Annual Reports")
         st.markdown("**🤖 Analysis:** CrewAI Multi-Agent System")
@@ -59,23 +59,23 @@ if not dataframes_available:
     st.markdown("""
     Loading financial data automatically...
     """)
-    
+
     # Initialize session state and load financial data
     init_global_session_state()
-    
+
     # Load financial data using smart data loading
     with st.spinner("📊 Loading financial data..."):
         loading_result = ensure_financial_data_loaded(
-            st.session_state.stock_symbol, 
-            period="year", 
-            source="VCI"
+            st.session_state.stock_symbol, period="year", source="VCI"
         )
-        
+
         if loading_result["success"]:
             st.success("✅ Financial data loaded successfully!")
             st.rerun()
         else:
-            st.error(f"❌ Failed to load financial data: {loading_result.get('error', 'Unknown error')}")
+            st.error(
+                f"❌ Failed to load financial data: {loading_result.get('error', 'Unknown error')}"
+            )
             st.markdown("""
             **To load financial data:**
             1. Go to **📊 Stock Price Analysis** page
@@ -90,11 +90,11 @@ st.markdown("### 🤖 AI Financial Health Analysis")
 
 col1, col2 = st.columns(2)
 with col1:
-    if st.button("🏥 Generate Health Report", type="primary", use_container_width=True):
+    if st.button("🏥 Generate Health Report", type="primary", width="stretch"):
         st.session_state.generate_report = True
 
 with col2:
-    if st.button("🔄 Reset Analysis", type="secondary", use_container_width=True):
+    if st.button("🔄 Reset Analysis", type="secondary", width="stretch"):
         if "health_report" in st.session_state:
             del st.session_state.health_report
         if "generate_report" in st.session_state:
@@ -136,7 +136,7 @@ if "health_report" in st.session_state and st.session_state.health_report:
             data=report_content,
             file_name=f"financial_health_report_{current_symbol}.txt",
             mime="text/plain",
-            use_container_width=True,
+            width="stretch",
         )
 
 st.markdown("---")

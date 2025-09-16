@@ -423,18 +423,14 @@ with tab1:
                 color=alt.Color(
                     "Symbol:N",
                     scale=alt.Scale(range=data["color"].tolist()),
-                    legend=alt.Legend(title="Symbols")
+                    legend=alt.Legend(title="Symbols"),
                 ),
                 tooltip=[
                     alt.Tooltip("Symbol:N", title="Symbol"),
-                    alt.Tooltip("Weight:Q", title="Weight", format=".2%")
-                ]
+                    alt.Tooltip("Weight:Q", title="Weight", format=".2%"),
+                ],
             )
-            .properties(
-                width=350,
-                height=350,
-                title=title
-            )
+            .properties(width=350, height=350, title=title)
         )
 
         return chart

@@ -7,8 +7,10 @@ Isolated from vnstock_api.py to prevent import failures when pandas-ta is unavai
 
 import streamlit as st
 import pandas as pd
+
 try:
     import pandas_ta as ta
+
     PANDAS_TA_AVAILABLE = True
 except ImportError:
     ta = None

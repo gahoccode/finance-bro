@@ -50,7 +50,9 @@ st.success(f"✅ Analyzing valuation for **{company_name}** ({symbol})")
 loading_result = ensure_valuation_data_loaded(symbol)
 
 if not loading_result["success"]:
-    st.error(f"❌ Failed to load valuation data: {loading_result.get('error', 'Unknown error')}")
+    st.error(
+        f"❌ Failed to load valuation data: {loading_result.get('error', 'Unknown error')}"
+    )
     st.info("Please try refreshing the page or selecting a different stock symbol.")
     st.stop()
 
@@ -140,7 +142,10 @@ try:
     interval = "1D"
 
     # Get stock price data (loaded automatically by ensure_valuation_data_loaded)
-    if "stock_price_data" in st.session_state and not st.session_state.stock_price_data.empty:
+    if (
+        "stock_price_data" in st.session_state
+        and not st.session_state.stock_price_data.empty
+    ):
         stock_price = st.session_state.stock_price_data
         st.success("✅ Using cached stock price data")
     else:
@@ -304,9 +309,7 @@ try:
                     "Effective Tax Rate": "Effective Tax Rate (%)",
                 }
             )
-            st.dataframe(
-                historical_tax_display, use_container_width=True, hide_index=True
-            )
+            st.dataframe(historical_tax_display, width="stretch", hide_index=True)
 
         if not balance_sheet.empty and not ratios.empty and "beta" in locals():
             # Get latest financial data (data is already sorted by yearReport ascending)
@@ -584,9 +587,7 @@ try:
                         }
 
                         breakdown_df = pd.DataFrame(breakdown_data)
-                        st.dataframe(
-                            breakdown_df, use_container_width=True, hide_index=True
-                        )
+                        st.dataframe(breakdown_df, width="stretch", hide_index=True)
 
                         # Share count comparison section
                         st.subheader("📊 Share Count Comparison")
@@ -697,7 +698,7 @@ try:
 
                             comparison_df = pd.DataFrame(comparison_data)
                             st.dataframe(
-                                comparison_df, use_container_width=True, hide_index=True
+                                comparison_df, width="stretch", hide_index=True
                             )
 
                         except Exception as e:
@@ -739,12 +740,16 @@ try:
 
                 # Validate required columns exist
                 if ocf_column not in cash_flow.columns:
-                    st.error(f"❌ Required column '{ocf_column}' not found in cash flow data")
+                    st.error(
+                        f"❌ Required column '{ocf_column}' not found in cash flow data"
+                    )
                     st.error(f"Available columns: {list(cash_flow.columns)}")
                     st.stop()
 
                 if capex_column not in cash_flow.columns:
-                    st.error(f"❌ Required column '{capex_column}' not found in cash flow data")
+                    st.error(
+                        f"❌ Required column '{capex_column}' not found in cash flow data"
+                    )
                     st.error(f"Available columns: {list(cash_flow.columns)}")
                     st.stop()
 
@@ -769,26 +774,33 @@ try:
                         "❌ Insufficient cash flow data for DCF analysis. Need at least 2 years of data."
                     )
                     if len(historical_fcf) == 0:
-                        st.error("🔍 Debug: No valid FCF data found. This could be due to:")
+                        st.error(
+                            "🔍 Debug: No valid FCF data found. This could be due to:"
+                        )
                         st.error("- All cash flow values are NaN or zero")
                         st.error("- Missing yearReport data")
                         st.error("- Data filtering conditions (line 762)")
                     elif len(historical_fcf) == 1:
                         st.error("🔍 Debug: Only 1 year of valid FCF data found.")
-                        st.error(f"Available year: {historical_years[0] if historical_years else 'Unknown'}")
+                        st.error(
+                            f"Available year: {historical_years[0] if historical_years else 'Unknown'}"
+                        )
 
                     # Show sample data for debugging
                     st.subheader("🔍 Cash Flow Data Debug")
                     debug_data = []
                     for _, row in cash_flow.head(3).iterrows():
-                        debug_data.append({
-                            "Year": row.get("yearReport", "N/A"),
-                            "OCF": row.get(ocf_column, "N/A"),
-                            "Capex": row.get(capex_column, "N/A"),
-                            "FCF Raw": row.get(ocf_column, 0) - abs(row.get(capex_column, 0))
-                        })
+                        debug_data.append(
+                            {
+                                "Year": row.get("yearReport", "N/A"),
+                                "OCF": row.get(ocf_column, "N/A"),
+                                "Capex": row.get(capex_column, "N/A"),
+                                "FCF Raw": row.get(ocf_column, 0)
+                                - abs(row.get(capex_column, 0)),
+                            }
+                        )
                     debug_df = pd.DataFrame(debug_data)
-                    st.dataframe(debug_df, use_container_width=True, hide_index=True)
+                    st.dataframe(debug_df, width="stretch", hide_index=True)
 
                     st.stop()
 
@@ -939,7 +951,7 @@ try:
                         for method, rate in forecasting_methods.items()
                     ]
                 )
-                st.dataframe(methods_df, use_container_width=True, hide_index=True)
+                st.dataframe(methods_df, width="stretch", hide_index=True)
 
                 # Multi-year FCF projections using different base years
                 st.subheader("📊 Multi-Year Base Analysis")
@@ -1015,7 +1027,7 @@ try:
                     )
                     proj_df["Weight"] = proj_df["Weight"].apply(lambda x: f"{x:.2f}")
 
-                    st.dataframe(proj_df, use_container_width=True, hide_index=True)
+                    st.dataframe(proj_df, width="stretch", hide_index=True)
                     st.info(f"📊 **Multi-Year Weighted CAGR**: {weighted_cagr:.1%}")
 
                 # DCF Parameters with sidebar controls
@@ -1268,7 +1280,7 @@ try:
                 )
 
                 dcf_df = pd.DataFrame(dcf_data)
-                st.dataframe(dcf_df, use_container_width=True, hide_index=True)
+                st.dataframe(dcf_df, width="stretch", hide_index=True)
 
                 # Summary calculation table
                 st.subheader("💎 Valuation Summary")
@@ -1302,12 +1314,19 @@ try:
                 }
 
                 summary_df = pd.DataFrame(summary_data)
-                st.dataframe(summary_df, use_container_width=True, hide_index=True)
+                st.dataframe(summary_df, width="stretch", hide_index=True)
 
                 # Historical FCF context
                 st.subheader("📊 Historical Free Cash Flow Context")
                 historical_data = []
-                for i, (year, fcf, ocf, capex) in enumerate(zip(historical_years, historical_fcf, historical_ocf, historical_capex)):
+                for i, (year, fcf, ocf, capex) in enumerate(
+                    zip(
+                        historical_years,
+                        historical_fcf,
+                        historical_ocf,
+                        historical_capex,
+                    )
+                ):
                     historical_data.append(
                         {
                             "Year": year,
@@ -1330,7 +1349,7 @@ try:
                         historical_data[i]["YoY Growth"] = f"{growth_rate:+.1%}"
 
                 historical_df = pd.DataFrame(historical_data)
-                st.dataframe(historical_df, use_container_width=True, hide_index=True)
+                st.dataframe(historical_df, width="stretch", hide_index=True)
 
                 # Download DCF results
                 dcf_results = {

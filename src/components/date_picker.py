@@ -258,14 +258,14 @@ def render_compact_date_picker(
     col1, col2 = st.columns(2)
 
     with col1:
-        if st.button("📅 Last Month", key=f"{key}_month", use_container_width=True):
+        if st.button("📅 Last Month", key=f"{key}_month", width="stretch"):
             today = pd.to_datetime("today")
             start = today - pd.Timedelta(days=30)
             end = today - pd.Timedelta(days=1)
             _update_date_range(key_prefix, start, end)
 
     with col2:
-        if st.button("📅 Last 3M", key=f"{key}_3months", use_container_width=True):
+        if st.button("📅 Last 3M", key=f"{key}_3months", width="stretch"):
             today = pd.to_datetime("today")
             start = today - pd.Timedelta(days=90)
             end = today - pd.Timedelta(days=1)

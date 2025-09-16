@@ -144,73 +144,88 @@ def main_page():
         st.markdown("**💰 Financial Analysis**")
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("📊 Stock Analysis", use_container_width=True):
+            if st.button("📊 Stock Analysis", width="stretch"):
                 st.switch_page("pages/Stock_Price_Analysis.py")
         with col2:
-            if st.button("📊 DuPont Analysis", use_container_width=True):
+            if st.button("📊 DuPont Analysis", width="stretch"):
                 st.switch_page("pages/dupont_analysis.py")
         with col3:
-            if st.button("💰 Valuation Analysis", use_container_width=True):
+            if st.button("💰 Valuation Analysis", width="stretch"):
                 st.switch_page("pages/Valuation.py")
-        
+
         # Enhanced Valuation Flow Section
         st.markdown("**🚀 Enhanced Valuation Flow (Recommended)**")
         st.markdown("Pre-load valuation data for the smoothest analysis experience")
-        
+
         col1, col2 = st.columns([2, 1])
         with col1:
-            if st.button("⚡ Load & Analyze Valuation", use_container_width=True, type="primary"):
+            if st.button(
+                "⚡ Load & Analyze Valuation", width="stretch", type="primary"
+            ):
                 # Pre-load valuation data before navigation
-                with st.spinner(f"🔄 Pre-loading valuation data for {st.session_state.stock_symbol}..."):
-                    loading_result = ensure_valuation_data_loaded(st.session_state.stock_symbol)
-                    
+                with st.spinner(
+                    f"🔄 Pre-loading valuation data for {st.session_state.stock_symbol}..."
+                ):
+                    loading_result = ensure_valuation_data_loaded(
+                        st.session_state.stock_symbol
+                    )
+
                     if loading_result["success"]:
-                        st.success("✅ Valuation data loaded successfully! Navigating...")
+                        st.success(
+                            "✅ Valuation data loaded successfully! Navigating..."
+                        )
                         st.switch_page("pages/Valuation.py")
                     else:
-                        st.error(f"❌ Failed to pre-load data: {loading_result.get('error', 'Unknown error')}")
-        
+                        st.error(
+                            f"❌ Failed to pre-load data: {loading_result.get('error', 'Unknown error')}"
+                        )
+
         with col2:
             # Data status indicator
-            valuation_data_status = "✅ Ready" if (
-                "dataframes" in st.session_state and 
-                "price_data" in st.session_state and
-                st.session_state.get("stock_symbol") in str(st.session_state.get("dataframes", {}))
-            ) else "⏳ Not Loaded"
-            
+            valuation_data_status = (
+                "✅ Ready"
+                if (
+                    "dataframes" in st.session_state
+                    and "price_data" in st.session_state
+                    and st.session_state.get("stock_symbol")
+                    in str(st.session_state.get("dataframes", {}))
+                )
+                else "⏳ Not Loaded"
+            )
+
             st.metric("Data Status", valuation_data_status)
 
         # Market Analysis Section
         st.markdown("**📈 Market Analysis**")
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("📈 Price Analysis", use_container_width=True):
+            if st.button("📈 Price Analysis", width="stretch"):
                 st.switch_page("pages/Stock_Price_Analysis.py")
         with col2:
-            if st.button("📊 Technical Analysis", use_container_width=True):
+            if st.button("📊 Technical Analysis", width="stretch"):
                 st.switch_page("pages/Technical_Analysis.py")
 
         # Company & Portfolio Section
         st.markdown("**🏢 Company & Portfolio**")
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button("🏢 Company Overview", use_container_width=True):
+            if st.button("🏢 Company Overview", width="stretch"):
                 st.switch_page("pages/Company_Overview.py")
         with col2:
-            if st.button("💼 Portfolio Optimization", use_container_width=True):
+            if st.button("💼 Portfolio Optimization", width="stretch"):
                 st.switch_page("pages/Portfolio_Optimization.py")
         with col3:
-            if st.button("🏥 Financial Health", use_container_width=True):
+            if st.button("🏥 Financial Health", width="stretch"):
                 st.switch_page("pages/Financial_Health_Report.py")
 
         # Tools Section
         st.markdown("**🔧 Tools**")
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("🔍 Stock Screener", use_container_width=True):
+            if st.button("🔍 Stock Screener", width="stretch"):
                 st.switch_page("pages/Screener.py")
         with col2:
-            if st.button("🏦 Fund Analysis", use_container_width=True):
+            if st.button("🏦 Fund Analysis", width="stretch"):
                 st.switch_page("pages/Fund_Analysis.py")
 
     # Instructions and app information
@@ -288,7 +303,7 @@ pages = {
 with st.sidebar:
     st.header("🔧 Controls")
     # User logout option
-    if st.button("🚪 Logout", use_container_width=True):
+    if st.button("🚪 Logout", width="stretch"):
         st.logout()
     # GitHub link
     st.markdown(

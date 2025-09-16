@@ -229,7 +229,7 @@ def main():
 
     # Display the heating stocks DataFrame
     st.subheader("📋 Heating Up Stocks Summary")
-    st.dataframe(heating_stocks, use_container_width=True, height=300, hide_index=True)
+    st.dataframe(heating_stocks, width="stretch", height=300, hide_index=True)
 
     # Technical indicators summary
     st.subheader("📊 Technical Indicators Summary")

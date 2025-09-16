@@ -5,7 +5,37 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.29] - 2025-09-15
+## [0.2.31] - 2025-09-16
+
+### Changed
+- [2025-09-16] **Streamlit API Partial Support Update**: Refined implementation of Streamlit's `use_container_width` parameter replacement based on actual function compatibility
+  - **Limited Parameter Support**: Discovered that `width` parameter is not universally supported across all Streamlit chart functions
+  - **Altair Chart Compatibility**: Reverted all `st.altair_chart()` calls back to `use_container_width=True` due to VegaChartsMixin incompatibility
+  - **Plotly Chart Compatibility**: Maintained `use_container_width=True` for `st.plotly_chart()` functions as they don't support `width` parameter yet
+  - **Successful Implementation**: Preserved `width='stretch'` for `st.button()` and `st.dataframe()` functions which fully support the new parameter
+  - **Error Resolution**: Fixed "VegaChartsMixin.altair_chart() got an unexpected keyword argument 'width'" error across all chart functions
+
+### Technical Implementation Details
+- [2025-09-16] **Selective Parameter Strategy**: Implemented conditional approach based on Streamlit function compatibility
+  - **Chart Functions**: Altair and Plotly charts maintain `use_container_width=True` until Streamlit adds `width` parameter support
+  - **UI Components**: Buttons and dataframes successfully migrated to `width='stretch'` for future compatibility
+  - **Version Preparedness**: Application now properly positioned for Streamlit's 2025-12-31 deprecation deadline where supported
+
+### Fixed
+- [2025-09-16] **Variable Scoping Issue**: Resolved `NameError: name 'ticker' is not defined` in Stock_Price_Analysis.py
+  - **Root Cause**: `ticker` variable was defined inside conditional block but used outside that scope
+  - **Solution**: Moved variable initialization outside conditional logic to ensure accessibility throughout the module
+  - **Impact**: Fixed import errors that prevented proper module loading in Stock_Price_Analysis.py
+
+## [0.2.30] - 2025-09-16
+
+### Changed
+- [2025-09-16] **Streamlit API Update**: Replaced deprecated `use_container_width` parameter with new `width` parameter where supported
+  - **Future Compatibility**: Updated 17 occurrences for buttons and dataframes to prepare for Streamlit's 2025-12-31 deprecation deadline
+  - **Compatibility Fix**: Reverted 28 chart function calls back to `use_container_width=True` due to Streamlit version compatibility issues
+  - **Selective Implementation**: Applied `width='stretch'` for buttons/dataframes and kept `use_container_width=True` for chart functions
+  - **Scope**: Updated all main application files (app.py, pages/, src/components/, src/services/) while preserving standalone-bro/ directory
+  - **Files Updated**: 13 main application files including all analysis pages, components, and services
 
 ### Enhanced
 - [2025-09-15] **Superior Candlestick Charts**: Migrated from Altair to Plotly for optimal OHLCV visualization in stock price analysis

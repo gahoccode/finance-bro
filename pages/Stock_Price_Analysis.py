@@ -16,6 +16,7 @@ qs.extend_pandas()
 
 # Get stock symbol from session state (set in main app)
 # If not available, show message to use main app first
+ticker = None
 if "stock_symbol" in st.session_state and st.session_state.stock_symbol:
     ticker = st.session_state.stock_symbol
 else:

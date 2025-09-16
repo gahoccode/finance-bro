@@ -104,19 +104,19 @@ def render_navigation_buttons() -> None:
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        if st.button("📊 Stock Analysis", use_container_width=True):
+        if st.button("📊 Stock Analysis", width="stretch"):
             st.switch_page("pages/Stock_Price_Analysis.py")
 
     with col2:
-        if st.button("📈 Price Analysis", use_container_width=True):
+        if st.button("📈 Price Analysis", width="stretch"):
             st.switch_page("pages/Stock_Price_Analysis.py")
 
     with col3:
-        if st.button("🏢 Company Overview", use_container_width=True):
+        if st.button("🏢 Company Overview", width="stretch"):
             st.switch_page("pages/Company_Overview.py")
 
     with col4:
-        if st.button("💼 Portfolio Optimization", use_container_width=True):
+        if st.button("💼 Portfolio Optimization", width="stretch"):
             st.switch_page("pages/Portfolio_Optimization.py")
 
     # Second row of navigation buttons
@@ -124,11 +124,11 @@ def render_navigation_buttons() -> None:
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        if st.button("🔍 Stock Screener", use_container_width=True):
+        if st.button("🔍 Stock Screener", width="stretch"):
             st.switch_page("pages/Screener.py")
 
     with col2:
-        if st.button("📊 Technical Analysis", use_container_width=True):
+        if st.button("📊 Technical Analysis", width="stretch"):
             st.switch_page("pages/Technical_Analysis.py")
 
 
