@@ -5,6 +5,19 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.32] - 2025-09-16
+
+### Fixed  
+- [2025-09-16] **Streamlit Caching Error**: Resolved `CacheReplayClosureError` in technical indicators calculation by implementing clean separation of concerns
+  - **Root Cause**: `calculate_technical_indicators()` was calling `st.warning()` and `st.success()` directly inside the cached function
+  - **Solution**: Split into two functions - `calculate_technical_indicators()` for pure calculation logic and `display_indicators_status()` for UI display
+  - **Performance**: Caching now works correctly without UI element conflicts, improving indicator calculation performance
+  - **Architecture**: Follows Streamlit best practices for cached functions (pure data computations only)
+  - **Scope of Impact** (2 files, 3 functions):
+    - **src/services/technical_indicators.py**: Modified `calculate_technical_indicators()` to return tuple `(dict, list, bool)` instead of `dict`, removed all UI calls, added new `display_indicators_status()` function
+    - **pages/Technical_Analysis.py** (2 call sites): Updated function calls to use new tuple return signature and added calls to `display_indicators_status()` for UI display
+  - **ADX Functionality Preserved**: Unlike dev branch, this fix maintains full ADX (Average Directional Index) functionality with enhanced data validation
+
 ## [0.2.31] - 2025-09-16
 
 ### Changed

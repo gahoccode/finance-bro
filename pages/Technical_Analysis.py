@@ -5,7 +5,10 @@ from src.services.vnstock_api import (
     get_heating_up_stocks,
     get_technical_stock_data,
 )
-from src.services.technical_indicators import calculate_technical_indicators
+from src.services.technical_indicators import (
+    calculate_technical_indicators,
+    display_indicators_status,
+)
 from src.services.chart_service import (
     create_technical_chart,
     display_fibonacci_summary,
@@ -293,7 +296,12 @@ def main():
                     )
 
                     if not stock_data.empty:
-                        indicators = calculate_technical_indicators(stock_data)
+                        indicators, warnings, has_success = (
+                            calculate_technical_indicators(stock_data)
+                        )
+                        display_indicators_status(
+                            warnings, has_success, list(indicators.keys())
+                        )
                         if indicators:
                             fig = create_technical_chart(
                                 ticker,
@@ -407,7 +415,12 @@ def main():
                             )
 
                             if not stock_data.empty:
-                                indicators = calculate_technical_indicators(stock_data)
+                                indicators, warnings, has_success = (
+                                    calculate_technical_indicators(stock_data)
+                                )
+                                display_indicators_status(
+                                    warnings, has_success, list(indicators.keys())
+                                )
                                 if indicators:
                                     fig = create_technical_chart(
                                         ticker,

@@ -20,37 +20,32 @@ from ..components.ui_components import inject_custom_success_styling
 
 
 @st.cache_data(ttl=300)  # Cache for 5 minutes
-def calculate_technical_indicators(data: pd.DataFrame) -> dict:
+def calculate_technical_indicators(data: pd.DataFrame) -> tuple:
     """Calculate technical indicators using pandas-ta with comprehensive error handling
 
     Extracted from vnstock_api.py lines 288-457 - EXACT same logic preserved.
     """
     if not PANDAS_TA_AVAILABLE:
-        st.error(
-            "❌ **Technical Analysis Unavailable**: pandas-ta library is not installed or compatible. "
-            "Technical indicators cannot be calculated."
-        )
-        return {}
+        return {}, ["pandas-ta library is not installed or compatible"], False
 
     indicators = {}
     warnings = []
 
     # Validate data sufficiency
     if len(data) < 20:
-        st.warning(
-            f"⚠️ **Insufficient data for technical indicators**: Only {len(data)} data points available. "
-            f"Most indicators require minimum 20 points. Try selecting '1W' or '1M' interval for more data."
+        warnings.append(
+            f"Insufficient data for technical indicators: Only {len(data)} data points available. Most indicators require minimum 20 points."
         )
-        return {}
+        return {}, warnings, False
 
     # Validate required columns
     required_columns = ["Open", "High", "Low", "Close", "Volume"]
     missing_columns = [col for col in required_columns if col not in data.columns]
     if missing_columns:
-        st.warning(
-            f"⚠️ **Missing required data columns**: {missing_columns}. Cannot calculate technical indicators."
+        warnings.append(
+            f"Missing required data columns: {missing_columns}. Cannot calculate technical indicators."
         )
-        return {}
+        return {}, warnings, False
 
     # Calculate RSI with error handling
     try:
@@ -179,6 +174,21 @@ def calculate_technical_indicators(data: pd.DataFrame) -> dict:
     except Exception as e:
         warnings.append(f"ADX calculation failed: {str(e)}")
 
+    # Return indicators, warnings, and success status
+    has_success = bool(indicators)
+    return indicators, warnings, has_success
+
+
+def display_indicators_status(
+    warnings: list, has_success: bool, indicator_keys: list
+) -> None:
+    """Display technical indicator status messages to user
+
+    Args:
+        warnings: List of warning messages from indicator calculations
+        has_success: Boolean indicating if any indicators were successfully calculated
+        indicator_keys: List of successfully calculated indicator names
+    """
     # Display warnings to user
     if warnings:
         warning_text = "⚠️ **Technical Indicator Issues:**\n" + "\n".join(
@@ -187,13 +197,11 @@ def calculate_technical_indicators(data: pd.DataFrame) -> dict:
         st.warning(warning_text)
 
     # Show success summary
-    if indicators:
+    if has_success and indicator_keys:
         # Apply custom CSS styling for success alerts
         inject_custom_success_styling()
 
-        success_indicators = list(indicators.keys())
+        success_indicators = [key.upper() for key in indicator_keys]
         st.success(
-            f"✅ **Successfully calculated indicators**: {', '.join(success_indicators).upper()}"
+            f"✅ **Successfully calculated indicators**: {', '.join(success_indicators)}"
         )
-
-    return indicators
