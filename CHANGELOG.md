@@ -13,6 +13,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Documentation Update**: Updated README.md to reflect current 4-indicator implementation (RSI, MACD, Bollinger Bands, OBV)
   - **Code Cleanup**: Updated internal comments and technical documentation to remove ADX references
   - **User Experience**: Eliminated confusing ADX placeholders that were showing "N/A" values in indicator displays
+  - **Scope of Impact** (15 references across 6 files):
+    - **pages/Technical_Analysis.py** (5 references): Removed ADX unavailability caption, metrics, and documentation
+    - **README.md** (5 references): Updated feature descriptions and requirements
+    - **src/services/vnstock_api.py** (1 reference): Updated data requirement comment
+    - **src/services/technical_indicators.py** (2 references): Updated docstring and internal comments
+    - **src/services/chart_service.py** (1 reference): Updated chart service comment
+    - **CHANGELOG.md** (1 reference): Preserved historical entries with context
+  - **Scope of Impact** (15 references across 6 files):
+    - **pages/Technical_Analysis.py** (5 references):
+      - Removed ADX unavailability caption (line 63)
+      - Removed ADX metrics `st.metric("ADX", "N/A")` from indicator display sections (lines 362-363, 467-468)
+      - Removed ADX entry from user documentation footer (line 487)
+    - **README.md** (5 references):
+      - Updated main feature description removing ADX from indicator list (line 10)
+      - Removed ADX feature description and requirements (lines 200, 211, 219, 233)
+    - **src/services/vnstock_api.py** (1 reference):
+      - Updated data requirement comment removing ADX reference (line 235)
+    - **src/services/technical_indicators.py** (2 references):
+      - Updated function docstring removing ADX complexity note (line 187)
+      - Updated internal comment to reflect current implementation (line 278)
+    - **src/services/chart_service.py** (1 reference):
+      - Updated chart service comment describing supported indicators (line 161)
+    - **CHANGELOG.md** (1 reference):
+      - Preserved historical ADX entries with context about current removal
 
 ### Fixed  
 - [2025-09-16] **Streamlit Caching Error**: Resolved `CacheReplayClosureError` in technical indicators calculation by implementing clean separation of concerns
@@ -20,6 +44,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Solution**: Split into two functions - `calculate_technical_indicators()` for pure calculation logic and `display_indicators_status()` for UI display
   - **Performance**: Caching now works correctly without UI element conflicts, improving indicator calculation performance
   - **Architecture**: Follows Streamlit best practices for cached functions (pure data computations only)
+  - **Scope of Impact** (2 files, 3 functions):
+    - **src/services/technical_indicators.py**: Modified `calculate_technical_indicators()` to return tuple, added new `display_indicators_status()` function
+    - **pages/Technical_Analysis.py**: Updated 2 call sites to use new function signatures and UI display function
+  - **Scope of Impact** (2 files, 3 functions):
+    - **src/services/technical_indicators.py**:
+      - **Modified**: `calculate_technical_indicators()` - Refactored to return tuple `(dict, list, bool)` instead of `dict`, removed all UI calls
+      - **New**: `display_indicators_status()` - New function to handle all Streamlit UI display logic (warnings, success messages)
+    - **pages/Technical_Analysis.py** (2 call sites):
+      - **Modified**: Updated function calls to use new tuple return signature: `indicators, warnings, has_success = calculate_technical_indicators(data)`
+      - **Modified**: Added calls to `display_indicators_status(warnings, has_success, list(indicators.keys()))` for UI display
 
 ## [0.2.28] - 2025-09-15
 
