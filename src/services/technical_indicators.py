@@ -82,7 +82,7 @@ def calculate_technical_indicators(data: pd.DataFrame) -> tuple:
         bb_result = ta.bbands(data["Close"], length=20)
         if bb_result is not None and not bb_result.empty:
             # Verify expected columns exist
-            expected_cols = ["BBL_20_2.0", "BBM_20_2.0", "BBU_20_2.0"]
+            expected_cols = ["BBL_20_2.0_2.0", "BBM_20_2.0_2.0", "BBU_20_2.0_2.0"]
             if all(col in bb_result.columns for col in expected_cols):
                 indicators["bbands"] = bb_result
             else:

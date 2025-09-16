@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.32] - 2025-09-16
 
 ### Fixed  
+- [2025-09-16] **Bollinger Bands Column Name Issue**: Fixed pandas-ta Bollinger Bands calculation showing "missing expected columns" warning
+  - **Root Cause**: pandas-ta `bbands()` function returns columns with format `BBL_20_2.0_2.0`, `BBM_20_2.0_2.0`, `BBU_20_2.0_2.0` but code expected `BBL_20_2.0`, `BBM_20_2.0`, `BBU_20_2.0`
+  - **Solution**: Updated column validation in `src/services/technical_indicators.py` to match actual pandas-ta output format
+  - **Impact**: Resolves warning message and enables proper Bollinger Bands display on Technical Analysis page
+  - **Scope of Impact** (1 file, 1 function): 
+    - **src/services/technical_indicators.py**: Updated expected column names in Bollinger Bands validation logic
 - [2025-09-16] **Streamlit Caching Error**: Resolved `CacheReplayClosureError` in technical indicators calculation by implementing clean separation of concerns
   - **Root Cause**: `calculate_technical_indicators()` was calling `st.warning()` and `st.success()` directly inside the cached function
   - **Solution**: Split into two functions - `calculate_technical_indicators()` for pure calculation logic and `display_indicators_status()` for UI display

@@ -344,15 +344,15 @@ def prepare_technical_chart_data(data: pd.DataFrame, indicators: dict) -> List:
     # Bollinger Bands - Safe validation
     if "bbands" in indicators and indicators["bbands"] is not None:
         bb = indicators["bbands"]
-        required_cols = ["BBU_20_2.0", "BBM_20_2.0", "BBL_20_2.0"]
+        required_cols = ["BBU_20_2.0_2.0", "BBM_20_2.0_2.0", "BBL_20_2.0_2.0"]
         if all(col in bb.columns for col in required_cols):
             try:
                 import mplfinance as mpf
 
                 addplots.extend([
-                    mpf.make_addplot(bb["BBU_20_2.0"], color="red", width=0.7),
-                    mpf.make_addplot(bb["BBM_20_2.0"], color="blue", width=0.7),
-                    mpf.make_addplot(bb["BBL_20_2.0"], color="green", width=0.7),
+                    mpf.make_addplot(bb["BBU_20_2.0_2.0"], color="red", width=0.7),
+                    mpf.make_addplot(bb["BBM_20_2.0_2.0"], color="blue", width=0.7),
+                    mpf.make_addplot(bb["BBL_20_2.0_2.0"], color="green", width=0.7),
                 ])
             except Exception as e:
                 skipped_indicators.append(f"Bollinger Bands: {str(e)}")
