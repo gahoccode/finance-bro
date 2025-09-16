@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: finance-bro
+    env: docker
+    # Use pre-built image from GitHub Container Registry
+    image:
+      url: ghcr.io/gahoccode/finance-bro:latest
+    region: oregon
+    plan: starter
+    branch: main
+    healthCheckPath: /_stcore/health
+    autoDeploy: true
+    
+    # Environment variables for Streamlit
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false  # Must be set manually in Render dashboard
+      - key: STREAMLIT_SERVER_PORT
+        value: "8501"
+      - key: STREAMLIT_SERVER_ADDRESS
+        value: "0.0.0.0"
+      - key: STREAMLIT_SERVER_HEADLESS
+        value: "true"
+      - key: STREAMLIT_BROWSER_GATHER_USAGE_STATS
+        value: "false"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: PYTHONDONTWRITEBYTECODE
+        value: "1"
+    
+    # Disk storage for cache and exports
+    disk:
+      name: finance-bro-data
+      mountPath: /app/data
+      sizeGB: 1
+    
+    # Resource allocation
+    numInstances: 1
+    
+    # Auto-deploy configuration
+    buildCommand: ""
+    startCommand: "streamlit run app.py --server.port=8501 --server.address=0.0.0.0 --server.headless=true"
+    
+    # Health check configuration
+    healthCheck:
+      path: /_stcore/health
+      initialDelay: 60s
+      period: 30s
+      timeout: 10s
+      successThreshold: 1
+      failureThreshold: 3

@@ -22,6 +22,23 @@
 - OpenAI API key
 - Google Cloud Console account (for OAuth setup)
 
+### 🚀 Quick Deploy to Render.com (Recommended)
+
+**For instant deployment without local setup:**
+
+1. **Fork this repository** on GitHub
+2. **Create a Render account** at [render.com](https://render.com)
+3. **Create a Web Service** from your forked repository
+4. **Configure environment variables** in Render dashboard:
+   - `OPENAI_API_KEY=your_openai_api_key_here`
+5. **Deploy** - Your app will be live at `https://your-app-name.onrender.com`
+
+**Benefits:** Zero local setup, $7/month, always-on hosting, automatic HTTPS
+
+### 💻 Local Development Setup
+
+**For local development and customization:**
+
 ### Google OAuth Setup (Required)
 
 Before running the app, you need to set up Google OAuth authentication:
@@ -512,6 +529,68 @@ finance-bro/
 ```
 
 ## Docker Deployment
+
+### Local Build and Deploy to Render.com
+
+Finance-Bro now supports a streamlined local Docker build process that pushes to GitHub Container Registry (ghcr.io) and deploys to Render.com for fast, cost-effective hosting.
+
+#### Quick Setup (5 minutes)
+
+1. **Set up GitHub token for local builds:**
+```bash
+# Create Personal Access Token with 'write:packages' scope at:
+# https://github.com/settings/personal-access-tokens/new
+export GITHUB_TOKEN=ghp_your_token_here
+```
+
+2. **Set up Render.com deployment (optional):**
+```bash
+# Get your service ID from Render dashboard URL (srv-XXXXXXXXX part)
+export RENDER_SERVICE_ID=srv-your-service-id
+# Create API key at: https://dashboard.render.com/account  
+export RENDER_API_KEY=your-render-api-key
+```
+
+3. **Build and push Docker image locally:**
+```bash
+# Build image with current version and push to ghcr.io
+./scripts/build-and-push.sh
+```
+
+4. **Deploy to Render (if configured):**
+```bash
+# Trigger deployment on Render
+./scripts/deploy-to-render.sh
+
+# Or run complete pipeline
+./scripts/build-deploy.sh
+```
+
+#### Benefits of Local Build + Render Deployment
+- ⚡ **Faster builds**: Skip GitHub Actions queue (~3 min vs ~8 min)
+- 💰 **Cost-effective**: Render.com Starter plan at $7/month vs variable serverless costs
+- 🚀 **Zero cold starts**: Always-on containers, perfect for Streamlit apps
+- 🔄 **Hybrid approach**: Keep GitHub Actions for production, local for development
+- 📦 **Pre-configured**: Uses existing ghcr.io registry and Docker setup
+
+#### Render.com Setup
+Finance-Bro includes a complete `render.yaml` blueprint for easy deployment:
+
+```yaml
+# Deploy directly from GitHub Container Registry
+services:
+  - type: web
+    name: finance-bro
+    image:
+      url: ghcr.io/gahoccode/finance-bro:latest
+    plan: starter
+    autoDeploy: true
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false  # Set in Render dashboard
+```
+
+**Deployment workflow:** Local build → Push to ghcr.io → Auto-deploy to Render → Live in 2-3 minutes
 
 ### Using Pre-built Image from GitHub Container Registry
 

@@ -6,6 +6,17 @@ on:
     tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "main", "master" ]
+  # Allow manual workflow dispatch for on-demand builds
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - development
 
 env:
   REGISTRY: ghcr.io
@@ -47,6 +58,8 @@ jobs:
           type=semver,pattern={{major}}.{{minor}}
           type=semver,pattern={{major}}
           type=raw,value=latest,enable={{is_default_branch}}
+          type=raw,value=dev-{{sha}},enable={{is_pr}}
+          type=raw,value=manual-{{date 'YYYYMMDD-HHmmss' tz='UTC'}},enable=${{ github.event_name == 'workflow_dispatch' }}
 
     - name: Build and push Docker image
       id: push
