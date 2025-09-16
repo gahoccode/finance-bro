@@ -59,17 +59,38 @@ def create_technical_chart(
                 "Bollinger Bands: Calculation failed or unavailable"
             )
 
-    # RSI Panel - Safe validation
+    # RSI Panel - Safe validation with reference levels
     if config.get("show_rsi", True):
         if "rsi" in indicators and indicators["rsi"] is not None:
             rsi = indicators["rsi"]
             if not rsi.empty:
                 try:
-                    addplots.append(
+                    # Create RSI reference levels as horizontal lines
+                    overbought_line = pd.Series([70] * len(rsi), index=rsi.index)
+                    midline = pd.Series([50] * len(rsi), index=rsi.index)
+                    oversold_line = pd.Series([30] * len(rsi), index=rsi.index)
+                    
+                    addplots.extend([
+                        # RSI actual values
                         mpf.make_addplot(
-                            rsi, panel=panels, color="purple", ylabel="RSI"
+                            rsi, panel=panels, color="purple", ylabel="RSI", width=2
+                        ),
+                        # Overbought level (70)
+                        mpf.make_addplot(
+                            overbought_line, panel=panels, color="red", 
+                            linestyle="--", alpha=0.7, width=1
+                        ),
+                        # Midline (50) 
+                        mpf.make_addplot(
+                            midline, panel=panels, color="gray", 
+                            linestyle="--", alpha=0.5, width=1
+                        ),
+                        # Oversold level (30)
+                        mpf.make_addplot(
+                            oversold_line, panel=panels, color="green", 
+                            linestyle="--", alpha=0.7, width=1
                         )
-                    )
+                    ])
                     panels += 1
                 except Exception as e:
                     skipped_indicators.append(f"RSI: {str(e)}")
@@ -78,26 +99,38 @@ def create_technical_chart(
         else:
             skipped_indicators.append("RSI: Calculation failed or unavailable")
 
-    # MACD Panel - Safe validation
+    # MACD Panel - Safe validation with histogram
     if config.get("show_macd", True):
         if "macd" in indicators and indicators["macd"] is not None:
             macd = indicators["macd"]
-            required_cols = ["MACD_12_26_9", "MACDs_12_26_9"]
+            required_cols = ["MACD_12_26_9", "MACDs_12_26_9", "MACDh_12_26_9"]
             if all(col in macd.columns for col in required_cols):
                 try:
-                    addplots.extend(
-                        [
-                            mpf.make_addplot(
-                                macd["MACD_12_26_9"],
-                                panel=panels,
-                                color="blue",
-                                ylabel="MACD",
-                            ),
-                            mpf.make_addplot(
-                                macd["MACDs_12_26_9"], panel=panels, color="red"
-                            ),
-                        ]
-                    )
+                    addplots.extend([
+                        # MACD Line
+                        mpf.make_addplot(
+                            macd["MACD_12_26_9"],
+                            panel=panels,
+                            color="blue",
+                            ylabel="MACD",
+                            width=2
+                        ),
+                        # Signal Line
+                        mpf.make_addplot(
+                            macd["MACDs_12_26_9"], 
+                            panel=panels, 
+                            color="red",
+                            width=2
+                        ),
+                        # Histogram
+                        mpf.make_addplot(
+                            macd["MACDh_12_26_9"], 
+                            panel=panels, 
+                            type="bar",
+                            color="gray",
+                            alpha=0.6
+                        )
+                    ])
                     panels += 1
                 except Exception as e:
                     skipped_indicators.append(f"MACD: {str(e)}")
@@ -125,31 +158,8 @@ def create_technical_chart(
         else:
             skipped_indicators.append("OBV: Calculation failed or unavailable")
 
-    # ADX Panel - Safe validation
-    if config.get("show_adx", True):
-        if "adx" in indicators and indicators["adx"] is not None:
-            adx = indicators["adx"]
-            required_cols = ["ADX_14", "DMP_14", "DMN_14"]
-            if all(col in adx.columns for col in required_cols):
-                try:
-                    addplots.extend(
-                        [
-                            mpf.make_addplot(
-                                adx["ADX_14"], panel=panels, color="brown", ylabel="ADX"
-                            ),
-                            mpf.make_addplot(
-                                adx["DMP_14"], panel=panels, color="green"
-                            ),
-                            mpf.make_addplot(adx["DMN_14"], panel=panels, color="red"),
-                        ]
-                    )
-                    panels += 1
-                except Exception as e:
-                    skipped_indicators.append(f"ADX: {str(e)}")
-            else:
-                skipped_indicators.append("ADX: Missing required columns")
-        else:
-            skipped_indicators.append("ADX: Calculation failed or unavailable")
+    # Note: ADX has been removed due to implementation complexity
+    # Manual implementation would be too error-prone and complex to maintain
 
     # Add Fibonacci retracement levels if provided
     if fibonacci_config and fibonacci_config.get("show_fibonacci", False):

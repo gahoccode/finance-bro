@@ -58,12 +58,13 @@ def main():
         show_rsi = st.checkbox("RSI", value=True)
         show_macd = st.checkbox("MACD", value=True)
         show_obv = st.checkbox("OBV", value=False)
-        show_adx = st.checkbox("ADX", value=False)
+        
+        # Note: ADX has been removed due to implementation complexity
+        st.caption("ℹ️ ADX indicator temporarily unavailable due to manual implementation complexity")
 
         # Indicator parameters
         bb_period = st.slider("BB Period", 10, 50, 20)
         rsi_period = st.slider("RSI Period", 5, 30, 14)
-        adx_period = st.slider("ADX Period", 5, 30, 14)
 
         # Fibonacci Retracement Controls
         st.subheader("📈 Fibonacci Retracement")
@@ -234,8 +235,8 @@ def main():
     # Technical indicators summary
     st.subheader("📊 Technical Indicators Summary")
 
-    # Create columns for indicator toggles
-    col1, col2, col3, col4, col5 = st.columns(5)
+    # Create columns for indicator toggles  
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("Bollinger Bands", "ON" if show_bb else "OFF")
     with col2:
@@ -244,8 +245,6 @@ def main():
         st.metric("MACD", "ON" if show_macd else "OFF")
     with col4:
         st.metric("OBV", "ON" if show_obv else "OFF")
-    with col5:
-        st.metric("ADX", "ON" if show_adx else "OFF")
 
     # Charts section with technical indicators
     st.subheader("📈 Advanced Technical Analysis Charts")
@@ -266,7 +265,6 @@ def main():
         "show_rsi": show_rsi,
         "show_macd": show_macd,
         "show_obv": show_obv,
-        "show_adx": show_adx,
     }
 
     # Create Fibonacci configuration
@@ -360,24 +358,8 @@ def main():
                                         st.caption("⚠️ MACD calculation failed")
 
                                 with col3:
-                                    if (
-                                        "adx" in indicators
-                                        and indicators["adx"] is not None
-                                        and not indicators["adx"].empty
-                                    ):
-                                        try:
-                                            if "ADX_14" in indicators["adx"].columns:
-                                                adx_value = indicators["adx"][
-                                                    "ADX_14"
-                                                ].iloc[-1]
-                                                st.metric("ADX", f"{adx_value:.2f}")
-                                            else:
-                                                st.metric("ADX", "N/A")
-                                        except Exception:
-                                            st.metric("ADX", "N/A")
-                                    else:
-                                        st.metric("ADX", "N/A")
-                                        st.caption("⚠️ ADX calculation failed")
+                                    st.metric("ADX", "N/A")
+                                    st.caption("ℹ️ ADX temporarily unavailable")
                         else:
                             st.warning("Could not calculate technical indicators")
                     else:
@@ -480,29 +462,8 @@ def main():
                                                 st.caption("⚠️ MACD calculation failed")
 
                                         with col3:
-                                            if (
-                                                "adx" in indicators
-                                                and indicators["adx"] is not None
-                                                and not indicators["adx"].empty
-                                            ):
-                                                try:
-                                                    if (
-                                                        "ADX_14"
-                                                        in indicators["adx"].columns
-                                                    ):
-                                                        adx_value = indicators["adx"][
-                                                            "ADX_14"
-                                                        ].iloc[-1]
-                                                        st.metric(
-                                                            "ADX", f"{adx_value:.2f}"
-                                                        )
-                                                    else:
-                                                        st.metric("ADX", "N/A")
-                                                except Exception:
-                                                    st.metric("ADX", "N/A")
-                                            else:
-                                                st.metric("ADX", "N/A")
-                                                st.caption("⚠️ ADX calculation failed")
+                                            st.metric("ADX", "N/A")
+                                            st.caption("ℹ️ ADX temporarily unavailable")
                                 else:
                                     st.warning(
                                         "Could not calculate technical indicators"
@@ -517,11 +478,11 @@ def main():
     Heating up signals are based on vnstock technical indicators that identify stocks "Overheated in previous trading session".
     
     **Technical Indicators:**
-    - **RSI**: Relative Strength Index (momentum oscillator)
-    - **MACD**: Moving Average Convergence Divergence (trend-following)
+    - **RSI**: Relative Strength Index (momentum oscillator) with 30/50/70 reference levels
+    - **MACD**: Moving Average Convergence Divergence (trend-following) with histogram
     - **Bollinger Bands**: Price volatility and potential reversal points
     - **OBV**: On-Balance Volume (volume flow indicator)
-    - **ADX**: Average Directional Index (trend strength)
+    - **ADX**: Temporarily unavailable due to implementation complexity
     - **Fibonacci Retracements**: Support/resistance levels at 23.6%, 38.2%, 50%, 61.8%, 78.6%
     
     **Fibonacci Features:**

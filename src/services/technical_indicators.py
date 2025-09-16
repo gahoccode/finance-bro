@@ -1,35 +1,197 @@
 """
 Technical Analysis Indicators Module
 
-Contains technical analysis functions that depend on pandas-ta.
-Isolated from vnstock_api.py to prevent import failures when pandas-ta is unavailable.
+Manual implementation of technical indicators to replace pandas-ta dependency.
+Provides RSI, MACD, Bollinger Bands, and OBV with comprehensive error handling.
 """
 
 import streamlit as st
 import pandas as pd
-try:
-    import pandas_ta as ta
-    PANDAS_TA_AVAILABLE = True
-except ImportError:
-    ta = None
-    PANDAS_TA_AVAILABLE = False
+import numpy as np
 
 from ..components.ui_components import inject_custom_success_styling
 
 
+def manual_obv(close_prices: pd.Series, volume: pd.Series) -> pd.Series:
+    """
+    Calculate On-Balance Volume (OBV) manually.
+    
+    OBV = Previous OBV + Volume (if Close > Previous Close)
+    OBV = Previous OBV - Volume (if Close < Previous Close)  
+    OBV = Previous OBV (if Close = Previous Close)
+    
+    Args:
+        close_prices: Series of closing prices
+        volume: Series of volume data
+        
+    Returns:
+        Series with OBV values, indexed same as input
+    """
+    if len(close_prices) != len(volume):
+        raise ValueError("Close prices and volume must have same length")
+    
+    if len(close_prices) < 2:
+        raise ValueError("Need at least 2 data points for OBV calculation")
+    
+    # Calculate price direction: 1 for up, -1 for down, 0 for unchanged
+    price_direction = pd.Series(index=close_prices.index, dtype=float)
+    price_direction.iloc[0] = 0  # First value has no previous price
+    
+    for i in range(1, len(close_prices)):
+        if close_prices.iloc[i] > close_prices.iloc[i-1]:
+            price_direction.iloc[i] = 1
+        elif close_prices.iloc[i] < close_prices.iloc[i-1]:
+            price_direction.iloc[i] = -1
+        else:
+            price_direction.iloc[i] = 0
+    
+    # Calculate OBV
+    obv = pd.Series(index=close_prices.index, dtype=float)
+    obv.iloc[0] = volume.iloc[0]  # First OBV value equals first volume
+    
+    for i in range(1, len(close_prices)):
+        volume_change = price_direction.iloc[i] * volume.iloc[i]
+        obv.iloc[i] = obv.iloc[i-1] + volume_change
+    
+    return obv
+
+
+def manual_bollinger_bands(close_prices: pd.Series, period: int = 20, std_dev: float = 2.0) -> pd.DataFrame:
+    """
+    Calculate Bollinger Bands manually.
+    
+    Middle Band = Simple Moving Average (SMA)
+    Upper Band = SMA + (std_dev * Standard Deviation)
+    Lower Band = SMA - (std_dev * Standard Deviation)
+    
+    Args:
+        close_prices: Series of closing prices
+        period: Number of periods for moving average (default: 20)
+        std_dev: Number of standard deviations (default: 2.0)
+        
+    Returns:
+        DataFrame with columns: BBL_20_2.0, BBM_20_2.0, BBU_20_2.0
+    """
+    if len(close_prices) < period:
+        raise ValueError(f"Need at least {period} data points for Bollinger Bands calculation")
+    
+    # Calculate Simple Moving Average (Middle Band)
+    sma = close_prices.rolling(window=period).mean()
+    
+    # Calculate Rolling Standard Deviation
+    rolling_std = close_prices.rolling(window=period).std()
+    
+    # Calculate Upper and Lower Bands
+    upper_band = sma + (std_dev * rolling_std)
+    lower_band = sma - (std_dev * rolling_std)
+    
+    # Create DataFrame with pandas-ta compatible column names
+    result = pd.DataFrame({
+        'BBL_20_2.0': lower_band,
+        'BBM_20_2.0': sma,
+        'BBU_20_2.0': upper_band
+    }, index=close_prices.index)
+    
+    return result
+
+
+def manual_rsi(close_prices: pd.Series, period: int = 14) -> pd.Series:
+    """
+    Calculate Relative Strength Index (RSI) manually using exponential moving average.
+    
+    RSI = 100 - (100 / (1 + RS))
+    RS = Average Gain / Average Loss
+    
+    Args:
+        close_prices: Series of closing prices
+        period: Number of periods for calculation (default: 14)
+        
+    Returns:
+        Series with RSI values (0-100 scale)
+    """
+    if len(close_prices) < period + 1:
+        raise ValueError(f"Need at least {period + 1} data points for RSI calculation")
+    
+    # Calculate price changes
+    price_changes = close_prices.diff()
+    
+    # Separate gains and losses
+    gains = price_changes.where(price_changes > 0, 0)
+    losses = -price_changes.where(price_changes < 0, 0)
+    
+    # Calculate exponential moving averages
+    # Use alpha = 1/period for EMA (same as pandas-ta default)
+    alpha = 1.0 / period
+    
+    avg_gains = gains.ewm(alpha=alpha, adjust=False).mean()
+    avg_losses = losses.ewm(alpha=alpha, adjust=False).mean()
+    
+    # Calculate RS and RSI
+    rs = avg_gains / avg_losses
+    rsi = 100 - (100 / (1 + rs))
+    
+    # Set name for compatibility
+    rsi.name = 'RSI_14'
+    
+    return rsi
+
+
+def manual_macd(close_prices: pd.Series, fast: int = 12, slow: int = 26, signal: int = 9) -> pd.DataFrame:
+    """
+    Calculate MACD (Moving Average Convergence Divergence) manually.
+    
+    MACD Line = EMA(fast) - EMA(slow)
+    Signal Line = EMA(MACD Line, signal periods)
+    Histogram = MACD Line - Signal Line
+    
+    Args:
+        close_prices: Series of closing prices
+        fast: Fast EMA period (default: 12)
+        slow: Slow EMA period (default: 26)
+        signal: Signal line EMA period (default: 9)
+        
+    Returns:
+        DataFrame with columns: MACD_12_26_9, MACDs_12_26_9, MACDh_12_26_9
+    """
+    if len(close_prices) < slow + signal:
+        raise ValueError(f"Need at least {slow + signal} data points for MACD calculation")
+    
+    # Calculate EMAs
+    ema_fast = close_prices.ewm(span=fast, adjust=False).mean()
+    ema_slow = close_prices.ewm(span=slow, adjust=False).mean()
+    
+    # Calculate MACD line
+    macd_line = ema_fast - ema_slow
+    
+    # Calculate Signal line (EMA of MACD line)
+    signal_line = macd_line.ewm(span=signal, adjust=False).mean()
+    
+    # Calculate Histogram
+    histogram = macd_line - signal_line
+    
+    # Create DataFrame with pandas-ta compatible column names
+    result = pd.DataFrame({
+        'MACD_12_26_9': macd_line,
+        'MACDs_12_26_9': signal_line,
+        'MACDh_12_26_9': histogram
+    }, index=close_prices.index)
+    
+    return result
+
+
 @st.cache_data(ttl=300)  # Cache for 5 minutes
 def calculate_technical_indicators(data: pd.DataFrame) -> dict:
-    """Calculate technical indicators using pandas-ta with comprehensive error handling
-
-    Extracted from vnstock_api.py lines 288-457 - EXACT same logic preserved.
+    """Calculate technical indicators using manual implementations.
+    
+    Provides RSI, MACD, Bollinger Bands, and OBV with comprehensive error handling.
+    Note: ADX has been removed due to implementation complexity.
+    
+    Args:
+        data: DataFrame with OHLCV columns
+        
+    Returns:
+        Dictionary of calculated indicators
     """
-    if not PANDAS_TA_AVAILABLE:
-        st.error(
-            "❌ **Technical Analysis Unavailable**: pandas-ta library is not installed or compatible. "
-            "Technical indicators cannot be calculated."
-        )
-        return {}
-
     indicators = {}
     warnings = []
 
@@ -50,38 +212,21 @@ def calculate_technical_indicators(data: pd.DataFrame) -> dict:
         )
         return {}
 
-    # Calculate RSI with error handling
+    # Calculate OBV with error handling
     try:
-        rsi_result = ta.rsi(data["Close"], length=14)
-        if rsi_result is not None and not rsi_result.empty:
-            indicators["rsi"] = rsi_result
+        obv_result = manual_obv(data["Close"], data["Volume"])
+        if obv_result is not None and not obv_result.empty:
+            indicators["obv"] = obv_result
         else:
             warnings.append(
-                "RSI calculation returned empty result - insufficient price variation"
+                "OBV calculation returned empty result - volume data may be insufficient"
             )
     except Exception as e:
-        warnings.append(f"RSI calculation failed: {str(e)}")
-
-    # Calculate MACD with error handling
-    try:
-        macd_result = ta.macd(data["Close"])
-        if macd_result is not None and not macd_result.empty:
-            # Verify expected columns exist
-            expected_cols = ["MACD_12_26_9", "MACDs_12_26_9", "MACDh_12_26_9"]
-            if all(col in macd_result.columns for col in expected_cols):
-                indicators["macd"] = macd_result
-            else:
-                warnings.append(
-                    "MACD calculation succeeded but missing expected columns"
-                )
-        else:
-            warnings.append("MACD calculation returned empty result")
-    except Exception as e:
-        warnings.append(f"MACD calculation failed: {str(e)}")
+        warnings.append(f"OBV calculation failed: {str(e)}")
 
     # Calculate Bollinger Bands with error handling
     try:
-        bb_result = ta.bbands(data["Close"], length=20)
+        bb_result = manual_bollinger_bands(data["Close"], period=20, std_dev=2.0)
         if bb_result is not None and not bb_result.empty:
             # Verify expected columns exist
             expected_cols = ["BBL_20_2.0", "BBM_20_2.0", "BBU_20_2.0"]
@@ -98,84 +243,37 @@ def calculate_technical_indicators(data: pd.DataFrame) -> dict:
     except Exception as e:
         warnings.append(f"Bollinger Bands calculation failed: {str(e)}")
 
-    # Calculate OBV with error handling
+    # Calculate RSI with error handling
     try:
-        obv_result = ta.obv(data["Close"], data["Volume"])
-        if obv_result is not None and not obv_result.empty:
-            indicators["obv"] = obv_result
+        rsi_result = manual_rsi(data["Close"], period=14)
+        if rsi_result is not None and not rsi_result.empty:
+            indicators["rsi"] = rsi_result
         else:
             warnings.append(
-                "OBV calculation returned empty result - volume data may be insufficient"
+                "RSI calculation returned empty result - insufficient price variation"
             )
     except Exception as e:
-        warnings.append(f"OBV calculation failed: {str(e)}")
+        warnings.append(f"RSI calculation failed: {str(e)}")
 
-    # Calculate ADX with enhanced error handling and data validation
+    # Calculate MACD with error handling
     try:
-        # ADX requires significant data for proper calculation
-        if len(data) < 30:  # ADX needs more data than just the length parameter
-            warnings.append(
-                "ADX calculation skipped - need minimum 30 data points for reliable calculation"
-            )
-        else:
-            # Validate High/Low/Close data quality
-            high_low_valid = (data["High"] >= data["Low"]).all()
-            price_range_valid = (
-                (data["High"] > 0).all()
-                and (data["Low"] > 0).all()
-                and (data["Close"] > 0).all()
-            )
-
-            if not high_low_valid:
-                warnings.append(
-                    "ADX calculation failed - High prices must be >= Low prices"
-                )
-            elif not price_range_valid:
-                warnings.append(
-                    "ADX calculation failed - All price values must be positive"
-                )
+        macd_result = manual_macd(data["Close"], fast=12, slow=26, signal=9)
+        if macd_result is not None and not macd_result.empty:
+            # Verify expected columns exist
+            expected_cols = ["MACD_12_26_9", "MACDs_12_26_9", "MACDh_12_26_9"]
+            if all(col in macd_result.columns for col in expected_cols):
+                indicators["macd"] = macd_result
             else:
-                # Check for sufficient price variation
-                high_range = data["High"].max() - data["High"].min()
-                low_range = data["Low"].max() - data["Low"].min()
-
-                if high_range == 0 or low_range == 0:
-                    warnings.append(
-                        "ADX calculation failed - insufficient price variation in High/Low data"
-                    )
-                else:
-                    adx_result = ta.adx(
-                        data["High"], data["Low"], data["Close"], length=14
-                    )
-                    if adx_result is not None and not adx_result.empty:
-                        # Verify expected columns exist
-                        expected_cols = ["ADX_14", "DMP_14", "DMN_14"]
-                        if all(col in adx_result.columns for col in expected_cols):
-                            # Additional check for valid ADX values (should be 0-100)
-                            adx_values = adx_result["ADX_14"].dropna()
-                            if len(adx_values) > 0 and not adx_values.isna().all():
-                                indicators["adx"] = adx_result
-                            else:
-                                warnings.append(
-                                    "ADX calculation returned invalid values - all NaN results"
-                                )
-                        else:
-                            warnings.append(
-                                "ADX calculation succeeded but missing expected columns"
-                            )
-                    else:
-                        warnings.append(
-                            "ADX calculation returned empty result - insufficient data quality"
-                        )
-    except ValueError as e:
-        if "zero-size array" in str(e):
-            warnings.append(
-                "ADX calculation failed - zero-size array error (insufficient valid data points)"
-            )
+                warnings.append(
+                    "MACD calculation succeeded but missing expected columns"
+                )
         else:
-            warnings.append(f"ADX calculation failed with ValueError: {str(e)}")
+            warnings.append("MACD calculation returned empty result")
     except Exception as e:
-        warnings.append(f"ADX calculation failed: {str(e)}")
+        warnings.append(f"MACD calculation failed: {str(e)}")
+
+    # Note: ADX has been removed due to implementation complexity
+    # Users will see a note about this in the Technical Analysis page
 
     # Display warnings to user
     if warnings:
