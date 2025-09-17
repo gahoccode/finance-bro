@@ -1,18 +1,22 @@
 # Finance Bro - AI Stock Analysis
 
-🚀 **Natural language interface for Vietnamese stock market analysis** Interact with your financial statements in natural language. Get answers to your questions about any financial statement of listed stocks in Vietnam with a friendly finance bro. He's an introvert so please make your questions short and to the point. 
+🚀 **Comprehensive Vietnamese stock market analysis platform** Advanced financial analysis tools for Vietnamese stock market with professional charting, portfolio optimization, and technical analysis capabilities.
+
+> **📢 Important Notice**: The AI chat interface for financial statements has been separated into a **standalone project** for improved maintainability. PandasAI dependency constraints made it challenging to expand and maintain the integrated chat feature. The standalone chat interface will be available as a separate repository with optimized dependencies and enhanced capabilities. 
 
 ## Features
 
 - 📊 **Vietnamese Stock Data** - Load financial data using Vnstock (VCI/TCBS sources)
-- 🤖 **AI Chat Interface** - Natural language queries about financial metrics with PandasAI integration
-- 💬 **Interactive Analysis** - Real-time conversation with AI analyst including file upload support
 - 📈 **Advanced Technical Analysis** - Interactive price charts with 75+ QuantStats metrics, professional tearsheets, and comprehensive technical indicators (RSI, MACD, Bollinger Bands, OBV, ADX) with robust error handling
 - 🎯 **Intelligent Stock Screener** - Multi-criteria filtering with 6 advanced filters (Beta, Alpha, Financial Health, etc.)
 - 💼 **Portfolio Optimization** - Modern Portfolio Theory, Hierarchical Risk Parity, and risk analysis with riskfolio-lib
 - 🏢 **Comprehensive Company Analysis** - Ownership structure, management team, subsidiaries, and foreign transaction analysis
+- 💰 **Valuation Analysis** - DCF modeling, comparative analysis, and financial health assessment
 - 📊 **Professional Visualizations** - Interactive charts with Plotly, Altair, and custom styling
+- 🤖 **Multi-Agent AI Analysis** - CrewAI-powered financial health reports with specialized agents
 - 🔐 **Secure Authentication** - Google OAuth integration with API key management
+
+> **Note**: The natural language chat interface has been moved to a standalone project for better maintainability and enhanced capabilities.
 
 ## Quick Start
 
@@ -592,14 +596,69 @@ services:
 
 **Deployment workflow:** Local build → Push to ghcr.io → Auto-deploy to Render → Live in 2-3 minutes
 
-### Using Pre-built Image from GitHub Container Registry
+### Using Pre-built Docker Images
 
-**Pull and run the latest image:**
+The fastest way to get started is using our pre-built Docker images from GitHub Container Registry.
+
+#### Step 1: Pull the Image
+
+```bash
+# Pull the latest stable version
+docker pull ghcr.io/gahoccode/finance-bro:latest
+
+# Or pull a specific version (recommended for production)
+docker pull ghcr.io/gahoccode/finance-bro:v0.2.33
+```
+
+#### Step 2: Prepare Environment Variables
+
+Create a `.env` file with your API keys:
+
+```bash
+# Create environment file
+cat > .env << EOF
+OPENAI_API_KEY=your-openai-api-key-here
+EOF
+```
+
+#### Step 3: Run the Container
+
+**Simple run (no persistence):**
 
 **macOS/Linux:**
 ```bash
-docker run -p 8501:8501 \
-  -e OPENAI_API_KEY=your_openai_api_key \
+docker run -d \
+  -p 8501:8501 \
+  -e OPENAI_API_KEY="your-openai-api-key" \
+  --name finance-bro \
+  --restart unless-stopped \
+  ghcr.io/gahoccode/finance-bro:latest
+```
+
+**Windows Command Prompt:**
+```cmd
+docker run -d -p 8501:8501 -e OPENAI_API_KEY="your-openai-api-key" --name finance-bro --restart unless-stopped ghcr.io/gahoccode/finance-bro:latest
+```
+
+**Windows PowerShell:**
+```powershell
+docker run -d `
+  -p 8501:8501 `
+  -e OPENAI_API_KEY="your-openai-api-key" `
+  --name finance-bro `
+  --restart unless-stopped `
+  ghcr.io/gahoccode/finance-bro:latest
+```
+
+**Advanced run (with persistent data):**
+
+**macOS/Linux:**
+```bash
+docker run -d \
+  -p 8501:8501 \
+  --env-file .env \
+  --name finance-bro \
+  --restart unless-stopped \
   -v $(pwd)/exports:/app/exports \
   -v $(pwd)/cache:/app/cache \
   -v $(pwd)/.streamlit:/app/.streamlit \
@@ -608,22 +667,62 @@ docker run -p 8501:8501 \
 
 **Windows Command Prompt:**
 ```cmd
-docker run -p 8501:8501 -e OPENAI_API_KEY=your_openai_api_key -v %cd%/exports:/app/exports -v %cd%/cache:/app/cache -v %cd%/.streamlit:/app/.streamlit ghcr.io/gahoccode/finance-bro:latest
+docker run -d -p 8501:8501 --env-file .env --name finance-bro --restart unless-stopped -v %cd%/exports:/app/exports -v %cd%/cache:/app/cache -v %cd%/.streamlit:/app/.streamlit ghcr.io/gahoccode/finance-bro:latest
 ```
 
 **Windows PowerShell:**
 ```powershell
-docker run -p 8501:8501 `
-  -e OPENAI_API_KEY=your_openai_api_key `
+docker run -d `
+  -p 8501:8501 `
+  --env-file .env `
+  --name finance-bro `
+  --restart unless-stopped `
   -v ${PWD}/exports:/app/exports `
   -v ${PWD}/cache:/app/cache `
   -v ${PWD}/.streamlit:/app/.streamlit `
   ghcr.io/gahoccode/finance-bro:latest
 ```
 
-**Note:** The `$(pwd)`, `%cd%`, and `${PWD}` commands automatically get your current working directory. For example, if you're in `/home/user/finance-bro`, these resolve to that path.
+#### Step 4: Access the Application
 
-**Or use with docker-compose:**
+```bash
+# Open in your browser
+open http://localhost:8501  # macOS
+start http://localhost:8501  # Windows
+```
+
+#### Container Management
+
+```bash
+# Check container status
+docker ps
+
+# View container logs
+docker logs finance-bro
+
+# Follow logs in real-time
+docker logs -f finance-bro
+
+# Stop the container
+docker stop finance-bro
+
+# Start the container
+docker start finance-bro
+
+# Restart the container
+docker restart finance-bro
+
+# Remove the container
+docker rm finance-bro
+
+# Remove the image
+docker rmi ghcr.io/gahoccode/finance-bro:latest
+```
+
+#### Docker Compose (Alternative)
+
+Create a `docker-compose.yml` file:
+
 ```yaml
 services:
   finance-bro:
@@ -635,8 +734,93 @@ services:
     volumes:
       - ./exports:/app/exports
       - ./cache:/app/cache
+      - ./.streamlit:/app/.streamlit
+    restart: unless-stopped
     env_file:
       - .env
+```
+
+Then run:
+```bash
+docker-compose up -d
+```
+
+#### Available Images
+
+| Image Tag | Description | Use Case |
+|-----------|-------------|----------|
+| `latest` | Latest stable release | Production |
+| `v0.2.33` | Specific version | Production (version pinning) |
+| `main` | Main branch build | Testing latest features |
+| `dev-{sha}` | Development builds | Feature testing |
+
+#### Image Information
+
+- **Size**: ~500MB compressed, ~1.2GB uncompressed
+- **Platforms**: linux/amd64, linux/arm64 (Apple Silicon compatible)
+- **Base**: Python 3.12 slim with optimized dependencies
+- **Updates**: Automatically built on releases and main branch pushes
+- **Security**: Regular base image updates and vulnerability scanning
+
+#### Troubleshooting
+
+**Container won't start:**
+```bash
+# Check container logs
+docker logs finance-bro
+
+# Common issues:
+# 1. Port already in use
+lsof -i :8501  # macOS/Linux
+netstat -ano | findstr :8501  # Windows
+
+# 2. Missing API key
+docker logs finance-bro | grep -i "api key"
+```
+
+**Application not accessible:**
+```bash
+# Verify container is running
+docker ps | grep finance-bro
+
+# Check port mapping
+docker port finance-bro
+
+# Test connection
+curl -I http://localhost:8501
+```
+
+**Performance issues:**
+```bash
+# Check container resource usage
+docker stats finance-bro
+
+# Allocate more memory (8GB example)
+docker run -d \
+  -p 8501:8501 \
+  --env-file .env \
+  --name finance-bro \
+  --memory=8g \
+  --restart unless-stopped \
+  ghcr.io/gahoccode/finance-bro:latest
+```
+
+**Update to latest version:**
+```bash
+# Stop and remove old container
+docker stop finance-bro && docker rm finance-bro
+
+# Pull latest image
+docker pull ghcr.io/gahoccode/finance-bro:latest
+
+# Run new container with same settings
+docker run -d \
+  -p 8501:8501 \
+  --env-file .env \
+  --name finance-bro \
+  --restart unless-stopped \
+  ghcr.io/gahoccode/finance-bro:latest
+```
 ```
 
 ### Quick Start with Docker
