@@ -194,14 +194,6 @@ streamlit run app.py
 - **Progressive Enhancement**: New features enhance rather than replace existing functionality
 - **Performance Improvements**: Even users following the traditional flow benefit from smart loading optimizations
 
-## Example Questions
-
-- "What is the return on invested capital (ROIC) trend?"
-- "Analyze the dividend yield and payout ratio trends"
-- "What is the company's debt-to-equity ratio?"
-- "Compare revenue growth across years"
-- "What are the key financial strengths and weaknesses?"
-
 ## 📊 Technical Analysis Features
 
 **Finance Bro** includes a comprehensive Technical Analysis page that automatically discovers and analyzes "heating up" stocks from the Vietnamese market using advanced technical indicators.
@@ -261,52 +253,10 @@ streamlit run app.py
 - Comprehensive fallback system maintains professional user experience
 - All error handling designed for production stability
 
-## ⚠️ Critical: Package Compatibility
-
-**IMPORTANT:** This project uses specific versions of pandas and pandasai that are carefully matched for compatibility. **DO NOT** upgrade these packages independently without testing.
-
-### Why Version Compatibility Matters
-
-- **pandasai v2.3.0** requires **pandas v2.2.0+** (compatible with NumPy 2.0)
-- **pandasai v3.x** (beta) has breaking changes and schema issues
-- Mismatched versions cause:
-  - `TypeError: sequence item 0: expected str instance, tuple found`
-  - `'DataFrame' object has no attribute 'schema'`
-  - Agent initialization failures
-
-### Tested Compatible Versions
-
-✅ **WORKING COMBINATION:**
-- `pandasai==2.3.0` (stable)
-- `pandas>=2.2.0,<3.0.0` (compatible with pandasai 2.x and NumPy 2.0)
-- `numpy>=2.0.0,<3.0.0` (enhanced performance with NumPy 2.0)
-- `quantstats>=0.0.77` (compatible with pandas 2.2.0+ and NumPy 2.0)
-- Built-in OpenAI LLM (no separate extension needed)
-
-❌ **AVOID:**
-- `pandasai>=3.0.0` (beta, unstable)
-- `pandas<2.2.0` (incompatible with NumPy 2.0 and current dependencies)
-- `numpy<2.0.0` (missing performance improvements and compatibility)
-- `quantstats<0.0.77` (incompatible with pandas 2.2.0+)
-- `pandasai-openai` extension (not needed in v2.3.0)
-
-### Critical QuantStats Compatibility
-**NEVER upgrade quantstats independently.** The app uses:
-- **QuantStats v0.0.77+** - Compatible with pandas 2.2.0+ and NumPy 2.0 frequency aliases (`ME`, `QE`, `YE`)
-- **Python 3.12+ Benefits**: Enhanced performance, better error handling, and NumPy 2.0 compatibility
-- **Solution**: Versions pinned in pyproject.toml and requirements.txt to maintain compatibility
-
-### If You Need to Upgrade
-
-1. **Test in a separate environment first**
-2. **Check pandasai release notes** for breaking changes
-3. **Update both packages together**, not individually
-4. **Run the app thoroughly** before deploying
-
 ## Technology Stack
 
 - **Frontend:** Streamlit v1.49.0+ with Google OAuth authentication
-- **AI Engine:** PandasAI v2.3.0 (stable) with OpenAI GPT integration
+- **AI Engine:** CrewAI v0.35.8+ multi-agent system with OpenAI GPT integration
 - **Stock Data:** Vnstock v3.2.6+ (VCI/TCBS sources for Vietnamese market)
 - **Data Processing:** Pandas v2.2.0+ with NumPy v2.0.0+ (enhanced performance)
 - **Financial Analysis:** QuantStats v0.0.77+ (75+ performance metrics and tearsheets)
@@ -316,156 +266,6 @@ streamlit run app.py
 - **Visualizations:** Plotly v5.17.0+ (professional financial charts), Altair v5.5.0+, mplfinance for interactive charts
 - **Multi-Agent AI:** CrewAI v0.35.8+ for collaborative financial analysis
 - **Authentication:** Authlib v1.3.2+ for Google OAuth integration
-
-## Future Refactor: PandasAI 3.x Migration
-
-### Target Dependencies (PandasAI 3.x)
-For future migration to PandasAI 3.x, the following dependencies will be required:
-
-```toml
-dependencies = [
-    "numpy>=1.26.4",
-    "pandasai>=3.0.0b2",
-    "pandasai-openai>=0.1.6",
-    "streamlit>=1.47.1",
-    "vnstock>=3.2.6",
-]
-```
-
-### Migration Considerations
-- **Breaking Changes**: PandasAI 3.x has significant API changes from 2.x
-- **Schema Changes**: New dataframe schema handling required
-- **Extension System**: Separate pandasai-openai package needed
-- **Testing Required**: Full regression testing needed before migration
-- **Compatibility**: Verify vnstock integration with new pandas versions
-
-## Session State Management
-
-Finance Bro uses Streamlit's `st.session_state` for comprehensive data sharing and persistence across pages. This ensures a seamless user experience where data, settings, and user interactions are maintained throughout the session.
-
-### Global Session State Variables
-
-**Authentication & API**
-- `api_key` - OpenAI API key for AI functionality
-- `stock_symbol` - Currently selected stock symbol (shared across all pages)
-
-**Data Caching & Performance**
-- `stock_symbols_list` - Cached list of all available Vietnamese stock symbols
-- `symbols_df` - Full DataFrame with stock symbols and company names for performance
-- `last_period` - Previously selected period (year/quarter) for change detection
-
-**Date Range Management**
-- `analysis_start_date` - Global start date for data analysis (default: 2024-01-01), shared across all analysis pages
-- `analysis_end_date` - Global end date for data analysis (default: today-1), shared across all analysis pages  
-- `date_range_changed` - Boolean flag to trigger cache invalidation when date range changes
-
-### Page-Specific Session State Variables
-
-#### Stock Analysis Page (bro.py)
-**Data Storage**
-- `dataframes` - AI-optimized financial dataframes with Quarter column names for better PandasAI queries
-- `display_dataframes` - Original financial dataframes with lengthReport for proper display formatting
-- `uploaded_dataframes` - User-uploaded CSV/Excel files for AI analysis
-- `messages` - Chat message history for conversation continuity
-
-**AI Agent Management**
-- `agent` - PandasAI agent instance for financial analysis
-- `agent_key` - Cache key for intelligent agent recreation when data changes
-- `pending_question` - Queued question from sidebar for processing
-
-#### Stock Price Analysis Page
-**Price & Returns Data**
-- `stock_price_data` - Historical stock price data with caching
-- `stock_returns` - Calculated stock returns for QuantStats analysis
-
-#### Portfolio Optimization Page
-**Portfolio Data**
-- `portfolio_returns` - Stock returns data shared across all portfolio tabs
-- `weights_max_sharpe` - Max Sharpe portfolio weights for cross-tab sharing
-- `weights_min_vol` - Min Volatility portfolio weights
-- `weights_max_utility` - Max Utility portfolio weights
-
-**Portfolio Strategy Selection**
-- `portfolio_strategy_choice` - Master control for portfolio strategy selection across all tabs (new in v0.2.16)
-
-#### Technical Analysis Page
-**Analysis Configuration**
-- `ta_interval` - Selected time interval for technical analysis (1D, 1W, 1M)
-
-#### DuPont Analysis Page
-**Financial Analysis Data**
-- `dupont_analysis` - Stored DuPont analysis results for persistence across page interactions
-- `capital_employed` - Capital employed calculation results
-- `dfl_analysis` - Degree of Financial Leverage analysis results
-
-#### Financial Health Report Page  
-**Report Management**
-- `health_report` - Generated financial health report content from CrewAI system
-- `generate_report` - Boolean flag to trigger report generation
-
-#### Chart & Visualization Services
-**Chart State Management**
-- `fibonacci_summary` - Fibonacci retracement analysis results keyed by date
-- `stock_price_data` - Historical stock price data cached from vnstock API
-
-#### UI Components (Dynamic Keys)
-**Financial Display Options**
-- `{unique_key}_financial_display_unit` - Display unit selection for financial formatting (billions/millions/original)
-  - Examples: `dupont_display_financial_display_unit`, `portfolio_display_financial_display_unit`
-
-**Date Picker Components (Dynamic Keys)**
-- `{key_prefix}_start_date` - Start date for date range pickers
-- `{key_prefix}_end_date` - End date for date range pickers  
-- `{key_prefix}_date_range_changed` - Boolean flag for date range change detection
-  - Examples: `analysis_start_date`, `portfolio_start_date`, `screener_start_date`
-
-#### Screener Page
-**Screening Data**
-- `screener_data` - Filtered stock results from screening criteria
-
-**Filter Presets (Dynamic Keys)**
-- `preset_industries` - Selected industries for quick filter presets
-- `preset_market_cap` - Market cap filter preset activation
-- `preset_roe` - ROE filter preset activation
-- `preset_roa` - ROA filter preset activation
-- `preset_dividend` - Dividend yield filter preset activation
-- `preset_beta` - Beta risk filter preset activation
-- `preset_financial_health` - Financial health filter preset activation
-- `preset_stock_rating` - Stock rating filter preset activation
-- `auto_run_screener` - Automatic screener execution trigger
-
-### Session State Architecture Benefits
-
-**Data Consistency**
-- Single source of truth for stock symbol selection across all pages
-- **Consistent date ranges**: Global start/end dates (today-1 default) shared across Stock Price Analysis and Portfolio Optimization pages
-- Portfolio strategy selection shared between Dollar Allocation, Report, and Risk Analysis tabs
-- Financial data loaded once and reused across different analysis tools
-
-**Performance Optimization**
-- Stock symbols loaded once in Stock Analysis page and cached for entire session
-- Financial dataframes cached to avoid repeated API calls
-- **Smart cache invalidation**: Automatic cache refresh when date ranges change across pages
-- Agent recreation only when data actually changes
-
-**User Experience**
-- Seamless navigation between pages without data loss
-- **Synchronized date selection**: Date changes in one page automatically apply to all analysis pages
-- Chat history persistence during analysis sessions
-- Filter presets remember user preferences across screening sessions
-
-**Memory Management**
-- Intelligent caching with change detection to prevent unnecessary data reloading
-- Cleanup mechanisms for dynamic preset keys to prevent memory bloat
-
-### Session State Flow
-
-1. **App Entry (app.py)**: Loads API key, stock symbols list, and handles symbol selection
-2. **Stock Analysis (bro.py)**: Creates comprehensive data cache and AI agent
-3. **Other Pages**: Access shared data from session state for analysis
-4. **Cross-Page Navigation**: All data persists seamlessly across page switches
-
-This architecture ensures optimal performance while maintaining a professional user experience comparable to institutional financial analysis tools.
 
 ## Project Structure
 
@@ -980,7 +780,7 @@ docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/gahoccode/finance-bro
 ## Dependencies
 
 ### Core Dependencies
-- `pandasai==2.3.0` - AI-powered data analysis
+- `crewai>=0.35.8` - Multi-agent AI system for financial health analysis
 - `pandas>=2.2.0,<3.0.0` - Data manipulation with NumPy 2.0 compatibility
 - `numpy>=2.0.0,<3.0.0` - Enhanced numerical computing with NumPy 2.0
 - `vnstock>=3.2.6` - Vietnamese stock data (VCI/TCBS sources)
@@ -1010,30 +810,6 @@ docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/gahoccode/finance-bro
 ### System Dependencies (Docker)
 - `osqp>=0.6.3` - Quadratic programming solver (specific version for stability)
 
-## Contributing
-
-We welcome contributions! Here are ways you can help improve Finance Bro:
-
-### Theme Contributions
-**🎨 Custom Themes Wanted**: We're looking for contributors to help create custom themes for the app. If you have design skills and want to contribute:
-- Create custom CSS themes (light/dark variants)
-- Design responsive layouts
-- Improve accessibility features
-- Submit theme proposals via pull requests
-
-### General Contributions
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-### Contribution Guidelines
-- Follow PEP8 style guidelines
-- Add appropriate documentation
-- Test your changes thoroughly
-- Include screenshots for UI changes
-- Update README if adding new features
 
 ## License
 
@@ -1045,4 +821,4 @@ If you encounter any issues or have questions, please open an issue on GitHub.
 
 ---
 
-**Built with ❤️ using Streamlit, PandasAI, and Vnstock**
+**Built with ❤️ using Streamlit, CrewAI, and Vnstock**
