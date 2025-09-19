@@ -96,11 +96,11 @@ with col2:
 
 # Update session state and detect changes
 if (
-    start_date != st.session_state.analysis_start_date
-    or end_date != st.session_state.analysis_end_date
+    pd.Timestamp(start_date) != st.session_state.analysis_start_date
+    or pd.Timestamp(end_date) != st.session_state.analysis_end_date
 ):
-    st.session_state.analysis_start_date = start_date
-    st.session_state.analysis_end_date = end_date
+    st.session_state.analysis_start_date = pd.Timestamp(start_date)
+    st.session_state.analysis_end_date = pd.Timestamp(end_date)
     st.session_state.date_range_changed = True
 
 # Risk parameters
