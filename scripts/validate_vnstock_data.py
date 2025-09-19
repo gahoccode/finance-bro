@@ -176,7 +176,7 @@ class VnStockDataValidator:
 
                 print("✅ Date sorting test:")
                 print(f"   Total reports: {len(reports)}")
-                print(f"   Date column type: {reports['date'].dtype}")
+                print(f"   Date column type: {reports["date"].dtype}")
                 print(f"   Sorted descending: {"Yes" if is_sorted_desc else "No"}")
 
                 if len(reports) >= 2:
@@ -225,7 +225,7 @@ class VnStockDataValidator:
             for func_name in successful_functions:
                 result = self.results[func_name]
                 data_info = (
-                    f"({result['data_shape'][0]} rows)"
+                    f"({result["data_shape"][0]} rows)"
                     if result.get("has_data")
                     else "(no data)"
                 )

@@ -61,20 +61,20 @@ with col1:
             highest_nav_fund = sorted_funds.iloc[0]
 
             st.success(
-                f"**Highest NAV Fund**: {highest_nav_fund['short_name']} ({highest_nav_fund['fund_code']})"
+                f"**Highest NAV Fund**: {highest_nav_fund["short_name"]} ({highest_nav_fund["fund_code"]})"
             )
 
             # Display key metrics in columns
             metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
 
             with metric_col1:
-                st.metric("NAV", f"{highest_nav_fund['nav']:,.0f}")
+                st.metric("NAV", f"{highest_nav_fund["nav"]:,.0f}")
 
             with metric_col2:
                 if pd.notna(highest_nav_fund.get("nav_change_inception")):
                     st.metric(
                         "Since Inception",
-                        f"{highest_nav_fund['nav_change_inception']:,.0f}%",
+                        f"{highest_nav_fund["nav_change_inception"]:,.0f}%",
                     )
                 else:
                     st.metric("Since Inception", "N/A")
@@ -83,7 +83,7 @@ with col1:
                 if pd.notna(highest_nav_fund.get("nav_change_36m_annualized")):
                     st.metric(
                         "3Y Annualized",
-                        f"{highest_nav_fund['nav_change_36m_annualized']:,.0f}%",
+                        f"{highest_nav_fund["nav_change_36m_annualized"]:,.0f}%",
                     )
                 else:
                     st.metric("3Y Annualized", "N/A")
@@ -91,7 +91,7 @@ with col1:
             with metric_col4:
                 if pd.notna(highest_nav_fund.get("management_fee")):
                     st.metric(
-                        "Management Fee", f"{highest_nav_fund['management_fee']:,.0f}%"
+                        "Management Fee", f"{highest_nav_fund["management_fee"]:,.0f}%"
                     )
                 else:
                     st.metric("Management Fee", "N/A")

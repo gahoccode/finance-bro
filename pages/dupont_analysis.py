@@ -161,7 +161,7 @@ with tab1:
 
         if missing_dfs:
             st.error(
-                f"❌ Missing required financial statements: {', '.join(missing_dfs)}"
+                f"❌ Missing required financial statements: {", ".join(missing_dfs)}"
             )
             st.info(
                 "Please ensure all financial data is loaded in the Stock Price Analysis page."
@@ -199,28 +199,28 @@ with tab1:
                 with col1:
                     st.metric(
                         "Net Profit Margin",
-                        f"{latest_data['Net Profit Margin']:.2f}%",
+                        f"{latest_data["Net Profit Margin"]:.2f}%",
                         help="Net Income / Revenue",
                     )
 
                 with col2:
                     st.metric(
                         "Asset Turnover",
-                        f"{latest_data['Asset Turnover']:.2f}x",
+                        f"{latest_data["Asset Turnover"]:.2f}x",
                         help="Revenue / Average Total Assets",
                     )
 
                 with col3:
                     st.metric(
                         "Financial Leverage",
-                        f"{latest_data['Financial Leverage']:.2f}x",
+                        f"{latest_data["Financial Leverage"]:.2f}x",
                         help="Average Total Assets / Average Equity",
                     )
 
                 with col4:
                     st.metric(
                         "ROE (DuPont)",
-                        f"{latest_data['ROE (DuPont)']:.2f}%",
+                        f"{latest_data["ROE (DuPont)"]:.2f}%",
                         help="Net Profit Margin × Asset Turnover × Financial Leverage",
                     )
 
@@ -229,7 +229,7 @@ with tab1:
                     st.metric(
                         "Net Income",
                         format_financial_display(
-                            latest_data['Net Income (Bn. VND)'], display_unit, 0
+                            latest_data["Net Income (Bn. VND)"], display_unit, 0
                         ),
                         help="Net profit after all expenses",
                     )
@@ -238,7 +238,7 @@ with tab1:
                     st.metric(
                         "Revenue",
                         format_financial_display(
-                            latest_data['Revenue (Bn. VND)'], display_unit, 0
+                            latest_data["Revenue (Bn. VND)"], display_unit, 0
                         ),
                         help="Total sales revenue",
                     )
@@ -247,7 +247,7 @@ with tab1:
                     st.metric(
                         "Avg Total Assets",
                         format_financial_display(
-                            latest_data['Average Total Assets (Bn. VND)'],
+                            latest_data["Average Total Assets (Bn. VND)"],
                             display_unit,
                             0,
                         ),
@@ -258,7 +258,7 @@ with tab1:
                     st.metric(
                         "Avg Equity",
                         format_financial_display(
-                            latest_data['Average Equity (Bn. VND)'], display_unit, 0
+                            latest_data["Average Equity (Bn. VND)"], display_unit, 0
                         ),
                         help="Average shareholders' equity",
                     )
@@ -441,19 +441,19 @@ with tab1:
                 drivers = []
                 if abs(margin_change) > 0.5:
                     drivers.append(
-                        f"Profitability ({'improved' if margin_change > 0 else 'declined'})"
+                        f"Profitability ({"improved" if margin_change > 0 else "declined"})"
                     )
                 if abs(turnover_change) > 0.05:
                     drivers.append(
-                        f"Asset efficiency ({'improved' if turnover_change > 0 else 'declined'})"
+                        f"Asset efficiency ({"improved" if turnover_change > 0 else "declined"})"
                     )
                 if abs(leverage_change) > 0.1:
                     drivers.append(
-                        f"Financial leverage ({'increased' if leverage_change > 0 else 'decreased'})"
+                        f"Financial leverage ({"increased" if leverage_change > 0 else "decreased"})"
                     )
 
                 if drivers:
-                    st.info(f"**Key ROE drivers**: {', '.join(drivers)}")
+                    st.info(f"**Key ROE drivers**: {", ".join(drivers)}")
 
             # Performance benchmarks
             latest_roe = dupont_analysis["ROE (DuPont)"].iloc[-1]
@@ -583,7 +583,7 @@ with tab2:
                         st.metric(
                             "Long-term Borrowings",
                             format_financial_display(
-                                latest_data['Long-term borrowings (Bn. VND)'],
+                                latest_data["Long-term borrowings (Bn. VND)"],
                                 display_unit,
                                 0,
                             ),
@@ -594,7 +594,7 @@ with tab2:
                         st.metric(
                             "Short-term Borrowings",
                             format_financial_display(
-                                latest_data['Short-term borrowings (Bn. VND)'],
+                                latest_data["Short-term borrowings (Bn. VND)"],
                                 display_unit,
                                 0,
                             ),
@@ -615,7 +615,7 @@ with tab2:
                         st.metric(
                             "Total Capital Employed",
                             format_financial_display(
-                                latest_data['Capital Employed (Bn. VND)'],
+                                latest_data["Capital Employed (Bn. VND)"],
                                 display_unit,
                                 0,
                             ),
@@ -790,11 +790,11 @@ with tab2:
 
                 latest_data = capital_employed_results.iloc[-1]
                 total_debt = (
-                    latest_data['Long-term borrowings (Bn. VND)']
-                    + latest_data['Short-term borrowings (Bn. VND)']
+                    latest_data["Long-term borrowings (Bn. VND)"]
+                    + latest_data["Short-term borrowings (Bn. VND)"]
                 )
                 debt_to_capital = (
-                    total_debt / latest_data['Capital Employed (Bn. VND)']
+                    total_debt / latest_data["Capital Employed (Bn. VND)"]
                 ) * 100
 
                 if debt_to_capital > 70:
@@ -809,7 +809,7 @@ with tab2:
                 st.markdown(f"""
                 - **Capital Structure**: {capital_assessment}
                 - **Debt-to-Capital Ratio**: {debt_to_capital:.1f}%
-                - **Total Capital Scale**: {latest_data['Capital Employed (Bn. VND)']:.1f}B VND
+                - **Total Capital Scale**: {latest_data["Capital Employed (Bn. VND)"]:.1f}B VND
                 """)
 
             else:
@@ -896,7 +896,7 @@ with tab3:
                         st.metric(
                             "EBIT",
                             format_financial_display(
-                                latest_data['EBIT (Bn. VND)'], display_unit, 0
+                                latest_data["EBIT (Bn. VND)"], display_unit, 0
                             ),
                             help="Earnings Before Interest and Taxes",
                         )
@@ -905,13 +905,13 @@ with tab3:
                         st.metric(
                             "Net Income",
                             format_financial_display(
-                                latest_data['Net Income (Bn. VND)'], display_unit, 0
+                                latest_data["Net Income (Bn. VND)"], display_unit, 0
                             ),
                             help="Net profit after all expenses including taxes and interest",
                         )
 
                     with col3:
-                        ebit_change = latest_data['EBIT % Change']
+                        ebit_change = latest_data["EBIT % Change"]
                         st.metric(
                             "EBIT % Change",
                             f"{ebit_change:.2f}%"
@@ -921,7 +921,7 @@ with tab3:
                         )
 
                     with col4:
-                        net_income_change = latest_data['Net Income % Change']
+                        net_income_change = latest_data["Net Income % Change"]
                         st.metric(
                             "Net Income % Change",
                             f"{net_income_change:.2f}%"
@@ -934,7 +934,7 @@ with tab3:
                     col5, col6, col7, col8 = st.columns(4)
 
                     with col5:
-                        dfl_value = latest_data['DFL']
+                        dfl_value = latest_data["DFL"]
                         dfl_display = (
                             f"{dfl_value:.2f}" if not pd.isna(dfl_value) else "N/A"
                         )

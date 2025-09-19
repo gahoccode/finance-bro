@@ -108,10 +108,10 @@ def render_date_validation(start_date: datetime, end_date: datetime) -> bool:
     validation_result = validate_date_range(start_date, end_date)
 
     if validation_result["valid"]:
-        st.success(f"✅ {validation_result['message']}")
+        st.success(f"✅ {validation_result["message"]}")
         return True
     else:
-        st.error(f"❌ {validation_result['message']}")
+        st.error(f"❌ {validation_result["message"]}")
         return False
 
 
