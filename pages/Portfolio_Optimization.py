@@ -1,6 +1,10 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+import os
+from datetime import datetime
+from math import pi
 from pypfopt import (
     EfficientFrontier,
     risk_models,
@@ -10,20 +14,15 @@ from pypfopt import (
 )
 from pypfopt.discrete_allocation import get_latest_prices
 from pypfopt import plotting
-import numpy as np
-from datetime import datetime
 from bokeh.plotting import figure
 from bokeh.transform import cumsum
-from src.services.vnstock_api import fetch_portfolio_stock_data
-from math import pi
 import riskfolio as rp
+from src.services.vnstock_api import fetch_portfolio_stock_data
 
 # Streamlit page configuration
 st.set_page_config(
     page_title="Stock Portfolio Optimization", page_icon="", layout="wide"
 )
-
-import os
 
 # CSS loading removed
 

@@ -1,11 +1,11 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-from vnstock import Listing
 import warnings
+from vnstock import Listing
+from src.services.vnstock_api import get_screener_data
 
 warnings.filterwarnings("ignore")
-from src.services.vnstock_api import get_screener_data
 
 # Title and header
 st.markdown("# 🔍 Stock Screener")

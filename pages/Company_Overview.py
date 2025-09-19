@@ -3,8 +3,6 @@ import pandas as pd
 import altair as alt
 import warnings
 
-warnings.filterwarnings("ignore")
-
 # Import from modular utilities - preserves ALL caching and session state
 from src.services.vnstock_api import (
     get_ownership_data,
@@ -13,6 +11,8 @@ from src.services.vnstock_api import (
     get_insider_deals_data,
     get_foreign_trading_data,
 )
+
+warnings.filterwarnings("ignore")
 
 # Set page configuration
 st.set_page_config(page_title="Company Profile Analysis", layout="wide")
