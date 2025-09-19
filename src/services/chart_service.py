@@ -120,7 +120,6 @@ def create_technical_chart(
         else:
             skipped_indicators.append("OBV: Calculation failed or unavailable")
 
-
     # Show warning for skipped indicators
     if skipped_indicators:
         warning_text = "⚠️ **Skipped indicators in chart:**\n" + "\n".join(

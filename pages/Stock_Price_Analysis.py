@@ -367,7 +367,6 @@ def calculate_custom_metrics(
     return results
 
 
-
 if ticker:
     try:
         with st.spinner(f"Loading data for {ticker}..."):

@@ -52,7 +52,9 @@ def main():
         show_obv = st.checkbox("OBV", value=False)
 
         # Note: Indicator parameters are fixed in manual implementation
-        st.info("📊 **Indicator Parameters**: RSI(14), MACD(12,26,9), BB(20,2), OBV - optimized for reliable signals")
+        st.info(
+            "📊 **Indicator Parameters**: RSI(14), MACD(12,26,9), BB(20,2), OBV - optimized for reliable signals"
+        )
 
         # Store in session state for persistence
         if "ta_interval" not in st.session_state:
