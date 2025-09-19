@@ -180,7 +180,7 @@ def main():
     # Show combined filter results
     if filter_messages:
         st.info(
-            f"📊 **Filters Applied**: {' | '.join(filter_messages)} (from {original_count} original stocks)"
+            f"📊 **Filters Applied**: {" | ".join(filter_messages)} (from {original_count} original stocks)"
         )
 
     # Check if any stocks remain after filtering
@@ -194,7 +194,7 @@ def main():
             if show_buy_only:
                 active_filters.append("Buy Signal")
             st.warning(
-                f"🔍 No heating stocks found matching: {' + '.join(active_filters)}. Try disabling some filters."
+                f"🔍 No heating stocks found matching: {" + ".join(active_filters)}. Try disabling some filters."
             )
         else:
             st.info(

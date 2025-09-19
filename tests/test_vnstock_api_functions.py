@@ -261,9 +261,9 @@ class TestVnStockCompanyFunctions:
 
         for func in functions_to_check:
             # Check if function has been decorated with cache
-            assert hasattr(func, "__wrapped__"), (
-                f"{func.__name__} should have caching decorator"
-            )
+            assert hasattr(
+                func, "__wrapped__"
+            ), f"{func.__name__} should have caching decorator"
 
     @pytest.mark.parametrize("symbol", ["TEST_REE", "TEST_FMC", "TEST_DHC"])
     def test_functions_with_multiple_symbols(self, symbol, mock_ownership_data):

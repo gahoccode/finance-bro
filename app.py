@@ -180,7 +180,7 @@ def main_page():
                         st.switch_page("pages/Valuation.py")
                     else:
                         st.error(
-                            f"❌ Failed to pre-load data: {loading_result.get('error', 'Unknown error')}"
+                            f"❌ Failed to pre-load data: {loading_result.get("error", "Unknown error")}"
                         )
 
         with col2:

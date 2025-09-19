@@ -209,7 +209,7 @@ def format_date_range_status() -> Dict[str, str]:
     return {
         "start_date": start_date.strftime("%Y-%m-%d"),
         "end_date": end_date.strftime("%Y-%m-%d"),
-        "range": f"{start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}",
+        "range": f"{start_date.strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")}",
     }
 
 

@@ -428,7 +428,7 @@ if ticker:
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.metric(
-                    "Latest Close", f"{stock_price['close'].iloc[-1] * 1000:,.0f}"
+                    "Latest Close", f"{stock_price["close"].iloc[-1] * 1000:,.0f}"
                 )
             with col2:
                 st.metric("Mean Return (Annualized)", f"{mean_return_pct:.2f}%")

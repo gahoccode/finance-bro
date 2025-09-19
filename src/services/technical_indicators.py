@@ -204,5 +204,5 @@ def display_indicators_status(
 
         success_indicators = [key.upper() for key in indicator_keys]
         st.success(
-            f"✅ **Successfully calculated indicators**: {', '.join(success_indicators)}"
+            f"✅ **Successfully calculated indicators**: {", ".join(success_indicators)}"
         )

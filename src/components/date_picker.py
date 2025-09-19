@@ -109,10 +109,10 @@ def render_date_validation(start_date: datetime, end_date: datetime) -> bool:
     validation_result = validate_date_range(start_date, end_date)
 
     if validation_result["valid"]:
-        st.success(f"✅ {validation_result['message']}")
+        st.success(f"✅ {validation_result["message"]}")
         return True
     else:
-        st.error(f"❌ {validation_result['message']}")
+        st.error(f"❌ {validation_result["message"]}")
         return False
 
 
@@ -144,7 +144,7 @@ def render_date_range_status(
                 st.metric("Days", f"{days}")
         else:
             st.info(
-                f"📅 {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
+                f"📅 {start_date.strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")}"
             )
 
 
@@ -253,7 +253,7 @@ def render_compact_date_picker(
     start_date, end_date = get_analysis_dates()
 
     st.write("**Date Range:**")
-    st.write(f"{start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}")
+    st.write(f"{start_date.strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")}")
 
     # Quick preset buttons in compact layout
     col1, col2 = st.columns(2)

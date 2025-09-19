@@ -53,7 +53,7 @@ loading_result = ensure_valuation_data_loaded(symbol)
 
 if not loading_result["success"]:
     st.error(
-        f"❌ Failed to load valuation data: {loading_result.get('error', 'Unknown error')}"
+        f"❌ Failed to load valuation data: {loading_result.get("error", "Unknown error")}"
     )
     st.info("Please try refreshing the page or selecting a different stock symbol.")
     st.stop()
@@ -238,10 +238,10 @@ try:
                 st.subheader("📋 Beta Analysis Summary")
                 st.write(f"- **Data Points**: {len(returns):,} trading days")
                 st.write(
-                    f"- **Period**: {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
+                    f"- **Period**: {start_date.strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")}"
                 )
                 st.write(
-                    f"- **Beta Interpretation**: Stock moves {abs(beta):.1f}x the market {'in same direction' if beta > 0 else 'in opposite direction'}"
+                    f"- **Beta Interpretation**: Stock moves {abs(beta):.1f}x the market {"in same direction" if beta > 0 else "in opposite direction"}"
                 )
 
             else:
@@ -291,9 +291,9 @@ try:
 
             # Apply financial formatting to monetary columns
             historical_tax_display["Profit Before Tax (Bn. VND)"] = (
-                historical_tax_display["Profit Before Tax (Bn. VND)"].apply(
-                    lambda x: format_financial_display(x, display_unit, 0)
-                )
+                historical_tax_display[
+                    "Profit Before Tax (Bn. VND)"
+                ].apply(lambda x: format_financial_display(x, display_unit, 0))
             )
 
             historical_tax_display["Tax Paid (Bn. VND)"] = historical_tax_display[
@@ -785,7 +785,7 @@ try:
                     elif len(historical_fcf) == 1:
                         st.error("🔍 Debug: Only 1 year of valid FCF data found.")
                         st.error(
-                            f"Available year: {historical_years[0] if historical_years else 'Unknown'}"
+                            f"Available year: {historical_years[0] if historical_years else "Unknown"}"
                         )
 
                     # Show sample data for debugging
@@ -1358,7 +1358,7 @@ try:
                 st.download_button(
                     label="📊 Download DCF Analysis (CSV)",
                     data=dcf_csv,
-                    file_name=f"dcf_analysis_{symbol}_{datetime.now().strftime('%Y%m%d')}.csv",
+                    file_name=f"dcf_analysis_{symbol}_{datetime.now().strftime("%Y%m%d")}.csv",
                     mime="text/csv",
                 )
 

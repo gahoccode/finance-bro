@@ -61,20 +61,20 @@ with col1:
             highest_nav_fund = sorted_funds.iloc[0]
 
             st.success(
-                f"**Highest NAV Fund**: {highest_nav_fund['short_name']} ({highest_nav_fund['fund_code']})"
+                f"**Highest NAV Fund**: {highest_nav_fund["short_name"]} ({highest_nav_fund["fund_code"]})"
             )
 
             # Display key metrics in columns
             metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
 
             with metric_col1:
-                st.metric("NAV", f"{highest_nav_fund['nav']:,.0f}")
+                st.metric("NAV", f"{highest_nav_fund["nav"]:,.0f}")
 
             with metric_col2:
                 if pd.notna(highest_nav_fund.get("nav_change_inception")):
                     st.metric(
                         "Since Inception",
-                        f"{highest_nav_fund['nav_change_inception']:,.0f}%",
+                        f"{highest_nav_fund["nav_change_inception"]:,.0f}%",
                     )
                 else:
                     st.metric("Since Inception", "N/A")
@@ -83,7 +83,7 @@ with col1:
                 if pd.notna(highest_nav_fund.get("nav_change_36m_annualized")):
                     st.metric(
                         "3Y Annualized",
-                        f"{highest_nav_fund['nav_change_36m_annualized']:,.0f}%",
+                        f"{highest_nav_fund["nav_change_36m_annualized"]:,.0f}%",
                     )
                 else:
                     st.metric("3Y Annualized", "N/A")
@@ -91,7 +91,7 @@ with col1:
             with metric_col4:
                 if pd.notna(highest_nav_fund.get("management_fee")):
                     st.metric(
-                        "Management Fee", f"{highest_nav_fund['management_fee']:,.0f}%"
+                        "Management Fee", f"{highest_nav_fund["management_fee"]:,.0f}%"
                     )
                 else:
                     st.metric("Management Fee", "N/A")
@@ -227,30 +227,30 @@ if len(selected_fund_info) > 0:
 
     with detail_col1:
         st.write("**Basic Information**")
-        st.write(f"**Full Name**: {fund_info.get('name', 'N/A')}")
-        st.write(f"**Fund Type**: {fund_info.get('fund_type', 'N/A')}")
-        st.write(f"**Fund Owner**: {fund_info.get('fund_owner_name', 'N/A')}")
-        st.write(f"**Inception Date**: {fund_info.get('inception_date', 'N/A')}")
+        st.write(f"**Full Name**: {fund_info.get("name", "N/A")}")
+        st.write(f"**Fund Type**: {fund_info.get("fund_type", "N/A")}")
+        st.write(f"**Fund Owner**: {fund_info.get("fund_owner_name", "N/A")}")
+        st.write(f"**Inception Date**: {fund_info.get("inception_date", "N/A")}")
 
     with detail_col2:
         st.write("**Performance Metrics**")
         st.write(
-            f"**Current NAV**: {fund_info.get('nav', 'N/A'):,.2f}"
+            f"**Current NAV**: {fund_info.get("nav", "N/A"):,.2f}"
             if pd.notna(fund_info.get("nav"))
             else "**Current NAV**: N/A"
         )
         st.write(
-            f"**Previous Change**: {fund_info.get('nav_change_previous', 'N/A'):.2f}%"
+            f"**Previous Change**: {fund_info.get("nav_change_previous", "N/A"):.2f}%"
             if pd.notna(fund_info.get("nav_change_previous"))
             else "**Previous Change**: N/A"
         )
         st.write(
-            f"**1 Month**: {fund_info.get('nav_change_1m', 'N/A'):.2f}%"
+            f"**1 Month**: {fund_info.get("nav_change_1m", "N/A"):.2f}%"
             if pd.notna(fund_info.get("nav_change_1m"))
             else "**1 Month**: N/A"
         )
         st.write(
-            f"**6 Month**: {fund_info.get('nav_change_6m', 'N/A'):.2f}%"
+            f"**6 Month**: {fund_info.get("nav_change_6m", "N/A"):.2f}%"
             if pd.notna(fund_info.get("nav_change_6m"))
             else "**6 Month**: N/A"
         )
@@ -258,22 +258,22 @@ if len(selected_fund_info) > 0:
     with detail_col3:
         st.write("**Extended Performance**")
         st.write(
-            f"**12 Month**: {fund_info.get('nav_change_12m', 'N/A'):.2f}%"
+            f"**12 Month**: {fund_info.get("nav_change_12m", "N/A"):.2f}%"
             if pd.notna(fund_info.get("nav_change_12m"))
             else "**12 Month**: N/A"
         )
         st.write(
-            f"**24 Month**: {fund_info.get('nav_change_24m', 'N/A'):.2f}%"
+            f"**24 Month**: {fund_info.get("nav_change_24m", "N/A"):.2f}%"
             if pd.notna(fund_info.get("nav_change_24m"))
             else "**24 Month**: N/A"
         )
         st.write(
-            f"**36 Month**: {fund_info.get('nav_change_36m', 'N/A'):.2f}%"
+            f"**36 Month**: {fund_info.get("nav_change_36m", "N/A"):.2f}%"
             if pd.notna(fund_info.get("nav_change_36m"))
             else "**36 Month**: N/A"
         )
         st.write(
-            f"**Management Fee**: {fund_info.get('management_fee', 'N/A'):.2f}%"
+            f"**Management Fee**: {fund_info.get("management_fee", "N/A"):.2f}%"
             if pd.notna(fund_info.get("management_fee"))
             else "**Management Fee**: N/A"
         )
@@ -289,7 +289,7 @@ with export_col1:
     st.download_button(
         label="📊 Download Fund List CSV",
         data=csv_data,
-        file_name=f"vietnamese_funds_{datetime.now().strftime('%Y%m%d')}.csv",
+        file_name=f"vietnamese_funds_{datetime.now().strftime("%Y%m%d")}.csv",
         mime="text/csv",
     )
 
@@ -300,7 +300,7 @@ with export_col2:
         st.download_button(
             label="📈 Download NAV Data CSV",
             data=nav_csv,
-            file_name=f"nav_data_{selected_fund_code}_{datetime.now().strftime('%Y%m%d')}.csv",
+            file_name=f"nav_data_{selected_fund_code}_{datetime.now().strftime("%Y%m%d")}.csv",
             mime="text/csv",
         )
     else:
@@ -320,7 +320,7 @@ with export_col3:
             st.download_button(
                 label="🏭 Download Allocations CSV",
                 data=allocation_csv,
-                file_name=f"allocations_{selected_fund_code}_{datetime.now().strftime('%Y%m%d')}.csv",
+                file_name=f"allocations_{selected_fund_code}_{datetime.now().strftime("%Y%m%d")}.csv",
                 mime="text/csv",
             )
         else:
@@ -363,7 +363,7 @@ with export_col4:
 
             if png_data:
                 # Generate download filename
-                download_filename = f"fund_dashboard_{selected_fund_code}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+                download_filename = f"fund_dashboard_{selected_fund_code}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.png"
 
                 # Single download button that generates and downloads immediately
                 st.download_button(

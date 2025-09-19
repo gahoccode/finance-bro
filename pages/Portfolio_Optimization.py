@@ -703,7 +703,7 @@ with tab4:
         with col1:
             st.info(f"**Portfolio**: {portfolio_label}")
         with col2:
-            st.info(f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            st.info(f"**Generated**: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}")
 
         # File download
         filepath_xlsx = filepath_base + ".xlsx"
