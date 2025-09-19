@@ -5,6 +5,15 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.33] - 2025-09-19
+
+### Fixed
+- [2025-09-19] **Resolve pandas Timestamp deprecation warnings in date comparisons**: Fixed pandas deprecation warnings about using non-timezone-aware datetime objects in timezone-aware comparisons
+- [2025-09-19] **Organize module imports to follow PEP8 standards (E402)**: Fixed E402 linting errors by organizing module imports to follow PEP8 standards
+
+### Removed
+- [2025-09-19] **Complete ADX indicator removal from technical analysis**: Removed Average Directional Index (ADX) indicator from the technical analysis system due to data requirements and calculation complexity issues
+
 ## [0.2.20] - 2025-08-12
 
 ### Added
