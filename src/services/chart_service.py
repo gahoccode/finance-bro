@@ -120,31 +120,6 @@ def create_technical_chart(
         else:
             skipped_indicators.append("OBV: Calculation failed or unavailable")
 
-    # ADX Panel - Safe validation
-    if config.get("show_adx", True):
-        if "adx" in indicators and indicators["adx"] is not None:
-            adx = indicators["adx"]
-            required_cols = ["ADX_14", "DMP_14", "DMN_14"]
-            if all(col in adx.columns for col in required_cols):
-                try:
-                    addplots.extend(
-                        [
-                            mpf.make_addplot(
-                                adx["ADX_14"], panel=panels, color="brown", ylabel="ADX"
-                            ),
-                            mpf.make_addplot(
-                                adx["DMP_14"], panel=panels, color="green"
-                            ),
-                            mpf.make_addplot(adx["DMN_14"], panel=panels, color="red"),
-                        ]
-                    )
-                    panels += 1
-                except Exception as e:
-                    skipped_indicators.append(f"ADX: {str(e)}")
-            else:
-                skipped_indicators.append("ADX: Missing required columns")
-        else:
-            skipped_indicators.append("ADX: Calculation failed or unavailable")
 
     # Show warning for skipped indicators
     if skipped_indicators:
