@@ -147,22 +147,22 @@ st.markdown("### ℹ️ About CrewAI Financial Analysis")
 with st.expander("🤖 How the AI Analysis Works", expanded=False):
     st.markdown("""
     This financial health report is generated using **CrewAI**, a multi-agent AI framework with specialized agents:
-    
+
     **🔬 Financial Data Analyst Agent:**
     - Analyzes financial statements from session state dataframes
     - Calculates key financial ratios and metrics
     - Identifies trends and patterns in financial performance
-    
+
     **⚠️ Risk Assessment Specialist Agent:**
     - Evaluates potential financial risks and stability factors
     - Assesses liquidity, debt levels, and sustainability
     - Provides risk level categorization and early warnings
-    
+
     **📝 Report Writer Agent:**
     - Synthesizes analysis from other agents into a comprehensive report
     - Creates actionable insights and recommendations
     - Formats findings in a structured, stakeholder-ready format
-    
+
     **Process:** The agents work sequentially, with each building on the previous agent's analysis to create a comprehensive financial health assessment.
     """)
 

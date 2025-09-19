@@ -4,12 +4,12 @@ Provides validation functions for user inputs and data integrity checks.
 """
 
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
 
-def validate_stock_symbol(symbol: str, available_symbols: List[str]) -> Dict[str, Any]:
+def validate_stock_symbol(symbol: str, available_symbols: list[str]) -> dict[str, Any]:
     """
     Validate stock symbol against available symbols list.
 
@@ -36,7 +36,7 @@ def validate_stock_symbol(symbol: str, available_symbols: List[str]) -> Dict[str
     return {"valid": True, "message": "Valid stock symbol"}
 
 
-def validate_date_range(start_date: datetime, end_date: datetime) -> Dict[str, Any]:
+def validate_date_range(start_date: datetime, end_date: datetime) -> dict[str, Any]:
     """
     Validate date range for analysis.
 
@@ -77,7 +77,7 @@ def validate_date_range(start_date: datetime, end_date: datetime) -> Dict[str, A
     return {"valid": True, "message": "Valid date range"}
 
 
-def validate_api_key(api_key: str) -> Dict[str, Any]:
+def validate_api_key(api_key: str) -> dict[str, Any]:
     """
     Validate OpenAI API key format.
 
@@ -107,7 +107,7 @@ def validate_api_key(api_key: str) -> Dict[str, Any]:
     return {"valid": True, "message": "Valid API key format"}
 
 
-def validate_dataframe(df: pd.DataFrame, required_columns: List[str]) -> Dict[str, Any]:
+def validate_dataframe(df: pd.DataFrame, required_columns: list[str]) -> dict[str, Any]:
     """
     Validate that DataFrame has required columns and data.
 
@@ -141,7 +141,7 @@ def validate_dataframe(df: pd.DataFrame, required_columns: List[str]) -> Dict[st
     return {"valid": True, "message": "Valid DataFrame"}
 
 
-def validate_ohlcv_data(df: pd.DataFrame) -> Dict[str, Any]:
+def validate_ohlcv_data(df: pd.DataFrame) -> dict[str, Any]:
     """
     Validate OHLCV (Open, High, Low, Close, Volume) data for stock analysis.
 
@@ -200,8 +200,8 @@ def validate_ohlcv_data(df: pd.DataFrame) -> Dict[str, Any]:
 
 
 def validate_portfolio_symbols(
-    symbols: List[str], available_symbols: List[str], min_symbols: int = 2
-) -> Dict[str, Any]:
+    symbols: list[str], available_symbols: list[str], min_symbols: int = 2
+) -> dict[str, Any]:
     """
     Validate portfolio symbol selection.
 
@@ -234,7 +234,7 @@ def validate_portfolio_symbols(
 
 def validate_numeric_range(
     value: float, min_val: float, max_val: float, field_name: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Validate that numeric value is within specified range.
 
@@ -255,7 +255,7 @@ def validate_numeric_range(
     return {"valid": True, "message": f"Valid {field_name}"}
 
 
-def validate_screener_filters(filters: Dict[str, Any]) -> Dict[str, Any]:
+def validate_screener_filters(filters: dict[str, Any]) -> dict[str, Any]:
     """
     Validate screener filter parameters.
 
@@ -277,7 +277,7 @@ def validate_screener_filters(filters: Dict[str, Any]) -> Dict[str, Any]:
             rules = validation_rules[filter_name]
 
             # Handle range filters (tuple of min, max)
-            if isinstance(filter_value, (tuple, list)) and len(filter_value) == 2:
+            if isinstance(filter_value, tuple | list) and len(filter_value) == 2:
                 min_val, max_val = filter_value
 
                 # Validate min value
@@ -302,7 +302,7 @@ def validate_screener_filters(filters: Dict[str, Any]) -> Dict[str, Any]:
                     }
 
             # Handle single value filters
-            elif isinstance(filter_value, (int, float)):
+            elif isinstance(filter_value, int | float):
                 validation = validate_numeric_range(
                     filter_value, rules["min"], rules["max"], filter_name
                 )
@@ -312,7 +312,7 @@ def validate_screener_filters(filters: Dict[str, Any]) -> Dict[str, Any]:
     return {"valid": True, "message": "Valid screener filters"}
 
 
-def validate_file_upload(uploaded_file) -> Dict[str, Any]:
+def validate_file_upload(uploaded_file) -> dict[str, Any]:
     """
     Validate uploaded file for data analysis.
 

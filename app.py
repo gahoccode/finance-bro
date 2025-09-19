@@ -111,15 +111,14 @@ def main_page():
     )
 
     # Store the selected symbol in session state
-    if current_symbol:
-        if (
-            "stock_symbol" not in st.session_state
-            or st.session_state.stock_symbol != current_symbol
-        ):
-            st.session_state.stock_symbol = current_symbol
-            st.success(f"✅ Selected stock symbol: **{current_symbol}**")
-            st.info("📊 You can now navigate to other pages to analyze this stock!")
-            st.rerun()  # Force immediate rerun to update sidebar
+    if current_symbol and (
+        "stock_symbol" not in st.session_state
+        or st.session_state.stock_symbol != current_symbol
+    ):
+        st.session_state.stock_symbol = current_symbol
+        st.success(f"✅ Selected stock symbol: **{current_symbol}**")
+        st.info("📊 You can now navigate to other pages to analyze this stock!")
+        st.rerun()  # Force immediate rerun to update sidebar
 
     # Display current selection status
     if "stock_symbol" in st.session_state:
@@ -180,7 +179,7 @@ def main_page():
                         st.switch_page("pages/Valuation.py")
                     else:
                         st.error(
-                            f"❌ Failed to pre-load data: {loading_result.get("error", "Unknown error")}"
+                            f"❌ Failed to pre-load data: {loading_result.get('error', 'Unknown error')}"
                         )
 
         with col2:
@@ -238,14 +237,14 @@ def main_page():
     with st.expander("📖 Instructions", expanded=False):
         st.markdown("""
         **Finance Bro** is your AI-powered financial analysis companion for Vietnamese stock market data.
-        
+
         **Getting Started:**
         1. **Select a Stock Symbol** - Use the searchable dropdown above to find and select a Vietnamese stock symbol
         2. **Choose Your Analysis Flow**:
            - **Enhanced Flow (Recommended)** - Use "⚡ Load & Analyze Valuation" for the smoothest experience
            - **Standard Flow** - Navigate to individual analysis pages using quick buttons or menu
         3. **Stock Symbol Persistence** - Your selected symbol will be available across all pages
-        
+
         **Available Analysis Tools:**
         - **📊 Stock Analysis (Main Bro)** - AI-powered chat interface for comprehensive financial analysis
         - **📊 DuPont Analysis** - Return on Equity breakdown using DuPont framework analysis
@@ -257,7 +256,7 @@ def main_page():
         - **🔍 Stock Screener** - Filter and analyze stocks by financial metrics across industries
         - **🏦 Fund Analysis** - Vietnamese investment fund analysis with NAV performance and allocation charts
         - **🏥 Financial Health Report** - CrewAI multi-agent system for comprehensive financial health analysis
-        
+
         **Tips:**
         - Your selected stock symbol persists across all pages
         - Each page has specialized tools for different types of analysis

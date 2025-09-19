@@ -13,8 +13,6 @@ Usage:
     python cleanup_cache.py
 """
 
-import glob
-import os
 import sys
 from pathlib import Path
 
@@ -36,8 +34,8 @@ def cleanup_directory(directory, file_pattern, description):
         return 0
 
     # Find files matching the pattern
-    pattern_path = os.path.join(directory, file_pattern)
-    files_to_delete = glob.glob(pattern_path)
+    pattern_path = Path(directory) / file_pattern
+    files_to_delete = list(pattern_path.parent.glob(file_pattern))
 
     if not files_to_delete:
         print(f"✅ No {description} found in {directory}")

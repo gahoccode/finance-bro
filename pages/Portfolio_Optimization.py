@@ -1,3 +1,4 @@
+import pathlib
 from datetime import datetime
 
 import altair as alt
@@ -27,9 +28,6 @@ st.set_page_config(
 
 # Apply custom CSS styling for success alerts
 inject_custom_success_styling()
-
-import os
-import pathlib
 
 
 # Get stock symbol from session state (set in main app)
@@ -620,10 +618,10 @@ with tab3:
             # Investment summary
             st.subheader("Investment Summary")
             st.info(f"""
-            **Portfolio Strategy**: {portfolio_label}  
-            **Total Investment**: {portfolio_value:,.0f} VND  
-            **Allocated**: {allocated_value:,.0f} VND ({(allocated_value / portfolio_value * 100):.1f}%)  
-            **Remaining Cash**: {leftover:,.0f} VND ({(leftover / portfolio_value * 100):.1f}%)  
+            **Portfolio Strategy**: {portfolio_label}
+            **Total Investment**: {portfolio_value:,.0f} VND
+            **Allocated**: {allocated_value:,.0f} VND ({(allocated_value / portfolio_value * 100):.1f}%)
+            **Remaining Cash**: {leftover:,.0f} VND ({(leftover / portfolio_value * 100):.1f}%)
             **Number of Stocks**: {total_stocks} stocks
             """)
 
@@ -665,8 +663,8 @@ with tab4:
         project_root = pathlib.Path(
             pathlib.Path(pathlib.Path(__file__).resolve()).parent
         ).parent
-        reports_dir = os.path.join(project_root, "exports", "reports")
-        os.makedirs(reports_dir, exist_ok=True)
+        reports_dir = project_root / "exports" / "reports"
+        reports_dir.mkdir(parents=True, exist_ok=True)
 
         # Get the selected weights and create meaningful names
         if portfolio_choice == "Max Sharpe Portfolio":
@@ -690,7 +688,7 @@ with tab4:
         # Create filename with timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename_base = f"{portfolio_name}_{timestamp}"
-        filepath_base = os.path.join(reports_dir, filename_base)
+        filepath_base = reports_dir / filename_base
 
         # Generate Excel report using riskfolio-lib
         rp.excel_report(returns=returns, w=selected_weights_df, name=filepath_base)
@@ -703,11 +701,11 @@ with tab4:
         with col1:
             st.info(f"**Portfolio**: {portfolio_label}")
         with col2:
-            st.info(f"**Generated**: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}")
+            st.info(f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
         # File download
-        filepath_xlsx = filepath_base + ".xlsx"
-        with open(filepath_xlsx, "rb") as file:
+        filepath_xlsx = pathlib.Path(str(filepath_base) + ".xlsx")
+        with filepath_xlsx.open("rb") as file:
             st.download_button(
                 label="📥 Download Excel Report",
                 data=file.read(),
@@ -841,7 +839,7 @@ with tab5:
         with st.expander("📚 Understanding the Risk Analysis Table"):
             st.markdown(f"""
             This table provides comprehensive risk metrics for your {portfolio_label} portfolio:
-            
+
             **Key Metrics:**
             - **Expected Return**: Annualized expected portfolio return
             - **Volatility**: Portfolio standard deviation (risk measure)
@@ -850,7 +848,7 @@ with tab5:
             - **CVaR**: Conditional Value at Risk - expected loss beyond VaR
             - **Max Drawdown**: Largest peak-to-trough decline
             - **Calmar Ratio**: Return to max drawdown ratio
-            
+
             *Generated using riskfolio-lib risk analysis framework*
             """)
 

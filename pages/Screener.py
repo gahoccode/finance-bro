@@ -5,9 +5,10 @@ import pandas as pd
 import streamlit as st
 from vnstock import Listing
 
+from src.services.vnstock_api import get_screener_data
+
 
 warnings.filterwarnings("ignore")
-from src.services.vnstock_api import get_screener_data
 
 
 # Title and header
@@ -710,7 +711,7 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
                 st.markdown("""
                 **EV/EBITDA Guidelines:**
                 - **< 8**: Potentially undervalued or distressed
-                - **8-12**: Fair valuation range  
+                - **8-12**: Fair valuation range
                 - **12-18**: Premium valuation (justify with growth/quality)
                 - **> 18**: Expensive (needs exceptional growth prospects)
                 """)
@@ -740,8 +741,8 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
                 - **< 0.8**: Defensive stocks (less volatile than market)
                 - **0.8-1.2**: Market-like volatility
                 - **> 1.2**: High volatility (amplified market moves)
-                
-                **Alpha Guidelines:**  
+
+                **Alpha Guidelines:**
                 - **Positive**: Outperforming the market
                 - **Negative**: Underperforming the market
                 """)
@@ -772,7 +773,7 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
                 st.markdown("""
                 **Score Guidelines (0-10 scale):**
                 - **8-10**: Excellent quality
-                - **6-8**: Good quality  
+                - **6-8**: Good quality
                 - **4-6**: Average quality
                 - **< 4**: Below average quality
                 """)
@@ -931,7 +932,7 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
         if num_charts == 0:
             return None, None
 
-        fig, axes = plt.subplots(num_charts, 1, figsize=(12, fig_height))
+        _fig, axes = plt.subplots(num_charts, 1, figsize=(12, fig_height))
         if num_charts == 1:
             axes = [axes]
 
@@ -1094,7 +1095,7 @@ else:
     # Initial state - show instructions
     st.info("""
     ### 📋 How to use the Stock Screener:
-    
+
     1. **Select Industries**: Choose one or more industry sectors from the sidebar
     2. **Set Exchanges**: Select which Vietnamese stock exchanges to include
     3. **Configure Filters**: Toggle and adjust the financial metric filters:
@@ -1105,7 +1106,7 @@ else:
        - EV/EBITDA: Valuation multiple
     4. **Run Screener**: Click the "Run Screener" button to find matching stocks
     5. **Analyze Results**: View the filtered stocks and interactive visualizations
-    
+
     The screener uses TCBS data and applies financial filters after data retrieval.
     """)
 

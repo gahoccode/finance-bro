@@ -613,7 +613,7 @@ try:
                             if (
                                 isinstance(
                                     issue_share_value,
-                                    (int, float, np.integer, np.floating),
+                                    int | float | np.integer | np.floating,
                                 )
                                 and issue_share_value > 0
                                 and actual_current_price > 0
@@ -627,7 +627,7 @@ try:
                             if (
                                 isinstance(
                                     financial_ratio_share_value,
-                                    (int, float, np.integer, np.floating),
+                                    int | float | np.integer | np.floating,
                                 )
                                 and financial_ratio_share_value > 0
                                 and actual_current_price > 0
@@ -642,11 +642,11 @@ try:
                             if (
                                 isinstance(
                                     issue_share_value,
-                                    (int, float, np.integer, np.floating),
+                                    int | float | np.integer | np.floating,
                                 )
                                 and isinstance(
                                     financial_ratio_share_value,
-                                    (int, float, np.integer, np.floating),
+                                    int | float | np.integer | np.floating,
                                 )
                                 and issue_share_value > 0
                                 and financial_ratio_share_value > 0
@@ -670,13 +670,13 @@ try:
                                     f"{issue_share_value:,.0f}"
                                     if isinstance(
                                         issue_share_value,
-                                        (int, float, np.integer, np.floating),
+                                        int | float | np.integer | np.floating,
                                     )
                                     else issue_share_value,
                                     f"{financial_ratio_share_value:,.0f}"
                                     if isinstance(
                                         financial_ratio_share_value,
-                                        (int, float, np.integer, np.floating),
+                                        int | float | np.integer | np.floating,
                                     )
                                     else financial_ratio_share_value,
                                     percentage_diff_str,
@@ -685,13 +685,13 @@ try:
                                     format_financial_display(
                                         market_cap_issue_share, display_unit, 2
                                     )
-                                    if isinstance(market_cap_issue_share, (int, float))
+                                    if isinstance(market_cap_issue_share, int | float)
                                     else market_cap_issue_share,
                                     format_financial_display(
                                         market_cap_financial_ratio, display_unit, 2
                                     )
                                     if isinstance(
-                                        market_cap_financial_ratio, (int, float)
+                                        market_cap_financial_ratio, int | float
                                     )
                                     else market_cap_financial_ratio,
                                     "-",
@@ -1308,7 +1308,7 @@ try:
                 # Historical FCF context
                 st.subheader("📊 Historical Free Cash Flow Context")
                 historical_data = []
-                for i, (year, fcf, ocf, capex) in enumerate(
+                for _i, (year, fcf, ocf, capex) in enumerate(
                     zip(
                         historical_years,
                         historical_fcf,

@@ -1,5 +1,3 @@
-from typing import Dict, List, Type
-
 import pandas as pd
 import streamlit as st
 from crewai.tools import BaseTool
@@ -20,7 +18,7 @@ class FinancialAnalysisTool(BaseTool):
     description: str = (
         "Access and analyze financial dataframes from Streamlit session state"
     )
-    args_schema: Type[BaseModel] = FinancialAnalysisToolInput
+    args_schema: type[BaseModel] = FinancialAnalysisToolInput
 
     def _run(self, analysis_type: str = "overview") -> str:
         """
@@ -55,7 +53,7 @@ class FinancialAnalysisTool(BaseTool):
         except Exception as e:
             return f"Error accessing financial data: {str(e)}"
 
-    def _get_overview_analysis(self, dataframes: Dict[str, pd.DataFrame]) -> str:
+    def _get_overview_analysis(self, dataframes: dict[str, pd.DataFrame]) -> str:
         """Get comprehensive overview analysis of financial dataframes with actual data"""
         analysis = "COMPREHENSIVE FINANCIAL DATA ANALYSIS:\n"
         analysis += "=" * 60 + "\n\n"
@@ -80,7 +78,7 @@ class FinancialAnalysisTool(BaseTool):
                     latest_data[key] = latest_year_data.iloc[-1]
 
         # Sort years for trend analysis
-        sorted_years = sorted(list(all_years)) if all_years else []
+        sorted_years = sorted(all_years) if all_years else []
 
         analysis += "DATA COVERAGE SUMMARY:\n"
         analysis += f"- Available years: {", ".join(map(str, sorted_years))}\n"
@@ -155,7 +153,7 @@ class FinancialAnalysisTool(BaseTool):
 
     def _identify_key_line_items_with_values(
         self, data: pd.DataFrame, statement_type: str
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Identify key line items from financial statements with actual values"""
         key_items = {}
 
@@ -293,7 +291,7 @@ class FinancialAnalysisTool(BaseTool):
             return str(value)
 
     def _get_comprehensive_financial_context(
-        self, dataframes: Dict[str, pd.DataFrame]
+        self, dataframes: dict[str, pd.DataFrame]
     ) -> str:
         """Provide comprehensive financial data context for agents"""
         context = "=== COMPREHENSIVE FINANCIAL DATA CONTEXT ===\n\n"
@@ -303,7 +301,7 @@ class FinancialAnalysisTool(BaseTool):
         all_years = set()
 
         # First pass: identify years
-        for key, df in dataframes.items():
+        for _key, df in dataframes.items():
             if not df.empty and "yearReport" in df.columns:
                 years = df["yearReport"].unique()
                 all_years.update(years)
@@ -311,7 +309,7 @@ class FinancialAnalysisTool(BaseTool):
                     max(years) if not current_year else max(current_year, max(years))
                 )
 
-        sorted_years = sorted(list(all_years)) if all_years else []
+        sorted_years = sorted(all_years) if all_years else []
         context += f"ANALYSIS PERIOD: {min(sorted_years)} - {max(sorted_years)} ({len(sorted_years)} years)\n"
         context += f"CURRENT YEAR: {current_year}\n\n"
 
@@ -369,7 +367,7 @@ class FinancialAnalysisTool(BaseTool):
 
         return context
 
-    def _get_detailed_ratios_context(self, dataframes: Dict[str, pd.DataFrame]) -> str:
+    def _get_detailed_ratios_context(self, dataframes: dict[str, pd.DataFrame]) -> str:
         """Provide detailed financial ratios context"""
         if "Ratios" not in dataframes or dataframes["Ratios"].empty:
             return "No ratio data available for analysis."
@@ -425,7 +423,7 @@ class FinancialAnalysisTool(BaseTool):
 
         return context
 
-    def _get_trend_analysis_context(self, dataframes: Dict[str, pd.DataFrame]) -> str:
+    def _get_trend_analysis_context(self, dataframes: dict[str, pd.DataFrame]) -> str:
         """Provide trend analysis context with actual data"""
         context = "=== FINANCIAL TRENDS ANALYSIS CONTEXT ===\n\n"
 
@@ -469,7 +467,7 @@ class FinancialAnalysisTool(BaseTool):
 
         return context
 
-    def _get_complete_financial_data(self, dataframes: Dict[str, pd.DataFrame]) -> str:
+    def _get_complete_financial_data(self, dataframes: dict[str, pd.DataFrame]) -> str:
         """Provide complete financial dataset for detailed analysis"""
         context = "=== COMPLETE FINANCIAL DATASET ===\n\n"
 
@@ -506,7 +504,7 @@ class FinancialAnalysisTool(BaseTool):
 
     def _get_key_metrics_for_statement(
         self, df: pd.DataFrame, statement_name: str
-    ) -> List[str]:
+    ) -> list[str]:
         """Get key metrics based on statement type"""
         all_cols = df.columns.tolist()
 
@@ -537,7 +535,7 @@ class FinancialAnalysisTool(BaseTool):
         return key_metrics[:10]  # Return top 10 matches
 
     def _calculate_financial_health_indicators(
-        self, latest_data: Dict[str, pd.Series], current_year: int
+        self, latest_data: dict[str, pd.Series], current_year: int
     ) -> str:
         """Calculate key financial health indicators from latest data"""
         indicators = f"FINANCIAL HEALTH INDICATORS ({current_year}):\n"
@@ -601,13 +599,13 @@ class FinancialAnalysisTool(BaseTool):
 
         return indicators
 
-    def _get_ratio_analysis(self, dataframes: Dict[str, pd.DataFrame]) -> str:
+    def _get_ratio_analysis(self, dataframes: dict[str, pd.DataFrame]) -> str:
         """Get comprehensive financial ratio analysis with actual data"""
         if "Ratios" not in dataframes or dataframes["Ratios"].empty:
             return "No ratio data available for comprehensive analysis."
 
         return self._get_detailed_ratios_context(dataframes)
 
-    def _get_trend_analysis(self, dataframes: Dict[str, pd.DataFrame]) -> str:
+    def _get_trend_analysis(self, dataframes: dict[str, pd.DataFrame]) -> str:
         """Get comprehensive trend analysis with actual financial data"""
         return self._get_trend_analysis_context(dataframes)

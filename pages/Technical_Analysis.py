@@ -33,7 +33,7 @@ def main():
     # Page description
     st.markdown("""
     **Technical Analysis** - Discover stocks showing technical heating signals and analyze their price patterns.
-    
+
     This page identifies Vietnamese stocks that are "**Overheated in previous trading session**" according to vnstock technical indicators,
     then displays their candlestick charts with advanced technical indicators for comprehensive analysis.
     """)
@@ -45,7 +45,7 @@ def main():
         st.subheader("📊 Chart Configuration")
 
         # Interval selection
-        interval = st.selectbox(
+        st.selectbox(
             "Select Interval",
             options=["1D", "1W", "1M"],
             format_func=lambda x: {
@@ -66,9 +66,9 @@ def main():
         show_adx = st.checkbox("ADX", value=False)
 
         # Indicator parameters
-        bb_period = st.slider("BB Period", 10, 50, 20)
-        rsi_period = st.slider("RSI Period", 5, 30, 14)
-        adx_period = st.slider("ADX Period", 5, 30, 14)
+        st.slider("BB Period", 10, 50, 20)
+        st.slider("RSI Period", 5, 30, 14)
+        st.slider("ADX Period", 5, 30, 14)
 
         # Fibonacci Retracement Controls
         st.subheader("📈 Fibonacci Retracement")
@@ -528,9 +528,9 @@ def main():
     # Footer information
     st.markdown("---")
     st.info(f"""
-    **Note:** Charts show the {interval_info[current_interval]} of trading data based on your selected interval ({current_interval}). 
+    **Note:** Charts show the {interval_info[current_interval]} of trading data based on your selected interval ({current_interval}).
     Heating up signals are based on vnstock technical indicators that identify stocks "Overheated in previous trading session".
-    
+
     **Technical Indicators:**
     - **RSI**: Relative Strength Index (momentum oscillator)
     - **MACD**: Moving Average Convergence Divergence (trend-following)
@@ -538,7 +538,7 @@ def main():
     - **OBV**: On-Balance Volume (volume flow indicator)
     - **ADX**: Average Directional Index (trend strength)
     - **Fibonacci Retracements**: Support/resistance levels at 23.6%, 38.2%, 50%, 61.8%, 78.6%
-    
+
     **Fibonacci Features:**
     - Automatic swing high/low detection using SciPy algorithms
     - Configurable lookback period and sensitivity

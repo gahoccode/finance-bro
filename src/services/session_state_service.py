@@ -6,7 +6,7 @@ Provides intelligent data loading with progress feedback and cache management.
 """
 
 import warnings
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -52,7 +52,7 @@ def init_global_session_state():
         st.session_state.api_key = os.environ.get("OPENAI_API_KEY", "")
 
 
-def ensure_stock_symbols_loaded() -> Dict[str, Any]:
+def ensure_stock_symbols_loaded() -> dict[str, Any]:
     """
     Ensure stock symbols are loaded and cached in session state.
 
@@ -89,7 +89,7 @@ def ensure_financial_data_loaded(
     source: str = "VCI",
     company_source: str = "TCBS",
     force_reload: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Ensure financial data is loaded for the specified symbol and parameters.
 
@@ -171,7 +171,7 @@ def ensure_valuation_data_loaded(
     start_date: pd.Timestamp | None = None,
     end_date: pd.Timestamp | None = None,
     force_reload: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Ensure all data required for valuation analysis is loaded.
 
@@ -311,7 +311,7 @@ def get_current_company_name() -> str:
     return get_company_name_from_symbol(symbol, symbols_df)
 
 
-def validate_valuation_prerequisites() -> Dict[str, Any]:
+def validate_valuation_prerequisites() -> dict[str, Any]:
     """
     Validate that all prerequisites for valuation analysis are met.
 
@@ -367,7 +367,7 @@ def validate_valuation_prerequisites() -> Dict[str, Any]:
     return validation
 
 
-def smart_load_for_page(page_name: str, symbol: str = None) -> Dict[str, Any]:
+def smart_load_for_page(page_name: str, symbol: str = None) -> dict[str, Any]:
     """
     Smart data loading based on page requirements.
 

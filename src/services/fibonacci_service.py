@@ -3,8 +3,6 @@ Fibonacci Retracement Service for Finance Bro application.
 Provides swing detection using SciPy and Fibonacci level calculations.
 """
 
-from typing import Dict, Tuple
-
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -14,7 +12,7 @@ from scipy.signal import argrelextrema
 @st.cache_data(ttl=300)  # 5-minute cache for fibonacci calculations
 def find_swing_points(
     data: pd.Series, order: int = 5, min_distance: int = 10
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Find swing highs and lows using SciPy's argrelextrema.
 
@@ -74,7 +72,7 @@ def _filter_by_distance(indices: np.ndarray, min_distance: int) -> np.ndarray:
 
 def calculate_fibonacci_levels(
     high: float, low: float, include_extensions: bool = False
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Calculate Fibonacci retracement and extension levels.
 
@@ -120,7 +118,7 @@ def get_recent_swing_fibonacci(
     lookback_bars: int = 50,
     swing_order: int = 5,
     include_extensions: bool = False,
-) -> Dict | None:
+) -> dict | None:
     """
     Calculate Fibonacci levels based on most recent significant swing.
 
@@ -155,11 +153,11 @@ def get_recent_swing_fibonacci(
             return None
 
         # Find swing points using high and low prices
-        high_swings, low_swings = find_swing_points(
+        high_swings, _low_swings = find_swing_points(
             recent_data[high_col], order=swing_order
         )
 
-        low_high_swings, low_low_swings = find_swing_points(
+        _low_high_swings, low_low_swings = find_swing_points(
             recent_data[low_col], order=swing_order
         )
 
@@ -204,7 +202,7 @@ def get_recent_swing_fibonacci(
         return None
 
 
-def get_fibonacci_colors() -> Dict[str, str]:
+def get_fibonacci_colors() -> dict[str, str]:
     """
     Get color mapping for Fibonacci levels using Finance Bro theme.
 
@@ -263,13 +261,10 @@ def validate_fibonacci_data(data: pd.DataFrame) -> bool:
 
     # Check for valid price data (use whichever column format exists)
     columns_to_check = required_columns if has_lowercase else required_columns_cap
-    if data[columns_to_check].isnull().all().any():
-        return False
-
-    return True
+    return not data[columns_to_check].isnull().all().any()
 
 
-def format_fibonacci_summary(fib_data: Dict) -> str:
+def format_fibonacci_summary(fib_data: dict) -> str:
     """
     Format Fibonacci analysis summary for display.
 
@@ -291,7 +286,7 @@ def format_fibonacci_summary(fib_data: Dict) -> str:
     - Swing High: {swing_high:,.2f} (on {fib_data["swing_high_date"].strftime("%Y-%m-%d")})
     - Swing Low: {swing_low:,.2f} (on {fib_data["swing_low_date"].strftime("%Y-%m-%d")})
     - Range: {range_pct:.1f}%
-    
+
     **Key Retracement Levels:**
     """
 

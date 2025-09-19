@@ -6,8 +6,6 @@ CRITICAL: All session state variables remain exactly the same.
 This component works WITH existing session state patterns.
 """
 
-from typing import List
-
 import streamlit as st
 
 from ..core.config import DEFAULT_STOCK_SYMBOLS
@@ -17,7 +15,7 @@ from .ui_components import inject_custom_success_styling
 
 
 def render_stock_selector(
-    symbols_list: List[str] | None = None,
+    symbols_list: list[str] | None = None,
     key: str = "stock_selector",
     help_text: str = "Search and select one stock symbol to analyze",
 ) -> str:
@@ -158,7 +156,7 @@ def handle_stock_selection(selected_symbol: str) -> None:
             st.rerun()  # Force immediate rerun to update sidebar
 
 
-def render_symbol_validation(symbol: str, available_symbols: List[str]) -> bool:
+def render_symbol_validation(symbol: str, available_symbols: list[str]) -> bool:
     """
     Render validation feedback for stock symbol selection.
 
@@ -183,7 +181,7 @@ def render_symbol_validation(symbol: str, available_symbols: List[str]) -> bool:
 
 
 def render_compact_stock_selector(
-    symbols_list: List[str] | None = None, key: str = "compact_stock_selector"
+    symbols_list: list[str] | None = None, key: str = "compact_stock_selector"
 ) -> str:
     """
     Render compact stock selector for sidebar or limited space.
@@ -248,9 +246,9 @@ def render_multi_symbol_selector(
     max_selections: int = 10,
     min_selections: int = 1,
     key: str = "multi_symbol_selector",
-    default_symbols: List[str] | None = None,
+    default_symbols: list[str] | None = None,
     preserve_session_state: bool = True,
-) -> List[str]:
+) -> list[str]:
     """
     Render multi-symbol selector for portfolio construction.
 
@@ -307,8 +305,8 @@ def render_multi_symbol_selector(
 
 
 def render_portfolio_symbol_selector(
-    selected_symbols: List[str] | None = None, key: str = "portfolio_symbols"
-) -> List[str]:
+    selected_symbols: list[str] | None = None, key: str = "portfolio_symbols"
+) -> list[str]:
     """
     Render symbol selector specifically for portfolio optimization.
     Matches the EXACT pattern from Portfolio_Optimization.py.

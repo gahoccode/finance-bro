@@ -137,14 +137,14 @@ with tab1:
     with st.expander("ℹ️ About DuPont Analysis", expanded=False):
         st.markdown("""
         **DuPont Analysis** breaks down Return on Equity (ROE) into three key components:
-        
+
         **ROE = Net Profit Margin × Asset Turnover × Financial Leverage**
-        
+
         Where:
         - **Net Profit Margin** = Net Income / Revenue (Profitability)
-        - **Asset Turnover** = Revenue / Average Total Assets (Efficiency) 
+        - **Asset Turnover** = Revenue / Average Total Assets (Efficiency)
         - **Financial Leverage** = Average Total Assets / Average Equity (Leverage)
-        
+
         This analysis helps identify the key drivers of a company's profitability and provides insights into:
         - **Profitability**: How much profit the company generates per dollar of sales
         - **Efficiency**: How effectively the company uses its assets to generate sales
@@ -161,7 +161,7 @@ with tab1:
 
         if missing_dfs:
             st.error(
-                f"❌ Missing required financial statements: {", ".join(missing_dfs)}"
+                f"❌ Missing required financial statements: {', '.join(missing_dfs)}"
             )
             st.info(
                 "Please ensure all financial data is loaded in the Stock Price Analysis page."
@@ -199,28 +199,28 @@ with tab1:
                 with col1:
                     st.metric(
                         "Net Profit Margin",
-                        f"{latest_data["Net Profit Margin"]:.2f}%",
+                        f"{latest_data['Net Profit Margin']:.2f}%",
                         help="Net Income / Revenue",
                     )
 
                 with col2:
                     st.metric(
                         "Asset Turnover",
-                        f"{latest_data["Asset Turnover"]:.2f}x",
+                        f"{latest_data['Asset Turnover']:.2f}x",
                         help="Revenue / Average Total Assets",
                     )
 
                 with col3:
                     st.metric(
                         "Financial Leverage",
-                        f"{latest_data["Financial Leverage"]:.2f}x",
+                        f"{latest_data['Financial Leverage']:.2f}x",
                         help="Average Total Assets / Average Equity",
                     )
 
                 with col4:
                     st.metric(
                         "ROE (DuPont)",
-                        f"{latest_data["ROE (DuPont)"]:.2f}%",
+                        f"{latest_data['ROE (DuPont)']:.2f}%",
                         help="Net Profit Margin × Asset Turnover × Financial Leverage",
                     )
 
@@ -229,7 +229,7 @@ with tab1:
                     st.metric(
                         "Net Income",
                         format_financial_display(
-                            latest_data["Net Income (Bn. VND)"], display_unit, 0
+                            latest_data['Net Income (Bn. VND)'], display_unit, 0
                         ),
                         help="Net profit after all expenses",
                     )
@@ -238,7 +238,7 @@ with tab1:
                     st.metric(
                         "Revenue",
                         format_financial_display(
-                            latest_data["Revenue (Bn. VND)"], display_unit, 0
+                            latest_data['Revenue (Bn. VND)'], display_unit, 0
                         ),
                         help="Total sales revenue",
                     )
@@ -247,7 +247,7 @@ with tab1:
                     st.metric(
                         "Avg Total Assets",
                         format_financial_display(
-                            latest_data["Average Total Assets (Bn. VND)"],
+                            latest_data['Average Total Assets (Bn. VND)'],
                             display_unit,
                             0,
                         ),
@@ -258,7 +258,7 @@ with tab1:
                     st.metric(
                         "Avg Equity",
                         format_financial_display(
-                            latest_data["Average Equity (Bn. VND)"], display_unit, 0
+                            latest_data['Average Equity (Bn. VND)'], display_unit, 0
                         ),
                         help="Average shareholders' equity",
                     )
@@ -396,7 +396,7 @@ with tab1:
                 - **Net Profit Margin (%)** - Top panel
                 - **Asset Turnover (x)** - Middle panel
                 - **Financial Leverage (x)** - Bottom panel
-                
+
                 *Each component is displayed in its own panel for better visualization of trends.*
                 """)
 
@@ -430,7 +430,7 @@ with tab1:
 
                 st.markdown(f"""
                 **Year-over-Year Changes ({previous["yearReport"]:.0f} to {latest["yearReport"]:.0f}):**
-                
+
                 - **ROE Change**: {roe_change:+.2f}% {"📈" if roe_change > 0 else "📉" if roe_change < 0 else "➡️"}
                 - **Net Profit Margin**: {margin_change:+.2f}% {"📈" if margin_change > 0 else "📉" if margin_change < 0 else "➡️"}
                 - **Asset Turnover**: {turnover_change:+.2f}x {"📈" if turnover_change > 0 else "📉" if turnover_change < 0 else "➡️"}
@@ -441,19 +441,19 @@ with tab1:
                 drivers = []
                 if abs(margin_change) > 0.5:
                     drivers.append(
-                        f"Profitability ({"improved" if margin_change > 0 else "declined"})"
+                        f"Profitability ({'improved' if margin_change > 0 else 'declined'})"
                     )
                 if abs(turnover_change) > 0.05:
                     drivers.append(
-                        f"Asset efficiency ({"improved" if turnover_change > 0 else "declined"})"
+                        f"Asset efficiency ({'improved' if turnover_change > 0 else 'declined'})"
                     )
                 if abs(leverage_change) > 0.1:
                     drivers.append(
-                        f"Financial leverage ({"increased" if leverage_change > 0 else "decreased"})"
+                        f"Financial leverage ({'increased' if leverage_change > 0 else 'decreased'})"
                     )
 
                 if drivers:
-                    st.info(f"**Key ROE drivers**: {", ".join(drivers)}")
+                    st.info(f"**Key ROE drivers**: {', '.join(drivers)}")
 
             # Performance benchmarks
             latest_roe = dupont_analysis["ROE (DuPont)"].iloc[-1]
@@ -512,15 +512,15 @@ with tab2:
     with st.expander("ℹ️ About Capital Employed Analysis", expanded=False):
         st.markdown("""
         **Capital Employed** represents the total amount of funds invested in a business by both equity holders and debt holders.
-        
+
         **Formula: Capital Employed = Long-term Borrowings + Short-term Borrowings + Owner's Equity**
-        
+
         **Key Insights:**
         - **Total Investment**: Shows the total capital resources available to the company
         - **Financing Mix**: Reveals the proportion of debt vs equity financing
         - **Capital Efficiency**: Can be used to calculate return on capital employed (ROCE)
         - **Growth Tracking**: Monitor how capital requirements change over time
-        
+
         **Vietnamese Context:**
         - Includes both short-term and long-term borrowings from Vietnamese financial institutions
         - Owner's equity reflects shareholders' investment in VND billions
@@ -583,7 +583,7 @@ with tab2:
                         st.metric(
                             "Long-term Borrowings",
                             format_financial_display(
-                                latest_data["Long-term borrowings (Bn. VND)"],
+                                latest_data['Long-term borrowings (Bn. VND)'],
                                 display_unit,
                                 0,
                             ),
@@ -594,7 +594,7 @@ with tab2:
                         st.metric(
                             "Short-term Borrowings",
                             format_financial_display(
-                                latest_data["Short-term borrowings (Bn. VND)"],
+                                latest_data['Short-term borrowings (Bn. VND)'],
                                 display_unit,
                                 0,
                             ),
@@ -615,7 +615,7 @@ with tab2:
                         st.metric(
                             "Total Capital Employed",
                             format_financial_display(
-                                latest_data["Capital Employed (Bn. VND)"],
+                                latest_data['Capital Employed (Bn. VND)'],
                                 display_unit,
                                 0,
                             ),
@@ -778,7 +778,7 @@ with tab2:
 
                     st.markdown(f"""
                     **Year-over-Year Analysis ({previous["yearReport"]:.0f} to {latest["yearReport"]:.0f}):**
-                    
+
                     - **Capital Employed Change**: {capital_change:+.1f}B VND ({change_pct:+.1f}%) {"📈" if capital_change > 0 else "📉" if capital_change < 0 else "➡️"}
                     - **Current Financing Mix**:
                       - Debt Financing: {debt_ratio_latest:.1f}% ({debt_total_latest:.1f}B VND)
@@ -790,11 +790,11 @@ with tab2:
 
                 latest_data = capital_employed_results.iloc[-1]
                 total_debt = (
-                    latest_data["Long-term borrowings (Bn. VND)"]
-                    + latest_data["Short-term borrowings (Bn. VND)"]
+                    latest_data['Long-term borrowings (Bn. VND)']
+                    + latest_data['Short-term borrowings (Bn. VND)']
                 )
                 debt_to_capital = (
-                    total_debt / latest_data["Capital Employed (Bn. VND)"]
+                    total_debt / latest_data['Capital Employed (Bn. VND)']
                 ) * 100
 
                 if debt_to_capital > 70:
@@ -809,7 +809,7 @@ with tab2:
                 st.markdown(f"""
                 - **Capital Structure**: {capital_assessment}
                 - **Debt-to-Capital Ratio**: {debt_to_capital:.1f}%
-                - **Total Capital Scale**: {latest_data["Capital Employed (Bn. VND)"]:.1f}B VND
+                - **Total Capital Scale**: {latest_data['Capital Employed (Bn. VND)']:.1f}B VND
                 """)
 
             else:
@@ -836,15 +836,15 @@ with tab3:
     with st.expander("ℹ️ About Degree of Financial Leverage Analysis", expanded=False):
         st.markdown("""
         **Degree of Financial Leverage (DFL)** measures how sensitive a company's net income is to changes in its operating income (EBIT).
-        
+
         **Formula: DFL = % Change in Net Income / % Change in EBIT**
-        
+
         **Key Insights:**
         - **Financial Risk Measurement**: Higher DFL indicates greater financial risk due to fixed financial costs (interest)
         - **Leverage Impact**: Shows how financial leverage amplifies the effect of operating income changes on net income
         - **Year-over-Year Analysis**: Compares percentage changes between consecutive years
         - **Risk Assessment**: Helps evaluate the company's financial structure and interest burden
-        
+
         **Interpretation:**
         - **DFL > 1**: Financial leverage amplifies earnings changes (both positive and negative)
         - **DFL = 1**: No financial leverage effect (no interest expense)
@@ -896,7 +896,7 @@ with tab3:
                         st.metric(
                             "EBIT",
                             format_financial_display(
-                                latest_data["EBIT (Bn. VND)"], display_unit, 0
+                                latest_data['EBIT (Bn. VND)'], display_unit, 0
                             ),
                             help="Earnings Before Interest and Taxes",
                         )
@@ -905,13 +905,13 @@ with tab3:
                         st.metric(
                             "Net Income",
                             format_financial_display(
-                                latest_data["Net Income (Bn. VND)"], display_unit, 0
+                                latest_data['Net Income (Bn. VND)'], display_unit, 0
                             ),
                             help="Net profit after all expenses including taxes and interest",
                         )
 
                     with col3:
-                        ebit_change = latest_data["EBIT % Change"]
+                        ebit_change = latest_data['EBIT % Change']
                         st.metric(
                             "EBIT % Change",
                             f"{ebit_change:.2f}%"
@@ -921,7 +921,7 @@ with tab3:
                         )
 
                     with col4:
-                        net_income_change = latest_data["Net Income % Change"]
+                        net_income_change = latest_data['Net Income % Change']
                         st.metric(
                             "Net Income % Change",
                             f"{net_income_change:.2f}%"
@@ -934,7 +934,7 @@ with tab3:
                     col5, col6, col7, col8 = st.columns(4)
 
                     with col5:
-                        dfl_value = latest_data["DFL"]
+                        dfl_value = latest_data['DFL']
                         dfl_display = (
                             f"{dfl_value:.2f}" if not pd.isna(dfl_value) else "N/A"
                         )
@@ -1096,7 +1096,7 @@ with tab3:
 
                     st.markdown(f"""
                     **Year-over-Year Analysis ({previous["yearReport"]:.0f} to {latest["yearReport"]:.0f}):**
-                    
+
                     - **DFL Change**: {f"{dfl_change:+.2f}" if dfl_change is not None else "N/A"} {"📈" if dfl_change and dfl_change > 0 else "📉" if dfl_change and dfl_change < 0 else "➡️" if dfl_change == 0 else ""}
                     - **EBIT Volatility**: {ebit_volatility:.2f}% (Standard Deviation)
                     - **Net Income Volatility**: {net_income_volatility:.2f}% (Standard Deviation)
@@ -1146,7 +1146,7 @@ with tab3:
                     - **DFL 1.5-2.0**: Moderate leverage - reasonable balance between risk and return
                     - **DFL 1.0-1.5**: Low leverage - conservative financial structure
                     - **DFL < 1.0**: Minimal leverage - very stable but potentially missing growth opportunities
-                    
+
                     **Key Takeaways:**
                     - Higher DFL means more financial risk but potentially higher returns for shareholders
                     - Lower DFL indicates more stable earnings and lower financial risk
@@ -1165,7 +1165,7 @@ with tab3:
 # Footer
 st.markdown("---")
 st.markdown("""
-**About DuPont Analysis**: This analysis provides insights into the key drivers of return on equity by decomposing 
-ROE into profitability, efficiency, and leverage components. Use this to understand what drives your company's 
+**About DuPont Analysis**: This analysis provides insights into the key drivers of return on equity by decomposing
+ROE into profitability, efficiency, and leverage components. Use this to understand what drives your company's
 financial performance and compare with industry benchmarks.
 """)

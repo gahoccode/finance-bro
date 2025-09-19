@@ -8,7 +8,7 @@ These utilities just provide convenient helpers for common patterns.
 """
 
 from datetime import datetime
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -29,7 +29,7 @@ def has_stock_symbol() -> bool:
     return "stock_symbol" in st.session_state and st.session_state.stock_symbol
 
 
-def get_symbols_list() -> List[str]:
+def get_symbols_list() -> list[str]:
     """
     Helper to get stock symbols list with fallback.
     Does NOT replace direct st.session_state.stock_symbols_list access.
@@ -61,7 +61,7 @@ def get_company_name_from_symbol(symbol: str) -> str:
     return symbol
 
 
-def get_analysis_dates() -> Tuple[datetime, datetime]:
+def get_analysis_dates() -> tuple[datetime, datetime]:
     """
     Helper to get analysis date range from session state.
     Does NOT replace direct st.session_state access.
@@ -94,7 +94,7 @@ def has_api_key() -> bool:
     return api_key is not None and len(api_key.strip()) > 0
 
 
-def get_chat_messages() -> List[Dict[str, Any]]:
+def get_chat_messages() -> list[dict[str, Any]]:
     """
     Helper to get chat messages from session state.
     Does NOT replace direct st.session_state.messages access.
@@ -175,7 +175,7 @@ def validate_date_range(start_date: datetime, end_date: datetime) -> bool:
     return start_date < end_date
 
 
-def validate_stock_symbol(symbol: str, available_symbols: List[str]) -> bool:
+def validate_stock_symbol(symbol: str, available_symbols: list[str]) -> bool:
     """Validate that stock symbol is in available symbols list."""
     return symbol in available_symbols
 
@@ -186,7 +186,7 @@ def validate_api_key(api_key: str) -> bool:
 
 
 # Status display helpers
-def format_stock_status() -> Dict[str, str]:
+def format_stock_status() -> dict[str, str]:
     """Format current stock selection status for display."""
     symbol = get_stock_symbol()
     if symbol:
@@ -203,7 +203,7 @@ def format_stock_status() -> Dict[str, str]:
         }
 
 
-def format_date_range_status() -> Dict[str, str]:
+def format_date_range_status() -> dict[str, str]:
     """Format current date range for display."""
     start_date, end_date = get_analysis_dates()
     return {
@@ -213,7 +213,7 @@ def format_date_range_status() -> Dict[str, str]:
     }
 
 
-def format_data_status() -> Dict[str, str]:
+def format_data_status() -> dict[str, str]:
     """Format current data availability status for display."""
     status = {
         "stock_data": "✅ Loaded" if has_stock_price_data() else "❌ Not loaded",

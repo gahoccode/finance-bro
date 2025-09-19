@@ -6,7 +6,7 @@ All components preserve existing session state variables and patterns.
 """
 
 import pathlib
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -14,7 +14,7 @@ import streamlit as st
 from src.core.config import DEFAULT_FINANCIAL_DISPLAY, FINANCIAL_DISPLAY_OPTIONS
 
 
-def render_performance_metrics_columns(metrics_data: List[Dict[str, Any]]) -> None:
+def render_performance_metrics_columns(metrics_data: list[dict[str, Any]]) -> None:
     """Render performance metrics in columns layout.
 
     Used across Portfolio_Optimization.py and other performance analysis pages.
@@ -49,7 +49,7 @@ def create_financial_summary_expander(
             "Display option:",
             ["First 5 rows", "Last 5 rows"],
             horizontal=True,
-            key=f"financial_data_view_{title.replace(" ", "_").lower()}",
+            key=f"financial_data_view_{title.replace(' ', '_').lower()}",
         )
 
         if view_option == "First 5 rows":
@@ -60,7 +60,7 @@ def create_financial_summary_expander(
         st.write(f"Shape: {data.shape}")
 
 
-def render_progress_indicator(progress_value: float, status_message: str) -> Tuple:
+def render_progress_indicator(progress_value: float, status_message: str) -> tuple:
     """Render progress bar and status message.
 
     Extracted from Portfolio_Optimization.py - EXACT same pattern preserved.
@@ -81,7 +81,7 @@ def clear_progress_indicator(progress_bar, status_text) -> None:
     status_text.empty()
 
 
-def render_weights_comparison_table(weights_data: Dict[str, Dict[str, float]]) -> None:
+def render_weights_comparison_table(weights_data: dict[str, dict[str, float]]) -> None:
     """Render portfolio weights comparison table.
 
     Used in Portfolio_Optimization.py for comparing different portfolio strategies.
@@ -103,7 +103,7 @@ def render_weights_comparison_table(weights_data: Dict[str, Dict[str, float]]) -
 
 
 def create_trading_value_metrics(
-    data: pd.DataFrame, columns_config: Dict[str, str]
+    data: pd.DataFrame, columns_config: dict[str, str]
 ) -> None:
     """Create trading value metrics display.
 
@@ -154,18 +154,18 @@ def create_trading_value_metrics(
                 )
 
 
-def render_filter_status_info(filter_messages: List[str], original_count: int) -> None:
+def render_filter_status_info(filter_messages: list[str], original_count: int) -> None:
     """Render filter status information.
 
     Extracted from Technical_Analysis.py filter status display - EXACT same logic preserved.
     """
     if filter_messages:
         st.info(
-            f"📊 **Filters Applied**: {" | ".join(filter_messages)} (from {original_count} original stocks)"
+            f"📊 **Filters Applied**: {' | '.join(filter_messages)} (from {original_count} original stocks)"
         )
 
 
-def create_indicator_toggle_metrics(indicators_config: Dict[str, bool]) -> None:
+def create_indicator_toggle_metrics(indicators_config: dict[str, bool]) -> None:
     """Create indicator toggle metrics display.
 
     Extracted from Technical_Analysis.py indicator summary - EXACT same logic preserved.
@@ -207,7 +207,7 @@ def render_file_download_interface(
         st.error(f"Error preparing download: {str(e)}")
 
 
-def create_investment_summary_info(summary_data: Dict[str, Any]) -> None:
+def create_investment_summary_info(summary_data: dict[str, Any]) -> None:
     """Create investment summary information box.
 
     Extracted from Portfolio_Optimization.py investment summary - EXACT same logic preserved.
@@ -221,10 +221,10 @@ def create_investment_summary_info(summary_data: Dict[str, Any]) -> None:
     portfolio_label = summary_data.get("portfolio_label", "Portfolio")
 
     st.info(f"""
-    **Portfolio Strategy**: {portfolio_label}  
-    **Total Investment**: {portfolio_value:,.0f} VND  
-    **Allocated**: {allocated_value:,.0f} VND ({(allocated_value / portfolio_value * 100):.1f}%)  
-    **Remaining Cash**: {leftover:,.0f} VND ({(leftover / portfolio_value * 100):.1f}%)  
+    **Portfolio Strategy**: {portfolio_label}
+    **Total Investment**: {portfolio_value:,.0f} VND
+    **Allocated**: {allocated_value:,.0f} VND ({(allocated_value / portfolio_value * 100):.1f}%)
+    **Remaining Cash**: {leftover:,.0f} VND ({(leftover / portfolio_value * 100):.1f}%)
     **Number of Stocks**: {total_stocks} stocks
     """)
 
@@ -291,7 +291,7 @@ def render_financial_display_options(
         display_df = convert_dataframe_for_display(df, columns, display_unit)
     """
     # Initialize session state key with default
-    session_key = f"{unique_key}_{DEFAULT_FINANCIAL_DISPLAY["session_key"]}"
+    session_key = f"{unique_key}_{DEFAULT_FINANCIAL_DISPLAY['session_key']}"
 
     if session_key not in st.session_state:
         st.session_state[session_key] = DEFAULT_FINANCIAL_DISPLAY["unit"]
@@ -300,7 +300,7 @@ def render_financial_display_options(
     options = []
     option_keys = []
 
-    for config_key, config_value in FINANCIAL_DISPLAY_OPTIONS.items():
+    for _config_key, config_value in FINANCIAL_DISPLAY_OPTIONS.items():
         options.append(config_value["label"])
         option_keys.append(config_value["key"])
 

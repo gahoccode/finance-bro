@@ -7,7 +7,6 @@ This component works WITH existing session state patterns.
 """
 
 from datetime import datetime, timedelta
-from typing import Tuple
 
 import pandas as pd
 import streamlit as st
@@ -22,7 +21,7 @@ def render_date_range_picker(
     key_prefix: str = "analysis",
     show_validation: bool = True,
     label: str = "Analysis Date Range",
-) -> Tuple[datetime, datetime]:
+) -> tuple[datetime, datetime]:
     """
     Render date range picker component.
 
@@ -109,10 +108,10 @@ def render_date_validation(start_date: datetime, end_date: datetime) -> bool:
     validation_result = validate_date_range(start_date, end_date)
 
     if validation_result["valid"]:
-        st.success(f"✅ {validation_result["message"]}")
+        st.success(f"✅ {validation_result['message']}")
         return True
     else:
-        st.error(f"❌ {validation_result["message"]}")
+        st.error(f"❌ {validation_result['message']}")
         return False
 
 
@@ -238,7 +237,7 @@ def _update_date_range(
 
 def render_compact_date_picker(
     key_prefix: str = "analysis", key: str = "compact_date"
-) -> Tuple[datetime, datetime]:
+) -> tuple[datetime, datetime]:
     """
     Render compact date picker for sidebar or limited space.
 
@@ -340,7 +339,4 @@ def validate_market_hours_date(date: datetime) -> bool:
 
     # Check if it's too far in the past (more than 10 years)
     ten_years_ago = today - timedelta(days=365 * 10)
-    if date < ten_years_ago:
-        return False
-
-    return True
+    return not date < ten_years_ago

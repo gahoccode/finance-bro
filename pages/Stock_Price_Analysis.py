@@ -1,4 +1,4 @@
-import os
+import pathlib
 from datetime import datetime
 
 import numpy as np
@@ -7,6 +7,12 @@ import quantstats as qs
 import streamlit as st
 
 from src.components.ui_components import inject_custom_success_styling
+from src.services.chart_service import (
+    create_altair_area_chart,
+    create_altair_line_chart,
+    create_plotly_candlestick_chart,
+)
+from src.services.vnstock_api import fetch_stock_price_data
 
 
 st.set_page_config(page_title="Stock Price Analysis", layout="wide")
@@ -328,7 +334,7 @@ def calculate_custom_metrics(
                 formatted_name = format_metric_name(metric)
 
                 # Handle different return types
-                if isinstance(value, (int, float)):
+                if isinstance(value, int | float):
                     if metric in [
                         "cagr",
                         "avg_return",
@@ -368,14 +374,6 @@ def calculate_custom_metrics(
 
 
 # Import cached function from modular utilities
-import pathlib
-
-from src.services.chart_service import (
-    create_altair_area_chart,
-    create_altair_line_chart,
-    create_plotly_candlestick_chart,
-)
-from src.services.vnstock_api import fetch_stock_price_data
 
 
 if ticker:
@@ -428,7 +426,7 @@ if ticker:
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.metric(
-                    "Latest Close", f"{stock_price["close"].iloc[-1] * 1000:,.0f}"
+                    "Latest Close", f"{stock_price['close'].iloc[-1] * 1000:,.0f}"
                 )
             with col2:
                 st.metric("Mean Return (Annualized)", f"{mean_return_pct:.2f}%")
@@ -454,15 +452,13 @@ if ticker:
                         project_root = pathlib.Path(
                             pathlib.Path(pathlib.Path(__file__).resolve()).parent
                         ).parent
-                        tearsheets_dir = os.path.join(
-                            project_root, "exports", "tearsheets"
-                        )
-                        os.makedirs(tearsheets_dir, exist_ok=True)
+                        tearsheets_dir = project_root / "exports" / "tearsheets"
+                        tearsheets_dir.mkdir(parents=True, exist_ok=True)
 
                         # Generate timestamp and filename
                         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                         filename = f"{ticker}_tearsheet_{timestamp}.html"
-                        filepath = os.path.join(tearsheets_dir, filename)
+                        filepath = tearsheets_dir / filename
 
                         with st.spinner("Generating QuantStats tearsheet..."):
                             try:
@@ -480,8 +476,8 @@ if ticker:
                                             pathlib.Path(__file__).resolve()
                                         ).parent
                                     ).parent
-                                    default_file = os.path.join(
-                                        project_root, "quantstats-tearsheet.html"
+                                    default_file = (
+                                        project_root / "quantstats-tearsheet.html"
                                     )
                                     if pathlib.Path(default_file).exists():
                                         # Move file to our desired location
@@ -490,7 +486,7 @@ if ticker:
                                         shutil.move(default_file, filepath)
 
                                 # Read the generated HTML file for display
-                                with open(filepath, encoding="utf-8") as f:
+                                with pathlib.Path(filepath).open(encoding="utf-8") as f:
                                     html_content = f.read()
 
                                 # Success message
@@ -507,7 +503,7 @@ if ticker:
                                 )
 
                                 # Download button
-                                with open(filepath, "rb") as file:
+                                with pathlib.Path(filepath).open("rb") as file:
                                     st.download_button(
                                         label="📥 Download HTML Report",
                                         data=file.read(),
@@ -593,7 +589,7 @@ if ticker:
                     # Create responsive grid layout
                     cols = st.columns(grid_columns)
 
-                    for idx, (metric_key, metric_data) in enumerate(
+                    for idx, (_metric_key, metric_data) in enumerate(
                         custom_results.items()
                     ):
                         col_idx = idx % grid_columns

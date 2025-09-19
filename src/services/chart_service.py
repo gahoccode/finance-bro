@@ -3,10 +3,7 @@ Chart generation utilities for Finance Bro application.
 Centralized chart creation functions extracted from various pages.
 """
 
-import glob
-import os
 import pathlib
-from typing import Dict
 
 import altair as alt
 import matplotlib.pyplot as plt
@@ -25,7 +22,7 @@ def create_technical_chart(
     data: pd.DataFrame,
     indicators: dict,
     config: dict,
-    fibonacci_config: Dict | None = None,
+    fibonacci_config: dict | None = None,
 ) -> plt.Figure:
     """Create technical analysis chart with indicators using mplfinance with safe validation
 
@@ -175,7 +172,7 @@ def create_technical_chart(
         figcolor="white",
     )
 
-    fig, axes = mpf.plot(
+    fig, _axes = mpf.plot(
         data,
         type="candle",
         style=style,
@@ -305,7 +302,7 @@ def create_plotly_candlestick_chart(
         decreasing_line_color=down_color,
         increasing_fillcolor=up_color,
         decreasing_fillcolor=down_color,
-        line=dict(width=1),
+        line={"width": 1},
         name="Price",
     )
 
@@ -333,19 +330,19 @@ def create_plotly_candlestick_chart(
 
     # Update layout with Finance Bro styling
     fig.update_layout(
-        title=dict(
-            text=f"{ticker} - Professional Candlestick Chart",
-            x=0.5,
-            font=dict(size=16, family="serif"),
-        ),
+        title={
+            "text": f"{ticker} - Professional Candlestick Chart",
+            "x": 0.5,
+            "font": {"size": 16, "family": "serif"},
+        },
         xaxis_rangeslider_visible=False,
         height=700,
         plot_bgcolor="white",
         paper_bgcolor="white",
-        font=dict(family="serif", color="#333333"),
+        font={"family": "serif", "color": "#333333"},
         hovermode="x unified",
         showlegend=False,
-        margin=dict(l=80, r=40, t=80, b=40),
+        margin={"l": 80, "r": 40, "t": 80, "b": 40},
     )
 
     # Update x-axes
@@ -383,24 +380,39 @@ def create_plotly_candlestick_chart(
 
     # Add range selector buttons for better interactivity
     fig.update_layout(
-        xaxis=dict(
-            rangeselector=dict(
-                buttons=list([
-                    dict(count=7, label="7d", step="day", stepmode="backward"),
-                    dict(count=30, label="30d", step="day", stepmode="backward"),
-                    dict(count=90, label="3m", step="day", stepmode="backward"),
-                    dict(count=180, label="6m", step="day", stepmode="backward"),
-                    dict(count=365, label="1y", step="day", stepmode="backward"),
-                    dict(step="all", label="All"),
-                ]),
-                bgcolor="rgba(118,112,108,0.1)",
-                bordercolor="rgba(118,112,108,0.3)",
-                borderwidth=1,
-                font=dict(color="#333333"),
-            ),
-            rangeslider=dict(visible=False),
-            type="date",
-        )
+        xaxis={
+            "rangeselector": {
+                "buttons": [
+                    {"count": 7, "label": "7d", "step": "day", "stepmode": "backward"},
+                    {
+                        "count": 30,
+                        "label": "30d",
+                        "step": "day",
+                        "stepmode": "backward",
+                    },
+                    {"count": 90, "label": "3m", "step": "day", "stepmode": "backward"},
+                    {
+                        "count": 180,
+                        "label": "6m",
+                        "step": "day",
+                        "stepmode": "backward",
+                    },
+                    {
+                        "count": 365,
+                        "label": "1y",
+                        "step": "day",
+                        "stepmode": "backward",
+                    },
+                    {"step": "all", "label": "All"},
+                ],
+                "bgcolor": "rgba(118,112,108,0.1)",
+                "bordercolor": "rgba(118,112,108,0.3)",
+                "borderwidth": 1,
+                "font": {"color": "#333333"},
+            },
+            "rangeslider": {"visible": False},
+            "type": "date",
+        }
     )
 
     return fig
@@ -415,11 +427,11 @@ def detect_latest_chart():
     Extracted from bro.py lines 45-59 - EXACT same logic preserved.
     """
     try:
-        chart_dir = "exports/charts/"
-        if pathlib.Path(chart_dir).exists():
-            chart_files = glob.glob(os.path.join(chart_dir, "*.png"))
+        chart_dir = pathlib.Path("exports/charts/")
+        if chart_dir.exists():
+            chart_files = list(chart_dir.glob("*.png"))
             if chart_files:
-                latest_chart = max(chart_files, key=os.path.getctime)
+                latest_chart = max(chart_files, key=lambda p: p.stat().st_ctime)
                 return {"type": "image", "path": latest_chart}
     except Exception:
         pass
@@ -480,7 +492,7 @@ def create_mplfinance_style():
 # Fibonacci Overlay Functions
 
 
-def _create_fibonacci_overlays(data: pd.DataFrame, fibonacci_config: Dict) -> list:
+def _create_fibonacci_overlays(data: pd.DataFrame, fibonacci_config: dict) -> list:
     """
     Create Fibonacci retracement level overlays for mplfinance charts.
 
@@ -529,7 +541,6 @@ def _create_fibonacci_overlays(data: pd.DataFrame, fibonacci_config: Dict) -> li
             color = fibonacci_colors.get(level_name, "#56524D")
 
             # Create line style based on importance
-            line_style = "solid"
             line_width = 1.5
             alpha = 0.7
 
@@ -538,7 +549,6 @@ def _create_fibonacci_overlays(data: pd.DataFrame, fibonacci_config: Dict) -> li
                 line_width = 2.0
                 alpha = 0.9
             elif level_name in ["0.0%", "100.0%"]:
-                line_style = "dashed"
                 line_width = 1.8
                 alpha = 0.8
 
@@ -568,7 +578,7 @@ def _create_fibonacci_overlays(data: pd.DataFrame, fibonacci_config: Dict) -> li
         return []
 
 
-def display_fibonacci_summary(fibonacci_config: Dict, ticker: str) -> None:
+def display_fibonacci_summary(fibonacci_config: dict, ticker: str) -> None:
     """
     Display Fibonacci retracement summary information.
 
@@ -600,8 +610,8 @@ def display_fibonacci_summary(fibonacci_config: Dict, ticker: str) -> None:
                 # Display current price context if available
                 current_price = fib_data.get("current_price")
                 if current_price:
-                    swing_high = fib_data["swing_high"]
-                    swing_low = fib_data["swing_low"]
+                    fib_data["swing_high"]
+                    fib_data["swing_low"]
 
                     # Calculate where current price sits relative to Fibonacci levels
                     fib_levels = fib_data["fibonacci_levels"]
@@ -632,7 +642,7 @@ def display_fibonacci_summary(fibonacci_config: Dict, ticker: str) -> None:
         st.error(f"Error displaying Fibonacci summary: {str(e)}")
 
 
-def get_fibonacci_level_alerts(data: pd.DataFrame, fibonacci_config: Dict) -> list:
+def get_fibonacci_level_alerts(data: pd.DataFrame, fibonacci_config: dict) -> list:
     """
     Check if current price is near any Fibonacci levels and return alerts.
 

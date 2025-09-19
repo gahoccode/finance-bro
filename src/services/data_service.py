@@ -6,7 +6,7 @@ CRITICAL: All session state variables remain exactly the same.
 These utilities work WITH existing data processing patterns.
 """
 
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -220,7 +220,7 @@ def calculate_portfolio_returns(prices_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_portfolio_price_data(
-    all_historical_data: Dict[str, pd.DataFrame],
+    all_historical_data: dict[str, pd.DataFrame],
 ) -> pd.DataFrame:
     """Process historical data from multiple stocks into combined price dataframe.
 
@@ -262,7 +262,7 @@ def process_portfolio_price_data(
     return prices_df
 
 
-def prepare_portfolio_symbol_defaults(main_stock_symbol: str) -> List[str]:
+def prepare_portfolio_symbol_defaults(main_stock_symbol: str) -> list[str]:
     """Prepare default symbols for portfolio selection.
 
     Extracted from Portfolio_Optimization.py lines 50-54 - EXACT same logic preserved.
@@ -279,7 +279,7 @@ def prepare_portfolio_symbol_defaults(main_stock_symbol: str) -> List[str]:
 
 
 def create_weights_dataframe(
-    weights_dict: Dict[str, float], column_name: str
+    weights_dict: dict[str, float], column_name: str
 ) -> pd.DataFrame:
     """Convert weights dictionary to DataFrame format for riskfolio-lib.
 
@@ -289,7 +289,7 @@ def create_weights_dataframe(
 
 
 def format_allocation_dataframe(
-    allocation: Dict[str, int], latest_prices_actual: pd.Series, portfolio_value: float
+    allocation: dict[str, int], latest_prices_actual: pd.Series, portfolio_value: float
 ) -> pd.DataFrame:
     """Format allocation data for display.
 
@@ -331,7 +331,7 @@ def validate_technical_data_sufficiency(data: pd.DataFrame) -> bool:
     return len(missing_columns) == 0
 
 
-def prepare_technical_chart_data(data: pd.DataFrame, indicators: dict) -> List:
+def prepare_technical_chart_data(data: pd.DataFrame, indicators: dict) -> list:
     """Prepare addplot data for mplfinance technical charts.
 
     Extracted from Technical_Analysis.py create_technical_chart function - EXACT logic preserved.
@@ -390,7 +390,7 @@ def clean_and_validate_ohlcv_data(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def create_performance_summary_dataframe(performance_data: List[Dict]) -> pd.DataFrame:
+def create_performance_summary_dataframe(performance_data: list[dict]) -> pd.DataFrame:
     """Create performance summary DataFrame from portfolio performance data.
 
     Used across Portfolio_Optimization.py for performance comparisons.
@@ -402,15 +402,15 @@ def create_performance_summary_dataframe(performance_data: List[Dict]) -> pd.Dat
     for col in numeric_cols:
         if col in performance_df.columns:
             performance_df[col] = performance_df[col].apply(
-                lambda x: f"{float(x):.4f}" if isinstance(x, (int, float)) else x
+                lambda x: f"{float(x):.4f}" if isinstance(x, int | float) else x
             )
 
     return performance_df
 
 
 def prepare_portfolio_data(
-    stock_data_dict: Dict[str, pd.DataFrame],
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    stock_data_dict: dict[str, pd.DataFrame],
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Prepare portfolio data for optimization.
     Extracted from Portfolio_Optimization.py logic.
@@ -552,8 +552,8 @@ def format_financial_metrics(value: Any, metric_type: str = "default") -> str:
 
 
 def validate_financial_dataframe(
-    df: pd.DataFrame, required_columns: List[str] | None = None
-) -> Dict[str, Any]:
+    df: pd.DataFrame, required_columns: list[str] | None = None
+) -> dict[str, Any]:
     """
     Validate financial dataframe structure and content.
 
@@ -590,7 +590,7 @@ def validate_financial_dataframe(
 
 
 def merge_financial_dataframes(
-    dataframes: Dict[str, pd.DataFrame], on_column: str = "yearReport"
+    dataframes: dict[str, pd.DataFrame], on_column: str = "yearReport"
 ) -> pd.DataFrame:
     """
     Merge multiple financial dataframes on a common column.
@@ -658,7 +658,7 @@ def calculate_financial_ratios(
     return ratios
 
 
-def aggregate_portfolio_metrics(returns_data: pd.DataFrame) -> Dict[str, float]:
+def aggregate_portfolio_metrics(returns_data: pd.DataFrame) -> dict[str, float]:
     """
     Calculate aggregate portfolio metrics.
 
@@ -738,7 +738,7 @@ def format_financial_display(
 
 def convert_dataframe_for_display(
     df: pd.DataFrame,
-    columns_to_format: List[str],
+    columns_to_format: list[str],
     display_unit: str = "original",
     decimal_places: int = 1,
 ) -> pd.DataFrame:
