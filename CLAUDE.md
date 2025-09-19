@@ -56,7 +56,7 @@ This is a Streamlit-based AI financial analysis application for Vietnamese stock
   - **bro.py** - Main AI chat interface with PandasAI integration
   - **Company_Overview.py** - Company profile and ownership analysis
   - **Stock_Price_Analysis.py** - Price charts and technical analysis
-  - **Technical_Analysis.py** - Advanced technical indicators with pandas-ta integration
+  - **Technical_Analysis.py** - Advanced technical indicators with manual implementation
   - **Portfolio_Optimization.py** - Modern Portfolio Theory optimization
   - **Screener.py** - Stock screening and filtering functionality
 - **src/** - Modular utilities and services (NEW):

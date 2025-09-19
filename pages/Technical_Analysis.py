@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from src.services.vnstock_api import (
     get_heating_up_stocks,
     get_technical_stock_data,
-    calculate_technical_indicators,
 )
+from src.services.technical_indicators import calculate_technical_indicators
 from src.services.chart_service import create_technical_chart
 
 st.set_page_config(
@@ -50,12 +50,10 @@ def main():
         show_rsi = st.checkbox("RSI", value=True)
         show_macd = st.checkbox("MACD", value=True)
         show_obv = st.checkbox("OBV", value=False)
-        show_adx = st.checkbox("ADX", value=False)
 
         # Indicator parameters
         bb_period = st.slider("BB Period", 10, 50, 20)
         rsi_period = st.slider("RSI Period", 5, 30, 14)
-        adx_period = st.slider("ADX Period", 5, 30, 14)
 
         # Store in session state for persistence
         if "ta_interval" not in st.session_state:
@@ -193,7 +191,7 @@ def main():
     st.subheader("📊 Technical Indicators Summary")
 
     # Create columns for indicator toggles
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("Bollinger Bands", "ON" if show_bb else "OFF")
     with col2:
@@ -202,8 +200,6 @@ def main():
         st.metric("MACD", "ON" if show_macd else "OFF")
     with col4:
         st.metric("OBV", "ON" if show_obv else "OFF")
-    with col5:
-        st.metric("ADX", "ON" if show_adx else "OFF")
 
     # Charts section with technical indicators
     st.subheader("📈 Advanced Technical Analysis Charts")
@@ -224,7 +220,6 @@ def main():
         "show_rsi": show_rsi,
         "show_macd": show_macd,
         "show_obv": show_obv,
-        "show_adx": show_adx,
     }
 
     # Create tabs for better organization if many stocks
@@ -253,7 +248,7 @@ def main():
 
                                 # Display indicator values with safe validation
                                 st.subheader("📊 Indicator Values")
-                                col1, col2, col3 = st.columns(3)
+                                col1, col2 = st.columns(2)
 
                                 with col1:
                                     if (
@@ -293,25 +288,6 @@ def main():
                                         st.metric("MACD", "N/A")
                                         st.caption("⚠️ MACD calculation failed")
 
-                                with col3:
-                                    if (
-                                        "adx" in indicators
-                                        and indicators["adx"] is not None
-                                        and not indicators["adx"].empty
-                                    ):
-                                        try:
-                                            if "ADX_14" in indicators["adx"].columns:
-                                                adx_value = indicators["adx"][
-                                                    "ADX_14"
-                                                ].iloc[-1]
-                                                st.metric("ADX", f"{adx_value:.2f}")
-                                            else:
-                                                st.metric("ADX", "N/A")
-                                        except Exception:
-                                            st.metric("ADX", "N/A")
-                                    else:
-                                        st.metric("ADX", "N/A")
-                                        st.caption("⚠️ ADX calculation failed")
                         else:
                             st.warning("Could not calculate technical indicators")
                     else:
@@ -352,7 +328,7 @@ def main():
 
                                         # Display indicator values with safe validation
                                         st.subheader("📊 Indicator Values")
-                                        col1, col2, col3 = st.columns(3)
+                                        col1, col2 = st.columns(2)
 
                                         with col1:
                                             if (
@@ -396,30 +372,6 @@ def main():
                                                 st.metric("MACD", "N/A")
                                                 st.caption("⚠️ MACD calculation failed")
 
-                                        with col3:
-                                            if (
-                                                "adx" in indicators
-                                                and indicators["adx"] is not None
-                                                and not indicators["adx"].empty
-                                            ):
-                                                try:
-                                                    if (
-                                                        "ADX_14"
-                                                        in indicators["adx"].columns
-                                                    ):
-                                                        adx_value = indicators["adx"][
-                                                            "ADX_14"
-                                                        ].iloc[-1]
-                                                        st.metric(
-                                                            "ADX", f"{adx_value:.2f}"
-                                                        )
-                                                    else:
-                                                        st.metric("ADX", "N/A")
-                                                except Exception:
-                                                    st.metric("ADX", "N/A")
-                                            else:
-                                                st.metric("ADX", "N/A")
-                                                st.caption("⚠️ ADX calculation failed")
                                 else:
                                     st.warning(
                                         "Could not calculate technical indicators"
@@ -438,7 +390,6 @@ def main():
     - **MACD**: Moving Average Convergence Divergence (trend-following)
     - **Bollinger Bands**: Price volatility and potential reversal points
     - **OBV**: On-Balance Volume (volume flow indicator)
-    - **ADX**: Average Directional Index (trend strength)
     """)
 
 

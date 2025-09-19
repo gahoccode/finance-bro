@@ -145,11 +145,11 @@ finance-bro/
 ## [0.2.18] - 2025-08-10
 
 ### Fixed
-- [2025-08-10] **Technical Analysis TypeError and ValueError Fixes**: Comprehensive error handling implementation for pandas-ta integration
-  - **Primary Issue**: `TypeError: 'NoneType' object is not subscriptable` when pandas-ta functions returned None instead of DataFrames
+- [2025-08-10] **Technical Analysis TypeError and ValueError Fixes**: Comprehensive error handling implementation for technical indicators
+  - **Primary Issue**: `TypeError: 'NoneType' object is not subscriptable` when technical indicator functions returned None instead of DataFrames
   - **Secondary Issue**: `ValueError: zero-size array to reduction operation maximum` when turning on ADX indicator
   - **Root Causes**: 
-    - pandas-ta functions returning None for insufficient data, then code attempting subscript access
+    - Technical indicator functions returning None for insufficient data, then code attempting subscript access
     - ADX calculation requiring more data than other indicators (30+ points vs 14-20)
     - Daily interval (1D) only providing 30 days of data, insufficient for reliable ADX calculation
   - **Solution Implementation**:
@@ -162,7 +162,7 @@ finance-bro/
   - **Files Modified**: 
     - `pages/Technical_Analysis.py` - comprehensive error handling for all indicators and chart creation
   - **User Experience**: Graceful degradation with clear feedback, app continues working with available indicators
-  - **Technical Result**: Production-ready Technical Analysis page with robust pandas-ta integration
+  - **Technical Result**: Production-ready Technical Analysis page with robust technical indicator integration
 
 ## [0.2.17] - 2025-08-10
 

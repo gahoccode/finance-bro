@@ -205,7 +205,7 @@ streamlit run app.py
 - Earth-toned color scheme for professional analysis
 
 **⚙️ Robust Error Handling**
-- Comprehensive pandas-ta integration with graceful error recovery
+- Comprehensive technical indicator integration with graceful error recovery
 - Individual indicator validation with specific failure explanations
 - Enhanced data validation for optimal ADX calculation (30+ data points required)
 - Transparent warning system explaining exactly why indicators might fail
@@ -214,7 +214,7 @@ streamlit run app.py
 ### Technical Implementation Highlights
 
 **Production-Ready Error Handling**
-- Fixed `TypeError: 'NoneType' object is not subscriptable` from pandas-ta None returns
+- Fixed `TypeError: 'NoneType' object is not subscriptable` from technical indicator None returns
 - Resolved `ValueError: zero-size array to reduction operation maximum` in ADX calculations
 - Safe chart creation with fallback mechanisms for partial indicator availability
 - Professional user feedback with success/failure indicator reporting
@@ -288,7 +288,7 @@ streamlit run app.py
 - **Financial Analysis:** QuantStats v0.0.59 (75+ performance metrics and tearsheets)
 - **Portfolio Optimization:** PyPortfolioOpt (Modern Portfolio Theory, Efficient Frontier)
 - **Risk Analysis:** riskfolio-lib v5.0.1+ (Hierarchical Risk Parity, advanced risk metrics)
-- **Technical Analysis:** pandas-ta for 150+ technical indicators with robust error handling
+- **Technical Analysis:** Manual implementation for RSI, MACD, Bollinger Bands, OBV with robust error handling
 - **Visualizations:** Altair v5.5.0+, Bokeh v2.4.3, mplfinance for interactive charts
 - **Authentication:** Authlib v1.3.2+ for Google OAuth integration
 
