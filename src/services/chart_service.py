@@ -272,7 +272,6 @@ def create_bokeh_candlestick_chart(stock_price_bokeh: pd.DataFrame, ticker: str)
     # Calculate min/max values for consistent scaling
     min_date = stock_price_bokeh.index.min()
     max_date = stock_price_bokeh.index.max()
-    max_volume = stock_price_bokeh["volume"].max()
 
     # Price chart - use responsive sizing
     price = figure(

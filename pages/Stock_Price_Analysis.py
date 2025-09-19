@@ -4,6 +4,12 @@ import numpy as np
 import os
 import quantstats as qs
 from datetime import datetime
+from src.services.vnstock_api import fetch_stock_price_data
+from src.services.chart_service import (
+    create_altair_line_chart,
+    create_altair_area_chart,
+    create_bokeh_candlestick_chart,
+)
 
 st.set_page_config(page_title="Stock Price Analysis", layout="wide")
 
@@ -361,13 +367,6 @@ def calculate_custom_metrics(
     return results
 
 
-# Import cached function from modular utilities
-from src.services.vnstock_api import fetch_stock_price_data
-from src.services.chart_service import (
-    create_altair_line_chart,
-    create_altair_area_chart,
-    create_bokeh_candlestick_chart,
-)
 
 if ticker:
     try:

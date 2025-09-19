@@ -32,7 +32,7 @@ def main():
         st.subheader("📊 Chart Configuration")
 
         # Interval selection
-        interval = st.selectbox(
+        st.selectbox(
             "Select Interval",
             options=["1D", "1W", "1M"],
             format_func=lambda x: {
@@ -51,9 +51,8 @@ def main():
         show_macd = st.checkbox("MACD", value=True)
         show_obv = st.checkbox("OBV", value=False)
 
-        # Indicator parameters
-        bb_period = st.slider("BB Period", 10, 50, 20)
-        rsi_period = st.slider("RSI Period", 5, 30, 14)
+        # Note: Indicator parameters are fixed in manual implementation
+        st.info("📊 **Indicator Parameters**: RSI(14), MACD(12,26,9), BB(20,2), OBV - optimized for reliable signals")
 
         # Store in session state for persistence
         if "ta_interval" not in st.session_state:
