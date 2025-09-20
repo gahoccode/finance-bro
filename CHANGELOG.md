@@ -5,6 +5,18 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.34] - 2025-01-20
+
+### Changed
+- [2025-01-20] **Portfolio Data Processing Deduplication**: Eliminated code duplication between Portfolio_Optimization.py and data_service.py
+  - **Root Cause**: Identical logic for processing portfolio price data existed in two places - inline processing in Portfolio_Optimization.py (lines 182-210) and unused service function in data_service.py
+  - **Solution**: Refactored Portfolio_Optimization.py to use centralized `process_portfolio_price_data()` service function
+  - **Benefits**: Single source of truth for portfolio data processing, improved maintainability, follows modular architecture guidelines
+  - **Scope of Impact** (1 file modified):
+    - **pages/Portfolio_Optimization.py**: Added import for `process_portfolio_price_data`, removed 29 lines of duplicated inline processing, replaced with single function call
+  - **Technical Debt Reduction**: Removed duplicate `combined_prices` variable logic, aligned with project's modular architecture patterns
+  - **Functionality Preserved**: All existing portfolio optimization features (Max Sharpe, Min Volatility, Max Utility) work identically
+
 ## [0.2.33] - 2025-01-17
 
 ### Added
