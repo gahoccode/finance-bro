@@ -69,7 +69,7 @@ def create_technical_chart(
                     overbought_line = pd.Series([70] * len(rsi), index=rsi.index)
                     midline = pd.Series([50] * len(rsi), index=rsi.index)
                     oversold_line = pd.Series([30] * len(rsi), index=rsi.index)
-                    
+
                     addplots.extend([
                         # RSI actual values
                         mpf.make_addplot(
@@ -77,17 +77,17 @@ def create_technical_chart(
                         ),
                         # Overbought level (70)
                         mpf.make_addplot(
-                            overbought_line, panel=panels, color="red", 
+                            overbought_line, panel=panels, color="red",
                             linestyle="--", alpha=0.7, width=1
                         ),
-                        # Midline (50) 
+                        # Midline (50)
                         mpf.make_addplot(
-                            midline, panel=panels, color="gray", 
+                            midline, panel=panels, color="gray",
                             linestyle="--", alpha=0.5, width=1
                         ),
                         # Oversold level (30)
                         mpf.make_addplot(
-                            oversold_line, panel=panels, color="green", 
+                            oversold_line, panel=panels, color="green",
                             linestyle="--", alpha=0.7, width=1
                         )
                     ])
@@ -117,15 +117,15 @@ def create_technical_chart(
                         ),
                         # Signal Line
                         mpf.make_addplot(
-                            macd["MACDs_12_26_9"], 
-                            panel=panels, 
+                            macd["MACDs_12_26_9"],
+                            panel=panels,
                             color="red",
                             width=2
                         ),
                         # Histogram
                         mpf.make_addplot(
-                            macd["MACDh_12_26_9"], 
-                            panel=panels, 
+                            macd["MACDh_12_26_9"],
+                            panel=panels,
                             type="bar",
                             color="gray",
                             alpha=0.6

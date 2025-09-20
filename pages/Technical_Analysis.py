@@ -58,7 +58,7 @@ def main():
         show_rsi = st.checkbox("RSI", value=True)
         show_macd = st.checkbox("MACD", value=True)
         show_obv = st.checkbox("OBV", value=False)
-        
+
 
         # Indicator parameters
         bb_period = st.slider("BB Period", 10, 50, 20)
@@ -233,7 +233,7 @@ def main():
     # Technical indicators summary
     st.subheader("📊 Technical Indicators Summary")
 
-    # Create columns for indicator toggles  
+    # Create columns for indicator toggles
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("Bollinger Bands", "ON" if show_bb else "OFF")

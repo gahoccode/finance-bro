@@ -7,7 +7,6 @@ Provides RSI, MACD, Bollinger Bands, and OBV with comprehensive error handling.
 
 import streamlit as st
 import pandas as pd
-import numpy as np
 
 from ..components.ui_components import inject_custom_success_styling
 
@@ -29,14 +28,14 @@ def manual_obv(close_prices: pd.Series, volume: pd.Series) -> pd.Series:
     """
     if len(close_prices) != len(volume):
         raise ValueError("Close prices and volume must have same length")
-    
+
     if len(close_prices) < 2:
         raise ValueError("Need at least 2 data points for OBV calculation")
-    
+
     # Calculate price direction: 1 for up, -1 for down, 0 for unchanged
     price_direction = pd.Series(index=close_prices.index, dtype=float)
     price_direction.iloc[0] = 0  # First value has no previous price
-    
+
     for i in range(1, len(close_prices)):
         if close_prices.iloc[i] > close_prices.iloc[i-1]:
             price_direction.iloc[i] = 1
@@ -44,15 +43,15 @@ def manual_obv(close_prices: pd.Series, volume: pd.Series) -> pd.Series:
             price_direction.iloc[i] = -1
         else:
             price_direction.iloc[i] = 0
-    
+
     # Calculate OBV
     obv = pd.Series(index=close_prices.index, dtype=float)
     obv.iloc[0] = volume.iloc[0]  # First OBV value equals first volume
-    
+
     for i in range(1, len(close_prices)):
         volume_change = price_direction.iloc[i] * volume.iloc[i]
         obv.iloc[i] = obv.iloc[i-1] + volume_change
-    
+
     return obv
 
 
@@ -74,24 +73,24 @@ def manual_bollinger_bands(close_prices: pd.Series, period: int = 20, std_dev: f
     """
     if len(close_prices) < period:
         raise ValueError(f"Need at least {period} data points for Bollinger Bands calculation")
-    
+
     # Calculate Simple Moving Average (Middle Band)
     sma = close_prices.rolling(window=period).mean()
-    
+
     # Calculate Rolling Standard Deviation
     rolling_std = close_prices.rolling(window=period).std()
-    
+
     # Calculate Upper and Lower Bands
     upper_band = sma + (std_dev * rolling_std)
     lower_band = sma - (std_dev * rolling_std)
-    
+
     # Create DataFrame with pandas-ta compatible column names
     result = pd.DataFrame({
         'BBL_20_2.0': lower_band,
         'BBM_20_2.0': sma,
         'BBU_20_2.0': upper_band
     }, index=close_prices.index)
-    
+
     return result
 
 
@@ -111,28 +110,28 @@ def manual_rsi(close_prices: pd.Series, period: int = 14) -> pd.Series:
     """
     if len(close_prices) < period + 1:
         raise ValueError(f"Need at least {period + 1} data points for RSI calculation")
-    
+
     # Calculate price changes
     price_changes = close_prices.diff()
-    
+
     # Separate gains and losses
     gains = price_changes.where(price_changes > 0, 0)
     losses = -price_changes.where(price_changes < 0, 0)
-    
+
     # Calculate exponential moving averages
     # Use alpha = 1/period for EMA (same as pandas-ta default)
     alpha = 1.0 / period
-    
+
     avg_gains = gains.ewm(alpha=alpha, adjust=False).mean()
     avg_losses = losses.ewm(alpha=alpha, adjust=False).mean()
-    
+
     # Calculate RS and RSI
     rs = avg_gains / avg_losses
     rsi = 100 - (100 / (1 + rs))
-    
+
     # Set name for compatibility
     rsi.name = 'RSI_14'
-    
+
     return rsi
 
 
@@ -155,27 +154,27 @@ def manual_macd(close_prices: pd.Series, fast: int = 12, slow: int = 26, signal:
     """
     if len(close_prices) < slow + signal:
         raise ValueError(f"Need at least {slow + signal} data points for MACD calculation")
-    
+
     # Calculate EMAs
     ema_fast = close_prices.ewm(span=fast, adjust=False).mean()
     ema_slow = close_prices.ewm(span=slow, adjust=False).mean()
-    
+
     # Calculate MACD line
     macd_line = ema_fast - ema_slow
-    
+
     # Calculate Signal line (EMA of MACD line)
     signal_line = macd_line.ewm(span=signal, adjust=False).mean()
-    
+
     # Calculate Histogram
     histogram = macd_line - signal_line
-    
+
     # Create DataFrame with pandas-ta compatible column names
     result = pd.DataFrame({
         'MACD_12_26_9': macd_line,
         'MACDs_12_26_9': signal_line,
         'MACDh_12_26_9': histogram
     }, index=close_prices.index)
-    
+
     return result
 
 

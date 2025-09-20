@@ -10,7 +10,6 @@ import pandas as pd
 from datetime import datetime, timedelta
 from vnstock import Vnstock, Company, Quote, Screener, Fund
 
-from ..components.ui_components import inject_custom_success_styling
 
 
 # ================================

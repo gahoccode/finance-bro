@@ -152,32 +152,32 @@ def main_page():
         with col3:
             if st.button("💰 Valuation Analysis", use_container_width=True):
                 st.switch_page("pages/Valuation.py")
-        
+
         # Enhanced Valuation Flow Section
         st.markdown("**🚀 Enhanced Valuation Flow (Recommended)**")
         st.markdown("Pre-load valuation data for the smoothest analysis experience")
-        
+
         col1, col2 = st.columns([2, 1])
         with col1:
             if st.button("⚡ Load & Analyze Valuation", use_container_width=True, type="primary"):
                 # Pre-load valuation data before navigation
                 with st.spinner(f"🔄 Pre-loading valuation data for {st.session_state.stock_symbol}..."):
                     loading_result = ensure_valuation_data_loaded(st.session_state.stock_symbol)
-                    
+
                     if loading_result["success"]:
                         st.success("✅ Valuation data loaded successfully! Navigating...")
                         st.switch_page("pages/Valuation.py")
                     else:
                         st.error(f"❌ Failed to pre-load data: {loading_result.get('error', 'Unknown error')}")
-        
+
         with col2:
             # Data status indicator
             valuation_data_status = "✅ Ready" if (
-                "dataframes" in st.session_state and 
+                "dataframes" in st.session_state and
                 "price_data" in st.session_state and
                 st.session_state.get("stock_symbol") in str(st.session_state.get("dataframes", {}))
             ) else "⏳ Not Loaded"
-            
+
             st.metric("Data Status", valuation_data_status)
 
         # Market Analysis Section

@@ -45,7 +45,7 @@ def load_comprehensive_financial_data(symbol, period="year", source="VCI", compa
 
         # Load and process Ratio data (multi-index columns)
         ratio_raw = stock.finance.ratio(period=period, lang="en", dropna=True)
-        
+
         # Use vnstock's built-in flatten_hierarchical_index function
         ratios = flatten_hierarchical_index(
             ratio_raw, separator="_", handle_duplicates=True, drop_levels=0
@@ -156,27 +156,27 @@ def load_valuation_essentials(symbol, start_date=None, end_date=None):
             - 'market_data': Market capitalization and shares outstanding
     """
     from .vnstock_api import fetch_stock_price_data
-    
+
     # Default date range if not provided
     if start_date is None:
         start_date = pd.to_datetime("2024-01-01")
     if end_date is None:
         end_date = pd.to_datetime("today") - pd.Timedelta(days=1)
-    
+
     # Load financial data
     financial_data = load_comprehensive_financial_data(symbol)
-    
+
     result = {
         "financial_data": financial_data,
         "symbol": symbol,
         "loaded_at": pd.Timestamp.now(),
     }
-    
+
     # Load price data if date range provided
     try:
         price_data = fetch_stock_price_data(symbol, start_date, end_date)
         result["price_data"] = price_data
-        
+
         # Calculate returns if price data available
         if not price_data.empty and "close" in price_data.columns:
             clean_prices = price_data["close"].dropna()
@@ -184,11 +184,11 @@ def load_valuation_essentials(symbol, start_date=None, end_date=None):
             if len(clean_prices) > 1:
                 returns = clean_prices.pct_change().dropna()
                 result["returns"] = returns
-                
+
     except Exception as e:
         st.warning(f"⚠️ Could not load price data: {str(e)}")
         result["price_data"] = pd.DataFrame()
-    
+
     return result
 
 
@@ -205,7 +205,7 @@ def get_stock_symbols_with_names():
     try:
         symbols_df = Listing().all_symbols()
         symbols_list = sorted(symbols_df["symbol"].tolist())
-        
+
         return {
             "symbols_list": symbols_list,
             "symbols_df": symbols_df,
@@ -237,7 +237,7 @@ def get_company_name_from_symbol(symbol, symbols_df=None):
     if symbols_df is None:
         symbol_data = get_stock_symbols_with_names()
         symbols_df = symbol_data.get("symbols_df")
-    
+
     if symbols_df is not None:
         try:
             matching_company = symbols_df[symbols_df["symbol"] == symbol]
@@ -245,7 +245,7 @@ def get_company_name_from_symbol(symbol, symbols_df=None):
                 return matching_company["organ_name"].iloc[0]
         except Exception:
             pass
-    
+
     return symbol
 
 
@@ -265,9 +265,9 @@ def validate_financial_data(dataframes):
         "errors": [],
         "data_summary": {},
     }
-    
+
     required_statements = ["BalanceSheet", "IncomeStatement", "CashFlow", "Ratios"]
-    
+
     for statement in required_statements:
         df = dataframes.get(statement, pd.DataFrame())
         if df.empty:
@@ -279,5 +279,5 @@ def validate_financial_data(dataframes):
                 "columns": len(df.columns),
                 "years_available": list(df.get("yearReport", []).unique()) if "yearReport" in df.columns else [],
             }
-    
+
     return validation

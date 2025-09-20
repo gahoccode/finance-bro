@@ -283,23 +283,23 @@ def calculate_effective_tax_rate(income_statement, cash_flow):
     # Handle empty dataframes
     if income_statement.empty or cash_flow.empty:
         return pd.DataFrame(columns=[
-            "ticker", "yearReport", "Profit Before Tax (Bn. VND)", 
+            "ticker", "yearReport", "Profit Before Tax (Bn. VND)",
             "Tax Paid (Bn. VND)", "Effective Tax Rate"
         ])
-    
+
     # Check for required columns
     required_income_cols = ["ticker", "yearReport", "Profit before tax"]
     required_cash_cols = ["ticker", "yearReport", "Business Income Tax paid", "Net Profit/Loss before tax"]
-    
+
     if not all(col in income_statement.columns for col in required_income_cols):
         return pd.DataFrame(columns=[
-            "ticker", "yearReport", "Profit Before Tax (Bn. VND)", 
+            "ticker", "yearReport", "Profit Before Tax (Bn. VND)",
             "Tax Paid (Bn. VND)", "Effective Tax Rate"
         ])
-        
+
     if not all(col in cash_flow.columns for col in required_cash_cols):
         return pd.DataFrame(columns=[
-            "ticker", "yearReport", "Profit Before Tax (Bn. VND)", 
+            "ticker", "yearReport", "Profit Before Tax (Bn. VND)",
             "Tax Paid (Bn. VND)", "Effective Tax Rate"
         ])
 
