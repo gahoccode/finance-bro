@@ -71,3 +71,6 @@ prd/
 # Tests
 .coverage
 .pytest_cache
+
+# Astral UV
+uv.lock
