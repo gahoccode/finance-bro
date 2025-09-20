@@ -5,6 +5,31 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.30] - 2025-09-20
+
+### Changed
+- [2025-09-20] **Portfolio Optimization Code Deduplication**: Eliminated code duplication by centralizing combined_prices processing logic
+  - **Code Reduction**: Replaced 29 lines of duplicate logic in Portfolio_Optimization.py with single function call to `process_portfolio_price_data()`
+  - **Centralization**: All combined_prices processing now handled by centralized function in `src/services/data_service.py`
+  - **Functionality Preservation**: Maintained all existing dev branch functionality including Bokeh charts, os.path handling, and type hints
+  - **No Breaking Changes**: Surgical approach avoided conflicts with separation/bro branch while achieving code deduplication goals
+  - **Scope of Impact** (1 file modified):
+    - **pages/Portfolio_Optimization.py**: Added import `from src.services.data_service import process_portfolio_price_data`, replaced lines 183-213 duplicate logic with single function call `prices_df = process_portfolio_price_data(all_historical_data)` (net -28 lines)
+- [2025-09-20] **Portfolio Optimization Code Deduplication**: Eliminated code duplication by centralizing combined_prices processing logic
+  - **Code Reduction**: Replaced 29 lines of duplicate logic in Portfolio_Optimization.py with single function call to `process_portfolio_price_data()`
+  - **Centralization**: All combined_prices processing now handled by centralized function in `src/services/data_service.py`
+  - **Functionality Preservation**: Maintained all existing dev branch functionality including Bokeh charts, os.path handling, and type hints
+  - **No Breaking Changes**: Surgical approach avoided conflicts with separation/bro branch while achieving code deduplication goals
+  - **Scope of Impact** (1 file modified):
+    - **pages/Portfolio_Optimization.py**: Added import `from src.services.data_service import process_portfolio_price_data`, replaced lines 183-213 duplicate logic with single function call `prices_df = process_portfolio_price_data(all_historical_data)` (net -28 lines)
+- [2025-09-20] **Portfolio Optimization Code Deduplication**: Eliminated code duplication by centralizing combined_prices processing logic
+  - **Code Reduction**: Replaced 29 lines of duplicate logic in Portfolio_Optimization.py with single function call to `process_portfolio_price_data()`
+  - **Centralization**: All combined_prices processing now handled by centralized function in `src/services/data_service.py`
+  - **Functionality Preservation**: Maintained all existing dev branch functionality including Bokeh charts, os.path handling, and type hints
+  - **No Breaking Changes**: Surgical approach avoided conflicts with separation/bro branch while achieving code deduplication goals
+  - **Scope of Impact** (1 file modified):
+    - **pages/Portfolio_Optimization.py**: Added import `from src.services.data_service import process_portfolio_price_data`, replaced lines 183-213 duplicate logic with single function call `prices_df = process_portfolio_price_data(all_historical_data)` (net -28 lines)
+
 ## [0.2.29] - 2025-09-16
 
 ### Removed

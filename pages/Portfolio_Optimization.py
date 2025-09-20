@@ -15,6 +15,7 @@ from datetime import datetime
 from bokeh.plotting import figure
 from bokeh.transform import cumsum
 from src.services.vnstock_api import fetch_portfolio_stock_data
+from src.services.data_service import process_portfolio_price_data
 from math import pi
 import riskfolio as rp
 from src.components.ui_components import inject_custom_success_styling
@@ -178,37 +179,7 @@ if not all_historical_data:
 
 # Process the data
 status_text.text("Processing data...")
-combined_prices = pd.DataFrame()
-
-for symbol, data in all_historical_data.items():
-    if not data.empty:
-        # Ensure we have a 'time' column
-        if "time" not in data.columns:
-            if hasattr(data.index, "name") and data.index.name is None:
-                data = data.reset_index()
-            data = data.rename(columns={data.columns[0]: "time"})
-
-        # Extract time and close price
-        temp_df = data[["time", "close"]].copy()
-        temp_df.rename(columns={"close": f"{symbol}_close"}, inplace=True)
-
-        if combined_prices.empty:
-            combined_prices = temp_df
-        else:
-            combined_prices = pd.merge(combined_prices, temp_df, on="time", how="outer")
-
-if combined_prices.empty:
-    st.error("No valid data to process.")
-    st.stop()
-
-combined_prices = combined_prices.sort_values("time")
-combined_prices.set_index("time", inplace=True)
-
-# Extract close prices
-close_price_columns = [col for col in combined_prices.columns if "_close" in col]
-prices_df = combined_prices[close_price_columns]
-prices_df.columns = [col.replace("_close", "") for col in close_price_columns]
-prices_df = prices_df.dropna()
+prices_df = process_portfolio_price_data(all_historical_data)
 
 if prices_df.empty:
     st.error("No valid price data after processing.")
