@@ -3,7 +3,9 @@ import os
 from dotenv import load_dotenv
 from vnstock import Listing
 from src.components.ui_components import inject_custom_success_styling
+from src.components.auth_components import render_logout_button
 from src.services.session_state_service import ensure_valuation_data_loaded
+from src.services.auth_service import handle_authentication
 
 # Load environment variables from .env file
 load_dotenv()
@@ -14,19 +16,8 @@ st.set_page_config(page_title="Finance Bro", page_icon="📈", layout="wide")
 # Apply custom CSS styling for success alerts
 inject_custom_success_styling()
 
-# Authentication handling
-if not st.user.is_logged_in:
-    st.title("🔒 Authentication Required")
-    st.markdown("Please authenticate with Google to access Finance Bro")
-
-    # Create a clean login interface
-    st.button("Login with Google", on_click=st.login)
-
-    # Show helpful information
-    st.markdown("---")
-    st.info("After logging in, you'll be redirected back to the app automatically.")
-
-    st.stop()
+# Authentication handling - now modularized
+handle_authentication()
 
 # API Key handling
 if "api_key" not in st.session_state:
@@ -288,9 +279,8 @@ pages = {
 # Sidebar for user controls
 with st.sidebar:
     st.header("🔧 Controls")
-    # User logout option
-    if st.button("🚪 Logout", use_container_width=True):
-        st.logout()
+    # User logout option - now modularized
+    render_logout_button()
     # GitHub link
     st.markdown(
         "[Finance Bro on GitHub](https://github.com/gahoccode/finance-bro) by Tam Le"

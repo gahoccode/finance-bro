@@ -22,9 +22,24 @@
 - OpenAI API key
 - Google Cloud Console account (for OAuth setup)
 
-### Google OAuth Setup (Required)
+### Google OAuth Setup (Production Mode)
 
-Before running the app, you need to set up Google OAuth authentication:
+**Production Mode** (default): Google OAuth authentication is required. **Development Mode**: OAuth can be disabled for local development.
+
+#### Authentication Configuration
+
+**Production Setup (default):**
+- `AUTH_ENABLED=true` (or omit entirely)
+- Requires Google OAuth setup as described below
+
+**Development Setup:**
+- `AUTH_ENABLED=false` in your `.env` file
+- Bypasses Google OAuth requirement for local development
+- Useful when you want to focus on application features without OAuth setup
+
+#### Setting Up Google OAuth (Production Mode)
+
+Before running the app in production mode, you need to set up Google OAuth authentication:
 
 1. **Create Google OAuth Credentials:**
    - Go to [Google Cloud Console](https://console.cloud.google.com/)
@@ -72,9 +87,28 @@ Or using pip:
 pip install -r requirements.txt
 ```
 
-3. **Set your OpenAI API key:**
+3. **Configure environment variables:**
 ```bash
-export OPENAI_API_KEY="your-openai-api-key"
+# Copy the environment template
+cp .env.example .env
+
+# Edit .env and set your configuration:
+# - OPENAI_API_KEY (required)
+# - AUTH_ENABLED (optional: true for production, false for development)
+```
+
+**For Production (default):**
+```bash
+# .env file
+OPENAI_API_KEY=your-openai-api-key
+AUTH_ENABLED=true  # or omit this line entirely
+```
+
+**For Development (optional):**
+```bash
+# .env file  
+OPENAI_API_KEY=your-openai-api-key
+AUTH_ENABLED=false  # Disables Google OAuth for local development
 ```
 
 4. **Run the application:**
@@ -442,6 +476,13 @@ Finance Bro uses Streamlit's `st.session_state` for comprehensive data sharing a
 
 This architecture ensures optimal performance while maintaining a professional user experience comparable to institutional financial analysis tools.
 
+## 🔐 Authentication Configuration
+
+**Optional**: You can disable Google OAuth for local development by setting `AUTH_ENABLED=false` in your `.env` file.
+
+- **Production (default)**: `AUTH_ENABLED=true` - Requires Google OAuth setup
+- **Development**: `AUTH_ENABLED=false` - Bypasses authentication for local development
+
 ## Project Structure
 
 ```
@@ -508,6 +549,7 @@ finance-bro/
 ```bash
 docker run -p 8501:8501 \
   -e OPENAI_API_KEY=your_openai_api_key \
+  -e AUTH_ENABLED=true \
   -v $(pwd)/exports:/app/exports \
   -v $(pwd)/cache:/app/cache \
   -v $(pwd)/.streamlit:/app/.streamlit \
@@ -516,13 +558,14 @@ docker run -p 8501:8501 \
 
 **Windows Command Prompt:**
 ```cmd
-docker run -p 8501:8501 -e OPENAI_API_KEY=your_openai_api_key -v %cd%/exports:/app/exports -v %cd%/cache:/app/cache -v %cd%/.streamlit:/app/.streamlit ghcr.io/gahoccode/finance-bro:latest
+docker run -p 8501:8501 -e OPENAI_API_KEY=your_openai_api_key -e AUTH_ENABLED=true -v %cd%/exports:/app/exports -v %cd%/cache:/app/cache -v %cd%/.streamlit:/app/.streamlit ghcr.io/gahoccode/finance-bro:latest
 ```
 
 **Windows PowerShell:**
 ```powershell
 docker run -p 8501:8501 `
   -e OPENAI_API_KEY=your_openai_api_key `
+  -e AUTH_ENABLED=true `
   -v ${PWD}/exports:/app/exports `
   -v ${PWD}/cache:/app/cache `
   -v ${PWD}/.streamlit:/app/.streamlit `
@@ -540,6 +583,7 @@ services:
       - "8501:8501"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - AUTH_ENABLED=${AUTH_ENABLED:-true}
     volumes:
       - ./exports:/app/exports
       - ./cache:/app/cache
@@ -582,6 +626,7 @@ docker build -t finance-bro .
 ```bash
 docker run -p 8501:8501 \
   -e OPENAI_API_KEY=your_openai_api_key \
+  -e AUTH_ENABLED=true \
   -v $(pwd)/exports:/app/exports \
   -v $(pwd)/cache:/app/cache \
   finance-bro
@@ -595,9 +640,14 @@ Create a `.env` file based on `.env.example`:
 # Copy the template
 cp .env.example .env
 
-# Edit .env and add your OpenAI API key
+# Edit .env and configure the application:
+
 # Required - Get from https://platform.openai.com/api-keys
 OPENAI_API_KEY=your_openai_api_key_here
+
+# Authentication Configuration
+# Set to "false" to disable Google OAuth for development
+AUTH_ENABLED=true
 
 # Optional - Usually not needed for local development
 STREAMLIT_SERVER_PORT=8501
@@ -606,6 +656,10 @@ LOG_LEVEL=INFO
 ```
 
 **Important:** You must set your `OPENAI_API_KEY` in the `.env` file before running Docker. The application won't work without it.
+
+**Authentication Configuration:**
+- Set `AUTH_ENABLED=true` for production (default)
+- Set `AUTH_ENABLED=false` for development mode without OAuth
 
 ### Docker Commands Reference
 
@@ -698,7 +752,7 @@ docker-compose up --build
 **For production deployment:**
 ```bash
 # Use pre-built image
-docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/gahoccode/finance-bro:latest
+docker run -p 8501:8501 -e OPENAI_API_KEY=your_key -e AUTH_ENABLED=true ghcr.io/gahoccode/finance-bro:latest
 ```
 
 ## Dependencies

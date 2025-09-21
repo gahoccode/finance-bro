@@ -5,6 +5,20 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.31] - 2025-09-21
+
+### Added
+- [2025-09-21] **Modular Authentication System**: Extracted Google OAuth logic from app.py into reusable components while preserving identical Streamlit built-in OAuth behavior
+  - **Component Architecture**: Created `src/components/auth_components.py` with reusable authentication UI components
+  - **Service Layer**: Added `src/services/auth_service.py` for centralized authentication logic and session management
+  - **Environment Control**: Added `AUTH_ENABLED` environment variable to enable/disable authentication for development vs production environments
+  - **Backward Compatibility**: Preserved identical Streamlit OAuth behavior and user experience
+  - **Modular Design**: Authentication logic now reusable across different pages and components
+  - **Scope of Impact** (3 files modified, 2 files added):
+    - **app.py**: Refactored to use new authentication components while maintaining identical behavior
+    - **src/components/auth_components.py**: New file with reusable authentication UI components
+    - **src/services/auth_service.py**: New file with centralized authentication service logic
+
 ## [0.2.30] - 2025-09-20
 
 ### Removed
