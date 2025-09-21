@@ -76,7 +76,7 @@ if not dataframes_available:
             st.rerun()
         else:
             st.error(
-                f"❌ Failed to load financial data: {loading_result.get("error", "Unknown error")}"
+                f"❌ Failed to load financial data: {loading_result.get('error', 'Unknown error')}"
             )
             st.markdown("""
             **To load financial data:**

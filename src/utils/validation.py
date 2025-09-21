@@ -127,7 +127,7 @@ def validate_dataframe(df: pd.DataFrame, required_columns: list[str]) -> dict[st
     if missing_columns:
         return {
             "valid": False,
-            "message": f"Missing required columns: {", ".join(missing_columns)}",
+            "message": f"Missing required columns: {', '.join(missing_columns)}",
         }
 
     # Check for all-null columns
@@ -135,7 +135,7 @@ def validate_dataframe(df: pd.DataFrame, required_columns: list[str]) -> dict[st
     if null_columns:
         return {
             "valid": False,
-            "message": f"All values are null in columns: {", ".join(null_columns)}",
+            "message": f"All values are null in columns: {', '.join(null_columns)}",
         }
 
     return {"valid": True, "message": "Valid DataFrame"}
@@ -226,7 +226,7 @@ def validate_portfolio_symbols(
     if invalid_symbols:
         return {
             "valid": False,
-            "message": f"Invalid symbols: {", ".join(invalid_symbols)}",
+            "message": f"Invalid symbols: {', '.join(invalid_symbols)}",
         }
 
     return {"valid": True, "message": "Valid portfolio symbols"}
@@ -335,7 +335,7 @@ def validate_file_upload(uploaded_file) -> dict[str, Any]:
         if file_extension not in allowed_extensions:
             return {
                 "valid": False,
-                "message": f"File type not supported. Allowed types: {", ".join(allowed_extensions)}",
+                "message": f"File type not supported. Allowed types: {', '.join(allowed_extensions)}",
             }
 
     return {"valid": True, "message": "Valid file upload"}

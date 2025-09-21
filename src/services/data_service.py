@@ -575,7 +575,7 @@ def validate_financial_dataframe(
         if missing_columns:
             return {
                 "valid": False,
-                "message": f"Missing columns: {", ".join(missing_columns)}",
+                "message": f"Missing columns: {', '.join(missing_columns)}",
             }
 
     # Check for all-null columns
@@ -583,7 +583,7 @@ def validate_financial_dataframe(
     if null_columns:
         return {
             "valid": False,
-            "message": f"All-null columns: {", ".join(null_columns)}",
+            "message": f"All-null columns: {', '.join(null_columns)}",
         }
 
     return {"valid": True, "message": "Valid financial dataframe"}

@@ -3,6 +3,12 @@ Configuration constants and settings for Finance Bro application.
 Centralizes all constants used across the application.
 """
 
+import os
+
+
+# Authentication configuration
+AUTH_ENABLED = os.getenv("AUTH_ENABLED", "true").lower() == "true"
+
 # Default stock symbols fallback list
 DEFAULT_STOCK_SYMBOLS = ["REE", "VIC", "VNM", "VCB", "BID", "HPG", "FPT", "FMC", "DHC"]
 

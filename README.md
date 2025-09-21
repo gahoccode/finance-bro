@@ -98,7 +98,20 @@ pip install -r requirements.txt
 export OPENAI_API_KEY="your-openai-api-key"
 ```
 
-4. **Run the application:**
+4. **Configure authentication (optional for development):**
+
+By default, Google OAuth authentication is enabled. You can disable it for local development:
+
+```bash
+# Optional: Disable authentication for development
+export AUTH_ENABLED=false
+```
+
+**Authentication Modes:**
+- **Production Mode (default)**: `AUTH_ENABLED=true` - Full Google OAuth required
+- **Development Mode**: `AUTH_ENABLED=false` - Direct access without authentication
+
+5. **Run the application:**
 ```bash
 uv run streamlit run app.py
 ```

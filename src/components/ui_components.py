@@ -49,7 +49,7 @@ def create_financial_summary_expander(
             "Display option:",
             ["First 5 rows", "Last 5 rows"],
             horizontal=True,
-            key=f"financial_data_view_{title.replace(" ", "_").lower()}",
+            key=f"financial_data_view_{title.replace(' ', '_').lower()}",
         )
 
         if view_option == "First 5 rows":
@@ -161,7 +161,7 @@ def render_filter_status_info(filter_messages: list[str], original_count: int) -
     """
     if filter_messages:
         st.info(
-            f"📊 **Filters Applied**: {" | ".join(filter_messages)} (from {original_count} original stocks)"
+            f"📊 **Filters Applied**: {' | '.join(filter_messages)} (from {original_count} original stocks)"
         )
 
 
@@ -291,7 +291,7 @@ def render_financial_display_options(
         display_df = convert_dataframe_for_display(df, columns, display_unit)
     """
     # Initialize session state key with default
-    session_key = f"{unique_key}_{DEFAULT_FINANCIAL_DISPLAY["session_key"]}"
+    session_key = f"{unique_key}_{DEFAULT_FINANCIAL_DISPLAY['session_key']}"
 
     if session_key not in st.session_state:
         st.session_state[session_key] = DEFAULT_FINANCIAL_DISPLAY["unit"]

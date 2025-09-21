@@ -5,6 +5,30 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.35] - 2025-09-21
+
+### Added
+- [2025-09-21] **Modular Authentication System**: Extracted Google OAuth logic from app.py into reusable components while preserving identical Streamlit built-in OAuth behavior
+  - **Component Architecture**: Created `src/components/auth_components.py` with reusable authentication UI components (`render_login_screen()`, `render_logout_button()`, `is_user_logged_in()`)
+  - **Service Layer**: Added `src/services/auth_service.py` for centralized authentication logic and session management with environment-driven control
+  - **Environment Control**: Added `AUTH_ENABLED` environment variable to enable/disable authentication for development vs production environments
+  - **Configuration Integration**: Updated `src/core/config.py` with `AUTH_ENABLED` boolean configuration defaulting to secure production mode
+  - **Documentation**: Created comprehensive `Reference/auth-spec.md` implementation specification with security considerations and testing strategy
+  - **Deployment Support**: Updated `docker-compose.yml` and `.env.example` with AUTH_ENABLED configuration and usage examples
+  - **Developer Experience**: Added authentication configuration section to README.md with development/production mode documentation
+  - **Backward Compatibility**: Preserved identical Streamlit OAuth behavior and user experience with zero breaking changes
+  - **Modular Design**: Authentication logic now reusable across different pages and components with clean separation of concerns
+  - **Security**: Secure defaults (AUTH_ENABLED=true) with explicit opt-out for development, maintaining Google OAuth security features
+  - **Scope of Impact** (5 files modified, 3 files added):
+    - **app.py**: Replaced inline authentication (lines 21-32) with modular `handle_authentication()` and `render_logout_button()` calls
+    - **src/core/config.py**: Added `AUTH_ENABLED = os.getenv("AUTH_ENABLED", "true").lower() == "true"` configuration
+    - **.env.example**: Added AUTH_ENABLED documentation with development/production usage guide
+    - **README.md**: Added authentication configuration section with mode explanations and setup instructions
+    - **docker-compose.yml**: Added `AUTH_ENABLED=${AUTH_ENABLED:-true}` environment variable with secure defaults
+    - **src/components/auth_components.py**: New file with reusable authentication UI components preserving exact Streamlit behavior
+    - **src/services/auth_service.py**: New file with centralized authentication service logic and environment control
+    - **Reference/auth-spec.md**: New comprehensive specification file with implementation guide, security considerations, and testing strategy
+
 ## [0.2.34] - 2025-01-20
 
 ### Changed
