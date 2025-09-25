@@ -11,7 +11,7 @@ import pandas as pd
 import pytest
 
 from src.core.config import FINANCIAL_DISPLAY_OPTIONS, DEFAULT_FINANCIAL_DISPLAY
-from src.services.data_service import (
+from src.services.data import (
     format_financial_display,
     convert_dataframe_for_display,
 )

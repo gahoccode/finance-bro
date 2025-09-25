@@ -2,7 +2,7 @@
 
 import pandas as pd
 import numpy as np
-from src.services.financial_analysis_service import calculate_effective_tax_rate
+from src.services.financial_analysis import calculate_effective_tax_rate
 
 
 class TestEffectiveTaxRateCalculation:

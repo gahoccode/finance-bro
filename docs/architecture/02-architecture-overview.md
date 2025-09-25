@@ -99,12 +99,12 @@ C4Container
 ```
 📁 Service Layer
 ├── vnstock_api.py          # Market data integration (30+ functions)
-├── chart_service.py        # Visualization generation (10+ functions)
-├── data_service.py         # Data transformation utilities
-├── fibonacci_service.py    # Technical analysis calculations
-├── crewai_service.py       # Multi-agent AI coordination
-├── session_state_service.py # Smart session state management
-└── financial_data_service.py # Centralized financial data loading
+├── chart.py                # Visualization generation (10+ functions)
+├── data.py                 # Data transformation utilities
+├── fibonacci.py            # Technical analysis calculations
+├── crewai.py               # Multi-agent AI coordination
+├── session_state.py        # Smart session state management
+└── financial_data.py       # Centralized financial data loading
 ```
 
 ### Core Layer
@@ -195,7 +195,7 @@ sequenceDiagram
 
 ### 3. Smart Data Loading
 - **Pattern**: Progressive data loading with intelligent dependency resolution
-- **Implementation**: `src/services/session_state_service.py` and `src/services/financial_data_service.py`
+- **Implementation**: `src/services/session_state.py` and `src/services/financial_data.py`
 - **Benefits**: Eliminates page dependencies, improves user experience with progress feedback, reduces redundant API calls
 
 ### 4. Session State Management

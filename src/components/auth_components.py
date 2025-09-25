@@ -51,8 +51,7 @@ def is_user_logged_in() -> bool:
         bool: True if user is logged in, False otherwise
     """
     try:
-        return hasattr(st, 'user') and st.user.is_logged_in
+        return hasattr(st, "user") and st.user.is_logged_in
     except AttributeError:
         # Handle case when running outside Streamlit context (e.g., tests)
         return False
-

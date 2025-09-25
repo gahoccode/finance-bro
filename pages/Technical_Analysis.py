@@ -5,8 +5,11 @@ from src.services.vnstock_api import (
     get_heating_up_stocks,
     get_technical_stock_data,
 )
-from src.services.technical_indicators import calculate_technical_indicators, display_indicators_status
-from src.services.chart_service import (
+from src.services.technical_indicators import (
+    calculate_technical_indicators,
+    display_indicators_status,
+)
+from src.services.chart import (
     create_technical_chart,
     display_fibonacci_summary,
     get_fibonacci_level_alerts,
@@ -58,7 +61,6 @@ def main():
         show_rsi = st.checkbox("RSI", value=True)
         show_macd = st.checkbox("MACD", value=True)
         show_obv = st.checkbox("OBV", value=False)
-
 
         # Indicator parameters
         bb_period = st.slider("BB Period", 10, 50, 20)
@@ -289,8 +291,12 @@ def main():
                     )
 
                     if not stock_data.empty:
-                        indicators, warnings, has_success = calculate_technical_indicators(stock_data)
-                        display_indicators_status(warnings, has_success, list(indicators.keys()))
+                        indicators, warnings, has_success = (
+                            calculate_technical_indicators(stock_data)
+                        )
+                        display_indicators_status(
+                            warnings, has_success, list(indicators.keys())
+                        )
                         if indicators:
                             fig = create_technical_chart(
                                 ticker,
@@ -385,8 +391,12 @@ def main():
                             )
 
                             if not stock_data.empty:
-                                indicators, warnings, has_success = calculate_technical_indicators(stock_data)
-                                display_indicators_status(warnings, has_success, list(indicators.keys()))
+                                indicators, warnings, has_success = (
+                                    calculate_technical_indicators(stock_data)
+                                )
+                                display_indicators_status(
+                                    warnings, has_success, list(indicators.keys())
+                                )
                                 if indicators:
                                     fig = create_technical_chart(
                                         ticker,

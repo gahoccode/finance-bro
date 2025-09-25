@@ -5,6 +5,34 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.32] - 2025-09-25
+
+### Changed
+- [2025-09-25] **Service File Naming Convention**: Removed `_service` suffix from all service module names for cleaner imports and better consistency
+  - **Files Renamed** (8 service modules):
+    - `chart_service.py` → `chart.py`
+    - `fibonacci_service.py` → `fibonacci.py`
+    - `auth_service.py` → `auth.py`
+    - `data_service.py` → `data.py`
+    - `session_state_service.py` → `session_state.py`
+    - `crewai_service.py` → `crewai.py`
+    - `financial_data_service.py` → `financial_data.py`
+    - `financial_analysis_service.py` → `financial_analysis.py`
+  - **Import Updates** (15 files affected):
+    - **Main Application**: `app.py` - 2 imports updated
+    - **Page Files**: 8 files - `dupont_analysis.py`, `Stock_Price_Analysis.py`, `Financial_Health_Report.py`, `Technical_Analysis.py`, `Portfolio_Optimization.py`, `Valuation.py`, `bro.py`, `Fund_Analysis.py`
+    - **Internal Services**: 2 files - `chart.py`, `session_state.py`
+    - **Test Files**: 2 files - `test_effective_tax_rate.py`, `test_financial_formatting.py`
+  - **Documentation Updates** (5 architecture files):
+    - Updated all C4 model diagrams and component references
+    - Synchronized import examples and file structure diagrams
+    - Updated architectural decision records
+  - **Scope of Impact** (28 files total):
+    - **Zero Breaking Changes**: All functionality preserved with cleaner naming
+    - **Improved Developer Experience**: Shorter, more intuitive import statements
+    - **Better Consistency**: Aligns with Python naming conventions for modules
+    - **Quality Assurance**: All imports tested and verified working correctly
+
 ## [0.2.31] - 2025-09-21
 
 ### Added

@@ -14,15 +14,15 @@ from ..components.ui_components import inject_custom_success_styling
 def manual_obv(close_prices: pd.Series, volume: pd.Series) -> pd.Series:
     """
     Calculate On-Balance Volume (OBV) manually.
-    
+
     OBV = Previous OBV + Volume (if Close > Previous Close)
-    OBV = Previous OBV - Volume (if Close < Previous Close)  
+    OBV = Previous OBV - Volume (if Close < Previous Close)
     OBV = Previous OBV (if Close = Previous Close)
-    
+
     Args:
         close_prices: Series of closing prices
         volume: Series of volume data
-        
+
     Returns:
         Series with OBV values, indexed same as input
     """
@@ -37,9 +37,9 @@ def manual_obv(close_prices: pd.Series, volume: pd.Series) -> pd.Series:
     price_direction.iloc[0] = 0  # First value has no previous price
 
     for i in range(1, len(close_prices)):
-        if close_prices.iloc[i] > close_prices.iloc[i-1]:
+        if close_prices.iloc[i] > close_prices.iloc[i - 1]:
             price_direction.iloc[i] = 1
-        elif close_prices.iloc[i] < close_prices.iloc[i-1]:
+        elif close_prices.iloc[i] < close_prices.iloc[i - 1]:
             price_direction.iloc[i] = -1
         else:
             price_direction.iloc[i] = 0
@@ -50,29 +50,33 @@ def manual_obv(close_prices: pd.Series, volume: pd.Series) -> pd.Series:
 
     for i in range(1, len(close_prices)):
         volume_change = price_direction.iloc[i] * volume.iloc[i]
-        obv.iloc[i] = obv.iloc[i-1] + volume_change
+        obv.iloc[i] = obv.iloc[i - 1] + volume_change
 
     return obv
 
 
-def manual_bollinger_bands(close_prices: pd.Series, period: int = 20, std_dev: float = 2.0) -> pd.DataFrame:
+def manual_bollinger_bands(
+    close_prices: pd.Series, period: int = 20, std_dev: float = 2.0
+) -> pd.DataFrame:
     """
     Calculate Bollinger Bands manually.
-    
+
     Middle Band = Simple Moving Average (SMA)
     Upper Band = SMA + (std_dev * Standard Deviation)
     Lower Band = SMA - (std_dev * Standard Deviation)
-    
+
     Args:
         close_prices: Series of closing prices
         period: Number of periods for moving average (default: 20)
         std_dev: Number of standard deviations (default: 2.0)
-        
+
     Returns:
         DataFrame with columns: BBL_20_2.0, BBM_20_2.0, BBU_20_2.0
     """
     if len(close_prices) < period:
-        raise ValueError(f"Need at least {period} data points for Bollinger Bands calculation")
+        raise ValueError(
+            f"Need at least {period} data points for Bollinger Bands calculation"
+        )
 
     # Calculate Simple Moving Average (Middle Band)
     sma = close_prices.rolling(window=period).mean()
@@ -85,11 +89,10 @@ def manual_bollinger_bands(close_prices: pd.Series, period: int = 20, std_dev: f
     lower_band = sma - (std_dev * rolling_std)
 
     # Create DataFrame with pandas-ta compatible column names
-    result = pd.DataFrame({
-        'BBL_20_2.0': lower_band,
-        'BBM_20_2.0': sma,
-        'BBU_20_2.0': upper_band
-    }, index=close_prices.index)
+    result = pd.DataFrame(
+        {"BBL_20_2.0": lower_band, "BBM_20_2.0": sma, "BBU_20_2.0": upper_band},
+        index=close_prices.index,
+    )
 
     return result
 
@@ -97,14 +100,14 @@ def manual_bollinger_bands(close_prices: pd.Series, period: int = 20, std_dev: f
 def manual_rsi(close_prices: pd.Series, period: int = 14) -> pd.Series:
     """
     Calculate Relative Strength Index (RSI) manually using exponential moving average.
-    
+
     RSI = 100 - (100 / (1 + RS))
     RS = Average Gain / Average Loss
-    
+
     Args:
         close_prices: Series of closing prices
         period: Number of periods for calculation (default: 14)
-        
+
     Returns:
         Series with RSI values (0-100 scale)
     """
@@ -130,30 +133,34 @@ def manual_rsi(close_prices: pd.Series, period: int = 14) -> pd.Series:
     rsi = 100 - (100 / (1 + rs))
 
     # Set name for compatibility
-    rsi.name = 'RSI_14'
+    rsi.name = "RSI_14"
 
     return rsi
 
 
-def manual_macd(close_prices: pd.Series, fast: int = 12, slow: int = 26, signal: int = 9) -> pd.DataFrame:
+def manual_macd(
+    close_prices: pd.Series, fast: int = 12, slow: int = 26, signal: int = 9
+) -> pd.DataFrame:
     """
     Calculate MACD (Moving Average Convergence Divergence) manually.
-    
+
     MACD Line = EMA(fast) - EMA(slow)
     Signal Line = EMA(MACD Line, signal periods)
     Histogram = MACD Line - Signal Line
-    
+
     Args:
         close_prices: Series of closing prices
         fast: Fast EMA period (default: 12)
         slow: Slow EMA period (default: 26)
         signal: Signal line EMA period (default: 9)
-        
+
     Returns:
         DataFrame with columns: MACD_12_26_9, MACDs_12_26_9, MACDh_12_26_9
     """
     if len(close_prices) < slow + signal:
-        raise ValueError(f"Need at least {slow + signal} data points for MACD calculation")
+        raise ValueError(
+            f"Need at least {slow + signal} data points for MACD calculation"
+        )
 
     # Calculate EMAs
     ema_fast = close_prices.ewm(span=fast, adjust=False).mean()
@@ -169,11 +176,14 @@ def manual_macd(close_prices: pd.Series, fast: int = 12, slow: int = 26, signal:
     histogram = macd_line - signal_line
 
     # Create DataFrame with pandas-ta compatible column names
-    result = pd.DataFrame({
-        'MACD_12_26_9': macd_line,
-        'MACDs_12_26_9': signal_line,
-        'MACDh_12_26_9': histogram
-    }, index=close_prices.index)
+    result = pd.DataFrame(
+        {
+            "MACD_12_26_9": macd_line,
+            "MACDs_12_26_9": signal_line,
+            "MACDh_12_26_9": histogram,
+        },
+        index=close_prices.index,
+    )
 
     return result
 
@@ -181,12 +191,12 @@ def manual_macd(close_prices: pd.Series, fast: int = 12, slow: int = 26, signal:
 @st.cache_data(ttl=300)  # Cache for 5 minutes
 def calculate_technical_indicators(data: pd.DataFrame) -> tuple[dict, list, bool]:
     """Calculate technical indicators using manual implementations.
-    
+
     Provides RSI, MACD, Bollinger Bands, and OBV with comprehensive error handling.
-    
+
     Args:
         data: DataFrame with OHLCV columns
-        
+
     Returns:
         tuple: (indicators_dict, warnings_list, has_success)
             - indicators_dict: Dictionary of calculated indicators
@@ -280,21 +290,25 @@ def calculate_technical_indicators(data: pd.DataFrame) -> tuple[dict, list, bool
     return indicators, warnings, has_success
 
 
-def display_indicators_status(warnings: list, has_success: bool, indicator_names: list) -> None:
+def display_indicators_status(
+    warnings: list, has_success: bool, indicator_names: list
+) -> None:
     """Display technical indicators status messages to the user.
-    
-    Handles all Streamlit UI display logic that was moved out of the cached 
+
+    Handles all Streamlit UI display logic that was moved out of the cached
     calculate_technical_indicators function to fix caching compatibility.
-    
+
     Args:
         warnings: List of warning messages to display
-        has_success: Whether any indicators were calculated successfully  
+        has_success: Whether any indicators were calculated successfully
         indicator_names: List of successfully calculated indicator names
     """
     # Display warnings to user
     if warnings:
         # Handle both single warning strings and lists of warnings
-        if len(warnings) == 1 and not warnings[0].startswith("⚠️ **Technical Indicator Issues:**"):
+        if len(warnings) == 1 and not warnings[0].startswith(
+            "⚠️ **Technical Indicator Issues:**"
+        ):
             # Single validation error (insufficient data or missing columns)
             st.warning(warnings[0])
         else:

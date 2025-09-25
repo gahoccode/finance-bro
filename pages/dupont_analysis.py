@@ -5,12 +5,12 @@ from src.components.ui_components import (
     inject_custom_success_styling,
     render_financial_display_options,
 )
-from src.services.financial_analysis_service import (
+from src.services.financial_analysis import (
     create_dupont_analysis,
     calculate_capital_employed,
     calculate_degree_of_financial_leverage,
 )
-from src.services.data_service import (
+from src.services.data import (
     format_financial_display,
     convert_dataframe_for_display,
 )

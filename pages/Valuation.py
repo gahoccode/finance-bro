@@ -10,9 +10,9 @@ from src.components.ui_components import (
     render_financial_display_options,
 )
 from src.services.vnstock_api import fetch_stock_price_data
-from src.services.data_service import format_financial_display
-from src.services.financial_analysis_service import calculate_effective_tax_rate
-from src.services.session_state_service import (
+from src.services.data import format_financial_display
+from src.services.financial_analysis import calculate_effective_tax_rate
+from src.services.session_state import (
     init_global_session_state,
     ensure_valuation_data_loaded,
     get_current_company_name,
@@ -50,7 +50,9 @@ st.success(f"✅ Analyzing valuation for **{company_name}** ({symbol})")
 loading_result = ensure_valuation_data_loaded(symbol)
 
 if not loading_result["success"]:
-    st.error(f"❌ Failed to load valuation data: {loading_result.get('error', 'Unknown error')}")
+    st.error(
+        f"❌ Failed to load valuation data: {loading_result.get('error', 'Unknown error')}"
+    )
     st.info("Please try refreshing the page or selecting a different stock symbol.")
     st.stop()
 
@@ -140,7 +142,10 @@ try:
     interval = "1D"
 
     # Get stock price data (loaded automatically by ensure_valuation_data_loaded)
-    if "stock_price_data" in st.session_state and not st.session_state.stock_price_data.empty:
+    if (
+        "stock_price_data" in st.session_state
+        and not st.session_state.stock_price_data.empty
+    ):
         stock_price = st.session_state.stock_price_data
         st.success("✅ Using cached stock price data")
     else:
@@ -282,9 +287,9 @@ try:
 
             # Apply financial formatting to monetary columns
             historical_tax_display["Profit Before Tax (Bn. VND)"] = (
-                historical_tax_display["Profit Before Tax (Bn. VND)"].apply(
-                    lambda x: format_financial_display(x, display_unit, 0)
-                )
+                historical_tax_display[
+                    "Profit Before Tax (Bn. VND)"
+                ].apply(lambda x: format_financial_display(x, display_unit, 0))
             )
 
             historical_tax_display["Tax Paid (Bn. VND)"] = historical_tax_display[
@@ -739,12 +744,16 @@ try:
 
                 # Validate required columns exist
                 if ocf_column not in cash_flow.columns:
-                    st.error(f"❌ Required column '{ocf_column}' not found in cash flow data")
+                    st.error(
+                        f"❌ Required column '{ocf_column}' not found in cash flow data"
+                    )
                     st.error(f"Available columns: {list(cash_flow.columns)}")
                     st.stop()
 
                 if capex_column not in cash_flow.columns:
-                    st.error(f"❌ Required column '{capex_column}' not found in cash flow data")
+                    st.error(
+                        f"❌ Required column '{capex_column}' not found in cash flow data"
+                    )
                     st.error(f"Available columns: {list(cash_flow.columns)}")
                     st.stop()
 
@@ -769,24 +778,31 @@ try:
                         "❌ Insufficient cash flow data for DCF analysis. Need at least 2 years of data."
                     )
                     if len(historical_fcf) == 0:
-                        st.error("🔍 Debug: No valid FCF data found. This could be due to:")
+                        st.error(
+                            "🔍 Debug: No valid FCF data found. This could be due to:"
+                        )
                         st.error("- All cash flow values are NaN or zero")
                         st.error("- Missing yearReport data")
                         st.error("- Data filtering conditions (line 762)")
                     elif len(historical_fcf) == 1:
                         st.error("🔍 Debug: Only 1 year of valid FCF data found.")
-                        st.error(f"Available year: {historical_years[0] if historical_years else 'Unknown'}")
+                        st.error(
+                            f"Available year: {historical_years[0] if historical_years else 'Unknown'}"
+                        )
 
                     # Show sample data for debugging
                     st.subheader("🔍 Cash Flow Data Debug")
                     debug_data = []
                     for _, row in cash_flow.head(3).iterrows():
-                        debug_data.append({
-                            "Year": row.get("yearReport", "N/A"),
-                            "OCF": row.get(ocf_column, "N/A"),
-                            "Capex": row.get(capex_column, "N/A"),
-                            "FCF Raw": row.get(ocf_column, 0) - abs(row.get(capex_column, 0))
-                        })
+                        debug_data.append(
+                            {
+                                "Year": row.get("yearReport", "N/A"),
+                                "OCF": row.get(ocf_column, "N/A"),
+                                "Capex": row.get(capex_column, "N/A"),
+                                "FCF Raw": row.get(ocf_column, 0)
+                                - abs(row.get(capex_column, 0)),
+                            }
+                        )
                     debug_df = pd.DataFrame(debug_data)
                     st.dataframe(debug_df, use_container_width=True, hide_index=True)
 
@@ -1307,7 +1323,14 @@ try:
                 # Historical FCF context
                 st.subheader("📊 Historical Free Cash Flow Context")
                 historical_data = []
-                for i, (year, fcf, ocf, capex) in enumerate(zip(historical_years, historical_fcf, historical_ocf, historical_capex)):
+                for i, (year, fcf, ocf, capex) in enumerate(
+                    zip(
+                        historical_years,
+                        historical_fcf,
+                        historical_ocf,
+                        historical_capex,
+                    )
+                ):
                     historical_data.append(
                         {
                             "Year": year,

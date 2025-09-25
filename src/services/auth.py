@@ -65,6 +65,5 @@ def get_authentication_status() -> dict:
     return {
         "enabled": is_authentication_enabled(),
         "required": is_authentication_required(),
-        "logged_in": is_user_logged_in()
+        "logged_in": is_user_logged_in(),
     }
-

@@ -15,7 +15,7 @@ from datetime import datetime
 from bokeh.plotting import figure
 from bokeh.transform import cumsum
 from src.services.vnstock_api import fetch_portfolio_stock_data
-from src.services.data_service import process_portfolio_price_data
+from src.services.data import process_portfolio_price_data
 from math import pi
 import riskfolio as rp
 from src.components.ui_components import inject_custom_success_styling

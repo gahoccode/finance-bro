@@ -447,3 +447,4 @@ result = smart_load_for_page(page_name="valuation", symbol=symbol)
 - Do not mix user interface logic with cached or memoized functions; cached functions should only perform pure data computations.
 - Always include the scope of impact in your plan and CHANGELOG.md: what files and functions will be affected, specify which functions (new and old) belong to what impacted file 
 - Each branch has a separate time line of versioning
+- exclude @Reference/ from ruff check and format

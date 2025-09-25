@@ -481,7 +481,7 @@ Options considered:
 ### Decision
 
 We implemented a **Comprehensive Financial Formatting System** with:
-- **Centralized Helper Functions**: `format_financial_display()` and `convert_dataframe_for_display()` in `src/services/data_service.py`
+- **Centralized Helper Functions**: `format_financial_display()` and `convert_dataframe_for_display()` in `src/services/data.py`
 - **Reusable UI Components**: `render_financial_display_options()` in `src/components/ui_components.py`
 - **Configuration Constants**: `FINANCIAL_DISPLAY_OPTIONS` and `DEFAULT_FINANCIAL_DISPLAY` in `src/core/config.py`
 - **Consistent Session State**: Unique session keys for display preferences across components
@@ -578,8 +578,8 @@ Key problems identified:
 ### Decision
 
 We implemented a **Smart Data Loading Architecture** with:
-- **Centralized Session State Service**: `src/services/session_state_service.py` for intelligent dependency resolution
-- **Financial Data Service**: `src/services/financial_data_service.py` for comprehensive data loading
+- **Centralized Session State Service**: `src/services/session_state.py` for intelligent dependency resolution
+- **Financial Data Service**: `src/services/financial_data.py` for comprehensive data loading
 - **Progressive Loading Patterns**: Multi-stage loading with progress bars and status updates
 - **Enhanced Valuation Flow**: Pre-loading system with "Load & Analyze Valuation" button
 - **Intelligent Cache Management**: Cache key generation and invalidation strategies

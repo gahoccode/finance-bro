@@ -10,7 +10,7 @@ import pandas as pd
 from typing import Optional, Dict, Any
 import warnings
 
-from .financial_data_service import (
+from .financial_data import (
     load_comprehensive_financial_data,
     get_stock_symbols_with_names,
     get_company_name_from_symbol,
@@ -23,7 +23,7 @@ warnings.filterwarnings("ignore")
 def init_global_session_state():
     """
     Initialize global session state variables with default values.
-    
+
     Sets up core application state that should be available across all pages.
     This function is safe to call multiple times.
     """
@@ -36,7 +36,9 @@ def init_global_session_state():
         st.session_state.analysis_start_date = pd.to_datetime("2024-01-01")
 
     if "analysis_end_date" not in st.session_state:
-        st.session_state.analysis_end_date = pd.to_datetime("today") - pd.Timedelta(days=1)
+        st.session_state.analysis_end_date = pd.to_datetime("today") - pd.Timedelta(
+            days=1
+        )
 
     if "date_range_changed" not in st.session_state:
         st.session_state.date_range_changed = False
@@ -44,17 +46,21 @@ def init_global_session_state():
     # API key management
     if "api_key" not in st.session_state:
         import os
+
         st.session_state.api_key = os.environ.get("OPENAI_API_KEY", "")
 
 
 def ensure_stock_symbols_loaded() -> Dict[str, Any]:
     """
     Ensure stock symbols are loaded and cached in session state.
-    
+
     Returns:
         dict: Symbol data with validation info
     """
-    if "stock_symbols_list" not in st.session_state or "symbols_df" not in st.session_state:
+    if (
+        "stock_symbols_list" not in st.session_state
+        or "symbols_df" not in st.session_state
+    ):
         with st.spinner("Loading stock symbols..."):
             symbols_data = get_stock_symbols_with_names()
             st.session_state.stock_symbols_list = symbols_data["symbols_list"]
@@ -80,18 +86,18 @@ def ensure_financial_data_loaded(
     period: str = "year",
     source: str = "VCI",
     company_source: str = "TCBS",
-    force_reload: bool = False
+    force_reload: bool = False,
 ) -> Dict[str, Any]:
     """
     Ensure financial data is loaded for the specified symbol and parameters.
-    
+
     Args:
         symbol (str): Stock symbol
         period (str): 'year' or 'quarter'
         source (str): Data source for financial statements
         company_source (str): Data source for company info
         force_reload (bool): Force reload even if data exists
-    
+
     Returns:
         dict: Financial data with validation info
     """
@@ -100,10 +106,10 @@ def ensure_financial_data_loaded(
 
     # Check if data needs loading
     needs_loading = (
-        force_reload or
-        "dataframes" not in st.session_state or
-        "display_dataframes" not in st.session_state or
-        st.session_state.get("financial_data_cache_key") != cache_key
+        force_reload
+        or "dataframes" not in st.session_state
+        or "display_dataframes" not in st.session_state
+        or st.session_state.get("financial_data_cache_key") != cache_key
     )
 
     if needs_loading:
@@ -115,7 +121,9 @@ def ensure_financial_data_loaded(
             if financial_data["dataframes"]:  # Success
                 # Store in session state with cache key
                 st.session_state.dataframes = financial_data["dataframes"]
-                st.session_state.display_dataframes = financial_data["display_dataframes"]
+                st.session_state.display_dataframes = financial_data[
+                    "display_dataframes"
+                ]
                 st.session_state.financial_data_metadata = financial_data["metadata"]
                 st.session_state.financial_data_cache_key = cache_key
                 st.session_state.stock_symbol = symbol  # Ensure symbol is set
@@ -160,28 +168,32 @@ def ensure_valuation_data_loaded(
     symbol: str,
     start_date: Optional[pd.Timestamp] = None,
     end_date: Optional[pd.Timestamp] = None,
-    force_reload: bool = False
+    force_reload: bool = False,
 ) -> Dict[str, Any]:
     """
     Ensure all data required for valuation analysis is loaded.
-    
+
     This is the main function for the valuation page to get all required data
     without depending on other pages being visited first.
-    
+
     Args:
         symbol (str): Stock symbol
         start_date (pd.Timestamp, optional): Start date for price data
         end_date (pd.Timestamp, optional): End date for price data
         force_reload (bool): Force reload even if data exists
-    
+
     Returns:
         dict: Complete valuation data package
     """
     # Use session state dates if not provided
     if start_date is None:
-        start_date = st.session_state.get("analysis_start_date", pd.to_datetime("2024-01-01"))
+        start_date = st.session_state.get(
+            "analysis_start_date", pd.to_datetime("2024-01-01")
+        )
     if end_date is None:
-        end_date = st.session_state.get("analysis_end_date", pd.to_datetime("today") - pd.Timedelta(days=1))
+        end_date = st.session_state.get(
+            "analysis_end_date", pd.to_datetime("today") - pd.Timedelta(days=1)
+        )
 
     # Progressive loading with UI feedback
     progress_container = st.container()
@@ -195,7 +207,9 @@ def ensure_valuation_data_loaded(
         try:
             # Step 1: Load financial data (60% of progress)
             status_text.text("Loading financial statements...")
-            financial_result = ensure_financial_data_loaded(symbol, force_reload=force_reload)
+            financial_result = ensure_financial_data_loaded(
+                symbol, force_reload=force_reload
+            )
             progress_bar.progress(0.6)
 
             if not financial_result["success"]:
@@ -249,6 +263,7 @@ def ensure_valuation_data_loaded(
 
             # Clear progress indicators after a short delay
             import time
+
             time.sleep(1)
             progress_container.empty()
 
@@ -282,7 +297,7 @@ def clear_financial_data_cache():
 def get_current_company_name() -> str:
     """
     Get the current company name based on selected symbol.
-    
+
     Returns:
         str: Company name or symbol if not available
     """
@@ -297,7 +312,7 @@ def get_current_company_name() -> str:
 def validate_valuation_prerequisites() -> Dict[str, Any]:
     """
     Validate that all prerequisites for valuation analysis are met.
-    
+
     Returns:
         dict: Validation results with specific checks
     """
@@ -317,9 +332,9 @@ def validate_valuation_prerequisites() -> Dict[str, Any]:
 
     # Check 2: Financial data available
     has_financial_data = (
-        "dataframes" in st.session_state and
-        st.session_state.dataframes and
-        any(not df.empty for df in st.session_state.dataframes.values())
+        "dataframes" in st.session_state
+        and st.session_state.dataframes
+        and any(not df.empty for df in st.session_state.dataframes.values())
     )
     validation["checks"]["financial_data"] = has_financial_data
     if not has_financial_data:
@@ -328,21 +343,24 @@ def validate_valuation_prerequisites() -> Dict[str, Any]:
 
     # Check 3: Price data available (optional but recommended)
     has_price_data = (
-        "stock_price_data" in st.session_state and
-        not st.session_state.stock_price_data.empty
+        "stock_price_data" in st.session_state
+        and not st.session_state.stock_price_data.empty
     )
     validation["checks"]["price_data"] = has_price_data
     if not has_price_data:
-        validation["warnings"].append("Price data not available - some calculations may be limited")
+        validation["warnings"].append(
+            "Price data not available - some calculations may be limited"
+        )
 
     # Check 4: Returns data for beta calculation
     has_returns = (
-        "stock_returns" in st.session_state and
-        len(st.session_state.stock_returns) > 0
+        "stock_returns" in st.session_state and len(st.session_state.stock_returns) > 0
     )
     validation["checks"]["returns_data"] = has_returns
     if not has_returns:
-        validation["warnings"].append("Returns data not available - beta calculation may be limited")
+        validation["warnings"].append(
+            "Returns data not available - beta calculation may be limited"
+        )
 
     return validation
 
@@ -350,11 +368,11 @@ def validate_valuation_prerequisites() -> Dict[str, Any]:
 def smart_load_for_page(page_name: str, symbol: str = None) -> Dict[str, Any]:
     """
     Smart data loading based on page requirements.
-    
+
     Args:
         page_name (str): Name of the page ('valuation', 'analysis', 'portfolio', etc.)
         symbol (str, optional): Stock symbol to load data for
-    
+
     Returns:
         dict: Loading results
     """

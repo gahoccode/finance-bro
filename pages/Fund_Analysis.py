@@ -9,7 +9,7 @@ from src.services.vnstock_api import (
     get_fund_asset_allocation,
     get_fund_industry_allocation,
 )
-from src.services.chart_service import (
+from src.services.chart import (
     create_fund_nav_line_chart,
     create_fund_comparison_bar_chart,
     create_fund_asset_pie_chart,

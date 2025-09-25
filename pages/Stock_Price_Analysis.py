@@ -365,7 +365,7 @@ def calculate_custom_metrics(
 
 # Import cached function from modular utilities
 from src.services.vnstock_api import fetch_stock_price_data
-from src.services.chart_service import (
+from src.services.chart import (
     create_altair_line_chart,
     create_altair_area_chart,
     create_bokeh_candlestick_chart,

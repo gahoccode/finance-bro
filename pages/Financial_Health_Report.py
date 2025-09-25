@@ -1,6 +1,6 @@
 import streamlit as st
 from src.components.ui_components import inject_custom_success_styling
-from src.services.crewai_service import run_financial_health_analysis
+from src.services.crewai import run_financial_health_analysis
 
 st.set_page_config(
     page_title="Financial Health Report - Finance Bro", page_icon="🏥", layout="wide"

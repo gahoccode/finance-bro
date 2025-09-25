@@ -1,5 +1,5 @@
 import os
-from src.services.chart_service import detect_latest_chart
+from src.services.chart import detect_latest_chart
 import streamlit as st
 import pandas as pd
 from vnstock import Vnstock, Listing

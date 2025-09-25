@@ -70,27 +70,41 @@ def create_technical_chart(
                     midline = pd.Series([50] * len(rsi), index=rsi.index)
                     oversold_line = pd.Series([30] * len(rsi), index=rsi.index)
 
-                    addplots.extend([
-                        # RSI actual values
-                        mpf.make_addplot(
-                            rsi, panel=panels, color="purple", ylabel="RSI", width=2
-                        ),
-                        # Overbought level (70)
-                        mpf.make_addplot(
-                            overbought_line, panel=panels, color="red",
-                            linestyle="--", alpha=0.7, width=1
-                        ),
-                        # Midline (50)
-                        mpf.make_addplot(
-                            midline, panel=panels, color="gray",
-                            linestyle="--", alpha=0.5, width=1
-                        ),
-                        # Oversold level (30)
-                        mpf.make_addplot(
-                            oversold_line, panel=panels, color="green",
-                            linestyle="--", alpha=0.7, width=1
-                        )
-                    ])
+                    addplots.extend(
+                        [
+                            # RSI actual values
+                            mpf.make_addplot(
+                                rsi, panel=panels, color="purple", ylabel="RSI", width=2
+                            ),
+                            # Overbought level (70)
+                            mpf.make_addplot(
+                                overbought_line,
+                                panel=panels,
+                                color="red",
+                                linestyle="--",
+                                alpha=0.7,
+                                width=1,
+                            ),
+                            # Midline (50)
+                            mpf.make_addplot(
+                                midline,
+                                panel=panels,
+                                color="gray",
+                                linestyle="--",
+                                alpha=0.5,
+                                width=1,
+                            ),
+                            # Oversold level (30)
+                            mpf.make_addplot(
+                                oversold_line,
+                                panel=panels,
+                                color="green",
+                                linestyle="--",
+                                alpha=0.7,
+                                width=1,
+                            ),
+                        ]
+                    )
                     panels += 1
                 except Exception as e:
                     skipped_indicators.append(f"RSI: {str(e)}")
@@ -106,31 +120,33 @@ def create_technical_chart(
             required_cols = ["MACD_12_26_9", "MACDs_12_26_9", "MACDh_12_26_9"]
             if all(col in macd.columns for col in required_cols):
                 try:
-                    addplots.extend([
-                        # MACD Line
-                        mpf.make_addplot(
-                            macd["MACD_12_26_9"],
-                            panel=panels,
-                            color="blue",
-                            ylabel="MACD",
-                            width=2
-                        ),
-                        # Signal Line
-                        mpf.make_addplot(
-                            macd["MACDs_12_26_9"],
-                            panel=panels,
-                            color="red",
-                            width=2
-                        ),
-                        # Histogram
-                        mpf.make_addplot(
-                            macd["MACDh_12_26_9"],
-                            panel=panels,
-                            type="bar",
-                            color="gray",
-                            alpha=0.6
-                        )
-                    ])
+                    addplots.extend(
+                        [
+                            # MACD Line
+                            mpf.make_addplot(
+                                macd["MACD_12_26_9"],
+                                panel=panels,
+                                color="blue",
+                                ylabel="MACD",
+                                width=2,
+                            ),
+                            # Signal Line
+                            mpf.make_addplot(
+                                macd["MACDs_12_26_9"],
+                                panel=panels,
+                                color="red",
+                                width=2,
+                            ),
+                            # Histogram
+                            mpf.make_addplot(
+                                macd["MACDh_12_26_9"],
+                                panel=panels,
+                                type="bar",
+                                color="gray",
+                                alpha=0.6,
+                            ),
+                        ]
+                    )
                     panels += 1
                 except Exception as e:
                     skipped_indicators.append(f"MACD: {str(e)}")
@@ -475,7 +491,7 @@ def _create_fibonacci_overlays(data: pd.DataFrame, fibonacci_config: Dict) -> li
         List of mplfinance addplot objects for Fibonacci levels
     """
     try:
-        from src.services.fibonacci_service import (
+        from src.services.fibonacci import (
             get_recent_swing_fibonacci,
             get_fibonacci_colors,
         )
@@ -572,7 +588,7 @@ def display_fibonacci_summary(fibonacci_config: Dict, ticker: str) -> None:
             fib_data = st.session_state.fibonacci_summary[latest_date]
 
             if fib_data:
-                from src.services.fibonacci_service import format_fibonacci_summary
+                from src.services.fibonacci import format_fibonacci_summary
 
                 st.subheader(f"📈 Fibonacci Analysis - {ticker}")
 
@@ -630,7 +646,7 @@ def get_fibonacci_level_alerts(data: pd.DataFrame, fibonacci_config: Dict) -> li
         if not fibonacci_config.get("show_fibonacci", False) or data.empty:
             return []
 
-        from src.services.fibonacci_service import get_recent_swing_fibonacci
+        from src.services.fibonacci import get_recent_swing_fibonacci
 
         # Get current Fibonacci analysis
         fib_data = get_recent_swing_fibonacci(
