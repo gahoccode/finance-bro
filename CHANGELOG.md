@@ -5,6 +5,33 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.36] - 2025-09-25
+
+### Changed
+- [2025-09-25] **Service Layer Naming Simplification**: Removed `_service` suffix from all service files for cleaner, more concise naming
+  - **Renamed Files** (8 service files):
+    - `src/services/chart_service.py` → `src/services/chart.py`
+    - `src/services/fibonacci_service.py` → `src/services/fibonacci.py`
+    - `src/services/auth_service.py` → `src/services/auth.py`
+    - `src/services/data_service.py` → `src/services/data.py`
+    - `src/services/session_state_service.py` → `src/services/session_state.py`
+    - `src/services/crewai_service.py` → `src/services/crewai.py`
+    - `src/services/financial_data_service.py` → `src/services/financial_data.py`
+    - `src/services/financial_analysis_service.py` → `src/services/financial_analysis.py`
+  - **Import Updates** (15 files): Updated all import statements across pages, tests, and internal services
+  - **Documentation Updates** (6 files): Updated architecture documentation and project documentation to reflect new naming
+  - **Configuration Updates**: Added `Reference/` to ruff exclude list in pyproject.toml
+  - **Scope of Impact** (29 files affected):
+    - **Main application**: app.py
+    - **Pages**: dupont_analysis.py, Stock_Price_Analysis.py, Financial_Health_Report.py, Technical_Analysis.py, Portfolio_Optimization.py, Valuation.py, Fund_Analysis.py
+    - **Tests**: test_effective_tax_rate.py, test_financial_formatting.py
+    - **Internal services**: Internal imports updated in chart.py
+    - **Architecture docs**: 5 files in docs/architecture/ updated
+    - **Project documentation**: CLAUDE.md updated with new naming patterns
+  - **Quality Assurance**: All imports verified working, application tested successfully, ruff checks passing
+  - **Benefits**: Cleaner codebase, simplified import statements, improved developer experience, more concise naming convention
+  - **No Breaking Changes**: Purely cosmetic refactoring with identical functionality
+
 ## [0.2.35] - 2025-09-21
 
 ### Added
