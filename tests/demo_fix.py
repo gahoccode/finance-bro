@@ -57,7 +57,7 @@ def demo_fixed_logic():
 
             print(f"   ✓ filename_base: {filename_base}")
             print(f"   ✓ filepath_base: {filepath_base}")
-            print(f"   ✓ No .xlsx in base path: {not filepath_base.endswith('.xlsx')}")
+            print(f"   ✓ No .xlsx in base path: {not filepath_base.endswith(".xlsx")}")
 
             # Convert weights to DataFrame (as done in actual code)
             selected_weights_df = pd.DataFrame.from_dict(

@@ -18,7 +18,7 @@ from pypfopt import (
 from pypfopt.discrete_allocation import get_latest_prices
 
 from src.components.ui_components import inject_custom_success_styling
-from src.services.data_service import process_portfolio_price_data
+from src.services.data import process_portfolio_price_data
 from src.services.vnstock_api import fetch_portfolio_stock_data
 
 
@@ -672,7 +672,7 @@ with tab4:
         with col1:
             st.info(f"**Portfolio**: {portfolio_label}")
         with col2:
-            st.info(f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            st.info(f"**Generated**: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}")
 
         # File download
         filepath_xlsx = pathlib.Path(str(filepath_base) + ".xlsx")

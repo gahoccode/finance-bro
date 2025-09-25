@@ -1,8 +1,8 @@
 import streamlit as st
 
 from src.components.ui_components import inject_custom_success_styling
-from src.services.crewai_service import run_financial_health_analysis
-from src.services.session_state_service import (
+from src.services.crewai import run_financial_health_analysis
+from src.services.session_state import (
     ensure_financial_data_loaded,
     get_current_company_name,
     init_global_session_state,
@@ -76,7 +76,7 @@ if not dataframes_available:
             st.rerun()
         else:
             st.error(
-                f"❌ Failed to load financial data: {loading_result.get('error', 'Unknown error')}"
+                f"❌ Failed to load financial data: {loading_result.get("error", "Unknown error")}"
             )
             st.markdown("""
             **To load financial data:**

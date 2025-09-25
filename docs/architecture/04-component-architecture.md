@@ -111,7 +111,7 @@ Each page follows a consistent structure pattern:
 # Standard Page Structure Template
 import streamlit as st
 from src.services.vnstock_api import get_stock_data
-from src.services.chart_service import create_technical_chart
+from src.services.chart import create_technical_chart
 from src.components.stock_selector import render_stock_selector
 from src.components.ui_components import inject_custom_success_styling
 
@@ -240,7 +240,7 @@ def fetch_with_retry(api_call, max_retries=3):
     """Implements retry logic for API calls"""
 ```
 
-#### Chart Service (`src/services/chart_service.py`)
+#### Chart Service (`src/services/chart.py`)
 **Purpose**: Financial data visualization
 
 ```python
@@ -258,7 +258,7 @@ def export_chart(chart: object, filename: str) -> str:
     """Exports charts to file system with consistent naming"""
 ```
 
-#### Data Service (`src/services/data_service.py`)
+#### Data Service (`src/services/data.py`)
 **Purpose**: Data transformation and validation
 
 ```python
@@ -512,9 +512,9 @@ graph TD
     C --> I[ui_components.py]
     
     D --> J[vnstock_api.py]
-    D --> K[chart_service.py]
-    D --> L[data_service.py]
-    D --> M[crewai_service.py]
+    D --> K[chart.py]
+    D --> L[data.py]
+    D --> M[crewai.py]
     
     E --> N[config.py]
     E --> O[session_utils.py]
@@ -538,7 +538,7 @@ from src.utils.session_utils import initialize_session_state
 
 # Layer 3: Services
 from src.services.vnstock_api import get_stock_data
-from src.services.chart_service import create_technical_chart
+from src.services.chart import create_technical_chart
 
 # Layer 4: Components
 from src.components.stock_selector import render_stock_selector

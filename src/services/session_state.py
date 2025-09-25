@@ -11,7 +11,7 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 
-from .financial_data_service import (
+from .financial_data import (
     get_company_name_from_symbol,
     get_stock_symbols_with_names,
     load_comprehensive_financial_data,

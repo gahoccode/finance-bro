@@ -6,11 +6,11 @@ from src.components.ui_components import (
     inject_custom_success_styling,
     render_financial_display_options,
 )
-from src.services.data_service import (
+from src.services.data import (
     convert_dataframe_for_display,
     format_financial_display,
 )
-from src.services.financial_analysis_service import (
+from src.services.financial_analysis import (
     calculate_capital_employed,
     calculate_degree_of_financial_leverage,
     create_dupont_analysis,
@@ -161,7 +161,7 @@ with tab1:
 
         if missing_dfs:
             st.error(
-                f"❌ Missing required financial statements: {', '.join(missing_dfs)}"
+                f"❌ Missing required financial statements: {", ".join(missing_dfs)}"
             )
             st.info(
                 "Please ensure all financial data is loaded in the Stock Price Analysis page."
@@ -199,28 +199,28 @@ with tab1:
                 with col1:
                     st.metric(
                         "Net Profit Margin",
-                        f"{latest_data['Net Profit Margin']:.2f}%",
+                        f"{latest_data["Net Profit Margin"]:.2f}%",
                         help="Net Income / Revenue",
                     )
 
                 with col2:
                     st.metric(
                         "Asset Turnover",
-                        f"{latest_data['Asset Turnover']:.2f}x",
+                        f"{latest_data["Asset Turnover"]:.2f}x",
                         help="Revenue / Average Total Assets",
                     )
 
                 with col3:
                     st.metric(
                         "Financial Leverage",
-                        f"{latest_data['Financial Leverage']:.2f}x",
+                        f"{latest_data["Financial Leverage"]:.2f}x",
                         help="Average Total Assets / Average Equity",
                     )
 
                 with col4:
                     st.metric(
                         "ROE (DuPont)",
-                        f"{latest_data['ROE (DuPont)']:.2f}%",
+                        f"{latest_data["ROE (DuPont)"]:.2f}%",
                         help="Net Profit Margin × Asset Turnover × Financial Leverage",
                     )
 
@@ -441,19 +441,19 @@ with tab1:
                 drivers = []
                 if abs(margin_change) > 0.5:
                     drivers.append(
-                        f"Profitability ({'improved' if margin_change > 0 else 'declined'})"
+                        f"Profitability ({"improved" if margin_change > 0 else "declined"})"
                     )
                 if abs(turnover_change) > 0.05:
                     drivers.append(
-                        f"Asset efficiency ({'improved' if turnover_change > 0 else 'declined'})"
+                        f"Asset efficiency ({"improved" if turnover_change > 0 else "declined"})"
                     )
                 if abs(leverage_change) > 0.1:
                     drivers.append(
-                        f"Financial leverage ({'increased' if leverage_change > 0 else 'decreased'})"
+                        f"Financial leverage ({"increased" if leverage_change > 0 else "decreased"})"
                     )
 
                 if drivers:
-                    st.info(f"**Key ROE drivers**: {', '.join(drivers)}")
+                    st.info(f"**Key ROE drivers**: {", ".join(drivers)}")
 
             # Performance benchmarks
             latest_roe = dupont_analysis["ROE (DuPont)"].iloc[-1]

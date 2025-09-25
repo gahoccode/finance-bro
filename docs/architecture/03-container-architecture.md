@@ -104,13 +104,13 @@ C4Component
 
     Container_Boundary(webapp, "Web Application Container") {
         Component(streamlit_app, "Streamlit App", "Python", "Main application framework")
-        Component(auth_service, "Authentication Service", "OAuth", "User authentication and session management")
-        
+        Component(auth, "Authentication Service", "OAuth", "User authentication and session management")
+
         ComponentDb(session_store, "Session Store", "Memory", "User session state")
         ComponentDb(cache_service, "Cache Service", "File System", "Data caching layer")
-        
+
         Component(page_router, "Page Router", "Streamlit Navigation", "Multi-page application routing")
-        
+
         Boundary(business_services, "Business Services") {
             Component(vnstock_service, "Market Data Service", "VnStock Integration", "Stock market data access")
             Component(ai_service, "AI Analysis Service", "PandasAI", "Natural language query processing")
@@ -129,7 +129,7 @@ C4Component
     System_Ext(vnstock_api, "VnStock API", "External market data")
     System_Ext(openai_api, "OpenAI API", "External AI service")
 
-    Rel(streamlit_app, auth_service, "Authenticates users")
+    Rel(streamlit_app, auth, "Authenticates users")
     Rel(streamlit_app, page_router, "Routes requests")
     Rel(page_router, business_services, "Delegates business logic")
     
@@ -138,7 +138,7 @@ C4Component
     Rel(crew_service, openai_api, "Coordinates agents", "HTTPS")
     
     Rel(business_services, cache_service, "Caches data")
-    Rel(auth_service, session_store, "Manages sessions")
+    Rel(auth, session_store, "Manages sessions")
     
     Rel(page_router, ui_components, "Renders components")
     Rel(ui_components, business_services, "Requests data")

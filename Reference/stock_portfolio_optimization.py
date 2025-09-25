@@ -102,7 +102,7 @@ from pypfopt.efficient_frontier import EfficientFrontier
 from pypfopt.expected_returns import mean_historical_return
 from pypfopt.risk_models import (
     sample_cov,
-)  # for covariance matrix, get more methods from risk_models
+)
 
 
 mu = mean_historical_return(

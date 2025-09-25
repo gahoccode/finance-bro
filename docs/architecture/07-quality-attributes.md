@@ -635,7 +635,7 @@ class TechnicalDebtTracker:
             },
             {
                 'category': 'MISSING_TESTS',
-                'description': 'Add unit tests for chart_service.py',
+                'description': 'Add unit tests for chart.py',
                 'impact': 'MEDIUM',
                 'effort': 'MEDIUM',
                 'risk': 'MEDIUM',

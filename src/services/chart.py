@@ -504,7 +504,7 @@ def _create_fibonacci_overlays(data: pd.DataFrame, fibonacci_config: dict) -> li
         List of mplfinance addplot objects for Fibonacci levels
     """
     try:
-        from src.services.fibonacci_service import (
+        from src.services.fibonacci import (
             get_fibonacci_colors,
             get_recent_swing_fibonacci,
         )
@@ -599,7 +599,7 @@ def display_fibonacci_summary(fibonacci_config: dict, ticker: str) -> None:
             fib_data = st.session_state.fibonacci_summary[latest_date]
 
             if fib_data:
-                from src.services.fibonacci_service import format_fibonacci_summary
+                from src.services.fibonacci import format_fibonacci_summary
 
                 st.subheader(f"📈 Fibonacci Analysis - {ticker}")
 
@@ -657,7 +657,7 @@ def get_fibonacci_level_alerts(data: pd.DataFrame, fibonacci_config: dict) -> li
         if not fibonacci_config.get("show_fibonacci", False) or data.empty:
             return []
 
-        from src.services.fibonacci_service import get_recent_swing_fibonacci
+        from src.services.fibonacci import get_recent_swing_fibonacci
 
         # Get current Fibonacci analysis
         fib_data = get_recent_swing_fibonacci(

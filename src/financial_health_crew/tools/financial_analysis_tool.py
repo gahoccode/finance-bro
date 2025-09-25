@@ -81,7 +81,7 @@ class FinancialAnalysisTool(BaseTool):
         sorted_years = sorted(all_years) if all_years else []
 
         analysis += "DATA COVERAGE SUMMARY:\n"
-        analysis += f"- Available years: {', '.join(map(str, sorted_years))}\n"
+        analysis += f"- Available years: {", ".join(map(str, sorted_years))}\n"
         analysis += f"- Current/Latest year: {current_year}\n"
         analysis += f"- Historical coverage: {len(sorted_years)} years\n\n"
 
@@ -476,14 +476,14 @@ class FinancialAnalysisTool(BaseTool):
                 continue
 
             context += f"{statement_name.upper()} - COMPLETE DATA:\n"
-            context += f"Columns: {', '.join(df.columns.tolist())}\n"
+            context += f"Columns: {", ".join(df.columns.tolist())}\n"
             context += f"Records: {len(df)} rows\n"
 
             # Show recent data (last 3 years if available)
             if "yearReport" in df.columns:
                 recent_years = sorted(df["yearReport"].unique())[-3:]
                 context += (
-                    f"\nRecent Years Data ({', '.join(map(str, recent_years))}):\n"
+                    f"\nRecent Years Data ({", ".join(map(str, recent_years))}):\n"
                 )
 
                 recent_data = df[df["yearReport"].isin(recent_years)]

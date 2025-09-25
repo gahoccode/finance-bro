@@ -6,8 +6,8 @@ from vnstock import Listing
 
 from src.components.auth_components import render_logout_button
 from src.components.ui_components import inject_custom_success_styling
-from src.services.auth_service import handle_authentication
-from src.services.session_state_service import ensure_valuation_data_loaded
+from src.services.auth import handle_authentication
+from src.services.session_state import ensure_valuation_data_loaded
 
 
 # Load environment variables from .env file
@@ -170,7 +170,7 @@ def main_page():
                         st.switch_page("pages/Valuation.py")
                     else:
                         st.error(
-                            f"❌ Failed to pre-load data: {loading_result.get('error', 'Unknown error')}"
+                            f"❌ Failed to pre-load data: {loading_result.get("error", "Unknown error")}"
                         )
 
         with col2:

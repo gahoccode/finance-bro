@@ -7,7 +7,7 @@ import quantstats as qs
 import streamlit as st
 
 from src.components.ui_components import inject_custom_success_styling
-from src.services.chart_service import (
+from src.services.chart import (
     create_altair_area_chart,
     create_altair_line_chart,
     create_plotly_candlestick_chart,
@@ -426,7 +426,7 @@ if ticker:
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.metric(
-                    "Latest Close", f"{stock_price['close'].iloc[-1] * 1000:,.0f}"
+                    "Latest Close", f"{stock_price["close"].iloc[-1] * 1000:,.0f}"
                 )
             with col2:
                 st.metric("Mean Return (Annualized)", f"{mean_return_pct:.2f}%")

@@ -62,13 +62,13 @@ This is a Streamlit-based financial analysis application for Vietnamese stock ma
 - **src/** - Modular utilities and services (NEW):
   - **core/config.py** - Centralized app configuration and constants
   - **services/vnstock_api.py** - All VnStock API functions (30 centralized, including fund data)
-  - **services/chart_service.py** - Chart generation utilities (10 functions, including Fibonacci overlays)
-  - **services/data_service.py** - Data transformation utilities
-  - **services/fibonacci_service.py** - Fibonacci retracement analysis with SciPy swing detection
-  - **services/crewai_service.py** - CrewAI financial health analysis orchestration with multi-agent system
-  - **services/financial_analysis_service.py** - Advanced financial analysis functions (DuPont analysis, capital employed, financial leverage)
-  - **services/session_state_service.py** - Smart session state management with progressive data loading (v0.2.22+)
-  - **services/financial_data_service.py** - Centralized financial data loading with validation and caching (v0.2.22+)
+  - **services/chart.py** - Chart generation utilities (10 functions, including Fibonacci overlays)
+  - **services/data.py** - Data transformation utilities
+  - **services/fibonacci.py** - Fibonacci retracement analysis with SciPy swing detection
+  - **services/crewai.py** - CrewAI financial health analysis orchestration with multi-agent system
+  - **services/financial_analysis.py** - Advanced financial analysis functions (DuPont analysis, capital employed, financial leverage)
+  - **services/session_state.py** - Smart session state management with progressive data loading (v0.2.22+)
+  - **services/financial_data.py** - Centralized financial data loading with validation and caching (v0.2.22+)
   - **financial_health_crew/** - CrewAI multi-agent financial health analysis system:
     - **crew.py** - Multi-agent crew configuration with 3 specialized agents (data analyst, risk specialist, report writer)
     - **config/agents.yaml** - Agent roles and expertise definitions for Vietnamese market analysis
@@ -250,7 +250,7 @@ The codebase follows a modular architecture pattern with centralized services:
 ```python
 # Pages import from services
 from src.services.vnstock_api import get_stock_data, get_company_overview
-from src.services.chart_service import create_technical_chart, create_altair_line_chart
+from src.services.chart import create_technical_chart, create_altair_line_chart
 from src.core.config import DEFAULT_SYMBOLS, CACHE_TTL_SETTINGS
 
 # Services are self-contained with @st.cache_data decorators
@@ -260,7 +260,7 @@ from src.components.stock_selector import render_stock_selector
 
 **Development Guidelines:**
 - **API Functions**: Add new VnStock functions to `src/services/vnstock_api.py`
-- **Charts**: Add new visualizations to `src/services/chart_service.py`
+- **Charts**: Add new visualizations to `src/services/chart.py`
 - **CrewAI Agents**: Add new financial analysis agents to `src/financial_health_crew/`
 - **Configuration**: Update constants in `src/core/config.py`
 - **UI Components**: Create reusable widgets in `src/components/`
@@ -409,8 +409,8 @@ Comprehensive architecture documentation is available in `docs/architecture/` fo
 The application implements a sophisticated smart data loading system that eliminates page dependencies and provides progressive loading with user feedback.
 
 **Core Services:**
-- **`src/services/session_state_service.py`** - Centralized session state management with intelligent dependency resolution
-- **`src/services/financial_data_service.py`** - Comprehensive financial data loading with validation and caching
+- **`src/services/session_state.py`** - Centralized session state management with intelligent dependency resolution
+- **`src/services/financial_data.py`** - Comprehensive financial data loading with validation and caching
 
 **Key Features:**
 - **Progressive Loading**: Data loads in stages with real-time progress feedback

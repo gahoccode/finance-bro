@@ -112,11 +112,11 @@ if stock_symbol:
                 st.metric("Total Shareholders", len(ownership_percentage))
                 st.metric(
                     "Largest Shareholder",
-                    f"{(ownership_percentage['share_own_percent'].max() * 100):.1f}%",
+                    f"{(ownership_percentage["share_own_percent"].max() * 100):.1f}%",
                 )
                 st.metric(
                     "Top 3 Combined",
-                    f"{(ownership_percentage['share_own_percent'].nlargest(3).sum() * 100):.1f}%",
+                    f"{(ownership_percentage["share_own_percent"].nlargest(3).sum() * 100):.1f}%",
                 )
 
                 # Display raw data in expander
@@ -517,7 +517,7 @@ if stock_symbol:
                         # Create container for each news item
                         with st.container():
                             # Title (description) in bold
-                            st.markdown(f"**{report['description']}**")
+                            st.markdown(f"**{report["description"]}**")
 
                             # Date formatting
                             if pd.notna(report["date"]):
@@ -526,11 +526,11 @@ if stock_symbol:
 
                             # Article summary (name)
                             if pd.notna(report["name"]) and report["name"].strip():
-                                st.markdown(f"{report['name']}")
+                                st.markdown(f"{report["name"]}")
 
                             # Clickable link
                             if pd.notna(report["link"]) and report["link"].strip():
-                                st.markdown(f"[🔗 Read Full Article]({report['link']})")
+                                st.markdown(f"[🔗 Read Full Article]({report["link"]})")
 
                             # Add separator
                             st.markdown("---")

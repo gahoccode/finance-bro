@@ -2,7 +2,7 @@
 Comprehensive tests for financial formatting functionality.
 
 Tests the flexible financial formatting system including:
-- Helper functions in src/services/data_service.py
+- Helper functions in src/services/data.py
 - Configuration constants in src/core/config.py
 - Reusable UI components in src/components/ui_components.py
 """
@@ -11,7 +11,7 @@ import pandas as pd
 import pytest
 
 from src.core.config import DEFAULT_FINANCIAL_DISPLAY, FINANCIAL_DISPLAY_OPTIONS
-from src.services.data_service import (
+from src.services.data import (
     convert_dataframe_for_display,
     format_financial_display,
 )
