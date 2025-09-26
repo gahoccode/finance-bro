@@ -462,3 +462,4 @@ result = smart_load_for_page(page_name="valuation", symbol=symbol)
 - Stock data cached in `cache/` directory for performance
 - Always include the scope of impact in your plan and CHANGELOG.md: what files and functions will be affected, specify which functions (new and old) belong to what impacted file
 - Run ruff check and format to check python errors
+- use @Reference/ as examples for the implementation. Do not check for errors or formatting issues in this directory
