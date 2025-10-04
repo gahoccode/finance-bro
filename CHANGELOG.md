@@ -8,9 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.34] - 2025-10-04
 
 ### Added
-- [2025-10-04] **One-click Render deployment support**: Added complete infrastructure-as-code setup for cloud deployment
-  - **render.yaml**: Blueprint specification for automated Render deployment with environment variable configuration
-  - **setup.sh**: Production Streamlit configuration script (headless mode, dynamic port, CORS settings) with automatic creation of required runtime directories (cache/, exports/, outputs/)
+- [2025-10-04] **Docker-based Render deployment support**: Added infrastructure-as-code setup for cloud deployment using existing Dockerfile
+  - **render.yaml**: Blueprint specification for automated Docker deployment (runtime: docker) from feature/render branch
   - **.renderignore**: Build optimization excluding development files while preserving runtime directory structure
   - **README.md**: Comprehensive Render deployment guide with one-click deploy button and step-by-step instructions
 
@@ -19,23 +18,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated README.md to remove OAuth setup instructions (deprecated feature)
   - Simplified authentication to OpenAI API key only (environment variable or UI input)
   - Updated Technology Stack section to reflect current authentication approach
+- [2025-10-04] **Switched from Python runtime to Docker runtime for Render**: Simplified deployment by leveraging existing Dockerfile
+  - Removed setup.sh dependency from Render deployment (Docker already handles configuration)
+  - Consistent deployment across Docker Hub, local development, and Render platform
+  - Uses existing working Dockerfile without modifications
 
 ### Scope of Impact
 **Files Modified:**
 - **README.md**: Added Render deployment section, removed deprecated Google OAuth documentation
 - **CHANGELOG.md**: Documented deployment infrastructure additions
+- **render.yaml**: Changed from Python runtime to Docker runtime for simplified deployment
 
 **Files Added:**
-- **render.yaml**: Render Blueprint configuration (web service, build commands, environment variables)
-- **setup.sh**: Streamlit production server configuration with runtime directory creation
 - **.renderignore**: Deployment optimization file (excludes local data while preserving directory structure)
 
 **Impact Analysis:**
-- **No code changes**: All modifications are deployment infrastructure only
+- **No application code changes**: All modifications are deployment infrastructure only
+- **No Dockerfile changes**: Uses existing working Dockerfile as-is
 - **No breaking changes**: Existing local development workflow unchanged
-- **New capability**: Cloud deployment now available via Render platform
+- **New capability**: Cloud deployment now available via Render platform using Docker
+- **Simplified deployment**: Existing Dockerfile controls deployment (no setup.sh needed for Render)
 - **Simplified authentication**: Single API key requirement (OPENAI_API_KEY)
-- **Runtime directories**: Automatically created during deployment (cache/, exports/charts/, exports/reports/, exports/tearsheets/, outputs/)
 
 ## [0.2.33] - 2025-09-19
 
