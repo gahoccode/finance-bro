@@ -3,7 +3,7 @@ services:
     name: finance-bro
     runtime: docker
     plan: free
-    branch: feature/render
+    branch: main
     dockerfilePath: ./Dockerfile
     dockerContext: .
     autoDeploy: true
