@@ -20,8 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated Technology Stack section to reflect current authentication approach
 - [2025-10-04] **Switched from Python runtime to Docker runtime for Render**: Simplified deployment by leveraging existing Dockerfile
   - Removed setup.sh dependency from Render deployment (Docker already handles configuration)
+  - Deleted setup.sh file (no longer needed with Docker runtime)
+  - All Streamlit configuration and directory creation handled by Dockerfile
   - Consistent deployment across Docker Hub, local development, and Render platform
   - Uses existing working Dockerfile without modifications
+  - Simplifies deployment: single Dockerfile is the source of truth
 
 ### Scope of Impact
 **Files Modified:**
@@ -31,6 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Files Added:**
 - **.renderignore**: Deployment optimization file (excludes local data while preserving directory structure)
+
+**Files Deleted:**
+- **setup.sh**: No longer needed (Dockerfile handles all configuration for Docker deployment)
 
 **Impact Analysis:**
 - **No application code changes**: All modifications are deployment infrastructure only
