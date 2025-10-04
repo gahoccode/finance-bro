@@ -1,0 +1,45 @@
+# Development and test files
+tests/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+__pycache__/
+
+# Local data and caches (exclude contents but directories will be created by setup.sh)
+cache/*
+outputs/*
+exports/*
+.ipynb_checkpoints/
+
+# IDE and editor files
+.windsurf/
+.taskmaster/
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+Reference/
+docs/
+
+# Environment files (use Render environment variables instead)
+.env
+.env.example
+
+# Streamlit secrets (configure via Render dashboard)
+.streamlit/secrets.toml
+.streamlit/secrets.example.toml
+
+# Build artifacts
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Logs
+*.log
+pandasai.log

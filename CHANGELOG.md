@@ -5,6 +5,38 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.34] - 2025-10-04
+
+### Added
+- [2025-10-04] **One-click Render deployment support**: Added complete infrastructure-as-code setup for cloud deployment
+  - **render.yaml**: Blueprint specification for automated Render deployment with environment variable configuration
+  - **setup.sh**: Production Streamlit configuration script (headless mode, dynamic port, CORS settings) with automatic creation of required runtime directories (cache/, exports/, outputs/)
+  - **.renderignore**: Build optimization excluding development files while preserving runtime directory structure
+  - **README.md**: Comprehensive Render deployment guide with one-click deploy button and step-by-step instructions
+
+### Changed
+- [2025-10-04] **Deprecated Google OAuth authentication**: Removed Google OAuth integration from documentation and feature list
+  - Updated README.md to remove OAuth setup instructions (deprecated feature)
+  - Simplified authentication to OpenAI API key only (environment variable or UI input)
+  - Updated Technology Stack section to reflect current authentication approach
+
+### Scope of Impact
+**Files Modified:**
+- **README.md**: Added Render deployment section, removed deprecated Google OAuth documentation
+- **CHANGELOG.md**: Documented deployment infrastructure additions
+
+**Files Added:**
+- **render.yaml**: Render Blueprint configuration (web service, build commands, environment variables)
+- **setup.sh**: Streamlit production server configuration with runtime directory creation
+- **.renderignore**: Deployment optimization file (excludes local data while preserving directory structure)
+
+**Impact Analysis:**
+- **No code changes**: All modifications are deployment infrastructure only
+- **No breaking changes**: Existing local development workflow unchanged
+- **New capability**: Cloud deployment now available via Render platform
+- **Simplified authentication**: Single API key requirement (OPENAI_API_KEY)
+- **Runtime directories**: Automatically created during deployment (cache/, exports/charts/, exports/reports/, exports/tearsheets/, outputs/)
+
 ## [0.2.33] - 2025-09-19
 
 ### Fixed

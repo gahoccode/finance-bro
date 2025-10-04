@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: finance-bro
+    runtime: python
+    plan: free
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash setup.sh && streamlit run app.py
+    healthCheckPath: /_stcore/health
+    autoDeploy: true
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.10.11

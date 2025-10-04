@@ -28,47 +28,41 @@ This project is an **experiment in front-end vibe coding** - exploring how intui
 - 💼 **Portfolio Optimization** - Modern Portfolio Theory, Hierarchical Risk Parity, and risk analysis with riskfolio-lib
 - 🏢 **Comprehensive Company Analysis** - Ownership structure, management team, subsidiaries, and foreign transaction analysis
 - 📊 **Professional Visualizations** - Interactive charts with Altair, Bokeh, and custom styling
-- 🔐 **Secure Authentication** - Google OAuth integration with API key management
+- 🔐 **Secure API Key Management** - Environment-based configuration with UI fallback
 
 ## Quick Start
+
+### Deploy to Render (Recommended)
+
+Deploy Finance Bro to the cloud with one click:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/gahoccode/finance-bro)
+
+**What you need:**
+- A [Render account](https://render.com) (free tier available)
+- Your OpenAI API key ([get one here](https://platform.openai.com/api-keys))
+
+**Deployment steps:**
+1. Click the "Deploy to Render" button above
+2. Render will prompt you to connect your GitHub account (if not already connected)
+3. Enter your `OPENAI_API_KEY` when prompted
+4. Click "Deploy" and wait ~5 minutes for the build to complete
+5. Your app will be live at `https://finance-bro-[random-id].onrender.com`
+
+**Important notes:**
+- **Free tier**: The app will sleep after 15 minutes of inactivity and may take ~30 seconds to wake up
+- **Environment variables**: Only `OPENAI_API_KEY` is required
+- **Updates**: Push changes to your GitHub repo and Render will auto-deploy
+- **Custom domain**: Available on paid plans
+
+---
+
+### Local Development
 
 ### Prerequisites
 
 - Python >= 3.10.11
 - OpenAI API key
-- Google Cloud Console account (for OAuth setup)
-
-### Google OAuth Setup (Required)
-
-Before running the app, you need to set up Google OAuth authentication:
-
-1. **Create Google OAuth Credentials:**
-   - Go to [Google Cloud Console](https://console.cloud.google.com/)
-   - Create a new project or select existing one
-   - Enable Google+ API
-   - Go to Credentials → Create Credentials → OAuth 2.0 Client IDs
-   - Configure OAuth consent screen
-   - Add authorized redirect URI: `http://localhost:8501/oauth2callback` or 'https://your-app-domain.com/oauth2callback' if you are deploying to production with a custom domain
-   - Download credentials JSON file
-
-2. **Configure authentication:**
-   ```bash
-   # Copy the example secrets file
-   cp .streamlit/secrets.example.toml .streamlit/secrets.toml
-   
-   # Edit .streamlit/secrets.toml and add your Google OAuth credentials
-   # Replace the placeholder values with your actual credentials
-   ```
-
-3. **Update secrets.toml with your credentials:**
-   ```toml
-   [auth]
-   redirect_uri = "http://localhost:8501/oauth2callback"
-   cookie_secret = "your-random-secret-string-here"
-   client_id = "your-google-client-id.apps.googleusercontent.com"
-   client_secret = "your-google-client-secret"
-   server_metadata_url = "https://accounts.google.com/.well-known/openid-configuration"
-   ```
 
 ### Installation
 
@@ -281,7 +275,7 @@ streamlit run app.py
 
 ## Technology Stack
 
-- **Frontend:** Streamlit v1.47.0 with Google OAuth authentication
+- **Frontend:** Streamlit v1.47.0
 - **AI Engine:** PandasAI v2.3.0 (stable) with OpenAI GPT integration
 - **Stock Data:** Vnstock v3.2.5 (VCI/TCBS sources for Vietnamese market)
 - **Data Processing:** Pandas v1.5.3 (compatible with pandasai 2.3.0)
@@ -290,7 +284,6 @@ streamlit run app.py
 - **Risk Analysis:** riskfolio-lib v5.0.1+ (Hierarchical Risk Parity, advanced risk metrics)
 - **Technical Analysis:** Manual implementation for RSI, MACD, Bollinger Bands, OBV with robust error handling
 - **Visualizations:** Altair v5.5.0+, Bokeh v2.4.3, mplfinance for interactive charts
-- **Authentication:** Authlib v1.3.2+ for Google OAuth integration
 
 ## Future Refactor: PandasAI 3.x Migration
 
