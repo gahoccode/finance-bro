@@ -1,12 +1,11 @@
 services:
   - type: web
     name: finance-bro
-    runtime: docker
+    runtime: image
+    region: singapore
     plan: free
-    branch: main
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
-    autoDeploy: true
+    image:
+      url: ghcr.io/gahoccode/finance-bro:latest
     envVars:
       - key: OPENAI_API_KEY
         sync: false
