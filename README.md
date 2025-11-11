@@ -34,6 +34,8 @@ This project is an **experiment in front-end vibe coding** - exploring how intui
 
 ### Deploy to Render (Recommended)
 
+**Try the live demo:** [https://finance-bro.onrender.com](https://finance-bro.onrender.com)
+
 Deploy Finance Bro to the cloud with one click:
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/gahoccode/finance-bro)
