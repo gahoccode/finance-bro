@@ -6,6 +6,7 @@ on:
     tags: [ 'v*.*.*' ]
     paths: 
       - 'Dockerfile'
+      - src/**
       - pages/**
       - app.py
       - requirements.txt
