@@ -4,6 +4,12 @@ on:
   push:
     branches: [ "main", "master" ]
     tags: [ 'v*.*.*' ]
+    paths: 
+      - 'Dockerfile'
+      - pages/**
+      - app.py
+      - requirements.txt
+      - .streamlit/config.toml
   pull_request:
     branches: [ "main", "master" ]
 
