@@ -37,9 +37,10 @@ def get_management_data(symbol):
     """Get management data with caching
 
     Extracted from Company_Overview.py lines 21-28 - EXACT same logic preserved.
+    Uses VCI source for consistent column names (quantity, officer_own_percent).
     """
     try:
-        company = Company(symbol=symbol)
+        company = Company(symbol=symbol, source="VCI")
         return company.officers()
     except Exception as e:
         st.error(f"Error fetching management data: {str(e)}")

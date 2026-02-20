@@ -5,6 +5,29 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.35] - 2025-10-20
+
+### Fixed
+- [2025-10-20] **Management Team KeyError in Company Overview**: Fixed `KeyError: 'quantity'` error when loading management team data
+  - **Root cause**: `Company()` class in `get_management_data()` was called without explicit `source` parameter
+  - Without source specification, vnstock may default to a source that doesn't provide expected columns
+  - VCI source provides consistent column names: `quantity`, `officer_own_percent`, `officer_name`, `position_short_name`
+
+### Scope of Impact
+**Files Modified:**
+- **src/services/vnstock_api.py** (line 43): Added `source='VCI'` parameter to `Company()` constructor in `get_management_data()` function
+- **pages/Company_Overview.py** (lines 146-157): Added defensive column existence check before filtering management_team DataFrame
+
+**Functions Affected:**
+- `get_management_data(symbol)` in src/services/vnstock_api.py: Now uses explicit VCI source
+- Management Team tab rendering in pages/Company_Overview.py: Safe column access with existence check
+
+**Impact Analysis:**
+- **No breaking changes**: All existing functionality preserved
+- **Improved reliability**: Explicit source parameter ensures consistent data structure
+- **Defensive programming**: Column existence check prevents future KeyError issues
+- **User-facing fix**: Management Team ownership chart now displays correctly
+
 ## [0.2.34] - 2025-10-04
 
 ### Added

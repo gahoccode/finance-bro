@@ -143,12 +143,18 @@ if stock_symbol:
                     # Create management team ownership chart
                     st.subheader("Management Team Ownership")
 
-                    # Filter for officers with quantity data
-                    mgmt_with_shares = management_team[
-                        management_team["quantity"].notna()
-                        & management_team["officer_own_percent"].notna()
-                        & (management_team["quantity"] > 0)
-                    ].copy()
+                    # Filter for officers with quantity data - check columns exist first
+                    if (
+                        "quantity" in management_team.columns
+                        and "officer_own_percent" in management_team.columns
+                    ):
+                        mgmt_with_shares = management_team[
+                            management_team["quantity"].notna()
+                            & management_team["officer_own_percent"].notna()
+                            & (management_team["quantity"] > 0)
+                        ].copy()
+                    else:
+                        mgmt_with_shares = pd.DataFrame()
 
                     if not mgmt_with_shares.empty:
                         # Sort by quantity for better visualization and convert percentage
