@@ -5,6 +5,28 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.36] - 2025-10-20
+
+### Changed
+- [2025-10-20] **Docker Environment Variables Simplification**: Removed unused environment variables from Docker configuration
+  - **Removed variables**: `PANDASAI_API_KEY`, `OPENAI_MODEL`, `LOG_LEVEL` - not used in application code
+  - **Documented VNSTOCK_API_KEY**: Added vnstock authentication to all Docker deployment examples in README.md
+  - **Files Modified**:
+    - `docker-compose.yml`: Removed unused env vars, added VNSTOCK_API_KEY with documentation
+    - `.env.example`: Removed PANDASAI_API_KEY, OPENAI_MODEL, LOG_LEVEL
+    - `README.md`: Updated all Docker CLI examples (macOS/Linux, Windows CMD/PowerShell, docker-compose) to include VNSTOCK_API_KEY
+
+### Scope of Impact
+**Files Modified:**
+- **docker-compose.yml**: Removed PANDASAI_API_KEY, OPENAI_MODEL, LOG_LEVEL; added VNSTOCK_API_KEY
+- **.env.example**: Removed unused environment variables
+- **README.md**: Updated Docker deployment documentation with VNSTOCK_API_KEY
+
+**Impact Analysis:**
+- **No breaking changes**: Application functionality unchanged
+- **Cleaner configuration**: Only actively used environment variables documented
+- **Better documentation**: VNSTOCK_API_KEY now properly documented for Docker deployments
+
 ## [0.2.35] - 2025-10-20
 
 ### Fixed

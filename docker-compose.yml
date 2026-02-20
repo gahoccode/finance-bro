@@ -2,11 +2,17 @@ services:
   finance-bro:
     build: .
     ports:
-      - "8501:8501"
+      - "${STREAMLIT_SERVER_PORT:-8501}:8501"
     environment:
+      # OpenAI API Key (required for AI analysis)
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - STREAMLIT_SERVER_PORT=8501
-      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+
+      # Vnstock API Key (optional - for higher rate limits and premium features)
+      - VNSTOCK_API_KEY=${VNSTOCK_API_KEY}
+
+      # Streamlit configuration
+      - STREAMLIT_SERVER_PORT=${STREAMLIT_SERVER_PORT:-8501}
+      - STREAMLIT_SERVER_ADDRESS=${STREAMLIT_SERVER_ADDRESS:-0.0.0.0}
     volumes:
       # Mount exports directory for persistent data
       - ./exports:/app/exports
