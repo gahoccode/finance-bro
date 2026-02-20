@@ -273,7 +273,6 @@ with st.sidebar:
 
     sample_questions = [
         "What is the return on invested capital (ROIC) trend?",
-        "Analyze the dividend yield trend",
         "What is the company's debt-to-equity ratio?",
         "What's 2024 revenue growth?",
         "What's the ROE in 2024?",
@@ -350,7 +349,8 @@ if analyze_button or (period_changed and "stock_symbol" in st.session_state):
                 Ratio_raw, separator="_", handle_duplicates=True, drop_levels=0
             )
 
-            dividend_schedule = company.dividends()
+            # Dividends data not available in vnstock - use empty DataFrame
+            dividend_schedule = pd.DataFrame()
 
             # Store original dataframes for display (keep original column names)
             st.session_state.display_dataframes = {
@@ -500,7 +500,7 @@ if "dataframes" in st.session_state:
 
     # Predefined questions
     st.subheader("Quick Questions")
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
 
     with col1:
         if st.button("ROIC Analysis"):
@@ -513,16 +513,6 @@ if "dataframes" in st.session_state:
                 st.rerun()
 
     with col2:
-        if st.button("Dividend Schedule"):
-            agent = get_or_create_agent()
-            if agent:
-                question = "Did the company issue cash dividends in 2024 and what was the exercise date, compare the percentage to last year?"
-                st.session_state.messages.append({"role": "user", "content": question})
-                message_data = process_agent_response(agent, question)
-                st.session_state.messages.append(message_data)
-                st.rerun()
-
-    with col3:
         if st.button("Debt Analysis"):
             agent = get_or_create_agent()
             if agent:
