@@ -74,3 +74,7 @@ REQUIRED_OHLCV_COLUMNS = ["Open", "High", "Low", "Close", "Volume"]
 
 # Theme colors (matching existing Streamlit theme)
 THEME_COLORS = {"primary": "#56524D", "secondary": "#2B2523", "tertiary": "#76706C"}
+
+# Vnstock API configuration
+VNSTOCK_API_KEY_ENV = "VNSTOCK_API_KEY"
+

@@ -1,8 +1,9 @@
 import os
 from src.services.chart_service import detect_latest_chart
+from src.core.config import VNSTOCK_API_KEY_ENV
 import streamlit as st
 import pandas as pd
-from vnstock import Vnstock, Listing
+from vnstock import Vnstock, Listing, register_user
 from vnstock.core.utils.transform import flatten_hierarchical_index
 import warnings
 
@@ -11,6 +12,17 @@ from pandasai import Agent
 from pandasai.llm import OpenAI
 
 warnings.filterwarnings("ignore")
+
+# Setup Vnstock API key if available
+_vnstock_api_key = os.environ.get(VNSTOCK_API_KEY_ENV, "")
+if _vnstock_api_key:
+    try:
+        register_user(_vnstock_api_key)
+        if "vnstock_registered" not in st.session_state:
+            st.session_state.vnstock_registered = True
+    except Exception:
+        # Silently fail if registration doesn't work - vnstock will work in free tier
+        pass
 
 
 # Helper function to extract generated code from PandasAI response/agent
