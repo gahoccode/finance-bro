@@ -77,4 +77,3 @@ THEME_COLORS = {"primary": "#56524D", "secondary": "#2B2523", "tertiary": "#7670
 
 # Vnstock API configuration
 VNSTOCK_API_KEY_ENV = "VNSTOCK_API_KEY"
-
