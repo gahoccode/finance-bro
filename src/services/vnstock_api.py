@@ -54,7 +54,7 @@ def get_subsidiaries_data(symbol):
     Extracted from Company_Overview.py lines 31-38 - EXACT same logic preserved.
     """
     try:
-        company = Company(symbol=symbol)
+        company = Company(symbol=symbol, source="VCI")
         return company.subsidiaries()
     except Exception as e:
         st.error(f"Error fetching subsidiaries data: {str(e)}")
@@ -65,14 +65,13 @@ def get_subsidiaries_data(symbol):
 def get_insider_deals_data(symbol):
     """Get insider deals data with caching
 
-    Extracted from Company_Overview.py lines 41-48 - EXACT same logic preserved.
+    Note: insider_deals() is not available from VCI source.
+    Returns empty DataFrame with info message.
     """
-    try:
-        stock = Vnstock().stock(symbol=symbol, source="TCBS")
-        return stock.company.insider_deals()
-    except Exception as e:
-        st.error(f"Error fetching insider deals data: {str(e)}")
-        return pd.DataFrame()
+    st.info(
+        "Insider deals data is not available from VCI source. TCBS source (which has this data) is deprecated."
+    )
+    return pd.DataFrame()
 
 
 @st.cache_data(ttl=3600)  # Cache for 1 hour
@@ -82,7 +81,7 @@ def get_foreign_trading_data(symbol):
     Extracted from Company_Overview.py lines 51-58 - EXACT same logic preserved.
     """
     try:
-        company = Company(symbol=symbol)
+        company = Company(symbol=symbol, source="VCI")
         return company.trading_stats()
     except Exception as e:
         st.error(f"Error fetching foreign trading data: {str(e)}")
