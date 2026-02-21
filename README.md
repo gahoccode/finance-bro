@@ -570,6 +570,41 @@ docker-compose down
 docker-compose down -v
 ```
 
+### Building and Pushing to GHCR
+
+**Option 1: Using the helper script (recommended)**
+
+```bash
+# Build and push as 'latest' (with cache)
+./build-and-push.sh
+
+# Build and push with version tag
+./build-and-push.sh v0.2.36
+
+# Force clean rebuild (no cache) - use when dependencies change
+./build-and-push.sh v0.2.36 --no-cache
+```
+
+**Option 2: Manual Docker commands**
+
+```bash
+# Build for linux/amd64 platform (required for Render/cloud deployment)
+docker buildx build --platform linux/amd64 --load -t finance-bro:latest .
+
+# Build without cache (use when dependencies change)
+docker buildx build --platform linux/amd64 --no-cache --load -t finance-bro:latest .
+
+# Tag for GHCR
+docker tag finance-bro:latest ghcr.io/gahoccode/finance-bro:latest
+docker tag finance-bro:latest ghcr.io/gahoccode/finance-bro:v0.2.36
+
+# Push to GHCR
+docker push ghcr.io/gahoccode/finance-bro:latest
+docker push ghcr.io/gahoccode/finance-bro:v0.2.36
+```
+
+**Note:** Use `--no-cache` when `requirements.txt` or `Dockerfile` dependencies change to ensure the new versions are installed.
+
 ### Volume Mounting
 
 The Docker setup includes volume mounting for:
