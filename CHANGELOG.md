@@ -5,6 +5,32 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.33] - 2026-02-26
+
+### Added
+- [2026-02-26] **CrewAI Streaming Progress & Typewriter Report Display**: Real-time visibility into the multi-agent financial health analysis workflow
+  - **New File: `src/services/crewai_streaming.py`**:
+    - `stream_report_text()` — Generator yielding words one-by-one with adaptive speed (20ms/word normal, 5ms/word for long reports) for `st.write_stream()` typewriter effect
+    - `CrewAIStreamingOrchestrator` class — Runs CrewAI crew in a background thread with `queue.Queue`-based communication to the main Streamlit thread
+    - `task_callback()` — Captures each agent's task completion and queues progress updates
+    - `run_crew_in_thread()` — Background thread execution with `task_callback` set on the Crew instance
+    - `execute_with_progress()` — Main entry point with `st.status` live progress tracking, 5-minute timeout
+  - **New File: `tests/test_crewai_streaming.py`** — 10 unit tests covering streaming generator and orchestrator
+  - **Modified: `src/services/crewai.py`**:
+    - Added `run_financial_health_analysis_streaming()` — Non-cached streaming entry point that validates session state and delegates to orchestrator
+  - **Modified: `pages/Financial_Health_Report.py`**:
+    - Replaced `st.spinner` with `st.status` showing per-agent progress updates
+    - Added `st.write_stream()` typewriter effect for final report display
+    - Session state caching (`health_report_text`) prevents re-streaming on page rerun
+    - Reset button now clears streaming-related session state keys
+  - **Modified: `src/financial_health_crew/tools/financial_analysis_tool.py`**:
+    - Added module-level data bridge (`_shared_dataframes`, `set_shared_dataframes()`, `get_shared_dataframes()`) for background thread access
+    - Updated `_run()` to check shared dataframes as fallback when `st.session_state` is inaccessible from background threads
+  - **Scope of Impact** (5 files modified/created, 0 breaking changes):
+    - Existing `run_financial_health_analysis()` cached function unchanged (backward compatible)
+    - No changes to `src/financial_health_crew/crew.py` — `task_callback` set directly on Crew instance
+    - **Data flow fix**: `st.session_state` is thread-local in Streamlit — dataframes are now captured in the main thread and bridged to the background thread via module-level shared state
+
 ## [0.2.32] - 2025-09-25
 
 ### Changed

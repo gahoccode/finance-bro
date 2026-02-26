@@ -331,7 +331,7 @@ if analyze_button or (period_changed and "stock_symbol" in st.session_state):
                 Ratio_raw, separator="_", handle_duplicates=True, drop_levels=0
             )
 
-            dividend_schedule = company.dividends()
+            dividend_schedule = pd.DataFrame()
 
             # Store original dataframes for display (keep original column names)
             st.session_state.display_dataframes = {

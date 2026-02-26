@@ -57,6 +57,32 @@ def run_financial_health_analysis():
         raise Exception(error_msg)
 
 
+def run_financial_health_analysis_streaming() -> dict:
+    """
+    Run CrewAI analysis with streaming progress and real-time agent tracking.
+
+    Unlike run_financial_health_analysis(), this is NOT cached — streaming
+    always runs fresh. Shows live progress as each agent completes and
+    returns results for typewriter-style report streaming.
+
+    Returns:
+        dict: {success: bool, result: CrewOutput|None, error: str|None, task_outputs: dict}
+    """
+    is_valid, error_msg = validate_session_state()
+    if not is_valid:
+        return {
+            "success": False,
+            "result": None,
+            "error": error_msg,
+            "task_outputs": {},
+        }
+
+    from src.services.crewai_streaming import CrewAIStreamingOrchestrator
+
+    orchestrator = CrewAIStreamingOrchestrator()
+    return orchestrator.execute_with_progress(st.session_state.stock_symbol)
+
+
 def get_available_dataframes():
     """
     Get information about available financial dataframes in session state

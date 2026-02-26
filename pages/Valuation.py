@@ -287,9 +287,9 @@ try:
 
             # Apply financial formatting to monetary columns
             historical_tax_display["Profit Before Tax (Bn. VND)"] = (
-                historical_tax_display[
-                    "Profit Before Tax (Bn. VND)"
-                ].apply(lambda x: format_financial_display(x, display_unit, 0))
+                historical_tax_display["Profit Before Tax (Bn. VND)"].apply(
+                    lambda x: format_financial_display(x, display_unit, 0)
+                )
             )
 
             historical_tax_display["Tax Paid (Bn. VND)"] = historical_tax_display[

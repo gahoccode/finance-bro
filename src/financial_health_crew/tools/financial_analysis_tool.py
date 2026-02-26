@@ -4,6 +4,23 @@ from pydantic import BaseModel, Field
 import pandas as pd
 import streamlit as st
 
+# Module-level data bridge for background thread access.
+# st.session_state is thread-local and inaccessible from background threads.
+# The streaming orchestrator sets this before crew kickoff so the tool can
+# read financial data regardless of which thread it runs on.
+_shared_dataframes: Dict[str, pd.DataFrame] | None = None
+
+
+def set_shared_dataframes(dataframes: Dict[str, pd.DataFrame] | None) -> None:
+    """Set shared dataframes for background thread access."""
+    global _shared_dataframes
+    _shared_dataframes = dataframes
+
+
+def get_shared_dataframes() -> Dict[str, pd.DataFrame] | None:
+    """Get shared dataframes, returns None if not set."""
+    return _shared_dataframes
+
 
 class FinancialAnalysisToolInput(BaseModel):
     """Input schema for FinancialAnalysisTool."""
@@ -29,14 +46,15 @@ class FinancialAnalysisTool(BaseTool):
             analysis_type: Type of analysis to perform ('overview', 'ratios', 'trends', 'detailed')
         """
         try:
-            # Check if dataframes exist in session state
-            if "dataframes" not in st.session_state:
-                return "No financial dataframes found in session state. Please load financial data first."
-
-            dataframes = st.session_state.dataframes
+            # Try session state first (main thread), then shared bridge (background thread)
+            dataframes = None
+            if hasattr(st, "session_state") and "dataframes" in st.session_state:
+                dataframes = st.session_state.dataframes
+            if not dataframes:
+                dataframes = get_shared_dataframes()
             if not dataframes:
                 return (
-                    "Financial dataframes are empty. Please load financial data first."
+                    "No financial dataframes found. Please load financial data first."
                 )
 
             # Return comprehensive financial data based on analysis type
