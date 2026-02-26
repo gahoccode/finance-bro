@@ -612,6 +612,60 @@ We implemented a **Smart Data Loading Architecture** with:
 
 ---
 
+## ADR-014: CrewAI Streaming Architecture with Thread-Safe Data Bridge
+
+**Status**: Accepted
+**Date**: 2026-02-26
+**Deciders**: Development Team
+
+### Context
+
+Finance Bro's CrewAI Financial Health Report runs a multi-agent pipeline via `kickoff()`, which is a blocking call — no UI updates are possible while it executes. This created a poor user experience where users saw only a spinner for 30–60 seconds with no indication of progress.
+
+Key technical constraints:
+- CrewAI `kickoff()` is blocking — the main thread cannot update Streamlit UI during execution
+- Streamlit batches UI updates per script run, so callbacks within `kickoff()` cannot update `st.status` mid-execution
+- `st.session_state` is thread-local in Streamlit — inaccessible from child threads
+- Financial dataframes stored in session state need to be available to CrewAI tools running in background threads
+
+Options considered:
+1. **Blocking with spinner**: Simple but no progress feedback during 30–60 second execution
+2. **Threading + Queue**: Background thread runs `kickoff()`, communicates progress via `queue.Queue` to main thread
+3. **Async execution**: Not supported by CrewAI's synchronous `kickoff()` API
+
+### Decision
+
+We implemented a **Threading + Queue** architecture with a module-level data bridge:
+- **Background thread** runs `kickoff()` with `task_callback`, posts progress updates to a `queue.Queue`
+- **Main thread** polls the queue in a loop, updating `st.status` containers as each agent completes its task
+- **Module-level `_shared_dataframes`** in `financial_analysis_tool.py` bridges session state data from the main thread to the background thread, bypassing Streamlit's thread-local session state limitation
+- **Typewriter streaming** via `st.write_stream()` with a word-by-word generator for the final report output
+- **Backward compatible** — the non-streaming `run_financial_health_analysis()` function remains available as fallback
+
+### Consequences
+
+**Positive**:
+- Real-time per-agent progress feedback improves perceived performance
+- Typewriter effect for final report creates engaging user experience
+- Backward compatible with existing non-streaming analysis function
+- Clean separation between streaming orchestration (`crewai_streaming.py`) and core crew logic (`crewai.py`)
+- Queue-based communication is thread-safe and well-understood
+
+**Negative**:
+- Threading adds complexity to error handling and debugging
+- Module-level `_shared_dataframes` is global mutable state — requires careful lifecycle management
+- Streaming results cannot be cached by Streamlit's `@st.cache_data` (each run re-executes)
+- Queue polling loop requires timeout handling to prevent infinite waits
+- Two code paths (streaming vs non-streaming) increase maintenance surface
+
+**Technical Implementation Details**:
+- `src/services/crewai_streaming.py` — Streaming orchestration with `run_financial_health_analysis_streaming()`
+- `src/financial_health_crew/tools/financial_analysis_tool.py` — `_shared_dataframes` module-level dict with `set_shared_dataframes()` / `get_shared_dataframes()` accessor functions
+- `pages/Financial_Health_Report.py` — UI integration with `st.status` containers and `st.write_stream()`
+- Thread lifecycle: main thread sets shared data → spawns worker thread → polls queue → collects result
+
+---
+
 ## Decision Status Summary
 
 | ADR | Title | Status | Impact |
@@ -629,6 +683,7 @@ We implemented a **Smart Data Loading Architecture** with:
 | ADR-011 | DuPont Analysis Financial Formatting | ✅ Accepted | Medium |
 | ADR-012 | Comprehensive Testing Strategy | ✅ Accepted | Medium |
 | ADR-013 | Smart Data Loading Architecture | ✅ Accepted | High |
+| ADR-014 | CrewAI Streaming with Thread-Safe Data Bridge | ✅ Accepted | Medium |
 
 ## Decision Review Process
 
@@ -674,7 +729,7 @@ We implemented a **Smart Data Loading Architecture** with:
 **Medium-term (12 months)**:
 - Horizontal scaling preparation and implementation
 - Advanced security enhancements
-- Real-time data streaming capabilities
+- Real-time market data streaming capabilities
 
 **Long-term (18+ months)**:
 - Microservices extraction for high-load components
