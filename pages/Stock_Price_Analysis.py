@@ -28,7 +28,7 @@ else:
     )
     st.stop()
 
-st.title("Stock Price Analysis")
+st.title("Stock price analysis")
 
 # Initialize global date session state variables
 if "analysis_start_date" not in st.session_state:
@@ -43,7 +43,7 @@ if "date_range_changed" not in st.session_state:
 # Sidebar for user inputs
 with st.sidebar:
     st.header("Settings")
-    st.metric("Current Symbol", ticker)
+    st.metric("Current symbol", ticker, border=True)
 
     # Date range inputs connected to session state
     start_date = st.date_input(
@@ -72,10 +72,10 @@ with st.sidebar:
         st.stop()
 
     # Chart type selector
-    chart_type = st.selectbox(
-        "Chart Type:",
+    chart_type = st.segmented_control(
+        "Chart type",
         options=["Line Chart", "Area Chart"],
-        index=0,
+        default="Line Chart",
         help="Choose between line chart and area chart with gradient",
     )
 
@@ -240,7 +240,7 @@ with st.sidebar:
         # Display format options
         col1, col2 = st.columns(2)
         with col1:
-            include_descriptions = st.checkbox("Include Descriptions", value=False)
+            include_descriptions = st.toggle("Include descriptions", value=False)
         with col2:
             grid_columns = st.selectbox("Grid Columns:", options=[2, 3, 4], index=1)
 
@@ -417,18 +417,26 @@ if ticker:
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.metric(
-                    "Latest Close", f"{stock_price['close'].iloc[-1] * 1000:,.0f}"
+                    "Latest close",
+                    f"{stock_price['close'].iloc[-1] * 1000:,.0f}",
+                    border=True,
                 )
             with col2:
-                st.metric("Mean Return (Annualized)", f"{mean_return_pct:.2f}%")
+                st.metric(
+                    "Mean return (annualized)", f"{mean_return_pct:.2f}%", border=True
+                )
             with col3:
-                st.metric("Annualized Volatility", f"{volatility:.2f}%")
+                st.metric("Annualized volatility", f"{volatility:.2f}%", border=True)
 
-            # Create metrics tabs including Tearsheet
-            st.subheader("Performance Analytics")
-            tearsheet_tab, metrics_tab = st.tabs(["📊 Tearsheet", "📈 Quick Metrics"])
+            # Performance analytics view selector
+            st.subheader("Performance analytics")
+            perf_view = st.segmented_control(
+                "View",
+                options=["Tearsheet", "Quick metrics"],
+                default="Tearsheet",
+            )
 
-            with tearsheet_tab:
+            if perf_view == "Tearsheet":
                 st.write(
                     "Generate comprehensive performance analytics using QuantStats"
                 )
@@ -505,7 +513,7 @@ if ticker:
 
                             except Exception as e:
                                 st.error(f"Error generating tearsheet: {str(e)}")
-                                st.info(
+                                st.caption(
                                     "Please ensure you have sufficient data points for analysis."
                                 )
                     else:
@@ -513,12 +521,12 @@ if ticker:
                             "⚠️ No returns data available. Please ensure stock data is loaded properly."
                         )
                 else:
-                    st.info(
-                        "👆 Click 'Generate Tearsheet' to create a comprehensive performance analysis report using QuantStats."
+                    st.caption(
+                        "Click 'Generate Tearsheet' above to create a comprehensive performance analysis report using QuantStats."
                     )
 
                     # Show what will be included in the tearsheet
-                    st.markdown("### 📋 Tearsheet Contents")
+                    st.markdown("### 📋 Tearsheet contents")
                     st.markdown("""
                     The QuantStats tearsheet will include:
                     - **Performance Metrics**: Sharpe, Sortino, and Calmar ratios
@@ -528,7 +536,7 @@ if ticker:
                     - **Distribution Analysis**: Returns histogram and risk-return scatter
                     """)
 
-            with metrics_tab:
+            if perf_view == "Quick metrics":
                 st.write("Quick performance metrics overview")
 
                 if (
@@ -542,23 +550,37 @@ if ticker:
 
                     with col1:
                         st.metric(
-                            "Sharpe Ratio", f"{qs.stats.sharpe(returns_data):.4f}"
+                            "Sharpe ratio",
+                            f"{qs.stats.sharpe(returns_data):.4f}",
+                            border=True,
                         )
                         st.metric(
-                            "Sortino Ratio", f"{qs.stats.sortino(returns_data):.4f}"
+                            "Sortino ratio",
+                            f"{qs.stats.sortino(returns_data):.4f}",
+                            border=True,
                         )
                         st.metric(
-                            "Max Drawdown", f"{qs.stats.max_drawdown(returns_data):.2%}"
+                            "Max drawdown",
+                            f"{qs.stats.max_drawdown(returns_data):.2%}",
+                            border=True,
                         )
 
                     with col2:
                         st.metric(
-                            "Calmar Ratio", f"{qs.stats.calmar(returns_data):.4f}"
+                            "Calmar ratio",
+                            f"{qs.stats.calmar(returns_data):.4f}",
+                            border=True,
                         )
                         st.metric(
-                            "VaR (95%)", f"{qs.stats.value_at_risk(returns_data):.2%}"
+                            "VaR (95%)",
+                            f"{qs.stats.value_at_risk(returns_data):.2%}",
+                            border=True,
                         )
-                        st.metric("Win Rate", f"{qs.stats.win_rate(returns_data):.2%}")
+                        st.metric(
+                            "Win rate",
+                            f"{qs.stats.win_rate(returns_data):.2%}",
+                            border=True,
+                        )
                 else:
                     st.warning("⚠️ No returns data available for metrics calculation.")
 
@@ -568,7 +590,7 @@ if ticker:
                 and "stock_returns" in st.session_state
                 and len(st.session_state.stock_returns) > 0
             ):
-                st.subheader("📊 Custom Performance Metrics")
+                st.subheader("📊 Custom performance metrics")
 
                 # Calculate custom metrics
                 returns_data = st.session_state.stock_returns
@@ -592,11 +614,13 @@ if ticker:
                                     label=metric_data["name"],
                                     value=metric_data["value"],
                                     help=metric_data["description"],
+                                    border=True,
                                 )
                             else:
                                 st.metric(
                                     label=metric_data["name"],
                                     value=metric_data["value"],
+                                    border=True,
                                 )
                 else:
                     st.info(
@@ -606,7 +630,7 @@ if ticker:
                 st.info("📈 Select a stock and load data to see custom metrics.")
 
             # Create interactive chart with Altair
-            st.subheader("Stock Performance")
+            st.subheader("Stock performance")
 
             # Prepare data for Altair
             chart_data = stock_price.reset_index()
@@ -624,7 +648,7 @@ if ticker:
             st.altair_chart(stock_chart, use_container_width=True)
 
             # Create candlestick chart with volume using Bokeh
-            st.subheader("Candlestick Chart with Volume")
+            st.subheader("Candlestick chart with volume")
 
             # Prepare data for Bokeh
             stock_price_bokeh = stock_price.copy()
@@ -641,5 +665,4 @@ if ticker:
         st.info("Please check if the ticker symbol is correct and try again.")
 
 # Footer
-st.markdown("---")
 st.caption("Data provided by Vnstock API")

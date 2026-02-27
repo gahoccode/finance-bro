@@ -621,35 +621,41 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
     # Display summary metrics
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Total Stocks", len(df))
+        st.metric("Total Stocks", len(df), border=True)
     with col2:
         if "beta" in df.columns and not df["beta"].isna().all():
             beta_min = df["beta"].min()
             beta_max = df["beta"].max()
-            st.metric("Beta Range", f"{beta_min:.2f} - {beta_max:.2f}")
+            st.metric("Beta Range", f"{beta_min:.2f} - {beta_max:.2f}", border=True)
         else:
             avg_roe = df["roe"].mean() if "roe" in df.columns else 0
-            st.metric("Avg ROE", f"{avg_roe:.1f}%")
+            st.metric("Avg ROE", f"{avg_roe:.1f}%", border=True)
     with col3:
         if "financial_health" in df.columns and not df["financial_health"].isna().all():
             health_min = df["financial_health"].min()
             health_max = df["financial_health"].max()
-            st.metric("Health Range", f"{health_min:.1f} - {health_max:.1f}")
+            st.metric(
+                "Health Range", f"{health_min:.1f} - {health_max:.1f}", border=True
+            )
         else:
             avg_div_yield = (
                 df["dividend_yield"].mean() if "dividend_yield" in df.columns else 0
             )
-            st.metric("Avg Dividend Yield", f"{avg_div_yield:.1f}%")
+            st.metric("Avg Dividend Yield", f"{avg_div_yield:.1f}%", border=True)
     with col4:
         if "stock_rating" in df.columns and not df["stock_rating"].isna().all():
             rating_min = df["stock_rating"].min()
             rating_max = df["stock_rating"].max()
-            st.metric("Rating Range", f"{rating_min:.1f} - {rating_max:.1f}")
+            st.metric(
+                "Rating Range", f"{rating_min:.1f} - {rating_max:.1f}", border=True
+            )
         else:
             total_market_cap = (
                 df["market_cap"].sum() if "market_cap" in df.columns else 0
             )
-            st.metric("Total Market Cap", f"{total_market_cap / 1000:.0f}B VND")
+            st.metric(
+                "Total Market Cap", f"{total_market_cap / 1000:.0f}B VND", border=True
+            )
 
     # Visualizations (moved above data table)
     st.subheader("📊 Visualizations")

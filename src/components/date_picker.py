@@ -129,14 +129,14 @@ def render_date_range_status(
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                st.metric("Start Date", start_date.strftime("%Y-%m-%d"))
+                st.metric("Start Date", start_date.strftime("%Y-%m-%d"), border=True)
 
             with col2:
-                st.metric("End Date", end_date.strftime("%Y-%m-%d"))
+                st.metric("End Date", end_date.strftime("%Y-%m-%d"), border=True)
 
             with col3:
                 days = (end_date - start_date).days
-                st.metric("Days", f"{days}")
+                st.metric("Days", f"{days}", border=True)
         else:
             st.info(
                 f"📅 {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
@@ -156,7 +156,7 @@ def render_preset_date_ranges(
         key_prefix: Prefix for session state keys
         show_custom: Whether to show custom range option
     """
-    st.subheader("📅 Quick Date Ranges")
+    st.subheader("📅 Quick date ranges")
 
     col1, col2, col3, col4 = st.columns(4)
 

@@ -74,13 +74,13 @@ def render_stock_status_display(show_navigation_buttons: bool = True) -> None:
 
     if current_symbol:
         st.markdown("---")
-        st.markdown("### 📈 Current Selection")
+        st.markdown("### 📈 Current selection")
 
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Selected Symbol", current_symbol)
+            st.metric("Selected symbol", current_symbol, border=True)
         with col2:
-            st.metric("Status", "✅ Ready")
+            st.metric("Status", "✅ Ready", border=True)
         with col3:
             if st.button("Clear Selection", type="secondary"):
                 symbols_list = get_symbols_list()
@@ -99,7 +99,7 @@ def render_navigation_buttons() -> None:
     Render quick navigation buttons to analysis pages.
     Uses existing page navigation patterns.
     """
-    st.markdown("### 🚀 Quick Navigation")
+    st.markdown("### 🚀 Quick navigation")
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
@@ -197,7 +197,7 @@ def render_compact_stock_selector(
 
     # Show current selection
     if current_symbol:
-        st.metric("Current Symbol", current_symbol)
+        st.metric("Current symbol", current_symbol, border=True)
 
     # Compact selector
     selected_symbol = st.selectbox(

@@ -46,7 +46,7 @@ def main_page():
     st.markdown("Select a stock symbol to analyze across all pages")
 
     # Stock symbol selection with searchable dropdown
-    st.subheader("🔍 Stock Symbol Selection")
+    st.subheader("🔍 Stock symbol selection")
 
     # Load stock symbols using Listing().all_symbols() since this is the entry point
     if "stock_symbols_list" not in st.session_state:
@@ -99,19 +99,18 @@ def main_page():
         ):
             st.session_state.stock_symbol = current_symbol
             st.success(f"✅ Selected stock symbol: **{current_symbol}**")
-            st.info("📊 You can now navigate to other pages to analyze this stock!")
+            st.caption("You can now navigate to other pages to analyze this stock.")
             st.rerun()  # Force immediate rerun to update sidebar
 
     # Display current selection status
     if "stock_symbol" in st.session_state:
-        st.markdown("---")
-        st.markdown("### 📈 Current Selection")
+        st.markdown("### 📈 Current selection")
 
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Selected Symbol", st.session_state.stock_symbol)
+            st.metric("Selected symbol", st.session_state.stock_symbol, border=True)
         with col2:
-            st.metric("Status", "✅ Ready")
+            st.metric("Status", "✅ Ready", border=True)
         with col3:
             if st.button("Clear Selection", type="secondary"):
                 if "stock_symbol" in st.session_state:
@@ -122,7 +121,7 @@ def main_page():
                 st.rerun()
 
         # Quick navigation to analysis pages
-        st.markdown("### 🚀 Quick Navigation")
+        st.markdown("### 🚀 Quick navigation")
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
@@ -154,8 +153,7 @@ def main_page():
                 st.switch_page("pages/Technical_Analysis.py")
 
     # Instructions and app information
-    st.markdown("---")
-    st.markdown("### 📋 How to Use Finance Bro")
+    st.markdown("### 📋 How to use Finance Bro")
 
     with st.expander("📖 Instructions", expanded=False):
         st.markdown("""

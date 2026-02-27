@@ -14,22 +14,18 @@ st.set_page_config(
 
 
 def main():
-    st.title("📊 Technical Analysis")
-    st.markdown("---")
+    st.title("📊 Technical analysis")
 
     # Page description
-    st.markdown("""
-    **Technical Analysis** - Discover stocks showing technical heating signals and analyze their price patterns.
-    
-    This page identifies Vietnamese stocks that are "**Overheated in previous trading session**" according to vnstock technical indicators,
-    then displays their candlestick charts with advanced technical indicators for comprehensive analysis.
-    """)
-
-    st.markdown("---")
+    st.caption(
+        "Discover stocks showing technical heating signals and analyze their price patterns. "
+        "This page identifies Vietnamese stocks that are overheated in the previous trading session "
+        "according to vnstock technical indicators, then displays their candlestick charts with advanced technical indicators."
+    )
 
     # Sidebar configuration
     with st.sidebar:
-        st.subheader("📊 Chart Configuration")
+        st.subheader("📊 Chart configuration")
 
         # Interval selection
         st.selectbox(
@@ -45,15 +41,15 @@ def main():
         )
 
         # Technical indicators toggles
-        st.subheader("📈 Technical Indicators")
-        show_bb = st.checkbox("Bollinger Bands", value=True)
-        show_rsi = st.checkbox("RSI", value=True)
-        show_macd = st.checkbox("MACD", value=True)
-        show_obv = st.checkbox("OBV", value=False)
+        st.subheader("📈 Technical indicators")
+        show_bb = st.toggle("Bollinger Bands", value=True)
+        show_rsi = st.toggle("RSI", value=True)
+        show_macd = st.toggle("MACD", value=True)
+        show_obv = st.toggle("OBV", value=False)
 
         # Note: Indicator parameters are fixed in manual implementation
-        st.info(
-            "📊 **Indicator Parameters**: RSI(14), MACD(12,26,9), BB(20,2), OBV - optimized for reliable signals"
+        st.caption(
+            "Indicator parameters: RSI(14), MACD(12,26,9), BB(20,2), OBV — optimized for reliable signals"
         )
 
         # Store in session state for persistence
@@ -61,21 +57,21 @@ def main():
             st.session_state.ta_interval = "1D"
 
         # Foreign Transaction Filter
-        st.subheader("📈 Data Filters")
-        show_foreign_buy_only = st.checkbox(
-            "Foreign Buy > Sell Only",
+        st.subheader("📈 Data filters")
+        show_foreign_buy_only = st.toggle(
+            "Foreign Buy > Sell only",
             value=False,
             help="Filter stocks where foreign investors are net buyers (Buy > Sell)",
         )
 
-        show_strong_buy_only = st.checkbox(
-            "Strong Buy Signal Only",
+        show_strong_buy_only = st.toggle(
+            "Strong Buy signal only",
             value=False,
             help="Filter stocks with TCBS Strong Buy recommendation",
         )
 
-        show_buy_only = st.checkbox(
-            "Buy Signal Only",
+        show_buy_only = st.toggle(
+            "Buy signal only",
             value=False,
             help="Filter stocks with TCBS Buy recommendation",
         )
@@ -168,9 +164,10 @@ def main():
                     "📊 Average 5-Day Trading Value",
                     f"{mean_trading_value:,.0f}",
                     help="Mean of avg_trading_value_5d across all filtered heating stocks",
+                    border=True,
                 )
             else:
-                st.metric("📊 Average 5-Day Trading Value", "N/A")
+                st.metric("📊 Average 5-Day Trading Value", "N/A", border=True)
 
     with col2:
         if "total_trading_value" in heating_stocks.columns:
@@ -180,30 +177,31 @@ def main():
                     "📈 Average Total Trading Value",
                     f"{mean_total_trading_value:,.0f}",
                     help="Mean of total_trading_value across all filtered heating stocks",
+                    border=True,
                 )
             else:
-                st.metric("📈 Average Total Trading Value", "N/A")
+                st.metric("📈 Average Total Trading Value", "N/A", border=True)
 
     # Display the heating stocks DataFrame
-    st.subheader("📋 Heating Up Stocks Summary")
+    st.subheader("📋 Heating up stocks summary")
     st.dataframe(heating_stocks, use_container_width=True, height=300, hide_index=True)
 
     # Technical indicators summary
-    st.subheader("📊 Technical Indicators Summary")
+    st.subheader("📊 Technical indicators summary")
 
     # Create columns for indicator toggles
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Bollinger Bands", "ON" if show_bb else "OFF")
+        st.metric("Bollinger Bands", "ON" if show_bb else "OFF", border=True)
     with col2:
-        st.metric("RSI", "ON" if show_rsi else "OFF")
+        st.metric("RSI", "ON" if show_rsi else "OFF", border=True)
     with col3:
-        st.metric("MACD", "ON" if show_macd else "OFF")
+        st.metric("MACD", "ON" if show_macd else "OFF", border=True)
     with col4:
-        st.metric("OBV", "ON" if show_obv else "OFF")
+        st.metric("OBV", "ON" if show_obv else "OFF", border=True)
 
     # Charts section with technical indicators
-    st.subheader("📈 Advanced Technical Analysis Charts")
+    st.subheader("📈 Advanced technical analysis charts")
 
     # Get current interval from session state
     current_interval = st.session_state.ta_interval
@@ -259,11 +257,13 @@ def main():
                                     ):
                                         try:
                                             rsi_value = indicators["rsi"].iloc[-1]
-                                            st.metric("RSI", f"{rsi_value:.2f}")
+                                            st.metric(
+                                                "RSI", f"{rsi_value:.2f}", border=True
+                                            )
                                         except Exception:
-                                            st.metric("RSI", "N/A")
+                                            st.metric("RSI", "N/A", border=True)
                                     else:
-                                        st.metric("RSI", "N/A")
+                                        st.metric("RSI", "N/A", border=True)
                                         st.caption("⚠️ RSI calculation failed")
 
                                 with col2:
@@ -280,13 +280,17 @@ def main():
                                                 macd_value = indicators["macd"][
                                                     "MACD_12_26_9"
                                                 ].iloc[-1]
-                                                st.metric("MACD", f"{macd_value:.2f}")
+                                                st.metric(
+                                                    "MACD",
+                                                    f"{macd_value:.2f}",
+                                                    border=True,
+                                                )
                                             else:
-                                                st.metric("MACD", "N/A")
+                                                st.metric("MACD", "N/A", border=True)
                                         except Exception:
-                                            st.metric("MACD", "N/A")
+                                            st.metric("MACD", "N/A", border=True)
                                     else:
-                                        st.metric("MACD", "N/A")
+                                        st.metric("MACD", "N/A", border=True)
                                         st.caption("⚠️ MACD calculation failed")
 
                         else:
@@ -341,11 +345,15 @@ def main():
                                                     rsi_value = indicators["rsi"].iloc[
                                                         -1
                                                     ]
-                                                    st.metric("RSI", f"{rsi_value:.2f}")
+                                                    st.metric(
+                                                        "RSI",
+                                                        f"{rsi_value:.2f}",
+                                                        border=True,
+                                                    )
                                                 except Exception:
-                                                    st.metric("RSI", "N/A")
+                                                    st.metric("RSI", "N/A", border=True)
                                             else:
-                                                st.metric("RSI", "N/A")
+                                                st.metric("RSI", "N/A", border=True)
                                                 st.caption("⚠️ RSI calculation failed")
 
                                         with col2:
@@ -363,14 +371,20 @@ def main():
                                                             "MACD_12_26_9"
                                                         ].iloc[-1]
                                                         st.metric(
-                                                            "MACD", f"{macd_value:.2f}"
+                                                            "MACD",
+                                                            f"{macd_value:.2f}",
+                                                            border=True,
                                                         )
                                                     else:
-                                                        st.metric("MACD", "N/A")
+                                                        st.metric(
+                                                            "MACD", "N/A", border=True
+                                                        )
                                                 except Exception:
-                                                    st.metric("MACD", "N/A")
+                                                    st.metric(
+                                                        "MACD", "N/A", border=True
+                                                    )
                                             else:
-                                                st.metric("MACD", "N/A")
+                                                st.metric("MACD", "N/A", border=True)
                                                 st.caption("⚠️ MACD calculation failed")
 
                                 else:
@@ -381,17 +395,10 @@ def main():
                                 st.warning(f"No data available for {ticker}")
 
     # Footer information
-    st.markdown("---")
-    st.info(f"""
-    **Note:** Charts show the {interval_info[current_interval]} of trading data based on your selected interval ({current_interval}). 
-    Heating up signals are based on vnstock technical indicators that identify stocks "Overheated in previous trading session".
-    
-    **Technical Indicators:**
-    - **RSI**: Relative Strength Index (momentum oscillator)
-    - **MACD**: Moving Average Convergence Divergence (trend-following)
-    - **Bollinger Bands**: Price volatility and potential reversal points
-    - **OBV**: On-Balance Volume (volume flow indicator)
-    """)
+    st.caption(
+        f"Charts show the {interval_info[current_interval]} of trading data based on your selected interval ({current_interval}). "
+        "Heating up signals are based on vnstock technical indicators that identify stocks overheated in the previous trading session."
+    )
 
 
 if __name__ == "__main__":

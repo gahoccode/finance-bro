@@ -248,14 +248,12 @@ if not st.session_state.api_key:
 
 # Sidebar for stock configuration
 with st.sidebar:
-    st.header("Stock Configuration")
+    st.header("Stock configuration")
 
     # Show current stock symbol from session state
-    st.metric("Current Symbol", stock_symbol)
+    st.metric("Current symbol", stock_symbol, border=True)
 
-    st.sidebar.markdown("---")
-
-    period = st.selectbox("Period:", options=["year", "quarter"], index=0)
+    period = st.segmented_control("Period", options=["year", "quarter"], default="year")
 
     source = st.selectbox("Data Source:", options=["VCI", "TCBS"], index=0)
 
@@ -267,9 +265,8 @@ with st.sidebar:
         "Analyze Stock", type="primary", use_container_width=True
     )
 
-    # Sample Questions - dropdown menu in sidebar
-    st.markdown("---")
-    st.subheader("Sample Questions")
+    # Sample questions - dropdown menu in sidebar
+    st.subheader("Sample questions")
 
     sample_questions = [
         "What is the return on invested capital (ROIC) trend?",
@@ -295,7 +292,6 @@ with st.sidebar:
         st.session_state.pending_question = selected_question
 
     # Clear Chat button in sidebar
-    st.sidebar.markdown("---")
 
     # Display current theme
     with st.sidebar.expander("🎨 Theme", expanded=False):
@@ -499,7 +495,7 @@ if "dataframes" in st.session_state:
         st.rerun()
 
     # Predefined questions
-    st.subheader("Quick Questions")
+    st.subheader("Quick questions")
     col1, col2 = st.columns(2)
 
     with col1:
@@ -523,7 +519,7 @@ if "dataframes" in st.session_state:
                 st.rerun()
 
     # Chat Interface
-    st.subheader("Chat with AI Analyst")
+    st.subheader("Chat with AI analyst")
 
     # Initialize chat history
     if "messages" not in st.session_state:
@@ -543,7 +539,7 @@ if "dataframes" in st.session_state:
 
                 # Show chart only for the latest message to avoid accumulation
                 if "chart_data" in message and i == len(st.session_state.messages) - 1:
-                    st.subheader("Analysis Chart")
+                    st.subheader("Analysis chart")
                     # Increase chart dimensions by 200px (1000x700)
                     if message["chart_data"]["type"] == "plotly":
                         st.plotly_chart(
@@ -654,9 +650,8 @@ if "dataframes" in st.session_state:
                 )
 
 # Footer
-st.markdown("---")
-st.markdown(
-    "**Tip:** Specify the table you want to analyze for more accurate results and customize charts by including any desired technical settings in your prompt"
+st.caption(
+    "Tip: Specify the table you want to analyze for more accurate results and customize charts by including any desired technical settings in your prompt."
 )
 st.markdown(
     "Built with [Streamlit](https://streamlit.io), [PandasAI](https://pandas-ai.com), and [Vnstock](https://github.com/thinh-vu/vnstock) by [Thinh Vu](https://github.com/thinh-vu)"

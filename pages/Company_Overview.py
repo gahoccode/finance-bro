@@ -43,13 +43,13 @@ if "symbols_df" in st.session_state and st.session_state.symbols_df is not None:
         pass
 else:
     # If symbols not cached, user should visit bro.py first for optimal experience
-    st.info(
-        "💡 For best experience with company names, visit the Stock Analysis page first to load stock symbols."
+    st.caption(
+        "For best experience with company names, visit the Stock Analysis page first to load stock symbols."
     )
 
 # Title and description
-st.title("Company Profile Analysis")
-st.markdown("Analyze company ownership structure and management information")
+st.title("Company profile analysis")
+st.caption("Analyze company ownership structure and management information")
 
 if stock_symbol:
     try:
@@ -58,7 +58,7 @@ if stock_symbol:
 
         if not ownership_percentage.empty:
             # Display ownership chart and metrics at the top
-            st.header(f"{company_name} ({stock_symbol}) - Ownership Structure")
+            st.header(f"{company_name} ({stock_symbol}) - Ownership structure")
 
             # Create two columns for chart and summary
             col_chart, col_summary = st.columns([3, 1])
@@ -105,14 +105,16 @@ if stock_symbol:
 
             with col_summary:
                 st.subheader("Summary")
-                st.metric("Total Shareholders", len(ownership_percentage))
+                st.metric("Total Shareholders", len(ownership_percentage), border=True)
                 st.metric(
                     "Largest Shareholder",
                     f"{(ownership_percentage['share_own_percent'].max() * 100):.1f}%",
+                    border=True,
                 )
                 st.metric(
                     "Top 3 Combined",
                     f"{(ownership_percentage['share_own_percent'].nlargest(3).sum() * 100):.1f}%",
+                    border=True,
                 )
 
                 # Display raw data in expander
@@ -122,26 +124,28 @@ if stock_symbol:
         else:
             st.info("No ownership data available for this symbol.")
 
-        # Create tabs for additional information
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(
+        # View selector for additional information
+        company_view = st.pills(
+            "View",
             [
-                "Management Team",
+                "Management team",
                 "Subsidiaries",
-                "Insider Deals",
-                "Foreign Transaction",
-                "Full Details",
-            ]
+                "Insider deals",
+                "Foreign transaction",
+                "Full details",
+            ],
+            default="Management team",
         )
 
-        with tab1:
-            st.header("Company Management")
+        if company_view == "Management team":
+            st.header("Company management")
             try:
                 # Get cached management data
                 management_team = get_management_data(stock_symbol)
 
                 if not management_team.empty:
                     # Create management team ownership chart
-                    st.subheader("Management Team Ownership")
+                    st.subheader("Management team ownership")
 
                     # Filter for officers with quantity data - check columns exist first
                     if (
@@ -223,15 +227,15 @@ if stock_symbol:
             except Exception as e:
                 st.error(f"Error loading management data: {str(e)}")
 
-        with tab2:
-            st.header("Company Subsidiaries")
+        if company_view == "Subsidiaries":
+            st.header("Company subsidiaries")
             try:
                 # Get cached subsidiaries data
                 subsidiaries = get_subsidiaries_data(stock_symbol)
 
                 if not subsidiaries.empty:
                     # Create ownership percentage visualization
-                    st.subheader("Subsidiaries Ownership Distribution")
+                    st.subheader("Subsidiaries ownership distribution")
 
                     # Filter out subsidiaries with valid ownership data and convert to percentage
                     subs_with_ownership = subsidiaries[
@@ -285,21 +289,31 @@ if stock_symbol:
                         # Summary metrics
                         col1, col2, col3 = st.columns(3)
                         with col1:
-                            st.metric("Total Subsidiaries", len(subsidiaries))
+                            st.metric(
+                                "Total Subsidiaries", len(subsidiaries), border=True
+                            )
                         with col2:
-                            st.metric("With Ownership Data", len(subs_with_ownership))
+                            st.metric(
+                                "With Ownership Data",
+                                len(subs_with_ownership),
+                                border=True,
+                            )
                         with col3:
                             avg_ownership = subs_with_ownership[
                                 "ownership_percent"
                             ].mean()
-                            st.metric("Average Ownership", f"{avg_ownership:.1f}%")
+                            st.metric(
+                                "Average Ownership",
+                                f"{avg_ownership:.1f}%",
+                                border=True,
+                            )
                     else:
                         st.info(
                             "No subsidiaries with ownership percentage data available."
                         )
 
                     # Display subsidiaries table
-                    st.subheader("Subsidiaries Overview")
+                    st.subheader("Subsidiaries overview")
                     # Convert ownership_percent to percentage for display
                     display_subs = subsidiaries[
                         ["organ_name", "ownership_percent", "type"]
@@ -315,15 +329,15 @@ if stock_symbol:
             except Exception as e:
                 st.error(f"Error loading subsidiaries data: {str(e)}")
 
-        with tab3:
-            st.header("Insider Deals")
+        if company_view == "Insider deals":
+            st.header("Insider deals")
             try:
                 # Get cached insider deals data
                 insider_deals = get_insider_deals_data(stock_symbol)
 
                 if not insider_deals.empty:
                     # Create timeline visualization
-                    st.subheader("Insider Deals Timeline")
+                    st.subheader("Insider deals timeline")
 
                     # Prepare data for visualization
                     deals_viz = insider_deals.copy()
@@ -381,20 +395,20 @@ if stock_symbol:
                     # Summary metrics
                     col1, col2, col3 = st.columns(3)
                     with col1:
-                        st.metric("Total Deals", len(insider_deals))
+                        st.metric("Total Deals", len(insider_deals), border=True)
                     with col2:
                         buy_deals = len(
                             insider_deals[insider_deals["deal_action"] == "Mua"]
                         )
-                        st.metric("Buy Deals", buy_deals)
+                        st.metric("Buy Deals", buy_deals, border=True)
                     with col3:
                         sell_deals = len(
                             insider_deals[insider_deals["deal_action"] == "Bán"]
                         )
-                        st.metric("Sell Deals", sell_deals)
+                        st.metric("Sell Deals", sell_deals, border=True)
 
                     # Display insider deals table
-                    st.subheader("Recent Insider Transactions")
+                    st.subheader("Recent insider transactions")
                     st.dataframe(insider_deals, use_container_width=True)
 
                 else:
@@ -403,25 +417,25 @@ if stock_symbol:
             except Exception as e:
                 st.error(f"Error loading insider deals data: {str(e)}")
 
-        with tab4:
-            st.header("Foreign Transaction Analysis")
+        if company_view == "Foreign transaction":
+            st.header("Foreign transaction analysis")
             try:
                 # Get cached foreign trading data
                 foreign_trading = get_foreign_trading_data(stock_symbol)
 
                 if not foreign_trading.empty:
                     # Display EV metric
-                    st.subheader("Enterprise Value")
+                    st.subheader("Enterprise value")
                     if "ev" in foreign_trading.columns:
                         ev_value = (
                             foreign_trading["ev"].iloc[0]
                             if len(foreign_trading) > 0
                             else 0
                         )
-                        st.metric("Enterprise Value", f"{ev_value:,.0f}")
+                        st.metric("Enterprise Value", f"{ev_value:,.0f}", border=True)
 
                     # Create visualization for foreign holding rooms
-                    st.subheader("Foreign Holding Room Analysis")
+                    st.subheader("Foreign holding room analysis")
 
                     room_data = []
                     for col in [
@@ -471,30 +485,42 @@ if stock_symbol:
                     with col1:
                         if "foreign_volume" in foreign_trading.columns:
                             foreign_vol = foreign_trading["foreign_volume"].iloc[0]
-                            st.metric("Foreign Volume", f"{foreign_vol:,.0f}")
+                            st.metric(
+                                "Foreign Volume", f"{foreign_vol:,.0f}", border=True
+                            )
                     with col2:
                         if "total_volume" in foreign_trading.columns:
                             total_vol = foreign_trading["total_volume"].iloc[0]
-                            st.metric("Total Volume", f"{total_vol:,.0f}")
+                            st.metric("Total Volume", f"{total_vol:,.0f}", border=True)
                     with col3:
                         if "foreign_room" in foreign_trading.columns:
                             foreign_room = foreign_trading["foreign_room"].iloc[0]
-                            st.metric("Foreign Room", f"{foreign_room:,.0f}")
+                            st.metric(
+                                "Foreign Room", f"{foreign_room:,.0f}", border=True
+                            )
                     with col4:
                         if "current_holding_ratio" in foreign_trading.columns:
                             holding_ratio = foreign_trading[
                                 "current_holding_ratio"
                             ].iloc[0]
-                            st.metric("Current Holding Ratio", f"{holding_ratio:.2%}")
+                            st.metric(
+                                "Current Holding Ratio",
+                                f"{holding_ratio:.2%}",
+                                border=True,
+                            )
                     with col5:
                         if "max_holding_ratio" in foreign_trading.columns:
                             max_holding_ratio = foreign_trading[
                                 "max_holding_ratio"
                             ].iloc[0]
-                            st.metric("Max Holding Ratio", f"{max_holding_ratio:.2%}")
+                            st.metric(
+                                "Max Holding Ratio",
+                                f"{max_holding_ratio:.2%}",
+                                border=True,
+                            )
 
                     # Display complete foreign trading data
-                    st.subheader("Complete Foreign Trading Data")
+                    st.subheader("Complete foreign trading data")
                     st.dataframe(foreign_trading, use_container_width=True)
 
                 else:
@@ -503,10 +529,10 @@ if stock_symbol:
             except Exception as e:
                 st.error(f"Error loading foreign trading data: {str(e)}")
 
-        with tab5:
-            st.header("Detailed Information")
+        if company_view == "Full details":
+            st.header("Detailed information")
             if not ownership_percentage.empty:
-                st.subheader("Complete Ownership Data")
+                st.subheader("Complete ownership data")
                 st.dataframe(ownership_percentage, use_container_width=True)
 
     except Exception as e:
@@ -517,5 +543,4 @@ else:
     st.info("Please enter a stock symbol to begin analysis.")
 
 # Footer
-st.markdown("---")
-st.markdown("*Powered by Vnstock and Streamlit*")
+st.caption("Powered by Vnstock and Streamlit")

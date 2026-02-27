@@ -37,7 +37,7 @@ else:
     st.stop()
 
 # Sidebar for user inputs
-st.sidebar.header("Portfolio Configuration")
+st.sidebar.header("Portfolio configuration")
 
 # Get stock symbols from session state (cached from bro.py)
 if "stock_symbols_list" in st.session_state:
@@ -137,8 +137,8 @@ start_date_str = st.session_state.analysis_start_date.strftime("%Y-%m-%d")
 end_date_str = st.session_state.analysis_end_date.strftime("%Y-%m-%d")
 
 # Main title
-st.title("Stock Portfolio Optimization")
-st.write("Optimize your portfolio using Modern Portfolio Theory")
+st.title("Stock portfolio optimization")
+st.caption("Optimize your portfolio using Modern Portfolio Theory")
 
 # Validate inputs
 if len(symbols) < 2:
@@ -212,12 +212,12 @@ if prices_df.empty:
     st.stop()
 
 # Display data summary
-st.header("Data Summary")
+st.header("Data summary")
 col1, col2 = st.columns(2)
 with col1:
-    st.metric("Symbols", len(symbols))
+    st.metric("Symbols", len(symbols), border=True)
 with col2:
-    st.metric("Data Points", len(prices_df))
+    st.metric("Data Points", len(prices_df), border=True)
 
 # Show price data
 with st.expander("View Price Data"):
@@ -270,15 +270,18 @@ ret_utility, std_utility, sharpe_utility = ef_max_utility.portfolio_performance(
 status_text.empty()
 
 # Display results
-st.header("Portfolio Optimization Results")
+st.header("Portfolio optimization results")
 
 # Performance metrics
-st.subheader("Performance Metrics")
+st.subheader("Performance metrics")
 col1, col2, col3 = st.columns(3)
 
 with col1:
     st.metric(
-        "Max Sharpe Portfolio", f"{sharpe:.4f}", f"Return: {(ret_tangent * 100):.1f}%"
+        "Max Sharpe Portfolio",
+        f"{sharpe:.4f}",
+        f"Return: {(ret_tangent * 100):.1f}%",
+        border=True,
     )
 
 with col2:
@@ -286,6 +289,7 @@ with col2:
         "Min Volatility Portfolio",
         f"{sharpe_min_vol:.4f}",
         f"Return: {(ret_min_vol * 100):.1f}%",
+        border=True,
     )
 
 with col3:
@@ -293,22 +297,25 @@ with col3:
         "Max Utility Portfolio",
         f"{sharpe_utility:.4f}",
         f"Return: {(ret_utility * 100):.1f}%",
+        border=True,
     )
 
-# Create tabs for different analysis views
-tab1, tab2, tab3, tab4, tab5 = st.tabs(
+# View selector for different analysis views
+portfolio_view = st.pills(
+    "View",
     [
-        "📈 Efficient Frontier & Weights",
-        "🌳 Hierarchical Risk Parity",
-        "💰 Dollars Allocation",
-        "📊 Report",
-        "📋 Risk Analysis",
-    ]
+        "Efficient frontier",
+        "HRP",
+        "Dollar allocation",
+        "Report",
+        "Risk analysis",
+    ],
+    default="Efficient frontier",
 )
 
-with tab1:
+if portfolio_view == "Efficient frontier":
     # Efficient Frontier Plot
-    st.subheader("Efficient Frontier Analysis")
+    st.subheader("Efficient frontier analysis")
     fig, ax = plt.subplots(figsize=(12, 8))
 
     # Plot efficient frontier
@@ -363,7 +370,7 @@ with tab1:
     st.pyplot(fig)
 
     # Portfolio Weights
-    st.subheader("Portfolio Weights")
+    st.subheader("Portfolio weights")
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -391,7 +398,7 @@ with tab1:
         st.dataframe(weights_df, hide_index=True)
 
     # Weight visualization
-    st.subheader("Portfolio Weights Visualization")
+    st.subheader("Portfolio weights visualization")
 
     # Define colors for pie charts
     pie_colors = ["#56524D", "#76706C", "#AAA39F"]
@@ -474,7 +481,7 @@ with tab1:
             st.write("No significant weights in Max Utility Portfolio")
 
     # Detailed performance table
-    st.subheader("Detailed Performance Analysis")
+    st.subheader("Detailed performance analysis")
     performance_df = pd.DataFrame(
         {
             "Portfolio": ["Max Sharpe", "Min Volatility", "Max Utility"],
@@ -497,7 +504,7 @@ with tab1:
     )
     st.dataframe(performance_df, hide_index=True)
 
-with tab2:
+if portfolio_view == "HRP":
     if "portfolio_returns" in st.session_state:
         returns = st.session_state.portfolio_returns
 
@@ -506,7 +513,7 @@ with tab2:
         weights_hrp = hrp.optimize()
 
         # Display HRP weights
-        st.subheader("HRP Portfolio Weights")
+        st.subheader("HRP portfolio weights")
         weights_df = pd.DataFrame(
             list(weights_hrp.items()), columns=["Symbol", "Weight"]
         )
@@ -514,15 +521,15 @@ with tab2:
         st.dataframe(weights_df, hide_index=True)
 
         # Dendrogram Visualization
-        st.subheader("HRP Dendrogram")
+        st.subheader("HRP dendrogram")
         fig_dendro, ax_dendro = plt.subplots(figsize=(12, 8))
         plotting.plot_dendrogram(hrp, ax=ax_dendro, show_tickers=True)
         st.pyplot(fig_dendro)
     else:
         st.warning("Returns data not available. Please refresh the page.")
 
-with tab3:
-    st.subheader("Discrete Portfolio Allocation")
+if portfolio_view == "Dollar allocation":
+    st.subheader("Discrete portfolio allocation")
 
     # Portfolio value input
     portfolio_value = st.number_input(
@@ -582,7 +589,7 @@ with tab3:
             )
 
             # Show allocation results
-            st.subheader("Stock Allocation")
+            st.subheader("Stock allocation")
             allocation_df = pd.DataFrame(
                 list(allocation.items()), columns=["Symbol", "Shares"]
             )
@@ -615,6 +622,7 @@ with tab3:
                     "Allocated Amount",
                     f"{allocated_value:,.0f} VND",
                     f"{(allocated_value / portfolio_value * 100):.1f}% of portfolio",
+                    border=True,
                 )
 
             with col2:
@@ -622,14 +630,15 @@ with tab3:
                     "Leftover Cash",
                     f"{leftover:,.0f} VND",
                     f"{(leftover / portfolio_value * 100):.1f}% of portfolio",
+                    border=True,
                 )
 
             with col3:
                 total_stocks = len(allocation)
-                st.metric("Stocks to Buy", total_stocks)
+                st.metric("Stocks to Buy", total_stocks, border=True)
 
             # Investment summary
-            st.subheader("Investment Summary")
+            st.subheader("Investment summary")
             st.info(f"""
             **Portfolio Strategy**: {portfolio_label}  
             **Total Investment**: {portfolio_value:,.0f} VND  
@@ -644,12 +653,12 @@ with tab3:
                 "Please ensure you have selected stocks and loaded price data first."
             )
     else:
-        st.info(
-            "👆 Click 'Calculate Allocation' to see how many shares to buy for each stock based on your selected portfolio strategy and investment amount."
+        st.caption(
+            "Click 'Calculate Allocation' to see how many shares to buy for each stock based on your selected portfolio strategy and investment amount."
         )
 
-with tab4:
-    st.subheader("Portfolio Excel Report Generator")
+if portfolio_view == "Report":
+    st.subheader("Portfolio Excel report generator")
     st.write(
         "Generate comprehensive Excel reports for your optimized portfolios using Riskfolio-lib."
     )
@@ -730,12 +739,12 @@ with tab4:
         st.caption(f"File: {filename_base}.xlsx ({file_size:.1f} KB)")
 
     else:
-        st.info(
-            "👆 Select a portfolio strategy and click 'Generate Report' to create a comprehensive Excel analysis."
+        st.caption(
+            "Select a portfolio strategy and click 'Generate Report' to create a comprehensive Excel analysis."
         )
 
         # Show what will be included in the report
-        st.markdown("### 📋 Report Contents")
+        st.markdown("### 📋 Report contents")
         st.markdown("""
         The Excel report will include:
         - **Portfolio Weights**: Detailed allocation percentages
@@ -745,8 +754,8 @@ with tab4:
         - **Correlation Matrix**: Asset correlation analysis
         """)
 
-with tab5:
-    st.subheader("Risk Analysis Table")
+if portfolio_view == "Risk analysis":
+    st.subheader("Risk analysis table")
 
     # Check if required data is available in session state
     if (
@@ -802,7 +811,7 @@ with tab5:
         st.pyplot(fig)
 
         # Drawdown Analysis
-        st.subheader("Portfolio Drawdown Analysis")
+        st.subheader("Portfolio drawdown analysis")
 
         # Create matplotlib figure for riskfolio plot_drawdown
         fig_drawdown, ax_drawdown = plt.subplots(figsize=(12, 8))
@@ -824,7 +833,7 @@ with tab5:
         st.pyplot(fig_drawdown)
 
         # Portfolio Returns Risk Measures
-        st.subheader("Portfolio Returns Risk Measures")
+        st.subheader("Portfolio returns risk measures")
 
         # Create matplotlib figure for riskfolio plot_range
         fig_range, ax_range = plt.subplots(figsize=(12, 6))
@@ -847,7 +856,7 @@ with tab5:
         st.pyplot(fig_range)
 
         # Add informational expander
-        with st.expander("📚 Understanding the Risk Analysis Table"):
+        with st.expander("📚 Understanding the risk analysis table"):
             st.markdown(f"""
             This table provides comprehensive risk metrics for your {portfolio_label} portfolio:
             
@@ -870,7 +879,6 @@ with tab5:
         )
 
 # Footer
-st.markdown("---")
-st.markdown(
-    "*Portfolio optimization based on Modern Portfolio Theory. Past performance does not guarantee future results.*"
+st.caption(
+    "Portfolio optimization based on Modern Portfolio Theory. Past performance does not guarantee future results."
 )

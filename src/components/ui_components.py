@@ -30,6 +30,7 @@ def render_performance_metrics_columns(metrics_data: List[Dict[str, Any]]) -> No
                 metric.get("label", f"Metric {i + 1}"),
                 metric.get("value", "N/A"),
                 metric.get("delta", None),
+                border=True,
             )
 
 
@@ -192,11 +193,13 @@ def create_trading_value_metrics(
                     help=columns_config.get(
                         "avg_trading_help", "Mean trading value calculation"
                     ),
+                    border=True,
                 )
             else:
                 st.metric(
                     columns_config.get("avg_trading_label", "📊 Average Trading Value"),
                     "N/A",
+                    border=True,
                 )
 
     with col2:
@@ -213,6 +216,7 @@ def create_trading_value_metrics(
                     help=columns_config.get(
                         "total_trading_help", "Mean total trading value calculation"
                     ),
+                    border=True,
                 )
             else:
                 st.metric(
@@ -220,6 +224,7 @@ def create_trading_value_metrics(
                         "total_trading_label", "📈 Average Total Trading Value"
                     ),
                     "N/A",
+                    border=True,
                 )
 
 
@@ -245,7 +250,7 @@ def create_indicator_toggle_metrics(indicators_config: Dict[str, bool]) -> None:
     for i, (indicator_name, is_enabled) in enumerate(indicators_config.items()):
         with columns[i]:
             display_name = indicator_name.replace("show_", "").replace("_", " ").title()
-            st.metric(display_name, "ON" if is_enabled else "OFF")
+            st.metric(display_name, "ON" if is_enabled else "OFF", border=True)
 
 
 def render_file_download_interface(
@@ -313,6 +318,7 @@ def render_allocation_summary_metrics(
             "Allocated Amount",
             f"{allocated_value:,.0f} VND",
             f"{(allocated_value / portfolio_value * 100):.1f}% of portfolio",
+            border=True,
         )
 
     with col2:
@@ -320,7 +326,27 @@ def render_allocation_summary_metrics(
             "Leftover Cash",
             f"{leftover:,.0f} VND",
             f"{(leftover / portfolio_value * 100):.1f}% of portfolio",
+            border=True,
         )
 
     with col3:
-        st.metric("Stocks to Buy", total_stocks)
+        st.metric("Stocks to Buy", total_stocks, border=True)
+
+
+def render_bordered_section(title: Optional[str] = None) -> st.container:
+    """Return a bordered container, optionally preceded by a subheader.
+
+    Usage::
+
+        with render_bordered_section("Ownership summary"):
+            st.metric("Total shareholders", 5)
+
+    Args:
+        title: Optional section title rendered as a subheader above the container.
+
+    Returns:
+        A ``st.container(border=True)`` context manager.
+    """
+    if title:
+        st.subheader(title)
+    return st.container(border=True)
