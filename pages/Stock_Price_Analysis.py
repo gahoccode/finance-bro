@@ -238,11 +238,7 @@ with st.sidebar:
         )
 
         # Display format options
-        col1, col2 = st.columns(2)
-        with col1:
-            include_descriptions = st.toggle("Include descriptions", value=False)
-        with col2:
-            grid_columns = st.selectbox("Grid Columns:", options=[2, 3, 4], index=1)
+        include_descriptions = st.toggle("Include descriptions", value=False)
 
 
 # Helper functions for custom metrics
@@ -600,12 +596,12 @@ if ticker:
 
                 if custom_results:
                     # Create responsive grid layout
-                    cols = st.columns(grid_columns)
+                    cols = st.columns(4)
 
                     for idx, (metric_key, metric_data) in enumerate(
                         custom_results.items()
                     ):
-                        col_idx = idx % grid_columns
+                        col_idx = idx % 4
 
                         with cols[col_idx]:
                             # Create metric card with styling
@@ -629,36 +625,37 @@ if ticker:
             elif selected_metrics:
                 st.info("📈 Select a stock and load data to see custom metrics.")
 
-            # Create interactive chart with Altair
-            st.subheader("Stock performance")
+            # Place charts side-by-side: line/area (primary) and candlestick (supplementary)
+            chart_left, chart_right = st.columns([3, 2])
 
-            # Prepare data for Altair
-            chart_data = stock_price.reset_index()
-            chart_data = chart_data.rename(columns={"time": "date", "close": "price"})
+            with chart_left:
+                st.subheader("Stock performance")
 
-            # Create chart based on selected type
-            if chart_type == "Line Chart":
-                # Line chart
-                stock_chart = create_altair_line_chart(chart_data, ticker)
-            else:
-                # Area chart with gradient
-                stock_chart = create_altair_area_chart(chart_data, ticker)
+                # Prepare data for Altair
+                chart_data = stock_price.reset_index()
+                chart_data = chart_data.rename(
+                    columns={"time": "date", "close": "price"}
+                )
 
-            # Display the Altair chart
-            st.altair_chart(stock_chart, use_container_width=True)
+                # Create chart based on selected type
+                if chart_type == "Line Chart":
+                    stock_chart = create_altair_line_chart(chart_data, ticker)
+                else:
+                    stock_chart = create_altair_area_chart(chart_data, ticker)
 
-            # Create candlestick chart with volume using Bokeh
-            st.subheader("Candlestick chart with volume")
+                st.altair_chart(stock_chart, use_container_width=True)
 
-            # Prepare data for Bokeh
-            stock_price_bokeh = stock_price.copy()
-            stock_price_bokeh["date"] = stock_price_bokeh.index
+            with chart_right:
+                st.subheader("Candlestick chart with volume")
 
-            # Create candlestick chart using chart service
-            combined_chart = create_bokeh_candlestick_chart(stock_price_bokeh, ticker)
+                # Prepare data for Bokeh
+                stock_price_bokeh = stock_price.copy()
+                stock_price_bokeh["date"] = stock_price_bokeh.index
 
-            # Display the combined Bokeh chart
-            st.bokeh_chart(combined_chart, use_container_width=True)
+                combined_chart = create_bokeh_candlestick_chart(
+                    stock_price_bokeh, ticker
+                )
+                st.bokeh_chart(combined_chart, use_container_width=True)
 
     except Exception as e:
         st.error(f"Error loading data for {ticker}: {str(e)}")

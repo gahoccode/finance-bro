@@ -183,7 +183,7 @@ def create_altair_line_chart(chart_data: pd.DataFrame, ticker: str) -> alt.Chart
                 alt.Tooltip("price:Q", title="Close Price", format=",.0f"),
             ],
         )
-        .properties(width="container", height=400, title=f"{ticker}")
+        .properties(width="container", height=600, title=f"{ticker}")
         .interactive()
     )
 
@@ -223,7 +223,7 @@ def create_altair_area_chart(chart_data: pd.DataFrame, ticker: str) -> alt.Chart
                 alt.Tooltip("price:Q", title="Close Price", format=",.0f"),
             ],
         )
-        .properties(width="container", height=400, title=f"{ticker}")
+        .properties(width="container", height=600, title=f"{ticker}")
         .interactive()
     )
 
