@@ -280,7 +280,7 @@ with st.sidebar:
     st.sidebar.markdown("---")
 
     # Display current theme
-    with st.sidebar.expander("🎨 Theme", expanded=False):
+    with st.sidebar.expander("Theme", expanded=False):
         try:
             # Check if dark mode is enabled
             is_dark = st.get_option("theme.base") == "dark"

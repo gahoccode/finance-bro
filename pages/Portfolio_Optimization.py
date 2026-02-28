@@ -675,7 +675,7 @@ with tab4:
         rp.excel_report(returns=returns, w=selected_weights_df, name=filepath_base)
 
         # Success message and download interface
-        st.success(f"✅ Excel report generated successfully!")
+        st.success(f"Excel report generated successfully!")
 
         # Display report information
         col1, col2 = st.columns(2)

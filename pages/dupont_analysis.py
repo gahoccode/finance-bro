@@ -54,7 +54,7 @@ st.subheader(f"Financial Analysis for {company_name}")
 
 # Beautiful DuPont Formula Display
 st.markdown("---")
-st.markdown("### 🧮 The DuPont Formula")
+st.markdown("###  The DuPont Formula")
 
 # Main formula in LaTeX
 st.latex(r"""
@@ -74,7 +74,7 @@ with col1:
     st.markdown(
         """
     <div style="background-color: #76706C; padding: 15px; border-radius: 10px; text-align: center; margin: 10px 0;">
-        <h4 style="color: white; margin: 0;">💰 Profitability</h4>
+        <h4 style="color: white; margin: 0;"> Profitability</h4>
         <p style="color: white; margin: 5px 0; font-size: 14px;">Net Profit Margin</p>
         <p style="color: white; margin: 0; font-size: 12px;">How much profit per dollar of sales</p>
     </div>
@@ -86,7 +86,7 @@ with col2:
     st.markdown(
         """
     <div style="background-color: #56524D; padding: 15px; border-radius: 10px; text-align: center; margin: 10px 0;">
-        <h4 style="color: white; margin: 0;">⚡ Efficiency</h4>
+        <h4 style="color: white; margin: 0;"> Efficiency</h4>
         <p style="color: white; margin: 5px 0; font-size: 14px;">Asset Turnover</p>
         <p style="color: white; margin: 0; font-size: 12px;">How effectively assets generate sales</p>
     </div>
@@ -98,7 +98,7 @@ with col3:
     st.markdown(
         """
     <div style="background-color: #2B2523; padding: 15px; border-radius: 10px; text-align: center; margin: 10px 0;">
-        <h4 style="color: white; margin: 0;">📈 Leverage</h4>
+        <h4 style="color: white; margin: 0;"> Leverage</h4>
         <p style="color: white; margin: 5px 0; font-size: 14px;">Financial Leverage</p>
         <p style="color: white; margin: 0; font-size: 12px;">How much debt finances assets</p>
     </div>
@@ -111,7 +111,7 @@ st.markdown("---")
 # Check if financial data is available
 if "dataframes" not in st.session_state:
     st.warning(
-        "⚠️ No financial data loaded. Please go to the AI Chat Analysis page and click 'Analyze Stock' first."
+        " No financial data loaded. Please go to the AI Chat Analysis page and click 'Analyze Stock' first."
     )
     st.stop()
 
@@ -119,18 +119,18 @@ if "dataframes" not in st.session_state:
 display_unit = render_financial_display_options(
     placement="sidebar",
     unique_key="dupont_display",
-    title="💰 Display Format",
+    title=" Display Format",
     help_text="Choose how financial values are displayed in metrics and tables",
 )
 
 # Create tabs for different analyses
 tab1, tab2, tab3 = st.tabs(
-    ["📊 DuPont Analysis", "💰 Capital Employed", "📈 Degree of Financial Leverage"]
+    [" DuPont Analysis", " Capital Employed", " Degree of Financial Leverage"]
 )
 
 with tab1:
     # Information about DuPont Analysis
-    with st.expander("ℹ️ About DuPont Analysis", expanded=False):
+    with st.expander(" About DuPont Analysis", expanded=False):
         st.markdown("""
         **DuPont Analysis** breaks down Return on Equity (ROE) into three key components:
         
@@ -157,7 +157,7 @@ with tab1:
 
         if missing_dfs:
             st.error(
-                f"❌ Missing required financial statements: {', '.join(missing_dfs)}"
+                f" Missing required financial statements: {', '.join(missing_dfs)}"
             )
             st.info(
                 "Please ensure all financial data is loaded in the AI Chat Analysis page."
@@ -165,7 +165,7 @@ with tab1:
             st.stop()
 
         # Create DuPont analysis
-        with st.spinner("🔄 Calculating DuPont Analysis..."):
+        with st.spinner(" Calculating DuPont Analysis..."):
             dupont_analysis = create_dupont_analysis(
                 dataframes["IncomeStatement"],
                 dataframes["BalanceSheet"],
@@ -176,10 +176,10 @@ with tab1:
             # Store the dataframe in session state
             st.session_state.dupont_analysis = dupont_analysis
 
-            st.success("✅ DuPont Analysis completed successfully!")
+            st.success(" DuPont Analysis completed successfully!")
 
             # Display the DuPont analysis dataframe
-            st.subheader("📈 DuPont Analysis Results")
+            st.subheader(" DuPont Analysis Results")
 
             # Create columns for metrics summary
             if len(dupont_analysis) > 0:
@@ -260,7 +260,7 @@ with tab1:
                     )
 
             # Display the complete dataframe with formatting
-            st.markdown("### 📊 Complete DuPont Analysis Table")
+            st.markdown("###  Complete DuPont Analysis Table")
 
             # Create display copy with formatted financial columns
             financial_columns = [
@@ -320,7 +320,7 @@ with tab1:
 
             # Altair chart for DuPont components trend
             if len(dupont_analysis) > 1:
-                st.markdown("### 📈 DuPont Components Trend")
+                st.markdown("###  DuPont Components Trend")
 
                 # Prepare data for Altair chart
                 chart_data = dupont_analysis.copy()
@@ -399,7 +399,7 @@ with tab1:
             # Download button for CSV export
             csv_data = dupont_analysis.to_csv(index=False)
             st.download_button(
-                label="📥 Download DuPont Analysis as CSV",
+                label=" Download DuPont Analysis as CSV",
                 data=csv_data,
                 file_name=f"dupont_analysis_{stock_symbol}.csv",
                 mime="text/csv",
@@ -407,7 +407,7 @@ with tab1:
             )
 
             # Interpretation and insights
-            st.markdown("### 🔍 Analysis Insights")
+            st.markdown("###  Analysis Insights")
 
             if len(dupont_analysis) > 1:
                 # Trend analysis for multiple years
@@ -427,10 +427,10 @@ with tab1:
                 st.markdown(f"""
                 **Year-over-Year Changes ({previous["yearReport"]:.0f} to {latest["yearReport"]:.0f}):**
                 
-                - **ROE Change**: {roe_change:+.2f}% {"📈" if roe_change > 0 else "📉" if roe_change < 0 else "➡️"}
-                - **Net Profit Margin**: {margin_change:+.2f}% {"📈" if margin_change > 0 else "📉" if margin_change < 0 else "➡️"}
-                - **Asset Turnover**: {turnover_change:+.2f}x {"📈" if turnover_change > 0 else "📉" if turnover_change < 0 else "➡️"}
-                - **Financial Leverage**: {leverage_change:+.2f}x {"📈" if leverage_change > 0 else "📉" if leverage_change < 0 else "➡️"}
+                - **ROE Change**: {roe_change:+.2f}% {"" if roe_change > 0 else "" if roe_change < 0 else ""}
+                - **Net Profit Margin**: {margin_change:+.2f}% {"" if margin_change > 0 else "" if margin_change < 0 else ""}
+                - **Asset Turnover**: {turnover_change:+.2f}x {"" if turnover_change > 0 else "" if turnover_change < 0 else ""}
+                - **Financial Leverage**: {leverage_change:+.2f}x {"" if leverage_change > 0 else "" if leverage_change < 0 else ""}
                 """)
 
                 # Identify main driver of ROE change
@@ -456,46 +456,46 @@ with tab1:
             latest_margin = dupont_analysis["Net Profit Margin"].iloc[-1]
             latest_turnover = dupont_analysis["Asset Turnover"].iloc[-1]
 
-            st.markdown("### 📊 Performance Assessment")
+            st.markdown("###  Performance Assessment")
 
             # ROE assessment
             if latest_roe > 15:
-                roe_assessment = "🟢 Excellent ROE (>15%)"
+                roe_assessment = " Excellent ROE (>15%)"
             elif latest_roe > 10:
-                roe_assessment = "🟡 Good ROE (10-15%)"
+                roe_assessment = " Good ROE (10-15%)"
             elif latest_roe > 5:
-                roe_assessment = "🟠 Average ROE (5-10%)"
+                roe_assessment = " Average ROE (5-10%)"
             else:
-                roe_assessment = "🔴 Low ROE (<5%)"
+                roe_assessment = " Low ROE (<5%)"
 
             # Margin assessment
             if latest_margin > 20:
-                margin_assessment = "🟢 High profitability (>20%)"
+                margin_assessment = " High profitability (>20%)"
             elif latest_margin > 10:
-                margin_assessment = "🟡 Good profitability (10-20%)"
+                margin_assessment = " Good profitability (10-20%)"
             elif latest_margin > 5:
-                margin_assessment = "🟠 Average profitability (5-10%)"
+                margin_assessment = " Average profitability (5-10%)"
             else:
-                margin_assessment = "🔴 Low profitability (<5%)"
+                margin_assessment = " Low profitability (<5%)"
 
             st.markdown(f"""
             - **ROE Performance**: {roe_assessment}
             - **Profitability**: {margin_assessment}
-            - **Asset Efficiency**: {"🟢 Efficient" if latest_turnover > 1 else "🟡 Moderate" if latest_turnover > 0.5 else "🔴 Low"} (Asset Turnover: {latest_turnover:.2f}x)
+            - **Asset Efficiency**: {" Efficient" if latest_turnover > 1 else " Moderate" if latest_turnover > 0.5 else " Low"} (Asset Turnover: {latest_turnover:.2f}x)
             """)
 
         else:
             st.error(
-                "❌ Could not calculate DuPont analysis. Please check the financial data."
+                " Could not calculate DuPont analysis. Please check the financial data."
             )
 
     except Exception as e:
-        st.error(f"❌ Error performing DuPont analysis: {str(e)}")
+        st.error(f" Error performing DuPont analysis: {str(e)}")
         st.info("Please ensure financial data is properly loaded and try again.")
 
 with tab2:
     # Capital Employed Analysis
-    st.markdown("### 🧮 Capital Employed Formula")
+    st.markdown("###  Capital Employed Formula")
 
     # Display the Capital Employed formula
     st.latex(r"""
@@ -505,7 +505,7 @@ with tab2:
     """)
 
     # Information about Capital Employed Analysis
-    with st.expander("ℹ️ About Capital Employed Analysis", expanded=False):
+    with st.expander(" About Capital Employed Analysis", expanded=False):
         st.markdown("""
         **Capital Employed** represents the total amount of funds invested in a business by both equity holders and debt holders.
         
@@ -529,13 +529,13 @@ with tab2:
 
         # Check if BalanceSheet data exists
         if "BalanceSheet" not in dataframes:
-            st.error("❌ Balance Sheet data not available")
+            st.error(" Balance Sheet data not available")
             st.info(
                 "Please ensure all financial data is loaded in the AI Chat Analysis page."
             )
         else:
             # Calculate capital employed
-            with st.spinner("🔄 Calculating Capital Employed..."):
+            with st.spinner(" Calculating Capital Employed..."):
                 capital_employed_results = calculate_capital_employed(
                     dataframes["BalanceSheet"]
                 )
@@ -562,10 +562,10 @@ with tab2:
                     decimal_places=1,
                 )
 
-                st.success("✅ Capital Employed analysis completed successfully!")
+                st.success(" Capital Employed analysis completed successfully!")
 
                 # Display metrics summary
-                st.subheader("💰 Capital Employed Summary")
+                st.subheader(" Capital Employed Summary")
 
                 if len(capital_employed_results) > 0:
                     latest_year = capital_employed_results["yearReport"].max()
@@ -619,7 +619,7 @@ with tab2:
                         )
 
                 # Display complete table
-                st.markdown("### 📊 Capital Employed Analysis Table")
+                st.markdown("###  Capital Employed Analysis Table")
 
                 # Configure column display (for comma-formatted strings)
                 column_config = {
@@ -653,7 +653,7 @@ with tab2:
 
                 # Trend visualization
                 if len(capital_employed_results) > 1:
-                    st.markdown("### 📈 Capital Employed Trend")
+                    st.markdown("###  Capital Employed Trend")
 
                     # Create stacked area chart
                     chart_data = capital_employed_results.copy()
@@ -687,7 +687,7 @@ with tab2:
                     st.altair_chart(capital_line, use_container_width=True)
 
                     # Component breakdown chart
-                    st.markdown("### 📊 Capital Components Breakdown")
+                    st.markdown("###  Capital Components Breakdown")
 
                     # Prepare data for stacked chart
                     melted_data = chart_data.melt(
@@ -738,7 +738,7 @@ with tab2:
                 # Download button
                 csv_data = capital_employed_results.to_csv(index=False)
                 st.download_button(
-                    label="📥 Download Capital Employed Analysis as CSV",
+                    label=" Download Capital Employed Analysis as CSV",
                     data=csv_data,
                     file_name=f"capital_employed_{stock_symbol}.csv",
                     mime="text/csv",
@@ -746,7 +746,7 @@ with tab2:
                 )
 
                 # Analysis insights
-                st.markdown("### 🔍 Capital Employed Insights")
+                st.markdown("###  Capital Employed Insights")
 
                 if len(capital_employed_results) > 1:
                     # Year-over-year analysis
@@ -777,14 +777,14 @@ with tab2:
                     st.markdown(f"""
                     **Year-over-Year Analysis ({previous["yearReport"]:.0f} to {latest["yearReport"]:.0f}):**
                     
-                    - **Capital Employed Change**: {capital_change:+.1f}B VND ({change_pct:+.1f}%) {"📈" if capital_change > 0 else "📉" if capital_change < 0 else "➡️"}
+                    - **Capital Employed Change**: {capital_change:+.1f}B VND ({change_pct:+.1f}%) {"" if capital_change > 0 else "" if capital_change < 0 else ""}
                     - **Current Financing Mix**:
                       - Debt Financing: {debt_ratio_latest:.1f}% ({debt_total_latest:.1f}B VND)
                       - Equity Financing: {equity_ratio_latest:.1f}% ({latest["OWNER'S EQUITY(Bn.VND)"]:.1f}B VND)
                     """)
 
                 # Performance assessment
-                st.markdown("### 📊 Capital Structure Assessment")
+                st.markdown("###  Capital Structure Assessment")
 
                 latest_data = capital_employed_results.iloc[-1]
                 total_debt = (
@@ -796,13 +796,13 @@ with tab2:
                 ) * 100
 
                 if debt_to_capital > 70:
-                    capital_assessment = "🔴 High leverage (>70% debt)"
+                    capital_assessment = " High leverage (>70% debt)"
                 elif debt_to_capital > 50:
-                    capital_assessment = "🟠 Moderate leverage (50-70% debt)"
+                    capital_assessment = " Moderate leverage (50-70% debt)"
                 elif debt_to_capital > 30:
-                    capital_assessment = "🟡 Balanced structure (30-50% debt)"
+                    capital_assessment = " Balanced structure (30-50% debt)"
                 else:
-                    capital_assessment = "🟢 Conservative structure (<30% debt)"
+                    capital_assessment = " Conservative structure (<30% debt)"
 
                 st.markdown(f"""
                 - **Capital Structure**: {capital_assessment}
@@ -812,16 +812,16 @@ with tab2:
 
             else:
                 st.error(
-                    "❌ Could not calculate Capital Employed. Please check the balance sheet data."
+                    " Could not calculate Capital Employed. Please check the balance sheet data."
                 )
 
     except Exception as e:
-        st.error(f"❌ Error performing Capital Employed analysis: {str(e)}")
+        st.error(f" Error performing Capital Employed analysis: {str(e)}")
         st.info("Please ensure financial data is properly loaded and try again.")
 
 with tab3:
     # Degree of Financial Leverage Analysis
-    st.markdown("### 🧮 Degree of Financial Leverage Formula")
+    st.markdown("###  Degree of Financial Leverage Formula")
 
     # Display the DFL formula
     st.latex(r"""
@@ -831,7 +831,7 @@ with tab3:
     """)
 
     # Information about DFL Analysis
-    with st.expander("ℹ️ About Degree of Financial Leverage Analysis", expanded=False):
+    with st.expander(" About Degree of Financial Leverage Analysis", expanded=False):
         st.markdown("""
         **Degree of Financial Leverage (DFL)** measures how sensitive a company's net income is to changes in its operating income (EBIT).
         
@@ -857,13 +857,13 @@ with tab3:
 
         # Check if IncomeStatement data exists
         if "IncomeStatement" not in dataframes:
-            st.error("❌ Income Statement data not available")
+            st.error(" Income Statement data not available")
             st.info(
                 "Please ensure all financial data is loaded in the AI Chat Analysis page."
             )
         else:
             # Calculate DFL
-            with st.spinner("🔄 Calculating Degree of Financial Leverage..."):
+            with st.spinner(" Calculating Degree of Financial Leverage..."):
                 dfl_results = calculate_degree_of_financial_leverage(
                     dataframes["IncomeStatement"]
                 )
@@ -873,11 +873,11 @@ with tab3:
                 st.session_state.dfl_analysis = dfl_results
 
                 st.success(
-                    "✅ Degree of Financial Leverage analysis completed successfully!"
+                    " Degree of Financial Leverage analysis completed successfully!"
                 )
 
                 # Display metrics summary
-                st.subheader("📈 DFL Analysis Summary")
+                st.subheader(" DFL Analysis Summary")
 
                 # Filter out rows with NaN DFL values for summary
                 valid_dfl_data = dfl_results.dropna(subset=["DFL"])
@@ -940,13 +940,13 @@ with tab3:
                         # Add color coding for DFL assessment
                         if not pd.isna(dfl_value):
                             if dfl_value > 2:
-                                dfl_status = "🔴 High Financial Risk"
+                                dfl_status = " High Financial Risk"
                             elif dfl_value > 1.5:
-                                dfl_status = "🟠 Moderate Financial Risk"
+                                dfl_status = " Moderate Financial Risk"
                             elif dfl_value > 1:
-                                dfl_status = "🟡 Low Financial Risk"
+                                dfl_status = " Low Financial Risk"
                             else:
-                                dfl_status = "🟢 Minimal Financial Risk"
+                                dfl_status = " Minimal Financial Risk"
                         else:
                             dfl_status = "N/A"
 
@@ -958,7 +958,7 @@ with tab3:
                         st.caption(dfl_status)
 
                 # Display complete table with formatting
-                st.markdown("### 📊 Degree of Financial Leverage Analysis Table")
+                st.markdown("###  Degree of Financial Leverage Analysis Table")
 
                 # Create display copy with formatted financial columns
                 financial_columns = ["EBIT (Bn. VND)", "Net Income (Bn. VND)"]
@@ -998,7 +998,7 @@ with tab3:
 
                 # Trend visualization
                 if len(valid_dfl_data) > 1:
-                    st.markdown("### 📈 DFL Trend Analysis")
+                    st.markdown("###  DFL Trend Analysis")
 
                     # Create trend charts
                     chart_data = valid_dfl_data.copy()
@@ -1031,7 +1031,7 @@ with tab3:
                     st.altair_chart(dfl_line, use_container_width=True)
 
                     # Percentage changes comparison chart
-                    st.markdown("### 📊 EBIT vs Net Income Changes Comparison")
+                    st.markdown("###  EBIT vs Net Income Changes Comparison")
 
                     # Prepare data for comparison chart
                     comparison_data = chart_data.melt(
@@ -1068,7 +1068,7 @@ with tab3:
                 # Download button
                 csv_data = dfl_results.to_csv(index=False)
                 st.download_button(
-                    label="📥 Download DFL Analysis as CSV",
+                    label=" Download DFL Analysis as CSV",
                     data=csv_data,
                     file_name=f"dfl_analysis_{stock_symbol}.csv",
                     mime="text/csv",
@@ -1076,7 +1076,7 @@ with tab3:
                 )
 
                 # Analysis insights
-                st.markdown("### 🔍 DFL Analysis Insights")
+                st.markdown("###  DFL Analysis Insights")
 
                 if len(valid_dfl_data) > 1:
                     # Year-over-year analysis
@@ -1095,7 +1095,7 @@ with tab3:
                     st.markdown(f"""
                     **Year-over-Year Analysis ({previous["yearReport"]:.0f} to {latest["yearReport"]:.0f}):**
                     
-                    - **DFL Change**: {f"{dfl_change:+.2f}" if dfl_change is not None else "N/A"} {"📈" if dfl_change and dfl_change > 0 else "📉" if dfl_change and dfl_change < 0 else "➡️" if dfl_change == 0 else ""}
+                    - **DFL Change**: {f"{dfl_change:+.2f}" if dfl_change is not None else "N/A"} {"" if dfl_change and dfl_change > 0 else "" if dfl_change and dfl_change < 0 else "" if dfl_change == 0 else ""}
                     - **EBIT Volatility**: {ebit_volatility:.2f}% (Standard Deviation)
                     - **Net Income Volatility**: {net_income_volatility:.2f}% (Standard Deviation)
                     """)
@@ -1103,33 +1103,33 @@ with tab3:
                     # Risk assessment
                     avg_dfl = valid_dfl_data["DFL"].mean()
                     if avg_dfl > 2:
-                        risk_assessment = "🔴 High Financial Risk - Company has significant financial leverage"
+                        risk_assessment = " High Financial Risk - Company has significant financial leverage"
                         risk_recommendation = (
                             "Consider reducing debt levels to lower financial risk"
                         )
                     elif avg_dfl > 1.5:
                         risk_assessment = (
-                            "🟠 Moderate Financial Risk - Balanced financial leverage"
+                            " Moderate Financial Risk - Balanced financial leverage"
                         )
                         risk_recommendation = (
                             "Monitor interest coverage and debt levels carefully"
                         )
                     elif avg_dfl > 1:
                         risk_assessment = (
-                            "🟡 Low Financial Risk - Conservative financial leverage"
+                            " Low Financial Risk - Conservative financial leverage"
                         )
                         risk_recommendation = (
                             "Opportunity to use more leverage for growth if needed"
                         )
                     else:
                         risk_assessment = (
-                            "🟢 Minimal Financial Risk - Very low financial leverage"
+                            " Minimal Financial Risk - Very low financial leverage"
                         )
                         risk_recommendation = (
                             "Company has room to take on debt for expansion"
                         )
 
-                    st.markdown("### 📊 Financial Risk Assessment")
+                    st.markdown("###  Financial Risk Assessment")
                     st.markdown(f"""
                     - **Average DFL**: {avg_dfl:.2f}
                     - **Risk Level**: {risk_assessment}
@@ -1137,7 +1137,7 @@ with tab3:
                     """)
 
                     # Leverage interpretation
-                    st.markdown("### 💡 DFL Interpretation Guide")
+                    st.markdown("###  DFL Interpretation Guide")
                     st.markdown("""
                     **Understanding Your DFL Values:**
                     - **DFL > 2.0**: High financial leverage - earnings are very sensitive to EBIT changes
@@ -1153,11 +1153,11 @@ with tab3:
 
             else:
                 st.error(
-                    "❌ Could not calculate Degree of Financial Leverage. Please check the income statement data."
+                    " Could not calculate Degree of Financial Leverage. Please check the income statement data."
                 )
 
     except Exception as e:
-        st.error(f"❌ Error performing DFL analysis: {str(e)}")
+        st.error(f" Error performing DFL analysis: {str(e)}")
         st.info("Please ensure financial data is properly loaded and try again.")
 
 # Footer

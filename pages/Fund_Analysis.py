@@ -37,7 +37,7 @@ with st.spinner("Loading fund data..."):
     fund_list = get_fund_listing()
 
 if fund_list.empty:
-    st.error("❌ Unable to load fund data. Please try again later.")
+    st.error("Unable to load fund data. Please try again later.")
     st.stop()
 
 # Fund selection section
@@ -375,10 +375,10 @@ with export_col4:
                     type="primary",
                 )
             else:
-                st.error("❌ Error generating chart dashboard")
+                st.error("Error generating chart dashboard")
 
         except Exception as e:
-            st.error(f"❌ Error creating charts: {str(e)}")
+            st.error(f"Error creating charts: {str(e)}")
     else:
         st.write("Charts (Insufficient Data)")
 

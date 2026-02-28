@@ -51,7 +51,7 @@ loading_result = ensure_valuation_data_loaded(symbol)
 
 if not loading_result["success"]:
     st.error(
-        f"❌ Failed to load valuation data: {loading_result.get('error', 'Unknown error')}"
+        f" Failed to load valuation data: {loading_result.get('error', 'Unknown error')}"
     )
     st.info("Please try refreshing the page or selecting a different stock symbol.")
     st.stop()
@@ -85,13 +85,13 @@ try:
                 )  # Convert to percentage
         except Exception as e:
             st.warning(
-                f"⚠️ Could not calculate effective tax rate: {str(e)}. Using statutory rate."
+                f" Could not calculate effective tax rate: {str(e)}. Using statutory rate."
             )
             calculated_tax_rate = DEFAULT_STATUTORY_TAX_RATE
 
     # Sidebar for WACC parameters
     with st.sidebar:
-        st.header("⚙️ WACC Parameters")
+        st.header(" WACC Parameters")
 
         st.subheader("Market Parameters")
         risk_free_rate = st.number_input(
@@ -147,7 +147,7 @@ try:
         and not st.session_state.stock_price_data.empty
     ):
         stock_price = st.session_state.stock_price_data
-        st.success("✅ Using cached stock price data")
+        st.success(" Using cached stock price data")
     else:
         # Fallback: Load stock price data if not in session state
         st.info("Loading fresh stock price data for beta calculation...")
@@ -165,11 +165,11 @@ try:
 
     # Create tabs for different analyses
     tab1, tab2, tab3 = st.tabs(
-        ["📊 Beta Analysis", "💰 WACC Calculation", "🎯 Valuation Results"]
+        [" Beta Analysis", " WACC Calculation", " Valuation Results"]
     )
 
     with tab1:
-        st.header("📊 Beta Calculation & Market Correlation")
+        st.header(" Beta Calculation & Market Correlation")
 
         if not stock_price.empty and not vnindex_data.empty:
             # 1. Prepare & align prices on common dates
@@ -209,13 +209,13 @@ try:
                 col1, col2, col3 = st.columns(3)
 
                 with col1:
-                    st.metric("📈 Stock Beta", f"{beta:.4f}")
+                    st.metric(" Stock Beta", f"{beta:.4f}")
 
                 with col2:
-                    st.metric("📊 R-squared", f"{r_squared:.4f}")
+                    st.metric(" R-squared", f"{r_squared:.4f}")
 
                 with col3:
-                    st.metric("🎯 Correlation", f"{correlation:.4f}")
+                    st.metric(" Correlation", f"{correlation:.4f}")
 
                 # Risk interpretation
                 if beta < 0.8:
@@ -231,7 +231,7 @@ try:
                 st.info(f"**Risk Level**: {risk_level}")
 
                 # Display data summary
-                st.subheader("📋 Beta Analysis Summary")
+                st.subheader(" Beta Analysis Summary")
                 st.write(f"- **Data Points**: {len(returns):,} trading days")
                 st.write(
                     f"- **Period**: {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
@@ -242,21 +242,19 @@ try:
 
             else:
                 st.error(
-                    "❌ Insufficient data points for reliable beta calculation. Try extending the date range."
+                    " Insufficient data points for reliable beta calculation. Try extending the date range."
                 )
         else:
-            st.error(
-                "❌ Unable to load stock price or market data for beta calculation."
-            )
+            st.error(" Unable to load stock price or market data for beta calculation.")
 
     with tab2:
-        st.header("💰 WACC Analysis")
+        st.header(" WACC Analysis")
 
         # Add financial display options
         display_unit = render_financial_display_options(
             placement="main",
             unique_key="wacc_display",
-            title="💰 Financial Display Options",
+            title=" Financial Display Options",
             help_text="Choose how financial values are displayed in Market Values section",
         )
 
@@ -276,13 +274,11 @@ try:
             else "Manual override or fallback statutory rate"
         )
 
-        st.metric(
-            f"🔢 {tax_rate_type} Used in WACC", f"{tax_rate:.1f}%", help=help_text
-        )
+        st.metric(f" {tax_rate_type} Used in WACC", f"{tax_rate:.1f}%", help=help_text)
 
         # Historical effective tax rates table
         if effective_tax_rate_data is not None and not effective_tax_rate_data.empty:
-            st.subheader("📋 Historical Effective Tax Rates")
+            st.subheader(" Historical Effective Tax Rates")
             historical_tax_display = effective_tax_rate_data.copy()
 
             # Apply financial formatting to monetary columns
@@ -327,7 +323,7 @@ try:
 
                 if balance_sheet_year != ratios_year:
                     st.warning(
-                        f"⚠️ Data alignment issue: Balance Sheet ({balance_sheet_year}) and Ratios ({ratios_year}) from different years"
+                        f" Data alignment issue: Balance Sheet ({balance_sheet_year}) and Ratios ({ratios_year}) from different years"
                     )
 
                 try:
@@ -365,7 +361,7 @@ try:
 
                         if market_value_of_equity > 0:
                             st.success(
-                                "✅ Using VnStock Company Class (Enterprise Value)"
+                                " Using VnStock Company Class (Enterprise Value)"
                             )
 
                             # Get shares data for DCF calculation
@@ -387,8 +383,8 @@ try:
                             )
 
                     except Exception as primary_error:
-                        st.warning(f"⚠️ Primary method failed: {str(primary_error)}")
-                        st.info("🔄 Falling back to manual calculation...")
+                        st.warning(f" Primary method failed: {str(primary_error)}")
+                        st.info(" Falling back to manual calculation...")
 
                         try:
                             # FALLBACK METHOD: Manual calculation using shares * price
@@ -414,7 +410,7 @@ try:
 
                             if market_value_of_equity > 0:
                                 st.success(
-                                    "✅ Fallback successful: Manual Calculation (Shares × Price)"
+                                    " Fallback successful: Manual Calculation (Shares × Price)"
                                 )
                             else:
                                 raise ValueError(
@@ -422,7 +418,7 @@ try:
                                 )
 
                         except Exception as fallback_error:
-                            st.error(f"❌ Both calculation methods failed:")
+                            st.error(f" Both calculation methods failed:")
                             st.error(
                                 f"   • Primary (VnStock Company): {str(primary_error)}"
                             )
@@ -431,9 +427,7 @@ try:
 
                     # Validate final result
                     if market_value_of_equity <= 0:
-                        st.error(
-                            "❌ Unable to calculate market cap. All methods failed."
-                        )
+                        st.error(" Unable to calculate market cap. All methods failed.")
                         st.stop()
 
                     market_value_of_debt = total_debt
@@ -468,7 +462,7 @@ try:
                         col1, col2 = st.columns(2)
 
                         with col1:
-                            st.subheader("📊 Capital Structure")
+                            st.subheader(" Capital Structure")
 
                             # Create pie chart data
                             capital_data = pd.DataFrame(
@@ -522,42 +516,42 @@ try:
                             st.subheader("💎 Key Metrics")
 
                             st.metric(
-                                "💰 WACC",
+                                " WACC",
                                 f"{wacc:.1%}",
                                 help="Weighted Average Cost of Capital",
                             )
-                            st.metric("📈 Cost of Equity", f"{cost_of_equity:.1%}")
+                            st.metric(" Cost of Equity", f"{cost_of_equity:.1%}")
                             st.metric(
-                                "💳 After-tax Cost of Debt",
+                                " After-tax Cost of Debt",
                                 f"{after_tax_cost_of_debt:.1%}",
                             )
 
                         # Market values with user-selected formatting
-                        st.subheader("📊 Market Values")
+                        st.subheader(" Market Values")
                         col3, col4, col5 = st.columns(3)
 
                         with col3:
                             st.metric(
-                                "🏛️ Market Cap",
+                                " Market Cap",
                                 format_financial_display(
                                     market_value_of_equity, display_unit, 0
                                 ),
                             )
                         with col4:
                             st.metric(
-                                "💳 Total Debt",
+                                " Total Debt",
                                 format_financial_display(total_debt, display_unit, 0),
                             )
                         with col5:
                             st.metric(
-                                "📊 Total Capital",
+                                " Total Capital",
                                 format_financial_display(
                                     total_market_capital, display_unit, 0
                                 ),
                             )
 
                         # WACC breakdown table
-                        st.subheader("🔢 WACC Calculation Breakdown")
+                        st.subheader(" WACC Calculation Breakdown")
                         breakdown_data = {
                             "Component": ["Debt", "Equity", "Total"],
                             f"Market Value ({display_unit.capitalize()})": [
@@ -594,7 +588,7 @@ try:
                         )
 
                         # Share count comparison section
-                        st.subheader("📊 Share Count Comparison")
+                        st.subheader(" Share Count Comparison")
 
                         try:
                             # Collect both share count values from overview data
@@ -707,21 +701,21 @@ try:
 
                         except Exception as e:
                             st.error(
-                                f"❌ Error creating share count comparison: {str(e)}"
+                                f" Error creating share count comparison: {str(e)}"
                             )
 
                     else:
                         st.error(
-                            "❌ Unable to calculate market values. Check financial data availability."
+                            " Unable to calculate market values. Check financial data availability."
                         )
 
                 except Exception as e:
-                    st.error(f"❌ Error in WACC calculation: {str(e)}")
+                    st.error(f" Error in WACC calculation: {str(e)}")
         else:
-            st.error("❌ Unable to load financial data or beta calculation failed.")
+            st.error(" Unable to load financial data or beta calculation failed.")
 
     with tab3:
-        st.header("🎯 DCF Intrinsic Value")
+        st.header(" DCF Intrinsic Value")
 
         if (
             "wacc" in locals()
@@ -745,14 +739,14 @@ try:
                 # Validate required columns exist
                 if ocf_column not in cash_flow.columns:
                     st.error(
-                        f"❌ Required column '{ocf_column}' not found in cash flow data"
+                        f" Required column '{ocf_column}' not found in cash flow data"
                     )
                     st.error(f"Available columns: {list(cash_flow.columns)}")
                     st.stop()
 
                 if capex_column not in cash_flow.columns:
                     st.error(
-                        f"❌ Required column '{capex_column}' not found in cash flow data"
+                        f" Required column '{capex_column}' not found in cash flow data"
                     )
                     st.error(f"Available columns: {list(cash_flow.columns)}")
                     st.stop()
@@ -775,23 +769,23 @@ try:
                 # Debug information - check data quality
                 if len(historical_fcf) < 2:
                     st.error(
-                        "❌ Insufficient cash flow data for DCF analysis. Need at least 2 years of data."
+                        " Insufficient cash flow data for DCF analysis. Need at least 2 years of data."
                     )
                     if len(historical_fcf) == 0:
                         st.error(
-                            "🔍 Debug: No valid FCF data found. This could be due to:"
+                            " Debug: No valid FCF data found. This could be due to:"
                         )
                         st.error("- All cash flow values are NaN or zero")
                         st.error("- Missing yearReport data")
                         st.error("- Data filtering conditions (line 762)")
                     elif len(historical_fcf) == 1:
-                        st.error("🔍 Debug: Only 1 year of valid FCF data found.")
+                        st.error(" Debug: Only 1 year of valid FCF data found.")
                         st.error(
                             f"Available year: {historical_years[0] if historical_years else 'Unknown'}"
                         )
 
                     # Show sample data for debugging
-                    st.subheader("🔍 Cash Flow Data Debug")
+                    st.subheader(" Cash Flow Data Debug")
                     debug_data = []
                     for _, row in cash_flow.head(3).iterrows():
                         debug_data.append(
@@ -921,36 +915,36 @@ try:
                 )  # Fallback
 
                 # Enhanced Time Series Analysis Display
-                st.subheader("📈 Time Series Analysis Results")
+                st.subheader(" Time Series Analysis Results")
 
                 # Display forecasting method analysis
                 col1, col2, col3 = st.columns(3)
 
                 with col1:
-                    st.metric("📊 Recommended Method", recommended_method)
-                    st.metric("🎯 Recommended Growth", f"{recommended_growth:.1%}")
+                    st.metric(" Recommended Method", recommended_method)
+                    st.metric(" Recommended Growth", f"{recommended_growth:.1%}")
 
                 with col2:
                     if "trend_r_squared" in locals():
-                        st.metric("📈 Trend R²", f"{trend_r_squared:.3f}")
+                        st.metric(" Trend R²", f"{trend_r_squared:.3f}")
                     if "growth_volatility" in locals():
-                        st.metric("📊 Growth Volatility", f"{growth_volatility:.1%}")
+                        st.metric(" Growth Volatility", f"{growth_volatility:.1%}")
 
                 with col3:
-                    st.metric("📋 Data Points", len(historical_fcf))
+                    st.metric(" Data Points", len(historical_fcf))
                     st.metric(
-                        "📅 Years Analyzed",
+                        " Years Analyzed",
                         f"{min(historical_years)}-{max(historical_years)}",
                     )
 
                 # Display all forecasting methods comparison
-                st.subheader("🔄 Forecasting Methods Comparison")
+                st.subheader(" Forecasting Methods Comparison")
                 methods_df = pd.DataFrame(
                     [
                         {
                             "Method": method,
                             "Growth Rate": f"{rate:.1%}",
-                            "Selected": "✅" if method == recommended_method else "",
+                            "Selected": "" if method == recommended_method else "",
                         }
                         for method, rate in forecasting_methods.items()
                     ]
@@ -958,7 +952,7 @@ try:
                 st.dataframe(methods_df, use_container_width=True, hide_index=True)
 
                 # Multi-year FCF projections using different base years
-                st.subheader("📊 Multi-Year Base Analysis")
+                st.subheader(" Multi-Year Base Analysis")
 
                 # Create projections from different historical starting points
                 multi_year_projections = []
@@ -1032,17 +1026,17 @@ try:
                     proj_df["Weight"] = proj_df["Weight"].apply(lambda x: f"{x:.2f}")
 
                     st.dataframe(proj_df, use_container_width=True, hide_index=True)
-                    st.info(f"📊 **Multi-Year Weighted CAGR**: {weighted_cagr:.1%}")
+                    st.info(f" **Multi-Year Weighted CAGR**: {weighted_cagr:.1%}")
 
                 # DCF Parameters with sidebar controls
                 with st.sidebar:
-                    st.header("🎯 DCF Parameters")
+                    st.header(" DCF Parameters")
                     st.subheader("Growth Assumptions")
 
                     # Enhanced historical context with time series insights
                     if growth_rates:
                         st.info(
-                            f"📊 **Time Series Analysis**:\n"
+                            f" **Time Series Analysis**:\n"
                             f"• Recommended: {recommended_growth:.1%} ({recommended_method})\n"
                             f"• Historical Avg: {avg_historical_growth:.1%}\n"
                             f"• Historical Median: {median_historical_growth:.1%}\n"
@@ -1051,7 +1045,7 @@ try:
                         )
 
                         if "weighted_cagr" in locals():
-                            st.info(f"📈 **Multi-Year CAGR**: {weighted_cagr:.1%}")
+                            st.info(f" **Multi-Year CAGR**: {weighted_cagr:.1%}")
 
                     # Stage 1: High Growth Period
                     stage1_years = st.slider(
@@ -1118,7 +1112,7 @@ try:
                     projection_method = f"Single-Year Base ({stage1_growth_rate:.1%})"
 
                 # DCF Calculations
-                st.subheader("📊 DCF Model Results")
+                st.subheader(" DCF Model Results")
                 st.info(f"**Projection Method**: {projection_method}")
 
                 # Stage 1: High Growth Period Cash Flows
@@ -1205,35 +1199,35 @@ try:
 
                 with col1:
                     st.metric(
-                        "🎯 Intrinsic Value",
+                        " Intrinsic Value",
                         f"{intrinsic_value_per_share:,.0f} VND",
                         help="DCF-based intrinsic value per share",
                     )
 
                 with col2:
                     st.metric(
-                        "💰 Current Price", f"{current_price_original_scale:,.0f} VND"
+                        " Current Price", f"{current_price_original_scale:,.0f} VND"
                     )
 
                 with col3:
                     st.metric(
-                        "📈 Upside/Downside",
+                        " Upside/Downside",
                         f"{upside_downside:+.1%}",
                         delta=f"{upside_downside:+.1%}",
                     )
 
                 with col4:
                     recommendation = (
-                        "🟢 BUY"
+                        " BUY"
                         if upside_downside > 0.20
-                        else "🟡 HOLD"
+                        else " HOLD"
                         if upside_downside > -0.10
-                        else "🔴 SELL"
+                        else " SELL"
                     )
-                    st.metric("📋 Recommendation", recommendation)
+                    st.metric(" Recommendation", recommendation)
 
                 # Detailed DCF breakdown
-                st.subheader("🔢 DCF Calculation Breakdown")
+                st.subheader(" DCF Calculation Breakdown")
 
                 # Create detailed table
                 dcf_data = []
@@ -1321,7 +1315,7 @@ try:
                 st.dataframe(summary_df, use_container_width=True, hide_index=True)
 
                 # Historical FCF context
-                st.subheader("📊 Historical Free Cash Flow Context")
+                st.subheader(" Historical Free Cash Flow Context")
                 historical_data = []
                 for i, (year, fcf, ocf, capex) in enumerate(
                     zip(
@@ -1372,25 +1366,25 @@ try:
 
                 dcf_csv = pd.DataFrame([dcf_results]).to_csv(index=False)
                 st.download_button(
-                    label="📊 Download DCF Analysis (CSV)",
+                    label=" Download DCF Analysis (CSV)",
                     data=dcf_csv,
                     file_name=f"dcf_analysis_{symbol}_{datetime.now().strftime('%Y%m%d')}.csv",
                     mime="text/csv",
                 )
 
             except Exception as e:
-                st.error(f"❌ Error in DCF calculation: {str(e)}")
+                st.error(f" Error in DCF calculation: {str(e)}")
                 st.info(
                     "Ensure cash flow data is available with the required Vietnamese column names."
                 )
 
         else:
             st.info(
-                "💡 Complete the WACC calculation and ensure cash flow data is loaded to perform DCF analysis."
+                " Complete the WACC calculation and ensure cash flow data is loaded to perform DCF analysis."
             )
 
             # Show required data status
-            st.subheader("📋 Data Requirements Check")
+            st.subheader(" Data Requirements Check")
             requirements = [
                 ("WACC Calculation", "wacc" in locals()),
                 ("Cash Flow Data", not cash_flow.empty),
@@ -1403,14 +1397,14 @@ try:
             ]
 
             for requirement, status in requirements:
-                status_icon = "✅" if status else "❌"
+                status_icon = "" if status else ""
                 st.write(f"{status_icon} {requirement}")
 
             if not all(status for _, status in requirements):
                 st.info(
-                    "💡 Visit previous tabs and Stock Price Analysis page to load required data. Ensure WACC calculation completes successfully."
+                    " Visit previous tabs and Stock Price Analysis page to load required data. Ensure WACC calculation completes successfully."
                 )
 
 except Exception as e:
-    st.error(f"❌ Error loading data: {str(e)}")
+    st.error(f" Error loading data: {str(e)}")
     st.info("Please ensure the selected stock has sufficient financial data available.")

@@ -176,7 +176,7 @@ def main():
     # Show combined filter results
     if filter_messages:
         st.info(
-            f"📊 **Filters Applied**: {' | '.join(filter_messages)} (from {original_count} original stocks)"
+            f"**Filters Applied**: {' | '.join(filter_messages)} (from {original_count} original stocks)"
         )
 
     # Check if any stocks remain after filtering
