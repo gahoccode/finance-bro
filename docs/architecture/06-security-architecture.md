@@ -14,25 +14,23 @@ There is no custom encryption, rate limiting, audit logging, or threat detection
 ## 2. Security Architecture Diagram
 
 ```mermaid
-C4Container
-    title Security Architecture - Finance Bro
+flowchart TD
+    user["User\n(Authenticated investor)"]
 
-    Person(user, "User", "Authenticated investor")
+    subgraph app["Finance Bro Application"]
+        auth["Auth Layer\n(Google OAuth gate via Streamlit built-in auth)"]
+        webapp["Streamlit App\n(Multi-page financial analysis UI)"]
+    end
 
-    Container_Boundary(app, "Finance Bro Application") {
-        Container(auth, "Auth Layer", "Python", "Google OAuth gate via Streamlit built-in auth")
-        Container(webapp, "Streamlit App", "Streamlit", "Multi-page financial analysis UI")
-    }
+    google["Google OAuth 2.0\n(Identity provider)"]
+    openai["OpenAI API\n(LLM provider, authenticated via API key)"]
+    vnstock["VnStock API\n(Vietnamese market data, no auth required)"]
 
-    System_Ext(google, "Google OAuth 2.0", "Identity provider")
-    System_Ext(openai, "OpenAI API", "LLM provider, authenticated via API key")
-    System_Ext(vnstock, "VnStock API", "Vietnamese market data, no auth required")
-
-    Rel(user, auth, "Authenticates", "HTTPS + OAuth 2.0")
-    Rel(auth, google, "Validates identity", "OAuth 2.0")
-    Rel(auth, webapp, "Grants access")
-    Rel(webapp, openai, "API calls", "HTTPS + API key")
-    Rel(webapp, vnstock, "Data requests", "HTTPS")
+    user -- "Authenticates\n(HTTPS + OAuth 2.0)" --> auth
+    auth -- "Validates identity\n(OAuth 2.0)" --> google
+    auth -- "Grants access" --> webapp
+    webapp -- "API calls\n(HTTPS + API key)" --> openai
+    webapp -- "Data requests\n(HTTPS)" --> vnstock
 ```
 
 ## 3. Authentication Architecture
