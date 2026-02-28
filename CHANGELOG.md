@@ -26,6 +26,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Updated Files** (7 modified): `app.py`, `src/components/stock_selector.py`, `src/services/vnstock_api.py`, `src/services/data.py`, `src/utils/session_utils.py`, `src/components/ui_components.py`, `cleanup_cache.py`
   - **Updated Documentation** (7 files): CLAUDE.md, README.md, CHANGELOG.md, `docs/architecture/02-architecture-overview.md`, `docs/architecture/04-component-architecture.md`, `docs/architecture/08-architecture-decisions.md`
 
+### Changed
+- [2026-02-28] **QuantStats Metrics Service Extraction**: Refactored metrics calculation logic from `pages/Stock_Price_Analysis.py` into reusable service module
+  - **New Service Module**: Created `src/services/quantstats_metrics.py` with 5 functions:
+    - `get_metric_categories()`: Returns metric categories organized by analysis type (All Metrics, Core Performance, Risk Analysis, Return Analysis, Advanced Ratios, Rolling Metrics, Specialized)
+    - `format_metric_name()`: Converts snake_case metric names to readable format with special cases (CAGR, VaR, CVaR, R², UPI, etc.)
+    - `get_metric_descriptions()`: Returns descriptions for common metrics (sharpe, sortino, calmar, cagr, max_drawdown, etc.)
+    - `calculate_custom_metrics()`: Calculates QuantStats metrics with uniform formatting (1 decimal place for all numeric values)
+    - `get_available_metrics()`: Returns all available QuantStats metric function names
+  - **Updated Files** (1 modified): `pages/Stock_Price_Analysis.py`:
+    - Added import: `from src.services.quantstats_metrics import calculate_custom_metrics, get_metric_categories`
+    - Removed local function definitions (~254 lines): `get_metric_categories()`, `format_metric_name()`, `get_metric_descriptions()`, `calculate_custom_metrics()`
+  - **Behavior Change**: All metrics now formatted uniformly to 1 decimal place (`:.1f`)
+    - Previously: Mixed precision (`.2%`, `.4f`, `.1%`) depending on metric type
+    - Now: Consistent 1 decimal place formatting for all numeric metrics
+  - **Benefits**: Code reusability, simplified maintenance, consistent formatting across application, follows modular architecture patterns
+  - **Quality Assurance**: All imports verified working, `python -m py_compile` checks passing, `ruff check` passing
+
 ## [0.2.36] - 2025-09-25
 
 ### Changed
