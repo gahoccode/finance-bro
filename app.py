@@ -1,10 +1,19 @@
 import streamlit as st
 import os
 from dotenv import load_dotenv
-from vnstock import Listing
+from vnstock import Listing, register_user
+from src.core.config import VNSTOCK_API_KEY_ENV
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Register vnstock API key globally (once per process, before any vnstock calls)
+_vnstock_api_key = os.environ.get(VNSTOCK_API_KEY_ENV, "")
+if _vnstock_api_key:
+    try:
+        register_user(_vnstock_api_key)
+    except Exception:
+        pass
 
 # Set page configuration - this must be called first
 st.set_page_config(page_title="Finance Bro", page_icon="📈", layout="wide")
