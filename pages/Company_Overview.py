@@ -26,7 +26,7 @@ if "stock_symbol" in st.session_state and st.session_state.stock_symbol:
     stock_symbol = st.session_state.stock_symbol
 else:
     st.warning(
-        "⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first."
+        "No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first."
     )
     st.stop()
 

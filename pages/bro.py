@@ -78,7 +78,7 @@ def process_agent_response(agent, question):
             return message_data
 
     except Exception as e:
-        return {"role": "assistant", "content": f"❌ Analysis error: {str(e)}"}
+        return {"role": "assistant", "content": f"Analysis error: {str(e)}"}
 
 
 def transpose_financial_dataframe(df, name, period):
@@ -186,7 +186,7 @@ if "stock_symbol" in st.session_state and st.session_state.stock_symbol:
     stock_symbol = st.session_state.stock_symbol
 else:
     st.warning(
-        "⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first."
+        "No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first."
     )
     st.stop()
 
@@ -204,7 +204,7 @@ if "stock_symbols_list" not in st.session_state:
             st.session_state.symbols_df = (
                 symbols_df  # Cache the full DataFrame for organ_name access
             )
-            st.success("✅ Stock symbols loaded and cached!")
+            st.success("Stock symbols loaded and cached!")
     except Exception as e:
         st.warning(f"Could not load stock symbols from vnstock: {str(e)}")
         st.session_state.stock_symbols_list = [
@@ -239,10 +239,10 @@ if not st.session_state.api_key:
             if api_key_input.startswith("sk-"):
                 st.session_state.api_key = api_key_input
                 os.environ["OPENAI_API_KEY"] = api_key_input
-                st.success("✅ API Key saved successfully!")
+                st.success("API Key saved successfully!")
                 st.rerun()
             else:
-                st.error("❌ Invalid API key format. Please check your key.")
+                st.error("Invalid API key format. Please check your key.")
 
     st.stop()
 
@@ -294,14 +294,14 @@ with st.sidebar:
     # Clear Chat button in sidebar
 
     # Display current theme
-    with st.sidebar.expander("🎨 Theme", expanded=False):
+    with st.sidebar.expander("Theme", expanded=False):
         try:
             # Check if dark mode is enabled
             is_dark = st.get_option("theme.base") == "dark"
             if is_dark:
-                st.write("**Dark Mode** 🌙")
+                st.write("**Dark Mode**")
             else:
-                st.write("**Light Mode** ☀️")
+                st.write("**Light Mode**")
         except Exception:
             st.write("**Theme unavailable**")
 
@@ -410,7 +410,7 @@ if analyze_button or (period_changed and "stock_symbol" in st.session_state):
             )
 
     except Exception as e:
-        st.error(f"❌ Error loading data: {str(e)}")
+        st.error(f"Error loading data: {str(e)}")
         st.info("Please check the stock symbol and try again.")
 
 # AI Analysis section
@@ -534,7 +534,7 @@ if "dataframes" in st.session_state:
 
                 # Show generated code for assistant messages
                 if message["role"] == "assistant" and "generated_code" in message:
-                    with st.expander("🔍 View Generated Code", expanded=False):
+                    with st.expander("View Generated Code", expanded=False):
                         st.code(message["generated_code"], language="python")
 
                 # Show chart only for the latest message to avoid accumulation
@@ -576,13 +576,13 @@ if "dataframes" in st.session_state:
                     if file.name.endswith(".csv"):
                         df = pd.read_csv(file)
                         st.session_state.uploaded_dataframes.append(df)
-                        st.info(f"📂 Loaded CSV file: {file.name} ({len(df)} rows)")
+                        st.info(f"Loaded CSV file: {file.name} ({len(df)} rows)")
                     elif file.name.endswith((".xlsx", ".xls")):
                         df = pd.read_excel(file)
                         st.session_state.uploaded_dataframes.append(df)
-                        st.info(f"📂 Loaded Excel file: {file.name} ({len(df)} rows)")
+                        st.info(f"Loaded Excel file: {file.name} ({len(df)} rows)")
                 except Exception as e:
-                    st.error(f"❌ Error loading file {file.name}: {str(e)}")
+                    st.error(f"Error loading file {file.name}: {str(e)}")
 
         # Only proceed if there's text content or files were uploaded
         if prompt.strip() or files:
@@ -591,7 +591,7 @@ if "dataframes" in st.session_state:
 
             if not agent:
                 st.error(
-                    "❌ No data available for analysis. Please load stock data first."
+                    "No data available for analysis. Please load stock data first."
                 )
                 st.stop()
 
@@ -599,7 +599,7 @@ if "dataframes" in st.session_state:
             message_content = prompt
             if files:
                 file_names = [f.name for f in files]
-                message_content += f"\n📎 Uploaded files: {', '.join(file_names)}"
+                message_content += f"\nUploaded files: {', '.join(file_names)}"
 
             if message_content.strip():
                 st.session_state.messages.append(
@@ -646,7 +646,7 @@ if "dataframes" in st.session_state:
                         st.dataframe(df_display)
             else:
                 st.warning(
-                    "⚠️ No data loaded yet. Please click 'Analyze Stock' first to load financial data."
+                    "No data loaded yet. Please click 'Analyze Stock' first to load financial data."
                 )
 
 # Footer

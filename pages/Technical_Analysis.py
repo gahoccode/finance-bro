@@ -9,12 +9,12 @@ from src.services.technical_indicators import calculate_technical_indicators
 from src.services.chart_service import create_technical_chart
 
 st.set_page_config(
-    page_title="Technical Analysis - Finance Bro", page_icon="📊", layout="wide"
+    page_title="Technical Analysis - Finance Bro", page_icon="", layout="wide"
 )
 
 
 def main():
-    st.title("📊 Technical analysis")
+    st.title("Technical analysis")
 
     # Page description
     st.caption(
@@ -25,7 +25,7 @@ def main():
 
     # Sidebar configuration
     with st.sidebar:
-        st.subheader("📊 Chart configuration")
+        st.subheader("Chart configuration")
 
         # Interval selection
         st.selectbox(
@@ -41,7 +41,7 @@ def main():
         )
 
         # Technical indicators toggles
-        st.subheader("📈 Technical indicators")
+        st.subheader("Technical indicators")
         show_bb = st.toggle("Bollinger Bands", value=True)
         show_rsi = st.toggle("RSI", value=True)
         show_macd = st.toggle("MACD", value=True)
@@ -57,7 +57,7 @@ def main():
             st.session_state.ta_interval = "1D"
 
         # Foreign Transaction Filter
-        st.subheader("📈 Data filters")
+        st.subheader("Data filters")
         show_foreign_buy_only = st.toggle(
             "Foreign Buy > Sell only",
             value=False,
@@ -77,12 +77,12 @@ def main():
         )
 
         # Add a button to clear cache if needed
-        if st.button("🔄 Refresh Data", help="Clear cached data and reload"):
+        if st.button("Refresh Data", help="Clear cached data and reload"):
             st.cache_data.clear()
             st.rerun()
 
     # Load heating up stocks
-    with st.spinner("🔍 Scanning market for heating up stocks..."):
+    with st.spinner("Scanning market for heating up stocks..."):
         try:
             heating_stocks = get_heating_up_stocks()
         except Exception as e:
@@ -91,7 +91,7 @@ def main():
 
     if heating_stocks.empty:
         st.info(
-            "🔥 No stocks showing 'Overheated in previous trading session' signal today."
+            "No stocks showing 'Overheated in previous trading session' signal today."
         )
         st.stop()
 
@@ -128,7 +128,7 @@ def main():
     # Show combined filter results
     if filter_messages:
         st.info(
-            f"📊 **Filters Applied**: {' | '.join(filter_messages)} (from {original_count} original stocks)"
+            f"**Filters Applied**: {' | '.join(filter_messages)} (from {original_count} original stocks)"
         )
 
     # Check if any stocks remain after filtering
@@ -142,16 +142,16 @@ def main():
             if show_buy_only:
                 active_filters.append("Buy Signal")
             st.warning(
-                f"🔍 No heating stocks found matching: {' + '.join(active_filters)}. Try disabling some filters."
+                f"No heating stocks found matching: {' + '.join(active_filters)}. Try disabling some filters."
             )
         else:
             st.info(
-                "🔥 No stocks showing 'Overheated in previous trading session' signal today."
+                "No stocks showing 'Overheated in previous trading session' signal today."
             )
         st.stop()
 
     # Display results summary
-    st.success(f"🔥 Found **{len(heating_stocks)}** stocks with heating up signals!")
+    st.success(f"Found **{len(heating_stocks)}** stocks with heating up signals!")
 
     # Display trading value metrics
     col1, col2 = st.columns(2)
@@ -161,33 +161,33 @@ def main():
             mean_trading_value = heating_stocks["avg_trading_value_5d"].mean()
             if not pd.isna(mean_trading_value):
                 st.metric(
-                    "📊 Average 5-Day Trading Value",
+                    "Average 5-Day Trading Value",
                     f"{mean_trading_value:,.0f}",
                     help="Mean of avg_trading_value_5d across all filtered heating stocks",
                     border=True,
                 )
             else:
-                st.metric("📊 Average 5-Day Trading Value", "N/A", border=True)
+                st.metric("Average 5-Day Trading Value", "N/A", border=True)
 
     with col2:
         if "total_trading_value" in heating_stocks.columns:
             mean_total_trading_value = heating_stocks["total_trading_value"].mean()
             if not pd.isna(mean_total_trading_value):
                 st.metric(
-                    "📈 Average Total Trading Value",
+                    "Average Total Trading Value",
                     f"{mean_total_trading_value:,.0f}",
                     help="Mean of total_trading_value across all filtered heating stocks",
                     border=True,
                 )
             else:
-                st.metric("📈 Average Total Trading Value", "N/A", border=True)
+                st.metric("Average Total Trading Value", "N/A", border=True)
 
     # Display the heating stocks DataFrame
-    st.subheader("📋 Heating up stocks summary")
+    st.subheader("Heating up stocks summary")
     st.dataframe(heating_stocks, use_container_width=True, height=300, hide_index=True)
 
     # Technical indicators summary
-    st.subheader("📊 Technical indicators summary")
+    st.subheader("Technical indicators summary")
 
     # Create columns for indicator toggles
     col1, col2, col3, col4 = st.columns(4)
@@ -201,7 +201,7 @@ def main():
         st.metric("OBV", "ON" if show_obv else "OFF", border=True)
 
     # Charts section with technical indicators
-    st.subheader("📈 Advanced technical analysis charts")
+    st.subheader("Advanced technical analysis charts")
 
     # Get current interval from session state
     current_interval = st.session_state.ta_interval
@@ -227,7 +227,7 @@ def main():
     if len(tickers) <= 5:
         # Display all charts directly if 5 or fewer stocks
         for ticker in tickers:
-            with st.expander(f"📊 {ticker} - Technical Analysis", expanded=True):
+            with st.expander(f"{ticker} - Technical Analysis", expanded=True):
                 with st.spinner(
                     f"Loading technical analysis for {ticker} ({current_interval})..."
                 ):
@@ -246,7 +246,7 @@ def main():
                                 plt.close(fig)
 
                                 # Display indicator values with safe validation
-                                st.subheader("📊 Indicator Values")
+                                st.subheader("Indicator Values")
                                 col1, col2 = st.columns(2)
 
                                 with col1:
@@ -264,7 +264,7 @@ def main():
                                             st.metric("RSI", "N/A", border=True)
                                     else:
                                         st.metric("RSI", "N/A", border=True)
-                                        st.caption("⚠️ RSI calculation failed")
+                                        st.caption("RSI calculation failed")
 
                                 with col2:
                                     if (
@@ -291,7 +291,7 @@ def main():
                                             st.metric("MACD", "N/A", border=True)
                                     else:
                                         st.metric("MACD", "N/A", border=True)
-                                        st.caption("⚠️ MACD calculation failed")
+                                        st.caption("MACD calculation failed")
 
                         else:
                             st.warning("Could not calculate technical indicators")
@@ -311,9 +311,7 @@ def main():
             with tab:
                 current_tickers = tab_chunks[tab_idx]
                 for ticker in current_tickers:
-                    with st.expander(
-                        f"📊 {ticker} - Technical Analysis", expanded=False
-                    ):
+                    with st.expander(f"{ticker} - Technical Analysis", expanded=False):
                         with st.spinner(
                             f"Loading technical analysis for {ticker} ({current_interval})..."
                         ):
@@ -332,7 +330,7 @@ def main():
                                         plt.close(fig)
 
                                         # Display indicator values with safe validation
-                                        st.subheader("📊 Indicator Values")
+                                        st.subheader("Indicator Values")
                                         col1, col2 = st.columns(2)
 
                                         with col1:
@@ -354,7 +352,7 @@ def main():
                                                     st.metric("RSI", "N/A", border=True)
                                             else:
                                                 st.metric("RSI", "N/A", border=True)
-                                                st.caption("⚠️ RSI calculation failed")
+                                                st.caption("RSI calculation failed")
 
                                         with col2:
                                             if (
@@ -385,7 +383,7 @@ def main():
                                                     )
                                             else:
                                                 st.metric("MACD", "N/A", border=True)
-                                                st.caption("⚠️ MACD calculation failed")
+                                                st.caption("MACD calculation failed")
 
                                 else:
                                     st.warning(
