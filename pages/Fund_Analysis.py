@@ -23,7 +23,7 @@ st.set_page_config(page_title="Fund Analysis", layout="wide")
 # Apply custom CSS styling for success alerts
 inject_custom_success_styling()
 
-st.title("🏦 Vietnamese Fund Analysis")
+st.title("Vietnamese Fund Analysis")
 
 # Main content
 with st.container():
@@ -41,7 +41,7 @@ if fund_list.empty:
     st.stop()
 
 # Fund selection section
-st.subheader("📊 Fund Selection & Overview")
+st.subheader("Fund Selection & Overview")
 
 col1, col2 = st.columns([2, 1])
 
@@ -113,7 +113,7 @@ with col2:
     ].iloc[0]
 
 # Performance Charts Section
-st.subheader("📈 Fund Performance Analysis")
+st.subheader("Fund Performance Analysis")
 
 # NAV Performance Chart
 nav_data = get_fund_nav_report(selected_fund_name)
@@ -141,10 +141,10 @@ if not nav_data.empty:
             st.metric("Total Return", f"{total_return:,.0f}%")
 
 else:
-    st.warning(f"⚠️ NAV data not available for {selected_fund_name}")
+    st.warning(f"NAV data not available for {selected_fund_name}")
 
 # Fund Performance Comparison Chart
-st.subheader("📊 Fund Performance Comparison")
+st.subheader("Fund Performance Comparison")
 
 # Create comparison chart for 36-month annualized returns
 if "nav_change_36m_annualized" in fund_list.columns:
@@ -158,7 +158,7 @@ if "nav_change_36m_annualized" in fund_list.columns:
         st.altair_chart(comparison_chart, use_container_width=True)
 
 # Asset and Industry Allocation Section
-st.subheader("🎯 Fund Allocation Analysis")
+st.subheader("Fund Allocation Analysis")
 
 allocation_col1, allocation_col2 = st.columns(2)
 
@@ -184,7 +184,7 @@ with allocation_col1:
             asset_display["Allocation (%)"] = asset_display["Allocation (%)"].round(2)
             st.dataframe(asset_display, hide_index=True)
     else:
-        st.warning("⚠️ Asset allocation data not available")
+        st.warning("Asset allocation data not available")
 
 with allocation_col2:
     st.write("**Industry Allocation**")
@@ -210,10 +210,10 @@ with allocation_col2:
             ].round(2)
             st.dataframe(industry_display, hide_index=True)
     else:
-        st.warning("⚠️ Industry allocation data not available")
+        st.warning("Industry allocation data not available")
 
 # Fund Details Section
-st.subheader("📋 Fund Details")
+st.subheader("Fund Details")
 
 selected_fund_info = fund_list[fund_list["fund_code"] == selected_fund_code]
 
@@ -276,7 +276,7 @@ if len(selected_fund_info) > 0:
         )
 
 # Data Export Section
-st.subheader("💾 Data Export")
+st.subheader("Data Export")
 
 export_col1, export_col2, export_col3, export_col4 = st.columns(4)
 
@@ -284,7 +284,7 @@ with export_col1:
     # Prepare fund list CSV data
     csv_data = fund_list.to_csv(index=False)
     st.download_button(
-        label="📊 Download Fund List CSV",
+        label="Download Fund List CSV",
         data=csv_data,
         file_name=f"vietnamese_funds_{datetime.now().strftime('%Y%m%d')}.csv",
         mime="text/csv",
@@ -295,13 +295,13 @@ with export_col2:
     if not nav_data.empty:
         nav_csv = nav_data.to_csv(index=False)
         st.download_button(
-            label="📈 Download NAV Data CSV",
+            label="Download NAV Data CSV",
             data=nav_csv,
             file_name=f"nav_data_{selected_fund_code}_{datetime.now().strftime('%Y%m%d')}.csv",
             mime="text/csv",
         )
     else:
-        st.write("📈 NAV Data (Not Available)")
+        st.write("NAV Data (Not Available)")
 
 with export_col3:
     # Prepare allocation data CSV (only show if data exists)
@@ -319,15 +319,15 @@ with export_col3:
         if not allocation_data.empty:
             allocation_csv = allocation_data.to_csv(index=False)
             st.download_button(
-                label="🏭 Download Allocations CSV",
+                label="Download Allocations CSV",
                 data=allocation_csv,
                 file_name=f"allocations_{selected_fund_code}_{datetime.now().strftime('%Y%m%d')}.csv",
                 mime="text/csv",
             )
         else:
-            st.write("🏭 Allocations (Not Available)")
+            st.write("Allocations (Not Available)")
     else:
-        st.write("🏭 Allocations (Not Available)")
+        st.write("Allocations (Not Available)")
 
 with export_col4:
     # Check if all charts are available for download
@@ -368,7 +368,7 @@ with export_col4:
 
                 # Single download button that generates and downloads immediately
                 st.download_button(
-                    label="📊 Download Charts PNG",
+                    label="Download Charts PNG",
                     data=png_data,
                     file_name=download_filename,
                     mime="image/png",
@@ -380,7 +380,7 @@ with export_col4:
         except Exception as e:
             st.error(f"❌ Error creating charts: {str(e)}")
     else:
-        st.write("📊 Charts (Insufficient Data)")
+        st.write("Charts (Insufficient Data)")
 
 # Footer
 st.markdown("---")

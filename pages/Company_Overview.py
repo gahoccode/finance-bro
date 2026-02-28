@@ -27,7 +27,7 @@ if "stock_symbol" in st.session_state and st.session_state.stock_symbol:
     stock_symbol = st.session_state.stock_symbol
 else:
     st.warning(
-        "⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first."
+        "No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first."
     )
     st.stop()
 
@@ -45,7 +45,7 @@ if "symbols_df" in st.session_state and st.session_state.symbols_df is not None:
 else:
     # If symbols not cached, user should visit bro.py first for optimal experience
     st.info(
-        "💡 For best experience with company names, visit the Stock Analysis page first to load stock symbols."
+        "For best experience with company names, visit the Stock Analysis page first to load stock symbols."
     )
 
 # Title and description
@@ -531,7 +531,7 @@ if stock_symbol:
 
                             # Clickable link
                             if pd.notna(report["link"]) and report["link"].strip():
-                                st.markdown(f"[🔗 Read Full Article]({report['link']})")
+                                st.markdown(f"[Read Full Article]({report['link']})")
 
                             # Add separator
                             st.markdown("---")

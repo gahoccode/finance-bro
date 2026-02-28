@@ -8,7 +8,7 @@ warnings.filterwarnings("ignore")
 from src.services.vnstock_api import get_screener_data
 
 # Title and header
-st.markdown("# 🔍 Stock Screener")
+st.markdown("# Stock Screener")
 st.markdown("Filter and analyze Vietnamese stocks based on various financial metrics")
 
 # Load stock symbols and cache in session state if not already loaded (for consistent experience across app)
@@ -120,13 +120,11 @@ def create_histogram(df, col, title):
 # Current stock symbol is available in sidebar for context - no need for notification
 
 # Quick filter presets
-st.subheader("⚡ Quick Filter Presets")
+st.subheader("Quick Filter Presets")
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    if st.button(
-        "🏦 High Quality Banks", help="Banks with ROE > 15%, Market Cap > 50B"
-    ):
+    if st.button("High Quality Banks", help="Banks with ROE > 15%, Market Cap > 50B"):
         # Clear all previous preset values
         for key in list(st.session_state.keys()):
             if key.startswith("preset_"):
@@ -140,7 +138,7 @@ with col1:
 
 with col2:
     if st.button(
-        "🛡️ Low Risk Quality",
+        "Low Risk Quality",
         help="High financial health > 7, Low beta < 1.2, High stock rating > 6",
     ):
         # Clear all previous preset values
@@ -155,7 +153,7 @@ with col2:
         st.rerun()
 
 with col3:
-    if st.button("📈 Growth Stocks", help="All industries with ROE > 20%, ROA > 10%"):
+    if st.button("Growth Stocks", help="All industries with ROE > 20%, ROA > 10%"):
         # Clear all previous preset values
         for key in list(st.session_state.keys()):
             if key.startswith("preset_"):
@@ -167,7 +165,7 @@ with col3:
         st.rerun()
 
 with col4:
-    if st.button("🔄 Clear All Filters", help="Reset all filters"):
+    if st.button("Clear All Filters", help="Reset all filters"):
         for key in list(st.session_state.keys()):
             if key.startswith("preset_"):
                 del st.session_state[key]
@@ -176,7 +174,7 @@ with col4:
         st.rerun()
 
 # Sidebar controls
-st.sidebar.header("🎛️ Screening Filters")
+st.sidebar.header("Screening Filters")
 
 # Fixed data source
 source = "TCBS"  # Using TCBS as the only data source
@@ -199,7 +197,7 @@ exchanges = st.sidebar.multiselect(
 )
 
 # Financial filters
-st.sidebar.subheader("📊 Financial Filters")
+st.sidebar.subheader("Financial Filters")
 st.sidebar.markdown("*Toggle filters on/off and adjust ranges as needed*")
 
 # Market Cap filter
@@ -452,7 +450,7 @@ if use_stock_rating:
 
 # Load data button or auto-run from preset
 run_screener = st.sidebar.button(
-    "🔍 Run Screener", type="primary"
+    "Run Screener", type="primary"
 ) or st.session_state.get("auto_run_screener", False)
 
 if run_screener:
@@ -532,12 +530,12 @@ if run_screener:
                     )
                 else:
                     st.warning(
-                        f"⚠️ Column '{column}' not found in data. Skipping this filter."
+                        f"Column '{column}' not found in data. Skipping this filter."
                     )
 
             # Create filtering visualization if we have multiple steps
             if len(filtering_steps) > 1:
-                st.subheader("🔍 Filtering Breakdown")
+                st.subheader("Filtering Breakdown")
 
                 # Create DataFrame for visualization
                 filter_df = pd.DataFrame(filtering_steps)
@@ -591,7 +589,7 @@ if run_screener:
                     (original_count - len(filtered_data)) / original_count
                 ) * 100
                 st.caption(
-                    f"📊 Filtering reduced dataset by {reduction_pct:.1f}% ({original_count - len(filtered_data):,} stocks removed)"
+                    f"Filtering reduced dataset by {reduction_pct:.1f}% ({original_count - len(filtered_data):,} stocks removed)"
                 )
 
             screener_data = filtered_data
@@ -651,7 +649,7 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
             st.metric("Total Market Cap", f"{total_market_cap / 1000:.0f}B VND")
 
     # Visualizations (moved above data table)
-    st.subheader("📊 Visualizations")
+    st.subheader("Visualizations")
 
     # Create tabs for different visualizations
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
@@ -704,7 +702,7 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
                 )
                 st.altair_chart(chart, use_container_width=True)
                 st.caption(
-                    "💡 **Sweet Spot**: High ROE (>15%) + Low EV/EBITDA (<12) = Quality stocks at reasonable valuations"
+                    "**Sweet Spot**: High ROE (>15%) + Low EV/EBITDA (<12) = Quality stocks at reasonable valuations"
                 )
 
                 # Add reference lines explanation
@@ -732,7 +730,7 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
                 )
                 st.altair_chart(chart, use_container_width=True)
                 st.caption(
-                    "💡 **Sweet Spot**: Low Beta (<1.0) + High Alpha (>0) = Low risk with market outperformance"
+                    "**Sweet Spot**: Low Beta (<1.0) + High Alpha (>0) = Low risk with market outperformance"
                 )
 
                 # Add reference guidelines
@@ -766,7 +764,7 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
                 )
                 st.altair_chart(chart, use_container_width=True)
                 st.caption(
-                    "💡 **Quality Leaders**: High Financial Health (>7) + High Business Model (>7) = Strong fundamentals"
+                    "**Quality Leaders**: High Financial Health (>7) + High Business Model (>7) = Strong fundamentals"
                 )
 
                 # Add quality score guidelines
@@ -835,7 +833,7 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
                     st.altair_chart(hist_chart, use_container_width=True)
 
     # Data table (moved below visualizations)
-    st.subheader("📋 Screened Stocks")
+    st.subheader("Screened Stocks")
 
     # Select columns to display
     display_columns = [
@@ -907,7 +905,7 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
     st.dataframe(display_df, use_container_width=True, hide_index=True)
 
     # Export functionality - Download PNG visualization
-    st.subheader("📥 Export Visualization")
+    st.subheader("Export Visualization")
 
     def create_matplotlib_charts_for_download(data):
         """Create matplotlib charts for PNG download"""
@@ -1077,7 +1075,7 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
 
         if png_data:
             st.download_button(
-                label="📊 Download Visualization as PNG",
+                label="Download Visualization as PNG",
                 data=png_data,
                 file_name=filename,
                 mime="image/png",
@@ -1088,12 +1086,12 @@ if "screener_data" in st.session_state and not st.session_state["screener_data"]
 
     except Exception as e:
         st.error(f"Error creating PNG download: {str(e)}")
-        st.info("💡 **Alternative:** Take a screenshot of the visualizations above.")
+        st.info("**Alternative:** Take a screenshot of the visualizations above.")
 
 else:
     # Initial state - show instructions
     st.info("""
-    ### 📋 How to use the Stock Screener:
+    ### How to use the Stock Screener:
     
     1. **Select Industries**: Choose one or more industry sectors from the sidebar
     2. **Set Exchanges**: Select which Vietnamese stock exchanges to include
@@ -1110,7 +1108,7 @@ else:
     """)
 
     # Show sample metrics
-    st.subheader("📊 Sample Visualization Preview")
+    st.subheader("Sample Visualization Preview")
     st.info(
         "Run the screener to see interactive charts comparing ROE, dividend yield, EV/EBITDA, and market cap across Vietnamese stocks."
     )

@@ -23,14 +23,14 @@ from vnstock import Quote, Vnstock
 from vnstock.explorer.vci import Company
 
 # Page configuration
-st.set_page_config(page_title="📊 Stock Valuation Analysis", layout="wide")
+st.set_page_config(page_title="Stock Valuation Analysis", layout="wide")
 inject_custom_success_styling()
 
 # Initialize global session state
 init_global_session_state()
 
 # Page header
-st.title("📊 Stock Valuation Analysis")
+st.title("Stock Valuation Analysis")
 st.markdown(
     "Comprehensive WACC (Weighted Average Cost of Capital) and Beta analysis for Vietnamese stocks"
 )
@@ -39,12 +39,12 @@ st.markdown(
 symbol = st.session_state.get("stock_symbol")
 
 if not symbol:
-    st.warning("⚠️ Please select a stock from the homepage first")
+    st.warning("Please select a stock from the homepage first")
     st.stop()
 
 # Display current selection
 company_name = get_current_company_name()
-st.success(f"✅ Analyzing valuation for **{company_name}** ({symbol})")
+st.success(f"Analyzing valuation for **{company_name}** ({symbol})")
 
 # Progressive data loading with user feedback
 loading_result = ensure_valuation_data_loaded(symbol)

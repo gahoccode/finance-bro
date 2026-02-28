@@ -18,7 +18,7 @@ from src.services.data import (
 # Page configuration
 st.set_page_config(
     page_title="DuPont Analysis - Finance Bro",
-    page_icon="📊",
+    page_icon="",
     layout="wide",
 )
 
@@ -31,12 +31,12 @@ if "stock_symbol" in st.session_state and st.session_state.stock_symbol:
     stock_symbol = st.session_state.stock_symbol
 else:
     st.warning(
-        "⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first."
+        "No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first."
     )
     st.stop()
 
 # Page header
-st.markdown("# 📊 DuPont Analysis")
+st.markdown("# DuPont Analysis")
 st.markdown(f"**Stock Symbol:** {stock_symbol}")
 
 # Get company full name from cached symbols DataFrame

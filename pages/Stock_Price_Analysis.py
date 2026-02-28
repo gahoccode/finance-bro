@@ -20,7 +20,7 @@ if "stock_symbol" in st.session_state and st.session_state.stock_symbol:
     ticker = st.session_state.stock_symbol
 else:
     st.warning(
-        "⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first."
+        "No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first."
     )
     st.stop()
 
@@ -76,7 +76,7 @@ with st.sidebar:
     )
 
     # Custom Metrics Section
-    with st.expander("📊 Custom Metrics"):
+    with st.expander("Custom Metrics"):
         # Define metric categories
         def get_metric_categories():
             return {
@@ -212,7 +212,7 @@ with st.sidebar:
         # Category selector
         categories = get_metric_categories()
         selected_category = st.selectbox(
-            "📈 Metric Category:",
+            "Metric Category:",
             options=list(categories.keys()),
             index=1,  # Default to "Core Performance"
             help="Choose a category to filter available metrics",
@@ -227,7 +227,7 @@ with st.sidebar:
         )
 
         selected_metrics = st.multiselect(
-            f"🎯 Select Metrics ({len(available_metrics)} available):",
+            f"Select Metrics ({len(available_metrics)} available):",
             options=available_metrics,
             default=[m for m in default_metrics if m in available_metrics],
             help=f"Select metrics from {selected_category} category to display",
@@ -430,7 +430,7 @@ if ticker:
 
             # Create metrics tabs including Tearsheet
             st.subheader("Performance Analytics")
-            tearsheet_tab, metrics_tab = st.tabs(["📊 Tearsheet", "📈 Quick Metrics"])
+            tearsheet_tab, metrics_tab = st.tabs(["Tearsheet", "Quick Metrics"])
 
             with tearsheet_tab:
                 st.write(
@@ -485,7 +485,7 @@ if ticker:
                                     html_content = f.read()
 
                                 # Success message
-                                st.success("✅ Tearsheet generated successfully!")
+                                st.success("Tearsheet generated successfully!")
 
                                 # Display HTML content using iframe for better chart rendering
                                 st.subheader("QuantStats Tearsheet")
@@ -500,7 +500,7 @@ if ticker:
                                 # Download button
                                 with open(filepath, "rb") as file:
                                     st.download_button(
-                                        label="📥 Download HTML Report",
+                                        label="Download HTML Report",
                                         data=file.read(),
                                         file_name=filename,
                                         mime="text/html",
@@ -514,15 +514,15 @@ if ticker:
                                 )
                     else:
                         st.warning(
-                            "⚠️ No returns data available. Please ensure stock data is loaded properly."
+                            "No returns data available. Please ensure stock data is loaded properly."
                         )
                 else:
                     st.info(
-                        "👆 Click 'Generate Tearsheet' to create a comprehensive performance analysis report using QuantStats."
+                        "Click 'Generate Tearsheet' to create a comprehensive performance analysis report using QuantStats."
                     )
 
                     # Show what will be included in the tearsheet
-                    st.markdown("### 📋 Tearsheet Contents")
+                    st.markdown("### Tearsheet Contents")
                     st.markdown("""
                     The QuantStats tearsheet will include:
                     - **Performance Metrics**: Sharpe, Sortino, and Calmar ratios
@@ -564,7 +564,7 @@ if ticker:
                         )
                         st.metric("Win Rate", f"{qs.stats.win_rate(returns_data):.2%}")
                 else:
-                    st.warning("⚠️ No returns data available for metrics calculation.")
+                    st.warning("No returns data available for metrics calculation.")
 
             # Custom Metrics Display Section
             if (
@@ -572,7 +572,7 @@ if ticker:
                 and "stock_returns" in st.session_state
                 and len(st.session_state.stock_returns) > 0
             ):
-                st.subheader("📊 Custom Performance Metrics")
+                st.subheader("Custom Performance Metrics")
 
                 # Calculate custom metrics
                 returns_data = st.session_state.stock_returns
@@ -607,7 +607,7 @@ if ticker:
                         "No metrics could be calculated. Try selecting different metrics."
                     )
             elif selected_metrics:
-                st.info("📈 Select a stock and load data to see custom metrics.")
+                st.info("Select a stock and load data to see custom metrics.")
 
             # Create interactive chart with Altair
             st.subheader("Stock Performance")

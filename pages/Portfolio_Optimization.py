@@ -36,7 +36,7 @@ if "stock_symbol" in st.session_state and st.session_state.stock_symbol:
     main_stock_symbol = st.session_state.stock_symbol
 else:
     st.warning(
-        "⚠️ No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first."
+        "No stock symbol selected. Please go to the main Finance Bro page and select a stock symbol first."
     )
     st.stop()
 
@@ -49,7 +49,7 @@ if "stock_symbols_list" in st.session_state:
 else:
     # If not cached, user should visit bro.py first
     st.warning(
-        "⚠️ Stock symbols not loaded. Please visit the Stock Analysis page first to load symbols."
+        "Stock symbols not loaded. Please visit the Stock Analysis page first to load symbols."
     )
     stock_symbols_list = ["REE", "FMC", "DHC", "VNM", "VCB", "BID", "HPG", "FPT"]
 
@@ -272,11 +272,11 @@ with col3:
 # Create tabs for different analysis views
 tab1, tab2, tab3, tab4, tab5 = st.tabs(
     [
-        "📈 Efficient Frontier & Weights",
-        "🌳 Hierarchical Risk Parity",
-        "💰 Dollars Allocation",
-        "📊 Report",
-        "📋 Risk Analysis",
+        "Efficient Frontier & Weights",
+        "Hierarchical Risk Parity",
+        "Dollars Allocation",
+        "Report",
+        "Risk Analysis",
     ]
 )
 
@@ -514,14 +514,12 @@ with tab3:
     else:
         portfolio_choice = "Max Sharpe Portfolio"  # Default fallback
         st.info(
-            "💡 Go to the **Report** tab to select portfolio strategy for all analysis tabs"
+            "Go to the **Report** tab to select portfolio strategy for all analysis tabs"
         )
 
     # Display current selection for user awareness
     symbol_display = ", ".join(symbols[:3]) + ("..." if len(symbols) > 3 else "")
-    st.info(
-        f"📊 **Using Strategy**: {portfolio_choice} | **Symbols**: {symbol_display}"
-    )
+    st.info(f"**Using Strategy**: {portfolio_choice} | **Symbols**: {symbol_display}")
 
     # Get the selected weights
     if portfolio_choice == "Max Sharpe Portfolio":
@@ -552,7 +550,7 @@ with tab3:
 
             # Display results
             st.success(
-                f"✅ Allocation calculated successfully for {portfolio_label} Portfolio!"
+                f"Allocation calculated successfully for {portfolio_label} Portfolio!"
             )
 
             # Show allocation results
@@ -619,7 +617,7 @@ with tab3:
             )
     else:
         st.info(
-            "👆 Click 'Calculate Allocation' to see how many shares to buy for each stock based on your selected portfolio strategy and investment amount."
+            "Click 'Calculate Allocation' to see how many shares to buy for each stock based on your selected portfolio strategy and investment amount."
         )
 
 with tab4:
@@ -640,9 +638,7 @@ with tab4:
     st.session_state.portfolio_strategy_choice = portfolio_choice
 
     # Display info about master control
-    st.info(
-        f"📊 **Current Strategy**: {portfolio_choice} (applies to all analysis tabs)"
-    )
+    st.info(f"**Current Strategy**: {portfolio_choice} (applies to all analysis tabs)")
 
     # Generate report button
     if st.button("Generate Report", key="generate_excel_report"):
@@ -692,7 +688,7 @@ with tab4:
         filepath_xlsx = filepath_base + ".xlsx"
         with open(filepath_xlsx, "rb") as file:
             st.download_button(
-                label="📥 Download Excel Report",
+                label="Download Excel Report",
                 data=file.read(),
                 file_name=filename_base + ".xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -705,11 +701,11 @@ with tab4:
 
     else:
         st.info(
-            "👆 Select a portfolio strategy and click 'Generate Report' to create a comprehensive Excel analysis."
+            "Select a portfolio strategy and click 'Generate Report' to create a comprehensive Excel analysis."
         )
 
         # Show what will be included in the report
-        st.markdown("### 📋 Report Contents")
+        st.markdown("### Report Contents")
         st.markdown("""
         The Excel report will include:
         - **Portfolio Weights**: Detailed allocation percentages
@@ -735,13 +731,13 @@ with tab5:
         else:
             portfolio_choice = "Max Sharpe Portfolio"  # Default fallback
             st.info(
-                "💡 Go to the **Report** tab to select portfolio strategy for all analysis tabs"
+                "Go to the **Report** tab to select portfolio strategy for all analysis tabs"
             )
 
         # Display current selection for user awareness
         symbol_display = ", ".join(symbols[:3]) + ("..." if len(symbols) > 3 else "")
         st.info(
-            f"📊 **Analyzing Strategy**: {portfolio_choice} | **Symbols**: {symbol_display}"
+            f"**Analyzing Strategy**: {portfolio_choice} | **Symbols**: {symbol_display}"
         )
 
         # Get the selected weights
@@ -821,7 +817,7 @@ with tab5:
         st.pyplot(fig_range)
 
         # Add informational expander
-        with st.expander("📚 Understanding the Risk Analysis Table"):
+        with st.expander("Understanding the Risk Analysis Table"):
             st.markdown(f"""
             This table provides comprehensive risk metrics for your {portfolio_label} portfolio:
             
@@ -838,7 +834,7 @@ with tab5:
             """)
 
     else:
-        st.warning("⚠️ Risk analysis requires portfolio data.")
+        st.warning("Risk analysis requires portfolio data.")
         st.info(
             "Please visit the 'Efficient Frontier & Weights' tab first to calculate portfolio optimization, then return here for risk analysis."
         )
