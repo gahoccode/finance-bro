@@ -6,6 +6,7 @@ Finance Bro is a single-user Streamlit application for Vietnamese stock market a
 
 - **Authentication**: Google OAuth 2.0 via Streamlit's built-in auth (`st.login` / `st.logout` / `st.user`)
 - **API key management**: OpenAI key loaded from environment variable or entered at runtime, stored in `st.session_state`
+- **VnStock API key management**: Optional API key loaded from environment variable, registered globally via `register_user()` — app degrades to free tier without it
 - **Transport security**: HTTPS enforced by the deployment platform (Render)
 - **No persistent user data**: The app does not store user data beyond the current Streamlit session
 
@@ -24,13 +25,13 @@ flowchart TD
 
     google["Google OAuth 2.0\n(Identity provider)"]
     openai["OpenAI API\n(LLM provider, authenticated via API key)"]
-    vnstock["VnStock API\n(Vietnamese market data, no auth required)"]
+    vnstock["VnStock API\n(Vietnamese market data, optional API key)"]
 
     user -- "Authenticates\n(HTTPS + OAuth 2.0)" --> auth
     auth -- "Validates identity\n(OAuth 2.0)" --> google
     auth -- "Grants access" --> webapp
     webapp -- "API calls\n(HTTPS + API key)" --> openai
-    webapp -- "Data requests\n(HTTPS)" --> vnstock
+    webapp -- "Data requests\n(HTTPS, optional API key)" --> vnstock
 ```
 
 ## 3. Authentication Architecture
@@ -52,7 +53,7 @@ graph TD
     end
 
     subgraph "Configuration"
-        CONFIG["src/core/config.py<br/>AUTH_ENABLED constant"]
+        CONFIG["src/core/config.py<br/>AUTH_ENABLED constant<br/>VNSTOCK_API_KEY_ENV constant"]
         ENV[".env<br/>AUTH_ENABLED=true/false"]
         SECRETS[".streamlit/secrets.toml<br/>client_id, client_secret<br/>redirect_uri, cookie_secret<br/>server_metadata_url"]
     end
@@ -60,9 +61,11 @@ graph TD
     subgraph "External"
         GOOGLE["Google OAuth 2.0"]
         ST["Streamlit Built-in Auth<br/>st.login / st.logout<br/>st.user.is_logged_in"]
+        VNSTOCK_EXT["VnStock API<br/>register_user() global registration"]
     end
 
     APP -->|"imports & calls<br/>handle_authentication()"| AUTH
+    APP -->|"registers vnstock API key<br/>register_user()"| VNSTOCK_EXT
     APP -->|"imports & calls<br/>render_logout_button()"| COMP
     AUTH -->|"imports & calls<br/>render_login_screen()<br/>is_user_logged_in()"| COMP
     AUTH -->|"reads"| ENV
@@ -172,9 +175,9 @@ Set `AUTH_ENABLED=false` in `.env` to bypass authentication during local develop
 
 ## 4. API Key Security
 
-### How the OpenAI API Key Is Handled
+### 4a. How the OpenAI API Key Is Handled
 
-The API key flow in `app.py` (lines 22–46):
+The API key flow in `app.py` (lines 32–55):
 
 1. **Environment variable check**: On first load, `os.environ.get("OPENAI_API_KEY", "")` is read into `st.session_state.api_key`
 2. **Manual entry fallback**: If no key is found, the user is prompted to enter one via `st.text_input(type="password")`
@@ -189,6 +192,23 @@ The API key flow in `app.py` (lines 22–46):
 - In production (Render), the key is set as an environment variable in the deployment configuration
 - The `type="password"` parameter on the text input masks the key in the browser UI
 
+### 4b. How the VnStock API Key Is Handled
+
+The VnStock API key flow in `app.py` (lines 14–20):
+
+1. **Environment variable check**: On module load, `os.environ.get(VNSTOCK_API_KEY_ENV, "")` reads the key
+2. **Global registration**: If a key is present, `register_user(api_key)` registers it globally for the Python process
+3. **Silent failure**: If registration fails, the exception is caught and ignored — the app continues in free tier mode
+4. **No user prompt**: Unlike OpenAI, there is no manual entry fallback — the key must come from the environment
+
+### What This Means
+
+- The key is **optional** — VnStock works in free tier without it (lower rate limits)
+- Registration is **global and idempotent** — `register_user()` affects all subsequent VnStock API calls in the process
+- The key is **not stored in session state** — it's registered once at module load via vnstock's internal mechanism
+- In production (Docker/Render), the key is set via `VNSTOCK_API_KEY` environment variable
+- Configuration constant `VNSTOCK_API_KEY_ENV` lives in `src/core/config.py`
+
 ## 5. Security Boundaries & Limitations
 
 ### What Is Implemented
@@ -200,6 +220,7 @@ The API key flow in `app.py` (lines 22–46):
 | API key masking | `st.text_input(type="password")` for browser display |
 | Transport encryption | HTTPS via deployment platform (Render) |
 | Session management | Streamlit's built-in session handling |
+| VnStock API key | Optional `register_user()` at startup; silent fallback to free tier |
 
 ### What Is NOT Implemented
 

@@ -161,13 +161,6 @@ def transpose_financial_dataframe(df, name, period):
         return df
 
 
-# Page configuration
-st.set_page_config(
-    page_title="Finance Bro",
-    # page_icon="",
-    layout="wide",
-)
-
 # Apply custom CSS styling for success alerts
 inject_custom_success_styling()
 
@@ -211,32 +204,6 @@ if "stock_symbols_list" not in st.session_state:
             "DHC",
         ]
         st.session_state.symbols_df = None
-
-# API Key handling
-if "api_key" not in st.session_state:
-    st.session_state.api_key = os.environ.get("OPENAI_API_KEY", "")
-
-if not st.session_state.api_key:
-    st.warning("OpenAI API Key Required")
-
-    with st.expander("Enter API Key", expanded=True):
-        api_key_input = st.text_input(
-            "OpenAI API Key:",
-            type="password",
-            placeholder="sk-...",
-            help="Enter your OpenAI API key to enable AI analysis",
-        )
-
-        if st.button("Save API Key", type="primary"):
-            if api_key_input.startswith("sk-"):
-                st.session_state.api_key = api_key_input
-                os.environ["OPENAI_API_KEY"] = api_key_input
-                st.success("API Key saved successfully!")
-                st.rerun()
-            else:
-                st.error("Invalid API key format. Please check your key.")
-
-    st.stop()
 
 # Sidebar for stock configuration
 with st.sidebar:

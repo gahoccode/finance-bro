@@ -8,6 +8,9 @@ import os
 # Authentication configuration
 AUTH_ENABLED = os.getenv("AUTH_ENABLED", "true").lower() == "true"
 
+# Vnstock API key environment variable name
+VNSTOCK_API_KEY_ENV = "VNSTOCK_API_KEY"
+
 # Default stock symbols fallback list
 DEFAULT_STOCK_SYMBOLS = ["REE", "VIC", "VNM", "VCB", "BID", "HPG", "FPT", "FMC", "DHC"]
 

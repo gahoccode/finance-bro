@@ -1,14 +1,23 @@
 import streamlit as st
 import os
 from dotenv import load_dotenv
-from vnstock import Listing
+from vnstock import Listing, register_user
 from src.components.ui_components import inject_custom_success_styling
 from src.components.auth_components import render_logout_button
 from src.services.session_state import ensure_valuation_data_loaded
 from src.services.auth import handle_authentication
+from src.core.config import VNSTOCK_API_KEY_ENV
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Register vnstock API key (optional - enables higher rate limits)
+_vnstock_api_key = os.environ.get(VNSTOCK_API_KEY_ENV, "")
+if _vnstock_api_key:
+    try:
+        register_user(_vnstock_api_key)
+    except Exception:
+        pass  # Silently fail - vnstock works in free tier without a key
 
 # Set page configuration - this must be called first
 st.set_page_config(page_title="Finance Bro", page_icon="📈", layout="wide")
