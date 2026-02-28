@@ -170,7 +170,7 @@ def main_page():
                         st.switch_page("pages/Valuation.py")
                     else:
                         st.error(
-                            f"❌ Failed to pre-load data: {loading_result.get("error", "Unknown error")}"
+                            f"❌ Failed to pre-load data: {loading_result.get('error', 'Unknown error')}"
                         )
 
         with col2:
@@ -198,16 +198,13 @@ def main_page():
             if st.button("📊 Technical Analysis", width="stretch"):
                 st.switch_page("pages/Technical_Analysis.py")
 
-        # Company & Portfolio Section
-        st.markdown("**🏢 Company & Portfolio**")
-        col1, col2, col3 = st.columns(3)
+        # Company Section
+        st.markdown("**🏢 Company**")
+        col1, col2 = st.columns(2)
         with col1:
             if st.button("🏢 Company Overview", width="stretch"):
                 st.switch_page("pages/Company_Overview.py")
         with col2:
-            if st.button("💼 Portfolio Optimization", width="stretch"):
-                st.switch_page("pages/Portfolio_Optimization.py")
-        with col3:
             if st.button("🏥 Financial Health", width="stretch"):
                 st.switch_page("pages/Financial_Health_Report.py")
 
@@ -243,7 +240,6 @@ def main_page():
         - **📈 Price Analysis** - Interactive price charts and technical analysis
         - **📊 Technical Analysis** - Candlestick charts for stocks with heating up technical signals
         - **🏢 Company Overview** - Company profile, ownership structure, and management team
-        - **💼 Portfolio Optimization** - Modern Portfolio Theory-based portfolio optimization
         - **🔍 Stock Screener** - Filter and analyze stocks by financial metrics across industries
         - **🏦 Fund Analysis** - Vietnamese investment fund analysis with NAV performance and allocation charts
         - **🏥 Financial Health Report** - CrewAI multi-agent system for comprehensive financial health analysis
@@ -275,11 +271,8 @@ pages = {
         st.Page("pages/Stock_Price_Analysis.py", title="Price Analysis", icon="📈"),
         st.Page("pages/Technical_Analysis.py", title="Technical Analysis", icon="📊"),
     ],
-    "Company & Portfolio": [
+    "Company": [
         st.Page("pages/Company_Overview.py", title="Company Overview", icon="🏢"),
-        st.Page(
-            "pages/Portfolio_Optimization.py", title="Portfolio Optimization", icon="💼"
-        ),
         st.Page(
             "pages/Financial_Health_Report.py",
             title="Financial Health Report",

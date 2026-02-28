@@ -680,7 +680,7 @@ We implemented a **Comprehensive Testing Strategy** with:
 - **Test Fixtures and Data**: Realistic sample data in `conftest.py` for consistent testing
 - **Edge Case Testing**: Comprehensive handling of invalid inputs, NaN values, and edge cases
 - **Integration Testing**: Cross-component workflow validation
-- **Financial Accuracy Testing**: Specific tests for financial formatting, DuPont analysis, and portfolio optimization
+- **Financial Accuracy Testing**: Specific tests for financial formatting and DuPont analysis
 
 ### Consequences
 

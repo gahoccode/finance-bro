@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 import streamlit as st
-from vnstock import Company, Fund, Quote, Screener, Vnstock
+from vnstock import Company, Fund, Screener, Vnstock
 
 
 # ================================
@@ -140,33 +140,6 @@ def fetch_stock_price_data(ticker, start_date, end_date):
     st.session_state.stock_price_data = stock_price
 
     return stock_price
-
-
-@st.cache_data(ttl=3600)  # Cache for 1 hour
-def fetch_portfolio_stock_data(symbols, start_date_str, end_date_str, interval):
-    """Cache stock data to avoid repeated API calls.
-
-    Extracted from Portfolio_Optimization.py lines 140-164 - EXACT same logic preserved.
-    """
-    all_data = {}
-
-    for symbol in symbols:
-        try:
-            quote = Quote(symbol=symbol)
-            historical_data = quote.history(
-                start=start_date_str, end=end_date_str, interval=interval, to_df=True
-            )
-
-            if not historical_data.empty:
-                # Ensure we have the required columns
-                if "time" not in historical_data.columns:
-                    historical_data["time"] = historical_data.index
-
-                all_data[symbol] = historical_data
-        except Exception as e:
-            st.error(f"Error fetching data for {symbol}: {e}")
-
-    return all_data
 
 
 # ================================
@@ -332,7 +305,6 @@ def get_cache_info():
         ],
         "Stock Price Data": [
             "fetch_stock_price_data (1h TTL)",
-            "fetch_portfolio_stock_data (1h TTL)",
         ],
         "Technical Analysis": [
             "get_heating_up_stocks (5min TTL)",

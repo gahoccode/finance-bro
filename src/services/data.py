@@ -173,7 +173,7 @@ def calculate_stock_returns(
 ) -> pd.Series:
     """
     Calculate stock returns from price data.
-    Used in Stock_Price_Analysis.py and Portfolio_Optimization.py.
+    Used in Stock_Price_Analysis.py.
 
     Args:
         prices: DataFrame with price data (must have 'Close' or 'close' column)
@@ -208,113 +208,6 @@ def calculate_stock_returns(
 
     except Exception:
         return pd.Series(dtype=float)
-
-
-def calculate_portfolio_returns(prices_df: pd.DataFrame) -> pd.DataFrame:
-    """Calculate portfolio returns from price data.
-
-    Extracted from Portfolio_Optimization.py line 247 - EXACT same logic preserved.
-    """
-    returns = prices_df.pct_change().dropna()
-    return returns
-
-
-def process_portfolio_price_data(
-    all_historical_data: dict[str, pd.DataFrame],
-) -> pd.DataFrame:
-    """Process historical data from multiple stocks into combined price dataframe.
-
-    Extracted from Portfolio_Optimization.py lines 185-216 - EXACT same logic preserved.
-    """
-    combined_prices = pd.DataFrame()
-
-    for symbol, data in all_historical_data.items():
-        if not data.empty:
-            # Ensure we have a 'time' column
-            if "time" not in data.columns:
-                if hasattr(data.index, "name") and data.index.name is None:
-                    data = data.reset_index()
-                data = data.rename(columns={data.columns[0]: "time"})
-
-            # Extract time and close price
-            temp_df = data[["time", "close"]].copy()
-            temp_df.rename(columns={"close": f"{symbol}_close"}, inplace=True)
-
-            if combined_prices.empty:
-                combined_prices = temp_df
-            else:
-                combined_prices = pd.merge(
-                    combined_prices, temp_df, on="time", how="outer"
-                )
-
-    if combined_prices.empty:
-        return combined_prices
-
-    combined_prices = combined_prices.sort_values("time")
-    combined_prices.set_index("time", inplace=True)
-
-    # Extract close prices
-    close_price_columns = [col for col in combined_prices.columns if "_close" in col]
-    prices_df = combined_prices[close_price_columns]
-    prices_df.columns = [col.replace("_close", "") for col in close_price_columns]
-    prices_df = prices_df.dropna()
-
-    return prices_df
-
-
-def prepare_portfolio_symbol_defaults(main_stock_symbol: str) -> list[str]:
-    """Prepare default symbols for portfolio selection.
-
-    Extracted from Portfolio_Optimization.py lines 50-54 - EXACT same logic preserved.
-    """
-    # Set default symbols to include the main symbol from session state
-    default_symbols = (
-        [main_stock_symbol, "FMC", "DHC"]
-        if main_stock_symbol not in ["FMC", "DHC"]
-        else [main_stock_symbol, "REE", "VNM"]
-    )
-    # Remove duplicates and ensure main symbol is first
-    default_symbols = list(dict.fromkeys(default_symbols))
-    return default_symbols
-
-
-def create_weights_dataframe(
-    weights_dict: dict[str, float], column_name: str
-) -> pd.DataFrame:
-    """Convert weights dictionary to DataFrame format for riskfolio-lib.
-
-    Extracted from Portfolio_Optimization.py lines 612, 691 - EXACT same logic preserved.
-    """
-    return pd.DataFrame.from_dict(weights_dict, orient="index", columns=[column_name])
-
-
-def format_allocation_dataframe(
-    allocation: dict[str, int], latest_prices_actual: pd.Series, portfolio_value: float
-) -> pd.DataFrame:
-    """Format allocation data for display.
-
-    Extracted from Portfolio_Optimization.py lines 523-530 - EXACT same logic preserved.
-    """
-    allocation_df = pd.DataFrame(list(allocation.items()), columns=["Symbol", "Shares"])
-    allocation_df["Latest Price (VND)"] = allocation_df["Symbol"].map(
-        latest_prices_actual
-    )
-    allocation_df["Total Value (VND)"] = (
-        allocation_df["Shares"] * allocation_df["Latest Price (VND)"]
-    )
-    allocation_df["Weight %"] = (
-        allocation_df["Total Value (VND)"] / portfolio_value * 100
-    ).round(2)
-
-    # Format numbers for display
-    allocation_df["Latest Price (VND)"] = allocation_df["Latest Price (VND)"].apply(
-        lambda x: f"{x:,.0f}"
-    )
-    allocation_df["Total Value (VND)"] = allocation_df["Total Value (VND)"].apply(
-        lambda x: f"{x:,.0f}"
-    )
-
-    return allocation_df
 
 
 def validate_technical_data_sufficiency(data: pd.DataFrame) -> bool:
@@ -388,67 +281,6 @@ def clean_and_validate_ohlcv_data(data: pd.DataFrame) -> pd.DataFrame:
     data = data.dropna()
 
     return data
-
-
-def create_performance_summary_dataframe(performance_data: list[dict]) -> pd.DataFrame:
-    """Create performance summary DataFrame from portfolio performance data.
-
-    Used across Portfolio_Optimization.py for performance comparisons.
-    """
-    performance_df = pd.DataFrame(performance_data)
-
-    # Format numeric columns to 4 decimal places
-    numeric_cols = ["Expected Return", "Volatility", "Sharpe Ratio"]
-    for col in numeric_cols:
-        if col in performance_df.columns:
-            performance_df[col] = performance_df[col].apply(
-                lambda x: f"{float(x):.4f}" if isinstance(x, int | float) else x
-            )
-
-    return performance_df
-
-
-def prepare_portfolio_data(
-    stock_data_dict: dict[str, pd.DataFrame],
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    Prepare portfolio data for optimization.
-    Extracted from Portfolio_Optimization.py logic.
-
-    Args:
-        stock_data_dict: Dictionary mapping symbols to their price DataFrames
-
-    Returns:
-        Tuple of (price_data, returns_data) DataFrames
-    """
-    try:
-        all_prices = {}
-
-        for symbol, data in stock_data_dict.items():
-            if data is not None and not data.empty:
-                # Get close price column
-                price_col = None
-                for col in data.columns:
-                    if col.lower() in ["close", "adj close", "adjusted_close"]:
-                        price_col = col
-                        break
-
-                if price_col is not None:
-                    all_prices[symbol] = data[price_col]
-
-        if not all_prices:
-            return pd.DataFrame(), pd.DataFrame()
-
-        # Combine into single DataFrame
-        price_data = pd.DataFrame(all_prices)
-
-        # Calculate returns
-        returns_data = price_data.pct_change().dropna()
-
-        return price_data, returns_data
-
-    except Exception:
-        return pd.DataFrame(), pd.DataFrame()
 
 
 def clean_financial_data(
@@ -575,7 +407,7 @@ def validate_financial_dataframe(
         if missing_columns:
             return {
                 "valid": False,
-                "message": f"Missing columns: {", ".join(missing_columns)}",
+                "message": f"Missing columns: {', '.join(missing_columns)}",
             }
 
     # Check for all-null columns
@@ -583,7 +415,7 @@ def validate_financial_dataframe(
     if null_columns:
         return {
             "valid": False,
-            "message": f"All-null columns: {", ".join(null_columns)}",
+            "message": f"All-null columns: {', '.join(null_columns)}",
         }
 
     return {"valid": True, "message": "Valid financial dataframe"}
@@ -656,41 +488,6 @@ def calculate_financial_ratios(
         pass
 
     return ratios
-
-
-def aggregate_portfolio_metrics(returns_data: pd.DataFrame) -> dict[str, float]:
-    """
-    Calculate aggregate portfolio metrics.
-
-    Args:
-        returns_data: Portfolio returns dataframe
-
-    Returns:
-        Dict with portfolio metrics
-    """
-    if returns_data is None or returns_data.empty:
-        return {}
-
-    try:
-        metrics = {}
-
-        # Calculate basic portfolio metrics
-        metrics["total_return"] = (returns_data.mean() * 252).mean()  # Annualized
-        metrics["volatility"] = (returns_data.std() * np.sqrt(252)).mean()  # Annualized
-        metrics["sharpe_ratio"] = (
-            metrics["total_return"] / metrics["volatility"]
-            if metrics["volatility"] > 0
-            else 0
-        )
-
-        # Correlation matrix
-        correlation_matrix = returns_data.corr()
-        metrics["avg_correlation"] = correlation_matrix.mean().mean()
-
-        return metrics
-
-    except Exception:
-        return {}
 
 
 def format_financial_display(

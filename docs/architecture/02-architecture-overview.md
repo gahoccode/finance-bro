@@ -82,7 +82,6 @@ C4Container
 │   ├── Stock_Price_Analysis.py
 │   ├── Technical_Analysis.py
 │   ├── Company_Overview.py
-│   ├── Portfolio_Optimization.py
 │   ├── Screener.py
 │   ├── Fund_Analysis.py
 │   └── Financial_Health_Report.py
@@ -284,7 +283,6 @@ sequenceDiagram
 ### Long-term Vision
 - Microservices extraction for high-load components
 - Real-time data streaming capabilities
-- Advanced portfolio management features
 - Mobile-responsive progressive web app
 
 ## Architectural Trade-offs

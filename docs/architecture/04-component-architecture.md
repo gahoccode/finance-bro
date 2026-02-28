@@ -18,7 +18,6 @@ C4Component
             Component(page_price, "Price Analysis Page", "Page", "Interactive price charts and technical analysis")
             Component(page_technical, "Technical Analysis Page", "Page", "Advanced technical indicators and signals")
             Component(page_company, "Company Overview Page", "Page", "Company profile and ownership analysis")
-            Component(page_portfolio, "Portfolio Optimization Page", "Page", "Modern Portfolio Theory optimization")
             Component(page_screener, "Stock Screener Page", "Page", "Stock filtering and screening")
             Component(page_fund, "Fund Analysis Page", "Page", "Investment fund analysis")
             Component(page_health, "Financial Health Page", "Page", "Multi-agent financial health analysis")

@@ -100,7 +100,7 @@ def render_navigation_buttons() -> None:
     Uses existing page navigation patterns.
     """
     st.markdown("### 🚀 Quick Navigation")
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         if st.button("📊 Stock Analysis", width="stretch"):
@@ -114,13 +114,9 @@ def render_navigation_buttons() -> None:
         if st.button("🏢 Company Overview", width="stretch"):
             st.switch_page("pages/Company_Overview.py")
 
-    with col4:
-        if st.button("💼 Portfolio Optimization", width="stretch"):
-            st.switch_page("pages/Portfolio_Optimization.py")
-
     # Second row of navigation buttons
     st.markdown("")  # Add some spacing
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2 = st.columns(2)
 
     with col1:
         if st.button("🔍 Stock Screener", width="stretch"):
@@ -309,7 +305,7 @@ def render_portfolio_symbol_selector(
 ) -> list[str]:
     """
     Render symbol selector specifically for portfolio optimization.
-    Matches the EXACT pattern from Portfolio_Optimization.py.
+    Matches the EXACT pattern from the portfolio optimization workflow.
 
     PRESERVES EXISTING PATTERNS:
     - st.session_state.stock_symbol integration
@@ -335,7 +331,7 @@ def render_portfolio_symbol_selector(
         # Fallback to default symbols
         stock_symbols_list = DEFAULT_STOCK_SYMBOLS
 
-    # Default selection logic (matching Portfolio_Optimization.py)
+    # Default selection logic
     if selected_symbols is not None:
         default_selection = selected_symbols
     else:
@@ -344,7 +340,7 @@ def render_portfolio_symbol_selector(
     # Filter valid symbols
     default_selection = [s for s in default_selection if s in stock_symbols_list]
 
-    # Render multiselect (matching exact pattern from Portfolio_Optimization.py)
+    # Render multiselect
     selected_symbols = st.multiselect(
         "Select stock symbols for portfolio:",
         options=stock_symbols_list,

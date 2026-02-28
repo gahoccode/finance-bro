@@ -56,7 +56,6 @@ This is a Streamlit-based financial analysis application for Vietnamese stock ma
   - **Company_Overview.py** - Company profile and ownership analysis
   - **Stock_Price_Analysis.py** - Price charts and technical analysis
   - **Technical_Analysis.py** - Advanced technical indicators with pandas-ta integration
-  - **Portfolio_Optimization.py** - Modern Portfolio Theory optimization
   - **Screener.py** - Stock screening and filtering functionality
   - **Fund_Analysis.py** - Vietnamese investment fund analysis with NAV performance and allocation charts
 - **src/** - Modular utilities and services (NEW):
@@ -342,12 +341,11 @@ uv run ruff format .             # Apply code formatting
 uv run ruff check . --verbose    # Detailed linting output
 
 # Run single test file/function
-uv run pytest tests/test_portfolio_optimization.py
-uv run pytest tests/test_portfolio_optimization.py::test_function_name
+uv run pytest tests/test_financial_formatting.py
+uv run pytest tests/test_financial_formatting.py::test_function_name
 
 # Available test files
-# - tests/test_portfolio_optimization.py - Portfolio optimization tests
-# - tests/test_financial_formatting.py - Financial data formatting tests  
+# - tests/test_financial_formatting.py - Financial data formatting tests
 # - tests/conftest.py - Test configuration and fixtures
 ```
 

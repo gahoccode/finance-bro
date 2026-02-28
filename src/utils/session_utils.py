@@ -107,27 +107,6 @@ def has_dataframes() -> bool:
     return "dataframes" in st.session_state
 
 
-def get_portfolio_returns() -> pd.DataFrame | None:
-    """
-    Helper to get portfolio returns from session state.
-    Does NOT replace direct st.session_state.portfolio_returns access.
-    """
-    return st.session_state.get("portfolio_returns")
-
-
-def has_portfolio_data() -> bool:
-    """Helper to check if portfolio optimization data is available."""
-    return "portfolio_returns" in st.session_state
-
-
-def get_portfolio_strategy_choice() -> str | None:
-    """
-    Helper to get portfolio strategy choice.
-    Does NOT replace direct st.session_state.portfolio_strategy_choice access.
-    """
-    return st.session_state.get("portfolio_strategy_choice")
-
-
 def get_screener_preset_value(preset_name: str, default_value: Any = False) -> Any:
     """
     Helper to get screener preset value.
@@ -209,7 +188,7 @@ def format_date_range_status() -> dict[str, str]:
     return {
         "start_date": start_date.strftime("%Y-%m-%d"),
         "end_date": end_date.strftime("%Y-%m-%d"),
-        "range": f"{start_date.strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")}",
+        "range": f"{start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}",
     }
 
 
@@ -217,7 +196,6 @@ def format_data_status() -> dict[str, str]:
     """Format current data availability status for display."""
     status = {
         "stock_data": "✅ Loaded" if has_stock_price_data() else "❌ Not loaded",
-        "portfolio_data": "✅ Loaded" if has_portfolio_data() else "❌ Not loaded",
         "screener_data": "✅ Loaded" if has_screener_data() else "❌ Not loaded",
         "financial_data": "✅ Loaded" if has_dataframes() else "❌ Not loaded",
     }

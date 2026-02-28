@@ -6,7 +6,6 @@ This script cleans up temporary files from:
 - ./cache/*.db (database cache files)
 - ./exports/charts/*.png (generated chart images)
 - ./exports/tearsheets/*.html (generated tearsheet reports)
-- ./exports/reports/*.xlsx (generated Excel reports)
 - ./pandasai.log (PandasAI log file)
 
 Usage:
@@ -79,11 +78,6 @@ def main():
     deleted = cleanup_directory(str(tearsheets_dir), "*.html", "tearsheet HTML files")
     total_deleted += deleted
 
-    # Clean exports/reports directory - *.xlsx files
-    reports_dir = script_dir / "exports" / "reports"
-    deleted = cleanup_directory(str(reports_dir), "*.xlsx", "Excel report files")
-    total_deleted += deleted
-
     # Clean pandasai.log file in project root
     deleted = cleanup_directory(str(script_dir), "pandasai.log", "PandasAI log file")
     total_deleted += deleted
@@ -94,7 +88,7 @@ def main():
     if total_deleted == 0:
         print("💡 No files needed cleanup - directories are already clean!")
     else:
-        print("✨ Cache, charts, tearsheets, reports, and log files have been cleaned!")
+        print("✨ Cache, charts, tearsheets, and log files have been cleaned!")
 
 
 if __name__ == "__main__":

@@ -9,7 +9,6 @@
 - 📊 **Vietnamese Stock Data** - Load financial data using Vnstock (VCI/TCBS sources)
 - 📈 **Advanced Technical Analysis** - Interactive price charts with 75+ QuantStats metrics, professional tearsheets, and comprehensive technical indicators (RSI, MACD, Bollinger Bands, OBV, ADX) with robust error handling
 - 🎯 **Intelligent Stock Screener** - Multi-criteria filtering with 6 advanced filters (Beta, Alpha, Financial Health, etc.)
-- 💼 **Portfolio Optimization** - Modern Portfolio Theory, Hierarchical Risk Parity, and risk analysis with riskfolio-lib
 - 🏢 **Comprehensive Company Analysis** - Ownership structure, management team, subsidiaries, and foreign transaction analysis
 - 💰 **Valuation Analysis** - DCF modeling, comparative analysis, and financial health assessment
 - 📊 **Professional Visualizations** - Interactive charts with Plotly, Altair, and custom styling
@@ -132,8 +131,6 @@ streamlit run app.py
 - **Stock Data:** Vnstock v3.2.6+ (VCI/TCBS sources for Vietnamese market)
 - **Data Processing:** Pandas v2.2.0+ with NumPy v2.0.0+ (enhanced performance)
 - **Financial Analysis:** QuantStats v0.0.77+ (75+ performance metrics and tearsheets)
-- **Portfolio Optimization:** PyPortfolioOpt (Modern Portfolio Theory, Efficient Frontier)
-- **Risk Analysis:** riskfolio-lib v7.0.1+ (Hierarchical Risk Parity, advanced risk metrics)
 - **Technical Analysis:** pandas-ta for 150+ technical indicators with robust error handling
 - **Visualizations:** Plotly v5.17.0+ (professional financial charts), Altair v5.5.0+, mplfinance for interactive charts
 - **Multi-Agent AI:** CrewAI v0.35.8+ for collaborative financial analysis
@@ -149,7 +146,6 @@ finance-bro/
 │   ├── Stock_Price_Analysis.py  # Price charts & QuantStats tearsheets
 │   ├── Technical_Analysis.py # Advanced technical indicators with heating stocks
 │   ├── Company_Overview.py   # Company profiles & ownership
-│   ├── Portfolio_Optimization.py # Modern Portfolio Theory & HRP
 │   ├── Screener.py           # Stock screening & filtering
 │   └── Fund_Analysis.py      # Vietnamese investment fund analysis
 ├── src/                      # Modular utilities and services
@@ -186,7 +182,7 @@ finance-bro/
 │   └── charts/              # Generated chart storage
 ├── tests/                   # Test suite with pytest framework
 │   ├── conftest.py          # Test configuration and fixtures
-│   └── test_portfolio_optimization.py # Portfolio optimization tests
+│   └── test_financial_formatting.py # Financial formatting tests
 ├── .github/
 │   └── workflows/
 │       └── docker-publish.yml # CI/CD Docker publishing
@@ -662,8 +658,6 @@ docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/gahoccode/finance-bro
 
 ### Financial Analysis
 - `quantstats>=0.0.77` - Performance analytics and tearsheets (75+ metrics)
-- `pyportfolioopt>=1.5.6` - Modern Portfolio Theory optimization
-- `riskfolio-lib>=7.0.1` - Advanced risk analysis and HRP
 - `mplfinance>=0.12.10b0` - Financial data visualization
 
 ### Visualization & UI
@@ -678,9 +672,6 @@ docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/gahoccode/finance-bro
 ### Technical Analysis
 - `pandas-ta==0.4.71b0` - 150+ technical indicators
 - `scipy>=1.11.0` - Scientific computing for technical analysis
-
-### System Dependencies (Docker)
-- `osqp>=0.6.3` - Quadratic programming solver (specific version for stability)
 
 
 ## License

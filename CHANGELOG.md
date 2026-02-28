@@ -5,6 +5,27 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.37] - 2026-02-28
+
+### Removed
+- [2026-02-28] **Portfolio Optimization Page Removal**: Removed `pages/Portfolio_Optimization.py` and all exclusively related code
+  - **Deleted Files** (3 files):
+    - `pages/Portfolio_Optimization.py` - Portfolio optimization page
+    - `tests/test_portfolio_optimization.py` - Portfolio optimization tests
+    - `tests/demo_fix.py` - Demo script for riskfolio Excel report fix
+  - **Removed Functions** (10 functions across 3 files):
+    - `src/services/vnstock_api.py`: `fetch_portfolio_stock_data()`
+    - `src/services/data.py`: `calculate_portfolio_returns()`, `process_portfolio_price_data()`, `prepare_portfolio_symbol_defaults()`, `create_weights_dataframe()`, `format_allocation_dataframe()`, `create_performance_summary_dataframe()`, `prepare_portfolio_data()`, `aggregate_portfolio_metrics()`
+    - `src/utils/session_utils.py`: `get_portfolio_returns()`, `has_portfolio_data()`, `get_portfolio_strategy_choice()`
+  - **Removed Dead UI Components** (11 functions from `src/components/ui_components.py`):
+    - `render_performance_metrics_columns()`, `create_financial_summary_expander()`, `render_progress_indicator()`, `clear_progress_indicator()`, `render_weights_comparison_table()`, `create_trading_value_metrics()`, `render_filter_status_info()`, `create_indicator_toggle_metrics()`, `render_file_download_interface()`, `create_investment_summary_info()`, `render_allocation_summary_metrics()`
+  - **Removed Dependencies** (3 packages):
+    - `pyportfolioopt>=1.5.6`, `riskfolio-lib>=7.0.1`, `osqp>=0.6.3`
+  - **Simplified Dockerfile**: Removed heavy C/Fortran build toolchain (`build-essential`, `gcc`, `g++`, `cmake`, `gfortran`, `libblas-dev`, `liblapack-dev`, `libopenblas-dev`, `pkg-config`)
+  - **Updated Navigation**: Renamed "Company & Portfolio" nav group to "Company", restructured quick nav buttons
+  - **Updated Files** (7 modified): `app.py`, `src/components/stock_selector.py`, `src/services/vnstock_api.py`, `src/services/data.py`, `src/utils/session_utils.py`, `src/components/ui_components.py`, `cleanup_cache.py`
+  - **Updated Documentation** (7 files): CLAUDE.md, README.md, CHANGELOG.md, `docs/architecture/02-architecture-overview.md`, `docs/architecture/04-component-architecture.md`, `docs/architecture/08-architecture-decisions.md`
+
 ## [0.2.36] - 2025-09-25
 
 ### Changed
