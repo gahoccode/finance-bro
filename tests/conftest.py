@@ -1,4 +1,5 @@
 import os
+import pathlib
 import tempfile
 
 import numpy as np
@@ -60,7 +61,7 @@ def temp_reports_dir():
     """Create a temporary directory for test reports."""
     with tempfile.TemporaryDirectory() as tmp_dir:
         reports_dir = os.path.join(tmp_dir, "exports", "reports")
-        os.makedirs(reports_dir, exist_ok=True)
+        pathlib.Path(reports_dir).mkdir(exist_ok=True, parents=True)
         yield reports_dir
 
 

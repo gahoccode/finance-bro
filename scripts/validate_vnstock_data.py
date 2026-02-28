@@ -46,9 +46,9 @@ class VnStockDataValidator:
 
     def validate_function(self, func_name, func, expected_columns=None):
         """Validate a single vnstock function."""
-        print(f"\n{"=" * 60}")
+        print(f"\n{'=' * 60}")
         print(f"Testing {func_name} with symbol: {self.symbol}")
-        print(f"{"=" * 60}")
+        print(f"{'=' * 60}")
 
         try:
             # Call the function
@@ -77,7 +77,7 @@ class VnStockDataValidator:
             print(f"✅ SUCCESS: {func_name}")
             print(f"   Duration: {duration:.2f} seconds")
             print(f"   Data shape: {data.shape}")
-            print(f"   Has data: {"Yes" if not data.empty else "No"}")
+            print(f"   Has data: {'Yes' if not data.empty else 'No'}")
 
             if not data.empty:
                 print(f"   Columns: {list(data.columns)}")
@@ -113,7 +113,7 @@ class VnStockDataValidator:
         """Validate all company data functions."""
         print("🚀 Starting VnStock Data Validation")
         print(f"Symbol: {self.symbol}")
-        print(f"Timestamp: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}")
+        print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
         # Define functions and their expected columns
         functions_to_test = [
@@ -163,9 +163,9 @@ class VnStockDataValidator:
 
     def validate_reports_date_sorting(self):
         """Special validation for company reports date sorting."""
-        print(f"\n{"=" * 60}")
+        print(f"\n{'=' * 60}")
         print("Special Test: Company Reports Date Sorting")
-        print(f"{"=" * 60}")
+        print(f"{'=' * 60}")
 
         try:
             reports = get_company_reports(self.symbol)
@@ -176,8 +176,8 @@ class VnStockDataValidator:
 
                 print("✅ Date sorting test:")
                 print(f"   Total reports: {len(reports)}")
-                print(f"   Date column type: {reports["date"].dtype}")
-                print(f"   Sorted descending: {"Yes" if is_sorted_desc else "No"}")
+                print(f"   Date column type: {reports['date'].dtype}")
+                print(f"   Sorted descending: {'Yes' if is_sorted_desc else 'No'}")
 
                 if len(reports) >= 2:
                     print(f"   Newest date: {dates[0]}")
@@ -194,9 +194,9 @@ class VnStockDataValidator:
 
     def generate_summary_report(self):
         """Generate summary validation report."""
-        print(f"\n{"=" * 60}")
+        print(f"\n{'=' * 60}")
         print("VALIDATION SUMMARY REPORT")
-        print(f"{"=" * 60}")
+        print(f"{'=' * 60}")
 
         successful_functions = [
             name
@@ -225,7 +225,7 @@ class VnStockDataValidator:
             for func_name in successful_functions:
                 result = self.results[func_name]
                 data_info = (
-                    f"({result["data_shape"][0]} rows)"
+                    f"({result['data_shape'][0]} rows)"
                     if result.get("has_data")
                     else "(no data)"
                 )
@@ -258,7 +258,7 @@ class VnStockDataValidator:
         overall_success = len(failed_functions) == 0
         status_icon = "✅" if overall_success else "⚠️"
         print(
-            f"\n{status_icon} Overall Status: {"PASSED" if overall_success else "PARTIAL SUCCESS"}"
+            f"\n{status_icon} Overall Status: {'PASSED' if overall_success else 'PARTIAL SUCCESS'}"
         )
 
         return overall_success
