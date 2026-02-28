@@ -5,6 +5,23 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.33] - 2026-02-28
+
+### Changed
+- [2026-02-28] **Security Architecture Documentation Rewrite**: Replaced ~830 lines of fictional security implementation with ~180 lines of accurate documentation
+  - **Modified: `docs/architecture/06-security-architecture.md`** (complete rewrite):
+    - Removed fictional classes: `AuthenticationManager`, `SecureSessionManager`, `APIKeyManager`, `RateLimiter`, `InputValidator`, `DataEncryption`, `PrivacyManager`, `SecurityLogger`, `ThreatDetector`, `IncidentResponseManager`
+    - Removed aspirational framing ("Zero Trust", "Defense in Depth", "Privacy by Design") that did not reflect reality
+    - Added accurate C4 container diagram showing actual Auth Layer, Streamlit App, and external systems (Google OAuth, OpenAI, VnStock)
+    - Added component relationship diagram (Mermaid) mapping `app.py` → `auth.py` → `auth_components.py` → Streamlit built-in auth
+    - Added OAuth flow sequence diagram matching actual code path (including `AUTH_ENABLED=false` bypass)
+    - Added function-level documentation for `auth.py` (4 functions) and `auth_components.py` (3 functions) with real signatures
+    - Added honest "Security Boundaries & Limitations" section documenting what is and is not implemented
+    - Added clearly-labeled future recommendations section for potential scaling needs
+  - **Scope of Impact** (1 file modified, 0 code changes):
+    - Documentation only — no application code affected
+    - ADR-007 in `08-architecture-decisions.md` already accurate, no update needed
+
 ## [0.2.33] - 2026-02-26
 
 ### Added
