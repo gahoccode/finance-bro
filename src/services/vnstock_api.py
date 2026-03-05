@@ -100,9 +100,8 @@ def fetch_stock_price_data(ticker, start_date, end_date):
     Extracted from Stock_Price_Analysis.py lines 247-264 - EXACT same logic preserved.
     PRESERVES session state assignment for cross-page access.
     """
-    stock = Vnstock().stock(symbol=ticker, source="VCI")
-    stock_price = stock.quote.history(
-        symbol=ticker,
+    stock_quote = Quote(symbol=ticker, source="VCI")
+    stock_price = stock_quote.history(
         start=start_date.strftime("%Y-%m-%d"),
         end=end_date.strftime("%Y-%m-%d"),
         interval="1D",
@@ -217,9 +216,8 @@ def get_technical_stock_data(ticker, interval="1D"):
         start_date = end_date - timedelta(days=days)
 
         # Use the same pattern as Stock_Price_Analysis.py
-        stock = Vnstock().stock(symbol=ticker, source="VCI")
-        data = stock.quote.history(
-            symbol=ticker,
+        stock_quote = Quote(symbol=ticker, source="VCI")
+        data = stock_quote.history(
             start=start_date.strftime("%Y-%m-%d"),
             end=end_date.strftime("%Y-%m-%d"),
             interval=interval,
