@@ -26,26 +26,9 @@ if "api_key" not in st.session_state:
     st.session_state.api_key = os.environ.get("OPENAI_API_KEY", "")
 
 if not st.session_state.api_key:
-    st.warning("OpenAI API Key Required")
-
-    with st.expander("Enter API Key", expanded=True):
-        api_key_input = st.text_input(
-            "OpenAI API Key:",
-            type="password",
-            placeholder="sk-...",
-            help="Enter your OpenAI API key to enable AI analysis",
-        )
-
-        if st.button("Save API Key", type="primary"):
-            if api_key_input.startswith("sk-"):
-                st.session_state.api_key = api_key_input
-                os.environ["OPENAI_API_KEY"] = api_key_input
-                st.success("✅ API Key saved successfully!")
-                st.rerun()
-            else:
-                st.error("❌ Invalid API key format. Please check your key.")
-
-    st.stop()
+    st.info(
+        "AI chat features require an OpenAI API key. Set it on the Stock Analysis page."
+    )
 
 
 # Function to create the main Finance Bro page content

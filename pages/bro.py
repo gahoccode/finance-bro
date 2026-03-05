@@ -159,6 +159,24 @@ def transpose_financial_dataframe(df, name, period):
         return df
 
 
+@st.dialog("OpenAI API key required")
+def api_key_dialog():
+    """Modal dialog for entering OpenAI API key when AI features are used without one."""
+    st.markdown("Enter your OpenAI API key to use AI chat features.")
+    api_key_input = st.text_input(
+        "OpenAI API key:",
+        type="password",
+        placeholder="sk-...",
+    )
+    if st.button("Save API key", type="primary"):
+        if api_key_input.startswith("sk-"):
+            st.session_state.api_key = api_key_input
+            os.environ["OPENAI_API_KEY"] = api_key_input
+            st.rerun()
+        else:
+            st.error("Invalid API key format.")
+
+
 # Page configuration
 st.set_page_config(
     page_title="Finance Bro",
@@ -208,31 +226,9 @@ if "stock_symbols_list" not in st.session_state:
         ]
         st.session_state.symbols_df = None
 
-# API Key handling
+# API Key handling (non-blocking)
 if "api_key" not in st.session_state:
     st.session_state.api_key = os.environ.get("OPENAI_API_KEY", "")
-
-if not st.session_state.api_key:
-    st.warning("OpenAI API Key Required")
-
-    with st.expander("Enter API Key", expanded=True):
-        api_key_input = st.text_input(
-            "OpenAI API Key:",
-            type="password",
-            placeholder="sk-...",
-            help="Enter your OpenAI API key to enable AI analysis",
-        )
-
-        if st.button("Save API Key", type="primary"):
-            if api_key_input.startswith("sk-"):
-                st.session_state.api_key = api_key_input
-                os.environ["OPENAI_API_KEY"] = api_key_input
-                st.success("API Key saved successfully!")
-                st.rerun()
-            else:
-                st.error("Invalid API key format. Please check your key.")
-
-    st.stop()
 
 # Sidebar for stock configuration
 with st.sidebar:
@@ -418,10 +414,6 @@ if "dataframes" in st.session_state:
 
     st.header(company_name)
 
-    # Initialize LLM with OpenAI for pandasai v2.4.2
-    model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-    llm = OpenAI(api_token=st.session_state.api_key, model=model)
-
     # Initialize session state for uploaded files if not exists
     if "uploaded_dataframes" not in st.session_state:
         st.session_state.uploaded_dataframes = []
@@ -430,7 +422,11 @@ if "dataframes" in st.session_state:
         """
         Creates or retrieves cached PandasAI agent with all available dataframes.
         Only recreates when dataframes have changed.
+        Returns None if no API key is set.
         """
+        if not st.session_state.get("api_key"):
+            return None
+
         # Create unique key based on current dataframes
         stock_df_count = (
             len(st.session_state.dataframes) if "dataframes" in st.session_state else 0
@@ -455,6 +451,10 @@ if "dataframes" in st.session_state:
         if not all_dataframes:
             return None
 
+        # Create LLM inline (deferred until agent is actually needed)
+        model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+        llm = OpenAI(api_token=st.session_state.api_key, model=model)
+
         agent = Agent(all_dataframes, config={"llm": llm, "verbose": True})
 
         # Cache the agent
@@ -465,6 +465,10 @@ if "dataframes" in st.session_state:
 
     # Process any pending sample question from sidebar
     if "pending_question" in st.session_state:
+        if not st.session_state.get("api_key"):
+            del st.session_state.pending_question
+            api_key_dialog()
+            st.stop()
         agent = get_or_create_agent()
         if agent:
             pending_q = st.session_state.pending_question
@@ -488,23 +492,33 @@ if "dataframes" in st.session_state:
 
     with col1:
         if st.button("ROIC Analysis"):
-            agent = get_or_create_agent()
-            if agent:
-                question = "What is the return on invested capital (ROIC) in 2024?"
-                st.session_state.messages.append({"role": "user", "content": question})
-                message_data = process_agent_response(agent, question)
-                st.session_state.messages.append(message_data)
-                st.rerun()
+            if not st.session_state.get("api_key"):
+                api_key_dialog()
+            else:
+                agent = get_or_create_agent()
+                if agent:
+                    question = "What is the return on invested capital (ROIC) in 2024?"
+                    st.session_state.messages.append(
+                        {"role": "user", "content": question}
+                    )
+                    message_data = process_agent_response(agent, question)
+                    st.session_state.messages.append(message_data)
+                    st.rerun()
 
     with col2:
         if st.button("Debt Analysis"):
-            agent = get_or_create_agent()
-            if agent:
-                question = "What is the company's debt-to-equity ratio and debt coverage metrics?"
-                st.session_state.messages.append({"role": "user", "content": question})
-                message_data = process_agent_response(agent, question)
-                st.session_state.messages.append(message_data)
-                st.rerun()
+            if not st.session_state.get("api_key"):
+                api_key_dialog()
+            else:
+                agent = get_or_create_agent()
+                if agent:
+                    question = "What is the company's debt-to-equity ratio and debt coverage metrics?"
+                    st.session_state.messages.append(
+                        {"role": "user", "content": question}
+                    )
+                    message_data = process_agent_response(agent, question)
+                    st.session_state.messages.append(message_data)
+                    st.rerun()
 
     # Chat Interface
     st.subheader("Chat with AI analyst")
@@ -578,6 +592,9 @@ if "dataframes" in st.session_state:
             agent = get_or_create_agent()
 
             if not agent:
+                if not st.session_state.get("api_key"):
+                    api_key_dialog()
+                    st.stop()
                 st.error(
                     "No data available for analysis. Please load stock data first."
                 )
