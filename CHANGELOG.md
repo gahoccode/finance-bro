@@ -5,6 +5,33 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.37] - 2026-03-13
+
+### Fixed
+- [2026-03-13] **Date Range Inconsistency: Sidebar vs QuantStats Tearsheet**: Fixed discrepancy between sidebar date selection and tearsheet date range
+  - **Issue**: Tearsheet showed dates starting from 2023-11-16 when user selected 2024-01-01 (~46-day difference)
+  - **Root cause**: vnstock API returns data with wider date range than requested
+  - **Solution**: Slice returned data to match exact requested date range before calculating returns
+  - **Added transparency**: Info box shows requested vs actual dates for user verification
+
+### Scope of Impact
+**Files Modified:**
+- **pages/Stock_Price_Analysis.py** (lines 383-400): Added data slicing logic after fetching stock price data
+- **pages/Stock_Price_Analysis.py** (lines 454-470): Added transparent info box displaying requested vs actual dates
+- **pages/Stock_Price_Analysis.py** (line 69): Added session state clearing for stale returns data when date range changes
+
+**Functions Affected:**
+- Main data loading flow: Filters API response to requested date range
+- Returns calculation: Now uses only requested date range instead of full API response
+- Tearsheet generation: Uses date-filtered returns data
+- Info box display: Shows requested vs actual dates with trading day count
+
+**Impact Analysis:**
+- **No breaking changes**: All existing functionality preserved
+- **Improved accuracy**: Tearsheets now reflect exact user-selected date ranges
+- **Better transparency**: Users can verify the actual data range being used for analysis
+- **Defensive programming**: Session state clearing prevents stale data when date ranges change
+
 ## [0.2.36] - 2025-10-20
 
 ### Changed

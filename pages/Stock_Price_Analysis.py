@@ -10,6 +10,7 @@ from src.services.chart_service import (
     create_altair_area_chart,
     create_bokeh_candlestick_chart,
 )
+from src.utils.session_utils import get_analysis_dates, has_stock_returns
 
 st.set_page_config(page_title="Stock Price Analysis", layout="wide")
 
@@ -65,6 +66,8 @@ with st.sidebar:
         st.session_state.analysis_start_date = pd.Timestamp(start_date)
         st.session_state.analysis_end_date = pd.Timestamp(end_date)
         st.session_state.date_range_changed = True
+        # Clear stale returns data to prevent date range mismatch
+        st.session_state.stock_returns = None
 
     # Validate date range
     if start_date >= end_date:
@@ -378,15 +381,20 @@ if ticker:
                 st.session_state.analysis_end_date,
             )
 
-            # Calculate returns using session state data and pct_change method
-            # Use the stock_price data stored in session state for consistency across pages
-            # Check if session state data exists, otherwise use the just-fetched data
-            if "stock_price_data" in st.session_state:
-                session_stock_price = st.session_state.stock_price_data
-            else:
-                session_stock_price = stock_price
+            # Filter to requested range since vnstock may return wider date ranges
+            requested_start, requested_end = get_analysis_dates()
+            mask = (stock_price.index >= requested_start) & (
+                stock_price.index <= requested_end
+            )
+            stock_price = stock_price[mask]
 
-            clean_prices = session_stock_price["close"].dropna()
+            if len(stock_price) == 0:
+                st.error(
+                    f"No data available for the selected date range ({requested_start.date()} to {requested_end.date()})"
+                )
+                st.stop()
+
+            clean_prices = stock_price["close"].dropna()
             clean_prices = clean_prices[clean_prices > 0]  # Remove zero/negative prices
 
             if len(clean_prices) > 1:
@@ -437,12 +445,21 @@ if ticker:
                     "Generate comprehensive performance analytics using QuantStats"
                 )
 
+                # Display actual data range being used for transparency
+                if has_stock_returns():
+                    returns = st.session_state.stock_returns
+                    actual_start = returns.index.min().date()
+                    actual_end = returns.index.max().date()
+
+                    st.info(f"""
+                    **Data Range:**
+                    - Requested: {requested_start.date()} to {requested_end.date()}
+                    - Actual: {actual_start} to {actual_end}
+                    - Trading days: {len(returns)}
+                    """)
+
                 if st.button("Generate Tearsheet", key="generate_tearsheet"):
-                    # Check if returns data exists in session state
-                    if (
-                        "stock_returns" in st.session_state
-                        and len(st.session_state.stock_returns) > 0
-                    ):
+                    if has_stock_returns():
                         # Set up exports directory
                         project_root = os.path.dirname(
                             os.path.dirname(os.path.abspath(__file__))

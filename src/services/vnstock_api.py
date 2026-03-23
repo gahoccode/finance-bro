@@ -7,8 +7,7 @@ PRESERVES ALL @st.cache_data decorators and vnstock API instantiation patterns e
 
 import streamlit as st
 import pandas as pd
-from datetime import datetime, timedelta
-from vnstock import Vnstock, Company, Quote, Screener
+from vnstock import Vnstock, Company, Quote
 
 
 # ================================
@@ -145,140 +144,6 @@ def fetch_portfolio_stock_data(symbols, start_date_str, end_date_str, interval):
 
 
 # ================================
-# TECHNICAL ANALYSIS FUNCTIONS
-# Extracted from Technical_Analysis.py
-# ================================
-
-
-@st.cache_data(ttl=300)  # Cache for 5 minutes
-def get_heating_up_stocks():
-    """Get stocks with heating_up indicator
-
-    Extracted from Technical_Analysis.py lines 17-58 - EXACT same logic preserved.
-    """
-    # Initialize screener and get data
-    screener = Screener(show_log=False)
-    screener_df = screener.stock(
-        params={"exchangeName": "HOSE,HNX,UPCOM"}, limit=1700, lang="en"
-    )
-
-    # Filter for heating_up condition only
-    filtered_stocks = screener_df[
-        screener_df["heating_up"] == "Overheated in previous trading session"
-    ]
-
-    # Select only required columns
-    result_columns = [
-        "ticker",
-        "industry",
-        "exchange",
-        "heating_up",
-        "uptrend",
-        "breakout",
-        "tcbs_buy_sell_signal",
-        "pct_1y_from_peak",
-        "pct_away_from_hist_peak",
-        "pct_1y_from_bottom",
-        "pct_off_hist_bottom",
-        "active_buy_pct",
-        "strong_buy_pct",
-        "market_cap",
-        "avg_trading_value_5d",
-        "total_trading_value",
-        "foreign_transaction",
-        "num_increase_continuous_day",
-    ]
-
-    # Only include columns that exist in the DataFrame
-    available_columns = [
-        col for col in result_columns if col in filtered_stocks.columns
-    ]
-
-    return filtered_stocks[available_columns]
-
-
-@st.cache_data(ttl=300)  # Cache for 5 minutes
-def get_technical_stock_data(ticker, interval="1D"):
-    """Get historical stock data based on interval parameter
-
-    Extracted from Technical_Analysis.py lines 62-115 - EXACT same logic preserved.
-    """
-    try:
-        # Calculate days based on interval (optimized for technical indicators)
-        if interval == "1D":
-            days = 90  # ~3 months (sufficient for all indicators)
-        elif interval == "1W":
-            days = 180  # ~6 months
-        elif interval == "1M":
-            days = 730  # ~2 years
-
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=days)
-
-        # Use the same pattern as Stock_Price_Analysis.py
-        stock_quote = Quote(symbol=ticker, source="VCI")
-        data = stock_quote.history(
-            start=start_date.strftime("%Y-%m-%d"),
-            end=end_date.strftime("%Y-%m-%d"),
-            interval=interval,
-        )
-
-        if data is not None and not data.empty:
-            # Prepare data for mplfinance
-            data = data.copy()
-
-            # Set time column as datetime index
-            if "time" in data.columns:
-                data["time"] = pd.to_datetime(data["time"])
-                data = data.set_index("time")
-
-            # mplfinance expects specific column names (capitalize first letter)
-            column_mapping = {
-                "open": "Open",
-                "high": "High",
-                "low": "Low",
-                "close": "Close",
-                "volume": "Volume",
-            }
-
-            # Rename columns to match mplfinance expectations
-            data = data.rename(columns=column_mapping)
-            required_columns = ["Open", "High", "Low", "Close", "Volume"]
-
-            # Check if all required columns exist and return them
-            if all(col in data.columns for col in required_columns):
-                return data[required_columns]
-
-        return pd.DataFrame()
-
-    except Exception as e:
-        st.error(f"Error fetching data for {ticker}: {str(e)}")
-        return pd.DataFrame()
-
-
-# ================================
-# SCREENER DATA FUNCTIONS
-# Extracted from Screener.py
-# ================================
-
-
-@st.cache_data(ttl=3600)  # Cache for 1 hour
-def get_screener_data(params, source="TCBS", limit=1700):
-    """Get screener data with caching
-
-    Extracted from Screener.py lines 49-58 - EXACT same logic preserved.
-    """
-    try:
-        screener = Screener(source=source)
-        result = screener.stock(params=params, limit=limit, lang="en")
-        return result
-    except Exception as e:
-        st.error(f"Error fetching screener data: {str(e)}")
-        st.error(f"API parameters used: {params}")
-        return pd.DataFrame()
-
-
-# ================================
 # UTILITY FUNCTIONS
 # ================================
 
@@ -308,12 +173,6 @@ def get_cache_info():
             "fetch_stock_price_data (1h TTL)",
             "fetch_portfolio_stock_data (1h TTL)",
         ],
-        "Technical Analysis": [
-            "get_heating_up_stocks (5min TTL)",
-            "get_technical_stock_data (5min TTL)",
-            "calculate_technical_indicators (5min TTL)",
-        ],
-        "Screener Data": ["get_screener_data (1h TTL)"],
     }
 
     return cached_functions
