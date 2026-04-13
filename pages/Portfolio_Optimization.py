@@ -125,7 +125,7 @@ colormap_options = [
 colormap = st.sidebar.selectbox(
     "Scatter Plot Colormap",
     options=colormap_options,
-    index=0,  # Default to gist_heat
+    index=0,
     help="Choose the color scheme for the efficient frontier scatter plot",
 )
 
