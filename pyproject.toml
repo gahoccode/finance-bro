@@ -39,4 +39,13 @@ dev = [
     "ipykernel>=6.30.0",
     "jupyterlab>=4.0.0",
     "notebook>=7.0.0",
+    "vulture>=2.16",
 ]
+
+[tool.vulture]
+paths = ["app.py", "pages", "src", "tests"]
+exclude = [".venv/", "cache/", "exports/"]
+ignore_names = ["_*", "setup", "teardown"]
+min_confidence = 80
+make_whitelist = false
+sort_by_size = true
