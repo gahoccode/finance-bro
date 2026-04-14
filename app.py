@@ -1,7 +1,9 @@
-import streamlit as st
 import os
+
+import streamlit as st
 from dotenv import load_dotenv
 from vnstock import Listing, register_user
+
 from src.core.config import VNSTOCK_API_KEY_ENV
 
 # Load environment variables from .env file
@@ -171,15 +173,13 @@ def main_page():
 # Define pages using st.Page
 pages = {
     "Home": [
-        st.Page(main_page, title="Finance Bro", icon=""),
+        st.Page(main_page, title="Finance Bro"),
     ],
     "Analysis": [
-        st.Page("pages/bro.py", title="Stock Analysis", icon=""),
-        st.Page("pages/Stock_Price_Analysis.py", title="Price Analysis", icon=""),
-        st.Page("pages/Company_Overview.py", title="Company Overview", icon=""),
-        st.Page(
-            "pages/Portfolio_Optimization.py", title="Portfolio Optimization", icon=""
-        ),
+        st.Page("pages/bro.py", title="Stock Analysis"),
+        st.Page("pages/Stock_Price_Analysis.py", title="Price Analysis"),
+        st.Page("pages/Company_Overview.py", title="Company Overview"),
+        st.Page("pages/Portfolio_Optimization.py", title="Portfolio Optimization"),
     ],
 }
 
