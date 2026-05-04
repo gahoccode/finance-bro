@@ -5,6 +5,35 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- [2026-05-04] **Vnstock v4 Finance Refactor**: Refactored the Stock Analysis page to use vnstock v4 top-level `Finance` and item-row financial dataframe shapes
+  - **Root cause**: `Vnstock().stock(...).finance` and old ratio flattening logic no longer match vnstock v4 financial statement shapes
+  - **Solution**: Added a dedicated finance service that fetches statements through `Finance`, defaults finance source to KBS, and prepares item-row dataframes for PandasAI
+  - **Dependency consistency**: Updated `requirements.txt` manually to match the existing `pyproject.toml` vnstock v4 requirement without regenerating requirements
+
+### Scope of Impact
+**Files Modified:**
+- **pages/bro.py**: Removed deprecated `Vnstock().stock(...).finance` usage, removed old MultiIndex ratio flattening, changed source selector to KBS/VCI, and stores vnstock v4 item-row dataframes in existing session-state keys
+- **src/services/vnstock_finance.py**: Added `FinanceClient`, v4 period-column detection, PandasAI dataframe preparation, and display formatting helpers
+- **tests/test_vnstock_finance.py**: Added unit coverage for vnstock v4 financial dataframe transformations
+- **README.md**: Updated vnstock version/source documentation and documentation links
+- **llms.txt**: Added LLM-facing project context and documentation links
+- **requirements.txt**: Updated vnstock minimum version to `>=4.0.2`
+
+**Functions Affected:**
+- `transpose_financial_dataframe()` in `pages/bro.py`: Now delegates display formatting to vnstock v4 helpers
+- `FinanceClient.fetch_statements()` in `src/services/vnstock_finance.py`: Fetches cash flow, balance sheet, income statement, ratios, and empty dividends placeholder
+- `prepare_financial_dataframe_for_ai()` in `src/services/vnstock_finance.py`: Adds `Metric` while preserving `item` and `item_id`
+- `format_financial_dataframe_for_display()` in `src/services/vnstock_finance.py`: Orders metric identifiers and period columns for Streamlit display
+
+**Impact Analysis:**
+- **No session-state key changes**: Existing `display_dataframes`, `dataframes`, `stock_symbol`, and `last_period` keys are preserved
+- **User-facing source change**: Stock Analysis financial data now defaults to KBS, with VCI as an alternate source
+- **PandasAI compatibility**: AI receives readable metric labels while retaining vnstock v4 `item_id` identifiers
+- **Reduced deprecated API risk**: Stock Analysis no longer depends on the removed/deprecated `Vnstock().stock(...).finance` path
+
 ## [0.2.37] - 2026-03-13
 
 ### Fixed

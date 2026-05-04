@@ -20,7 +20,7 @@ This project is an **experiment in front-end vibe coding** - exploring how intui
 
 ## Features
 
-- 📊 **Vietnamese Stock Data** - Load financial data using Vnstock (VCI/TCBS sources)
+- 📊 **Vietnamese Stock Data** - Load financial data using Vnstock v4 (KBS/VCI sources)
 - 🤖 **AI Chat Interface** - Natural language queries about financial metrics with PandasAI integration
 - 💬 **Interactive Analysis** - Real-time conversation with AI analyst including file upload support
 - 📈 **Advanced Technical Analysis** - Interactive price charts with 75+ QuantStats metrics, professional tearsheets, and comprehensive technical indicators (RSI, MACD, Bollinger Bands, OBV, ADX) with robust error handling
@@ -123,7 +123,7 @@ streamlit run app.py
 
 5. **⚙️ Configure Analysis Settings**: In the Stock Analysis page:
    - Select period (year/quarter)
-   - Choose data source (VCI/TCBS)
+   - Choose data source (KBS/VCI)
    - Click "Analyze Stock" to load financial data
 
 6. **💬 AI Interaction**: Once data is loaded:
@@ -279,13 +279,21 @@ streamlit run app.py
 
 - **Frontend:** Streamlit v1.47.0
 - **AI Engine:** PandasAI v2.3.0 (stable) with OpenAI GPT integration
-- **Stock Data:** Vnstock v3.2.5 (VCI/TCBS sources for Vietnamese market)
+- **Stock Data:** Vnstock v4.0.2+ (KBS/VCI sources for Vietnamese market)
 - **Data Processing:** Pandas v1.5.3 (compatible with pandasai 2.3.0)
 - **Financial Analysis:** QuantStats v0.0.59 (75+ performance metrics and tearsheets)
 - **Portfolio Optimization:** PyPortfolioOpt (Modern Portfolio Theory, Efficient Frontier)
 - **Risk Analysis:** riskfolio-lib v5.0.1+ (Hierarchical Risk Parity, advanced risk metrics)
 - **Technical Analysis:** Manual implementation for RSI, MACD, Bollinger Bands, OBV with robust error handling
 - **Visualizations:** Altair v5.5.0+, Bokeh v2.4.3, mplfinance for interactive charts
+
+## Documentation Links
+
+- [Vnstock](https://github.com/thinh-vu/vnstock)
+- [Streamlit](https://docs.streamlit.io)
+- [PandasAI](https://docs.pandas-ai.com)
+- [Project changelog](CHANGELOG.md)
+- [LLM project context](llms.txt)
 
 ## Future Refactor: PandasAI 3.x Migration
 
@@ -298,7 +306,7 @@ dependencies = [
     "pandasai>=3.0.0b2",
     "pandasai-openai>=0.1.6",
     "streamlit>=1.47.1",
-    "vnstock>=3.2.6",
+    "vnstock>=4.0.2",
 ]
 ```
 
@@ -333,8 +341,8 @@ Finance Bro uses Streamlit's `st.session_state` for comprehensive data sharing a
 
 #### Stock Analysis Page (bro.py)
 **Data Storage**
-- `dataframes` - AI-optimized financial dataframes with Quarter column names for better PandasAI queries
-- `display_dataframes` - Original financial dataframes with lengthReport for proper display formatting
+- `dataframes` - AI-optimized vnstock v4 financial dataframes with `Metric`, `item`, and `item_id` fields for better PandasAI queries
+- `display_dataframes` - Original vnstock v4 item-row financial dataframes for table display
 - `uploaded_dataframes` - User-uploaded CSV/Excel files for AI analysis
 - `messages` - Chat message history for conversation continuity
 
@@ -682,7 +690,7 @@ docker run -p 8501:8501 -e OPENAI_API_KEY=your_key ghcr.io/gahoccode/finance-bro
 ### Core Dependencies
 - `pandasai==2.3.0` - AI-powered data analysis
 - `pandas==1.5.3` - Data manipulation (exact version for compatibility)
-- `vnstock==3.2.5` - Vietnamese stock data (VCI/TCBS sources)
+- `vnstock>=4.0.2` - Vietnamese stock data (KBS/VCI sources)
 - `openai>=1.61.0` - OpenAI API client
 - `streamlit==1.47.0` - Web application framework with OAuth support
 - `python-dotenv==1.0.1` - Environment variable management

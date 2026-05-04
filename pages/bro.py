@@ -1,9 +1,13 @@
 import os
 from src.services.chart_service import detect_latest_chart
+from src.services.vnstock_finance import (
+    FinanceClient,
+    format_financial_dataframe_for_display,
+    prepare_finance_dataframes,
+)
 import streamlit as st
 import pandas as pd
-from vnstock import Vnstock, Listing
-from vnstock.core.utils.transform import flatten_hierarchical_index
+from vnstock import Listing
 import warnings
 
 # pandasai v2.4.2 imports
@@ -69,94 +73,11 @@ def process_agent_response(agent, question):
         return {"role": "assistant", "content": f"Analysis error: {str(e)}"}
 
 
-def transpose_financial_dataframe(df, name, period):
-    """Transpose financial dataframes from long to wide format"""
-    try:
-        if name in ["CashFlow", "BalanceSheet", "IncomeStatement"]:
-            if "yearReport" in df.columns:
-                df_clean = df.drop("ticker", axis=1, errors="ignore")
-
-                # Handle quarterly vs annual data
-                if (
-                    "lengthReport" in df.columns
-                    and period == "quarter"
-                    and df["lengthReport"].isin([1, 2, 3, 4]).any()
-                ):
-                    # Quarterly data
-                    df_clean = df_clean.rename(columns={"lengthReport": "Quarter"})
-                    df_clean["period_id"] = (
-                        df_clean["yearReport"].astype(str)
-                        + "-Q"
-                        + df_clean["Quarter"].astype(str)
-                    )
-                    df_wide = df_clean.set_index("period_id").T
-                    df_wide = df_wide.drop(
-                        ["yearReport", "Quarter"], axis=0, errors="ignore"
-                    )
-                else:
-                    # Annual data
-                    df_wide = df_clean.set_index("yearReport").T
-                    df_wide = df_wide.drop(["lengthReport"], axis=0, errors="ignore")
-
-                df_wide = df_wide.reset_index()
-                df_wide = df_wide.rename(columns={"index": "Metric"})
-                return df_wide
-
-        elif name == "Ratios":
-            if hasattr(df, "columns") and len(df.columns) > 0:
-                # Check if years are already in columns
-                year_cols = [
-                    str(col)
-                    for col in df.columns
-                    if str(col).isdigit() and len(str(col)) == 4
-                ]
-
-                if len(year_cols) > 1:
-                    # Years already in columns
-                    return df
-                elif "yearReport" in df.columns:
-                    # Standard long format, transpose to wide
-                    df_clean = df.drop("ticker", axis=1, errors="ignore")
-
-                    if (
-                        "lengthReport" in df.columns
-                        and period == "quarter"
-                        and df["lengthReport"].isin([1, 2, 3, 4]).any()
-                    ):
-                        # Quarterly data
-                        df_clean = df_clean.rename(columns={"lengthReport": "Quarter"})
-                        df_clean["period_id"] = (
-                            df_clean["yearReport"].astype(str)
-                            + "-Q"
-                            + df_clean["Quarter"].astype(str)
-                        )
-                        df_wide = df_clean.set_index("period_id").T
-                        df_wide = df_wide.drop(
-                            ["yearReport", "Quarter"], axis=0, errors="ignore"
-                        )
-                    else:
-                        # Annual data
-                        df_wide = df_clean.set_index("yearReport").T
-                        df_wide = df_wide.drop(
-                            ["lengthReport"], axis=0, errors="ignore"
-                        )
-
-                    df_wide = df_wide.reset_index()
-                    df_wide = df_wide.rename(columns={"index": "Metric"})
-                    return df_wide
-                else:
-                    # Multi-index or other format
-                    df_transposed = df.T
-                    df_transposed = df_transposed.reset_index()
-                    df_transposed = df_transposed.rename(columns={"index": "Metric"})
-                    return df_transposed
-
-        # For other dataframes, return as-is
-        return df
-
-    except Exception:
-        # If transposition fails, return original dataframe
-        return df
+def transpose_financial_dataframe(
+    df: pd.DataFrame, name: str, period: str
+) -> pd.DataFrame:
+    """Format vnstock v4 financial dataframes for table display."""
+    return format_financial_dataframe_for_display(df)
 
 
 @st.dialog("OpenAI API key required")
@@ -239,11 +160,7 @@ with st.sidebar:
 
     period = st.segmented_control("Period", options=["year", "quarter"], default="year")
 
-    source = st.selectbox("Data Source:", options=["VCI", "TCBS"], index=0)
-
-    company_source = st.selectbox(
-        "Company Data Source:", options=["TCBS", "VCI"], index=0
-    )
+    source = st.selectbox("Data Source:", options=["KBS", "VCI"], index=0)
 
     analyze_button = st.button(
         "Analyze Stock", type="primary", use_container_width=True
@@ -306,87 +223,15 @@ if "last_period" in st.session_state and st.session_state.last_period != period:
 if analyze_button or (period_changed and "stock_symbol" in st.session_state):
     try:
         with st.spinner(f"Loading data for {stock_symbol}..."):
-            # Initialize Vnstock
-            stock = Vnstock().stock(symbol=stock_symbol, source=source)
-            company = (
-                Vnstock().stock(symbol=stock_symbol, source=company_source).company
+            finance_client = FinanceClient(
+                symbol=stock_symbol,
+                source=source,
+                period=period,
             )
+            display_dataframes = finance_client.fetch_statements()
 
-            # Load financial data
-            CashFlow = stock.finance.cash_flow(period=period)
-            BalanceSheet = stock.finance.balance_sheet(
-                period=period, lang="en", dropna=True
-            )
-            IncomeStatement = stock.finance.income_statement(
-                period=period, lang="en", dropna=True
-            )
-
-            # Load and process Ratio data (multi-index columns)
-            Ratio_raw = stock.finance.ratio(period=period, lang="en", dropna=True)
-
-            # Use vnstock's built-in flatten_hierarchical_index function
-            Ratio = flatten_hierarchical_index(
-                Ratio_raw, separator="_", handle_duplicates=True, drop_levels=0
-            )
-
-            # Dividends data not available in vnstock - use empty DataFrame
-            dividend_schedule = pd.DataFrame()
-
-            # Store original dataframes for display (keep original column names)
-            st.session_state.display_dataframes = {
-                "CashFlow": CashFlow,
-                "BalanceSheet": BalanceSheet,
-                "IncomeStatement": IncomeStatement,
-                "Ratios": Ratio,
-                "Dividends": dividend_schedule,
-            }
-
-            # Create copies with renamed columns for PandasAI (better query compatibility)
-            CashFlow_AI = CashFlow.copy()
-            BalanceSheet_AI = BalanceSheet.copy()
-            IncomeStatement_AI = IncomeStatement.copy()
-            Ratio_AI = Ratio.copy()
-
-            if period == "quarter":
-                # Rename columns in AI copies for better query compatibility
-                if (
-                    "lengthReport" in CashFlow_AI.columns
-                    and CashFlow_AI["lengthReport"].isin([1, 2, 3, 4]).any()
-                ):
-                    CashFlow_AI = CashFlow_AI.rename(
-                        columns={"lengthReport": "Quarter"}
-                    )
-
-                if (
-                    "lengthReport" in BalanceSheet_AI.columns
-                    and BalanceSheet_AI["lengthReport"].isin([1, 2, 3, 4]).any()
-                ):
-                    BalanceSheet_AI = BalanceSheet_AI.rename(
-                        columns={"lengthReport": "Quarter"}
-                    )
-
-                if (
-                    "lengthReport" in IncomeStatement_AI.columns
-                    and IncomeStatement_AI["lengthReport"].isin([1, 2, 3, 4]).any()
-                ):
-                    IncomeStatement_AI = IncomeStatement_AI.rename(
-                        columns={"lengthReport": "Quarter"}
-                    )
-
-                if (
-                    "lengthReport" in Ratio_AI.columns
-                    and Ratio_AI["lengthReport"].isin([1, 2, 3, 4]).any()
-                ):
-                    Ratio_AI = Ratio_AI.rename(columns={"lengthReport": "Quarter"})
-
-            # Store AI-optimized dataframes for PandasAI
-            st.session_state.dataframes = {
-                "CashFlow": CashFlow_AI,
-                "BalanceSheet": BalanceSheet_AI,
-                "IncomeStatement": IncomeStatement_AI,
-                "Ratios": Ratio_AI,
-                "Dividends": dividend_schedule,
-            }
+            st.session_state.display_dataframes = display_dataframes
+            st.session_state.dataframes = prepare_finance_dataframes(display_dataframes)
 
             st.session_state.stock_symbol = stock_symbol
             st.session_state.last_period = (
