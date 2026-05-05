@@ -5,7 +5,7 @@ All notable changes to the Finance Bro AI Stock Analysis application will be doc
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] - 2026-05-05
 
 ### Changed
 - [2026-05-04] **Vnstock v4 Finance Refactor**: Refactored the Stock Analysis page to use vnstock v4 top-level `Finance` and item-row financial dataframe shapes

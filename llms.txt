@@ -1,0 +1,35 @@
+# Finance Bro
+
+Finance Bro is a Streamlit application for Vietnamese stock analysis, portfolio
+optimization, and AI-assisted financial exploration.
+
+## Runtime
+
+- Python: 3.10.11
+- App entrypoint: `app.py`
+- Package manager: uv
+- UI framework: Streamlit
+- Stock data provider: vnstock v4
+
+## Key Documentation
+
+- Project README: `README.md`
+- Changelog: `CHANGELOG.md`
+- Streamlit docs: https://docs.streamlit.io
+- Vnstock repository: https://github.com/thinh-vu/vnstock
+- PandasAI docs: https://docs.pandas-ai.com
+
+## Vnstock v4 Notes
+
+- Stock Analysis financial data uses vnstock v4 top-level `Finance`.
+- Supported financial data sources in the Stock Analysis page are KBS and VCI.
+- Financial statements use item-row dataframe shapes with period columns.
+- `src/services/vnstock_finance.py` prepares dataframes for Streamlit display
+  and PandasAI analysis.
+
+## Engineering Notes
+
+- Business logic should stay in service modules under `src/services`.
+- Streamlit page code should stay thin and delegate data preparation.
+- Keep `pyproject.toml` and `requirements.txt` dependency declarations aligned.
+- Run pytest, ruff, and vulture before merging release branches.
